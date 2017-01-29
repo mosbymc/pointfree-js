@@ -1,0 +1,16 @@
+{
+  "presets": ["es2015"],
+  "sourceMaps": true,
+  "plugins": ["transform-es2015-modules-commonjs", "babel-plugin-transform-runtime"],
+  "env": {
+    "dev": {
+      "plugins": [
+        [
+          "istanbul", {
+          "exclude": ["test", "dev/expressionParser/expressionParser.js"]
+        }
+        ]
+      ]
+    }
+  }
+}

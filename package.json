@@ -1,0 +1,112 @@
+{
+  "name": "queryable-js",
+  "version": "0.0.1",
+  "description": "A JavaScript library for performing queries against lists with lazy evaluation and deferred execution.",
+  "main": "app.js",
+  "scripts": {
+    "yuidoc": "yuidoc",
+    "babs": "babel --version",
+    "babel": "babel src --out-dir src",
+    "build": "babel --out-dir dist",
+    "test": "karma start karma.conf.js",
+    "cover": "nyc npm t"
+  },
+  "nyc": {
+    "sourceMap": false,
+    "instrument": false,
+    "env": {
+      "dev": {
+        "plugins": [
+          [
+            "istanbul",
+            {
+              "include": [
+                "**/*.spec.js"
+              ]
+            }
+          ]
+        ]
+      }
+    }
+  },
+  "license": "MIT",
+  "author": "Mark Mosby",
+  "dependencies": {
+    "body-parser": "^1.15.0",
+    "connect": "^3.4.1",
+    "express": "^4.13.4",
+    "request": "^2.69.0",
+    "rootpath": "^0.1.2"
+  },
+  "devDependencies": {
+    "babel-cli": "^6.14.0",
+    "babel-core": "^6.21.0",
+    "babel-plugin-istanbul": "^3.0.0",
+    "babel-plugin-transform-es2015-modules-commonjs": "^6.18.0",
+    "babel-plugin-transform-runtime": "^6.15.0",
+    "babel-polyfill": "^6.20.0",
+    "babel-preset-es2015": "^6.18.0",
+    "babel-preset-latest": "^6.14.0",
+    "babel-register": "^6.18.0",
+    "babelify": "^7.3.0",
+    "brfs": "^1.4.3",
+    "browser-sync": "^2.11.1",
+    "browserify": "^13.1.1",
+    "chai": "^3.5.0",
+    "del": "^2.2.0",
+    "gulp": "^3.9.1",
+    "gulp-autoprefixer": "^3.1.0",
+    "gulp-babel": "^6.1.2",
+    "gulp-closure-compiler": "^0.4.0",
+    "gulp-csso": "^1.1.0",
+    "gulp-filter": "^4.0.0",
+    "gulp-if": "^2.0.0",
+    "gulp-imagemin": "^2.4.0",
+    "gulp-jscs": "^3.0.2",
+    "gulp-jscs-stylish": "^1.3.0",
+    "gulp-jshint": "^2.0.0",
+    "gulp-less": "^3.0.5",
+    "gulp-load-plugins": "^1.2.0",
+    "gulp-nodemon": "^2.0.6",
+    "gulp-plumber": "^1.1.0",
+    "gulp-print": "^2.0.1",
+    "gulp-rename": "^1.2.2",
+    "gulp-strip-comments": "^2.4.3",
+    "gulp-task-listing": "^1.0.1",
+    "gulp-util": "^3.0.7",
+    "gulp-yuidoc": "^0.1.2",
+    "istanbul": "^0.4.2",
+    "jshint": "^2.9.1",
+    "jshint-stylish": "^2.1.0",
+    "karma": "^0.13.22",
+    "karma-babel-preprocessor": "^6.0.1",
+    "karma-browserify": "^5.1.0",
+    "karma-chai": "^0.1.0",
+    "karma-chai-sinon": "^0.1.5",
+    "karma-chrome-launcher": "^0.2.3",
+    "karma-coverage": "^0.5.5",
+    "karma-growl-reporter": "^1.0.0",
+    "karma-mocha": "^1.3.0",
+    "karma-mocha-reporter": "^2.2.1",
+    "karma-phantomjs-launcher": "^1.0.2",
+    "karma-qunit": "^0.1.9",
+    "karma-sinon": "^1.0.5",
+    "karma-sinon-chai": "^1.2.0",
+    "mocha": "^3.2.0",
+    "mocha-babel": "^3.0.3",
+    "mocha-clean": "^1.0.0",
+    "node-qunit-phantomjs-istanbul": "^1.0.0",
+    "nyc": "^10.0.0",
+    "path": "^0.12.7",
+    "phantomjs": "^2.1.7",
+    "plato": "^1.5.0",
+    "power-assert": "^1.4.2",
+    "proxyquire": "^1.7.4",
+    "proxyquireify": "^3.2.1",
+    "qunit": "^0.9.0",
+    "sinon": "^1.17.6",
+    "sinon-chai": "^2.8.0",
+    "wallabify": "0.0.14",
+    "yargs": "^4.2.0"
+  }
+}
