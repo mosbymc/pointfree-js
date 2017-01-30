@@ -27,7 +27,7 @@ module.exports = function _wallaby(wallaby) {
         /*
          name: the name of the project; displayed in the wallaby code coverage application
          */
-        name: 'js-data-manager',
+        name: 'queryable-js',
 
         /*
          framework: the test framework being used; defaults to jasmine
@@ -43,7 +43,7 @@ module.exports = function _wallaby(wallaby) {
         files: [
             { pattern: 'node_modules/chai/chai.js', instrument: false },
             { pattern: 'node_modules/babel-polyfill/dist/polyfill.js', instrument: false },
-            { pattern : 'dev/**/*.js', load: false },
+            { pattern : 'src/**/*.js', load: false },
             { pattern: 'test/testData.js', load: false },
             '!test/**/*.spec.js'
         ],
@@ -61,7 +61,7 @@ module.exports = function _wallaby(wallaby) {
          filesWithNoCoverageCalculated: turns off code coverage reporting in the wallaby application, but leave it on
          inside the IDE so that I can maintain in-line errors with selected files
          */
-        filesWithNoCoverageCalculated: ['dev/expressionParser/expressionParser.js', 'test/testData.js'],
+        filesWithNoCoverageCalculated: ['src/expressionParser/expressionParser.js', 'test/testData.js'],
 
         /*
          compilers: wallaby ships with three built-in compilers: typescript, coffeescript, and babel; files
@@ -69,7 +69,7 @@ module.exports = function _wallaby(wallaby) {
          babel compiler is being used with the .babelrc file in the project root
          */
         compilers: {
-            'dev/**/*.js': wallaby.compilers.babel(),
+            'src/**/*.js': wallaby.compilers.babel(),
             'test/**/*.js': wallaby.compilers.babel()
         },
 
@@ -79,7 +79,7 @@ module.exports = function _wallaby(wallaby) {
          */
         postprocessor: wallabify({
             entryPatterns: [
-                'dev/**/*.js',
+                'src/**/*.js',
                 'test/**/*.js'
             ]
         }),

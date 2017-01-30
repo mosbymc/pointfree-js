@@ -76,6 +76,7 @@
     "gulp-util": "^3.0.7",
     "gulp-yuidoc": "^0.1.2",
     "istanbul": "^0.4.2",
+    "jscs": "^3.0.7",
     "jshint": "^2.9.1",
     "jshint-stylish": "^2.1.0",
     "karma": "^0.13.22",
