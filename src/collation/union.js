@@ -14,6 +14,11 @@ function union(previousFunc, collection, comparer) {
     }
 
     return Object.defineProperty(
+        //TODO: I don't know how realistic it would be to implement an ES6 generator for the .next function properties,
+        //TODO: but it would allow me to throw the whole function into a while-loop with a .next() as the predicate.
+        //TODO: The problem is that it takes so darn much to transpile/polyfill ES6 generators for a pre-ES6 environment
+        //TODO: that it probably isn't realistic to use them. However, I may be able to simulate a generator with closures
+        //TODO: that would allow a similar while-loop execution.
         unionFunc,
         'next', {
             writable: false,
