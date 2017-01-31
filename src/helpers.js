@@ -103,7 +103,7 @@ function memoizer() {
 //TODO: should be reusable here to indicate a 'false' value
 function memoizer2(comparer) {
     comparer = comparer || defaultEqualityComparer;
-    var items = [];
+    var items = [undefined];    //initialize the array with an undefined value as we don't accept that as a legit value for the comparator
     return function _memoizeThis(item) {
         if (items.some(function _checkEquality(it) { return comparer(it, item); })) {
             return true;
