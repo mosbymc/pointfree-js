@@ -1,5 +1,6 @@
 import { defaultEqualityComparer, memoizer2, emptyObj } from '../helpers';
 
+/*
 function union(previousFunc, collection, comparer) {
     comparer = comparer || defaultEqualityComparer;
     var havePreviouslyViewed = memoizer2(comparer),
@@ -7,10 +8,7 @@ function union(previousFunc, collection, comparer) {
         atEndOfCollection = false;
 
     function unionFunc(item) {
-        //TODO: once I change the response type/object of the memoizer, I can just return the evaluation of something
-        //TODO: like this: emptyObject.isPrototypeOf(havePreviouslyViewed(item))... so the 'next' function will
-        //TODO: check for true to forward the item, or false to pull another item to evaluate
-        return havePreviouslyViewed(item) ? undefined : item;
+        return havePreviouslyViewed(item);
     }
 
     return Object.defineProperty(
@@ -34,20 +32,21 @@ function union(previousFunc, collection, comparer) {
                     }
 
                     res = unionFunc(next);
-                    if (false !== res) return res;
+                    if (!res) return res;
                 }
 
                 while (!atEndOfCollection && undefined === res) {
                     next = collection.shift();
                     if (!collection.length) atEndOfCollection = true;
                     res = unionFunc(next);
-                    if (false !== res) return res;
+                    if (!res) return res;
                 }
                 return Object.create(emptyObj);
             }
         }
     )
 }
+*/
 
 //TODO: Here's what I'm thinking now.
 //TODO: 1) I am going to stick with using ES2015 generators for queryable object evaluation. Even though that means transpiling them and including
@@ -134,27 +133,24 @@ function union(previousFunc, collection, comparer) {
 //TODO:           just won't stand for it!
 
 
-function unionCreator(source, collection, comparer) {
+function union(source, collection, comparer) {
     comparer = comparer || defaultEqualityComparer;
     var havePreviouslyViewed = memoizer2(comparer);
 
-    function union(item) {
+    function unionFunc(item) {
         return havePreviouslyViewed(item);
     }
 
-    return {
-        union: union,
-        [Symbol.iterator]: function *_iterator() {
-            var res;
-            for (let item of source) {
-                res = union(item);
-                if (!res) yield item;
-            }
+    return function *unionIterator() {
+        var res;
+        for (let item of source) {
+            res = unionFunc(item);
+            if (!res) yield item;
+        }
 
-            for (let item of collection) {
-                res = union(item);
-                if (!res) yield item;
-            }
+        for (let item of collection) {
+            res = unionFunc(item);
+            if (!res) yield item;
         }
     };
 }

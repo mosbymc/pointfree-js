@@ -1,69 +1,73 @@
 import { queryable } from './queryable';
-import { orderedQueryable } from './orderedQueryable';
-import { filteredQueryable } from './filteredQueryable';
-import { filterAppend } from '../limitation/limitationFunctions';
-import { orderByThunk, orderByDescendingThunk } from '../projection/projectionFunctions';
-import { _pipelineGenerator } from '../evaluation/pipelineGenerator';
-import { functionTypes } from '../helpers';
+//import { orderedQueryable } from './orderedQueryable';
+//import { filteredQueryable } from './filteredQueryable';
+//import { filterAppend } from '../limitation/limitationFunctions';
+//import { orderByThunk, orderByDescendingThunk } from '../projection/projectionFunctions';
+//import { _pipelineGenerator } from '../evaluation/pipelineGenerator';
+//import { functionTypes } from '../helpers';
 import { ifElse, not, isArray, wrap, identity } from '../functionalHelpers';
-import { expressionManager } from '../expressionManager';
+//import { expressionManager } from '../expressionManager';
 
-function createNewQueryableDelegator(data, funcs) {
-    if (!isPipelineOk(funcs)) return;
-
+function createNewQueryableDelegator(source, iterator) {
     var obj = Object.create(queryable);
-    obj.source = data;
+    obj.source = source;
     obj._evaluatedData = null;
     obj._dataComputed = false;
-    obj._pipeline = funcs ? ifElse(not(isArray), wrap, identity, funcs) : [];
     obj._currentPipelineIndex = 0;
     obj._currentDataIndex = 0;
-    obj._iterator = _iterator.bind(obj)();
-    obj.select = function _select(fields) {
+    obj[Symbol.iterator] = iterator;
+
+    /*obj.select = function _select(fields) {
         return this.queryableSelect(fields);
-    };
-    obj.selectMany = function _selectMany(selector, resSelector) {
+    };*/
+    /*obj.selectMany = function _selectMany(selector, resSelector) {
         return this.queryableSelectMany(selector, resSelector);
-    };
-    obj.where = function _where(field, operator, value) {
+    };*/
+    /*obj.where = function _where(field, operator, value) {
         return this.queryableWhere(field, operator, value);
-    };
-    obj.join = function _join(outer, inner, projector, comparer, collection) {
-        return this.queryableJoin(outer, inner, projector, comparer, collection);
-    };
-    obj.union = function _union(comparer, collection) {
-        return this.queryableUnion(comparer, collection);
-    };
-    obj.zip = function _zip() {
-        return this.queryableZip();
+    };*/
+    obj.concat = function _concat(collection) {
+        return this.queryableConcat(collection);
     };
     obj.except = function _except(collection, comparer) {
         return this.queryableExcept(collection, comparer);
     };
-    obj.intersect = function _intersect(comparer, collection) {
-        return this.queryableIntersect(comparer, collection);
+    obj.groupJoin = function _groupJoin(inner, outerSelector, innerSelector, projector, comparer) {
+        return this.queryableGroupJoin(inner, outerSelector, innerSelector, projector, comparer);
     };
-    obj.groupBy = function _groupBy(fields, sl) {
+    obj.intersect = function _intersect(collection, comparer) {
+        return this.queryableIntersect(collection, comparer);
+    };
+    obj.join = function _join(inner, outerSelector, innerSelector, projector, comparer) {
+        return this.queryableJoin(inner, outerSelector, innerSelector, projector, comparer);
+    };
+    obj.union = function _union(collection, comparer) {
+        return this.queryableUnion(collection, comparer);
+    };
+    obj.zip = function _zip(selector, collection) {
+        return this.queryableZip(selector, collection);
+    };
+    /*obj.groupBy = function _groupBy(fields, sl) {
         return this.queryableGroupBy(fields, sl);
-    };
-    obj.groupByDescending = function _groupByDescending(fields) {
+    };*/
+    /*obj.groupByDescending = function _groupByDescending(fields) {
         return this.queryableGroupByDescending(fields);
-    };
-    obj.orderBy = function _orderBy(field) {
+    };*/
+    /*obj.orderBy = function _orderBy(field) {
         return this.queryableOrderBy(field);
-    };
-    obj.orderByDescending = function _orderByDescending(field) {
+    };*/
+    /*obj.orderByDescending = function _orderByDescending(field) {
         return this.queryableOrderByDescending(field);
-    };
-    obj.distinct = function _distinct(fields) {
+    };*/
+    /*obj.distinct = function _distinct(fields) {
         return this.queryableDistinct(fields);
-    };
-    obj.flatten = function _flatten() {
+    };*/
+    /*obj.flatten = function _flatten() {
         return this.queryableFlatten();
-    };
-    obj.flattenDeep = function _flattenDeep() {
+    };*/
+    /*obj.flattenDeep = function _flattenDeep() {
         return this.queryableFlattenDeep();
-    };
+    };*/
     obj._getData = function _getData() {
         return this._getData();
     };
@@ -88,8 +92,8 @@ function createNewQueryableDelegator(data, funcs) {
     return addGetter(obj);
 }
 
+/*
 function createNewFilteredQueryableDelegator(data, funcs, filterExpression) {
-    if (!isPipelineOk(funcs)) return;
     if (!expressionManager.isPrototypeOf(filterExpression)) return;
 
     var obj = Object.create(filteredQueryable);
@@ -99,7 +103,7 @@ function createNewFilteredQueryableDelegator(data, funcs, filterExpression) {
     obj._pipeline = funcs ? ifElse(not(isArray), wrap, identity, funcs) : [];
     obj._currentPipelineIndex = 0;
     obj._currentDataIndex = 0;
-    obj._iterator = _iterator.bind(obj)();
+
     obj.select = function _select(fields) {
         return this.filteredSelect(fields);
     };
@@ -166,7 +170,6 @@ function createNewFilteredQueryableDelegator(data, funcs, filterExpression) {
 }
 
 function createNewOrderedQueryableDelegator(data, funcs, fields) {
-    if (!isPipelineOk(funcs)) return;
 
     var obj = Object.create(orderedQueryable);
     obj.source = data;
@@ -175,7 +178,7 @@ function createNewOrderedQueryableDelegator(data, funcs, fields) {
     obj._pipeline = funcs ? ifElse(not(isArray), wrap, identity, funcs) : [];
     obj._currentPipelineIndex = 0;
     obj._currentDataIndex = 0;
-    obj._iterator = _iterator.bind(obj)();
+
     obj.select = function _select(fields) {
         return this.orderedSelect(fields);
     };
@@ -255,55 +258,23 @@ function createNewOrderedQueryableDelegator(data, funcs, fields) {
 
     return addGetter(obj);
 }
+*/
 
 function addGetter(obj) {
     return Object.defineProperty(
         obj,
         'data', {
             get: function _data() {
+                //TODO: not sure if I plan on 'saving' the eval-ed data of a queryable object, and if I do, it'll take a different
+                //TODO: form that what is currently here; for now I am going to leave the check for pre-eval-ed data in place
                 if (!this._dataComputed) {
-                    var ret = [];
-                    for (let item of _pipelineGenerator(this.source, this._pipeline)) {
-                        if (undefined !== item) {
-                            if (isArray(item) && undefined !== item[0]) ret.push(item);
-                            else ret = ret.concat(item);
-                        }
-                        //if (undefined !== item) ret.push(item);
-                        /*if (undefined !== item) {
-                         if (isArray(item)) ret = ret.concat(item);
-                         else ret.push(item);
-                         }*/
-                    }
-                    return ret;
+                    //TODO: is this valid for an object that has an iterator? Seems like it should work...
+                    return Array.from(this);
                 }
-
-                return this.source;
+                return this._evaluatedData;
             }
         }
     );
 }
 
-function *_iterator(items) {
-    if (this._dataComputed) {
-        for (let item of items)
-            yield item;
-    }
-    else {
-        yield _pipelineGenerator(this.source, this._pipeline);
-    }
-}
-
-function isPipelineOk(funcs) {
-    if (funcs !== undefined && (!funcs || typeof funcs !== 'object') && !Array.isArray(funcs))
-        return false;
-    if (Array.isArray(funcs)) {
-        return funcs.every(function checkFunctionProperties(func) {
-            return func.fn && typeof func.fn === 'function' && func.functionType && func.functionType in functionTypes;
-        });
-    }
-    else if (typeof funcs === 'object')
-        return funcs.fn && typeof funcs.fn === 'function' && funcs.functionType && funcs.functionType in functionTypes;
-    return true;
-}
-
-export { createNewQueryableDelegator, createNewFilteredQueryableDelegator, createNewOrderedQueryableDelegator };
+export { createNewQueryableDelegator/*, createNewFilteredQueryableDelegator, createNewOrderedQueryableDelegator*/ };
