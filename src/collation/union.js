@@ -131,6 +131,11 @@ function union(previousFunc, collection, comparer) {
 //TODO:           plain lazy, but I also feel it reduces the usability practicality of this library if a user must learn not one, but two APIs for the
 //TODO:           two queryable objects, and when to use each one. In general, it is sacrificing consumer convenience for developer convenience, and I
 //TODO:           just won't stand for it!
+//TODO:
+//TODO: 4) Every queryable collation 'method' should be capable of taking any enumerable object as an argument for the 'collection' parameter, including
+//TODO:    another queryable object. Utilizing generators and for-of loops should make this very possible. Only objects that have an iterator, built-in or
+//TODO:    otherwise, should be accepted. An object without an iterator, although enumerable, should not be accepted as a valid parameter. In light of this,
+//TODO:    I should probably change the 'collection' parameter in all collation 'methods' to 'enumerable' or something similar.
 
 
 function union(source, collection, comparer) {

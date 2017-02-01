@@ -184,28 +184,45 @@ var queryable = {
      *@type {function}
      */
     queryableTake: function _take(amt = 1) {
+        //TODO: If I decide to 'save' not just a fully evaluated 'source', but also any data from a partially evaluated
+        //TODO: 'source', then I'll probably have to re-think my strategy of wrapping each 'method's' iterator with
+        //TODO: the standard queryable iterator as it may not work as needed.
+        //TODO:
+        //TODO: I'll also have to change this 'method' as it should take as much of the pre-evaluated date as possible
+        //TODO: before evaluating any remaining data the it needs from the source.
         if (!amt) return;
         if (!this._dataComputed) {
-            var takeResult = Array.from(_takeGenerator(_pipelineGenerator(this.source, this._pipeline), amt));
-            return takeResult && takeResult.length ? Array.prototype.concat.apply([], takeResult) : [];
-            //return takeResult[0];
+            var res = [],
+                idx = 0;
+
+            for (let item of this) {
+                if (idx < amt)
+                    res = res.concat(item);
+                else
+                    break;
+                ++idx;
+            }
+            return res;
         }
-        return this.data.slice(0, amt);
+        return this._evaluatedData.slice(0, amt);
     },
 
     /**
      *@type {function}
      */
     queryableTakeWhile: function takeWhile(predicate) {
+        var res = [];
         if (!this._dataComputed) {
-            var takeWhileResult = Array.from(_takeWhileGenerator(predicate, _pipelineGenerator(this.source, this._pipeline)));
-            return takeWhileResult && takeWhileResult.length ? Array.prototype.concat.apply([], takeWhileResult) : [];
+            for (let item of this) {
+                if (predicate(item))
+                    res = res.concat(item);
+                else return res;
+            }
         }
 
-        var ret = [];
-        for (var item of this.data) {
-            if (predicate(item)) ret = ret.concat([item]);
-            else return ret;
+        for (let item of this._evaluatedData) {
+            if (predicate(item)) res = res.concat([item]);
+            else return res;
         }
     },
 
