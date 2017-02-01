@@ -1,4 +1,4 @@
-import { defaultEqualityComparer, memoizer2, emptyObj } from '../helpers';
+import { defaultEqualityComparer, memoizer2 } from '../helpers';
 
 /*
 function union(previousFunc, collection, comparer) {

@@ -2,9 +2,9 @@ import { concat, except, groupJoin, intersect, join, union, zip } from '../colla
 //import { selectThunk, selectManyThunk, orderByThunk, orderByDescendingThunk, groupByThunk, groupByDescendingThunk, flattenData, deepFlattenData } from '../projection/projectionFunctions';
 //import { _takeGenerator, _takeWhileGenerator, _pipelineGenerator, any, all, last } from '../evaluation/evaluationFunctions';
 //import { filterDataWrapper, distinctThunk } from '../limitation/limitationFunctions';
-import { defaultEqualityComparer, memoizer, functionTypes, javaScriptTypes } from '../helpers';
+import { functionTypes, javaScriptTypes } from '../helpers';
 import { identity } from '../functionalHelpers';
-import { createNewQueryableDelegator, createNewFilteredQueryableDelegator, createNewOrderedQueryableDelegator } from './queryObjectCreators';
+import { createNewQueryableDelegator/*, createNewFilteredQueryableDelegator, createNewOrderedQueryableDelegator*/ } from './queryObjectCreators';
 //import { expressionManager } from '../expressionManager';
 
 

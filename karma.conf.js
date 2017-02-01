@@ -13,11 +13,11 @@ module.exports = function _karmaConfig(config) {
                 ['babelify']
             ]
         },
-        files: ['./dev/**/*.js', './test/**/*.js'],
+        files: ['./src/**/*.js', './test/**/*.js'],
         preprocessors: {
             './test/testData.js': ['browserify'],
             './test/**/*.js': ['browserify'],
-            './dev/**/*.js': ['browserify']
+            './src/**/*.js': ['browserify']
         },
         reporters: ['mocha', 'coverage', 'progress'],
         coverageReporter: {
