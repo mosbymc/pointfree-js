@@ -1,4 +1,5 @@
 import { defaultEqualityComparer, memoizer2 } from '../helpers';
+import { when, not, isArray } from '../functionalHelpers';
 
 function intersect(source, collection, comparer) {
     comparer = comparer || defaultEqualityComparer;
@@ -17,7 +18,7 @@ function intersect(source, collection, comparer) {
 
             //TODO: The logic here needs adjusting.
             //if (!res && collection.includes(item)) yield item;
-            collection = Array.isArray(collection) ? collection : Array.from(collection);
+            collection = when(not(isArray), Array.from, collection);
             if (!res && ~collection.findIndex(function findMatchingItem(it) { return comparer(item, it); })) yield item;
         }
     };

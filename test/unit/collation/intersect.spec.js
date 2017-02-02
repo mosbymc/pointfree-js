@@ -135,12 +135,12 @@ describe('Test intersect...', function testIntersect() {
             });
         });
 
-        it('should return no items when collections do not overlap', function testIntersectWithNonOverlappingCollections() {
+        it('should return a single item when collections because of shared .FirstName property', function testIntersectWithNonOverlappingCollections() {
             var intersectIterable = intersect(oddIdxs, evenIdxs, comparer),
                 intersectRes = Array.from(intersectIterable());
 
-            console.log(intersectRes);
-            //intersectRes.should.have.lengthOf(0);
+            intersectRes.should.have.lengthOf(1);
+            intersectRes[0].FirstName.should.eql('Mark');
         });
     });
 
@@ -156,6 +156,30 @@ describe('Test intersect...', function testIntersect() {
 
             intersectRes.should.have.lengthOf(testData.dataSource.data.length);
             intersectRes.should.eql(testData.dataSource.data);
+        });
+
+        it('should return testData.dataSource.data when source evaluates to the same', function testIntersectWithFirstParameterAsGenerator() {
+            var intersectIterable = intersect(gen(testData.dataSource.data), testData.dataSource.data),
+                intersectRes = Array.from(intersectIterable());
+
+            intersectRes.should.have.lengthOf(testData.dataSource.data.length);
+            intersectRes.should.eql(testData.dataSource.data);
+        });
+
+        it('should return source when both parameters are generators', function testIntersectWithBothParametersAsGenerators() {
+            var intersectIterable = intersect(gen(testData.dataSource.data), gen(testData.dataSource.data)),
+                intersectRes = Array.from(intersectIterable());
+
+            intersectRes.should.have.lengthOf(testData.dataSource.data.length);
+            intersectRes.should.eql(testData.dataSource.data);
+        });
+
+        it('should function correctly with generators and a non-default comparer', function testIntersectWithGeneratorsAndComparer() {
+            var intersectIterable = intersect(gen(testData.dataSource.data), gen(testData.dataSource.data), comparer),
+                intersectRes = Array.from(intersectIterable());
+
+            intersectRes.should.have.lengthOf(uniqueFirstNames.length);
+            intersectRes.should.eql(uniqueFirstNames);
         });
     });
 });
