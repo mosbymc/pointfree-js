@@ -86,7 +86,7 @@ describe('Test zip...', function testZip() {
             var zipIterable = zip(gen(testData.dataSource.data), gen(testData.dataSource.data), zipSelector),
                 zipRes = Array.from(zipIterable());
 
-            zipRes.should.have.lengthOf(0);
+            zipRes.should.have.lengthOf(testData.dataSource.data.length);
         });
 
         it('should return empty array when collection is empty', function testZipWithEmptyCollection() {
