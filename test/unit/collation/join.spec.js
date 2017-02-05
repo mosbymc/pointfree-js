@@ -176,8 +176,68 @@ describe('Test join...', function testJoin() {
     });
 
     describe('...using generators', function testJoinUsingGenerators() {
-        it('should do something', function testJoinDoingSomething() {
+        function *gen(data) {
+            for (let item of data)
+                yield item;
+        }
 
+        it('should return all test data items that share the same name', function testJoinOnFirstNameWithGenerators() {
+            var joinIterable = join(gen(testData.dataSource.data), gen(testData.dataSource.data), selector, selector, projector),
+                joinRes = Array.from(joinIterable());
+
+            joinRes.should.have.lengthOf(duplicateFirstNames.length);
+            joinRes.forEach(function _validateResults(item) {
+                item.outerFirstName.should.eql(item.innerFirstName);
+            });
+        });
+
+        it('should return empty array when no matches are found', function testJoinWithNoMatches() {
+            var joinIterable = join(gen(testData.dataSource.data), gen(joinTestData), selector, identity, projector),
+                joinRes = Array.from(joinIterable());
+
+            joinRes.should.have.lengthOf(0);
+        });
+
+        it('should return empty array when second collection is empty', function testJoinWithNoMatches() {
+            var joinIterable = join(gen(testData.dataSource.data), gen([]), selector, identity, projector),
+                joinRes = Array.from(joinIterable());
+
+            joinRes.should.have.lengthOf(0);
+        });
+
+        it('should return empty array when source is empty', function testJoinWithEmptySource() {
+            var joinIterable = join(gen([]), gen(testData.dataSource.data), selector, identity, projector),
+                joinRes = Array.from(joinIterable());
+
+            joinRes.should.have.lengthOf(0);
+        });
+
+        it('should return all test data items that share the same state and city', function testJoinWithSelector2() {
+            var joinIterable = join(gen(testData.dataSource.data), gen(testData.dataSource.data), selector2, selector2, projector2),
+                joinRes = Array.from(joinIterable());
+
+            joinRes.should.have.lengthOf(duplicateFullNames.length);
+            joinRes.forEach(function _validateResults(item) {
+                item.should.have.keys('sourceName', 'otherName');
+                item.sourceName.should.eql(item.otherName);
+            });
+        });
+
+        it('should return empty array when source is empty', function testJoinWithEmptySource() {
+            var joinIterable = join(gen([]), gen(testData.dataSource.data), selector2, identity, projector, comparer),
+                joinRes = Array.from(joinIterable());
+
+            joinRes.should.have.lengthOf(0);
+        });
+
+        it('should return all test data items that share the same state and city', function testJoinWithSelector2() {
+            var joinIterable = join(gen(testData.dataSource.data), gen(testData.dataSource.data), selector4, selector4, projector2, comparer3),
+                joinRes = Array.from(joinIterable());
+
+            joinRes.should.have.lengthOf(duplicateLocations.length);
+            joinRes.forEach(function _validateResults(item) {
+                item.should.have.keys('sourceName', 'otherName');
+            });
         });
     });
 });

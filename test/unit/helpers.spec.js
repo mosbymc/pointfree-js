@@ -1,4 +1,4 @@
-import { comparisons, defaultEqualityComparer, memoizer,
+import { comparisons, defaultEqualityComparer, memoizer, memoizer2,
     getNumbersFromTime, comparator, dataTypeValueNormalizer, cloneData, cloneArray } from '../../src/helpers';
 import { testData } from '../testData';
 
@@ -473,7 +473,8 @@ describe('getNumbersFromTime', function testGetNumbersFromTime() {
             time4 = getNumbersFromTime('11:42:42 AM'),
             time5 = getNumbersFromTime('11:42:42'),
             time6 = getNumbersFromTime('1.232.645'),
-            time7 = getNumbersFromTime('12 AM');
+            time7 = getNumbersFromTime('12 AM'),
+            time8 = getNumbersFromTime('12:00');
 
         time1.should.be.an('array');
         time1.should.have.lengthOf(4);
@@ -520,19 +521,32 @@ describe('getNumbersFromTime', function testGetNumbersFromTime() {
         time7[0].should.eql(12);
         time7[1].should.eql('00');
         time7[2].should.eql('00');
+
+        time8.should.be.an('array');
+        time8.should.have.lengthOf(3);
+        time8[0].should.eql(12);
+        time8[1].should.eql('00');
+        time8[2].should.eql('00');
     });
 });
 
 describe('dataTypeValueNormalizer', function testDataTypeValueNormalizer() {
     it('should properly normalize values by data type', function testDataTypeValueNormalizer() {
+        var unknownTypeValue = 123;
+
         var normalizeResult1 = dataTypeValueNormalizer('time', '3:33:21 PM'),
             normalizeResult2 = dataTypeValueNormalizer('time', '15:33:21'),
             normalizeResult3 = dataTypeValueNormalizer('number', 16.2),
             normalizeResult4 = dataTypeValueNormalizer('number', '16.2'),
             normalizeResult5 = dataTypeValueNormalizer('date', '10-18-1982'),
             normalizeResult6 = dataTypeValueNormalizer('date', '18-10-1982'),
-            normalizeResult7 = dataTypeValueNormalizer('datetime', '10-18-1982 06:55:21 PM'),
-            normalizeResult8 = dataTypeValueNormalizer('datetime', '18-10-1982 18:55:21');
+            normalizeResult7 = dataTypeValueNormalizer('date', 123),
+            normalizeResult8 = dataTypeValueNormalizer('datetime', '10-18-1982 06:55:21 PM'),
+            normalizeResult9 = dataTypeValueNormalizer('datetime', '18-10-1982 18:55:21'),
+            normalizeResult10 = dataTypeValueNormalizer('datetime', 123),
+            normalizeResult11 = dataTypeValueNormalizer(),
+            normalizeResult12 = dataTypeValueNormalizer(null, null),
+            normalizeResult13 = dataTypeValueNormalizer('some unknown type', unknownTypeValue);
 
         normalizeResult1.should.be.an('number');
         normalizeResult1.should.eql(56901);
@@ -546,23 +560,38 @@ describe('dataTypeValueNormalizer', function testDataTypeValueNormalizer() {
         normalizeResult4.should.be.a('number');
         normalizeResult4.should.eql(normalizeResult3);
 
-        normalizeResult7.should.be.a('number');
+        normalizeResult5.should.be.a('date');
         expect(normalizeResult5 instanceof Date).to.be.true;
         normalizeResult5.getDate().should.eql(18);
         normalizeResult5.getYear().should.eql(82);
         normalizeResult5.getMonth().should.eql(10);
 
+        normalizeResult6.should.be.a('date');
         expect(normalizeResult6 instanceof Date).to.be.true;
+        normalizeResult6.getDate().should.eql(18);
+        normalizeResult6.getYear().should.eql(82);
+        normalizeResult6.getMonth().should.eql(10);
         normalizeResult6.getDate().should.eql(normalizeResult5.getDate());
         normalizeResult6.getTime().should.eql(normalizeResult5.getTime());
         normalizeResult6.getYear().should.eql(normalizeResult5.getYear());
         normalizeResult6.getMonth().should.eql(normalizeResult5.getMonth());
 
-        normalizeResult7.should.be.a('number');
-        normalizeResult7.should.eql(406443669201);
+        normalizeResult7.should.be.a('date');
+        expect(normalizeResult7 instanceof Date).to.be.true;
 
         normalizeResult8.should.be.a('number');
-        normalizeResult8.should.eql(normalizeResult7);
+        normalizeResult8.should.eql(406443669201);
+
+        normalizeResult9.should.be.a('number');
+        normalizeResult9.should.eql(normalizeResult8);
+
+        normalizeResult10.should.be.a('number');
+        normalizeResult10.should.eql(0);
+
+        expect(normalizeResult11).to.be.undefined;
+        expect(normalizeResult12).to.be.null;
+
+        normalizeResult13.should.eql(unknownTypeValue.toString());
     });
 });
 
@@ -571,6 +600,24 @@ describe('memoizer', function testMemoizer() {
         var mem1 = memoizer(),
             mem2 = memoizer(),
             mem3 = memoizer();
+
+        testData.dataSource.data.forEach(function findUniques(item) {
+            mem1(item).should.not.be.true;
+            mem2(item).should.not.be.true;
+            mem1(item).should.be.true;
+        });
+
+        [1, 1, 2, 2, 3, 3, 4, 4, 5, 5].forEach(function findUniques(item, idx) {
+            mem3(item).should.eql(!!(idx % 2));
+        });
+    });
+});
+
+describe('memoizer2', function testMemoizer() {
+    it('should remember unique values for each instance', function testMemoizer() {
+        var mem1 = memoizer2(),
+            mem2 = memoizer2(),
+            mem3 = memoizer2();
 
         testData.dataSource.data.forEach(function findUniques(item) {
             mem1(item).should.not.be.true;
