@@ -13,9 +13,8 @@ function createNewQueryableDelegator(source, iterator) {
     obj.source = source;
     obj._evaluatedData = null;
     obj._dataComputed = false;
-    obj._currentPipelineIndex = 0;
     obj._currentDataIndex = 0;
-    obj[Symbol.iterator] = iterator;
+    obj[Symbol.iterator] = iterator ? iterator : queryableIterator(source);
 
     /*obj.select = function _select(fields) {
         return this.queryableSelect(fields);
@@ -259,6 +258,13 @@ function createNewOrderedQueryableDelegator(data, funcs, fields) {
     return addGetter(obj);
 }
 */
+
+function queryableIterator(source) {
+    return function *iterator() {
+        for (let item in source)
+            yield item;
+    }
+}
 
 function addGetter(obj) {
     return Object.defineProperty(

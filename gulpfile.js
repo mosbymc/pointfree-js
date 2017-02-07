@@ -8,7 +8,7 @@ var gulp = require('gulp'),
     browserSync = require('browser-sync'),
     port = process.env.port || config.defaultPort,
     transpileDependencies = ['transpile-root', 'transpile-collation', 'transpile-evaluation', 'transpile-expressionParser',
-        'transpile-limitation', 'transpile-mutation', 'transpile-projection', 'transpile-queryObject', 'transpile-transformation'];
+        'transpile-limitation', 'transpile-mutation', 'transpile-projection', 'transpile-queryObjects', 'transpile-transformation'];
 
 gulp.task('help', _.taskListing);
 gulp.task('default', ['help']);
@@ -143,7 +143,7 @@ gulp.task('transpile-projection', function _transpileProjection() {
         .pipe(gulp.dest(config.srcProjectionJs));
 });
 
-gulp.task('transpile-queryObject', function _transpileQueryObjects() {
+gulp.task('transpile-queryObjects', function _transpileQueryObjects() {
     return gulp.src(config.devQueryObjectJs)
         .pipe(_.babel())
         .pipe(gulp.dest(config.srcQueryObjectJs));
