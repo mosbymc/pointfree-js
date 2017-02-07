@@ -14,6 +14,9 @@ function createNewQueryableDelegator(source, iterator) {
     obj._evaluatedData = null;
     obj._dataComputed = false;
     obj._currentDataIndex = 0;
+    //TODO: may not need to set a default iterator here... if the iterator value is passed in, then
+    //TODO: set it, otherwise, don't shadow the queryable's iterator and just let it yield each item
+    //TODO: of the source
     obj[Symbol.iterator] = iterator ? iterator : queryableIterator(source);
 
     /*obj.select = function _select(fields) {

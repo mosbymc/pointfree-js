@@ -2,33 +2,33 @@ import { intersect } from '../../../src/collation/intersect';
 import { memoizer2 } from '../../../src/helpers';
 import { testData } from '../../testData';
 
+function comparer(a, b) { return a.FirstName === b.FirstName; }
+
+var havePreviouslyViewed = memoizer2(comparer),
+    uniqueFirstNames = testData.dataSource.data.filter(function findUniqueNames(item) {
+        return !havePreviouslyViewed(item);
+    });
+
+var firstHalf = testData.dataSource.data.slice(0, testData.dataSource.data.length / 2),
+    evenIdxs = testData.dataSource.data.filter(function _getEvenIndexedItems(item, idx) { return idx % 2; }),
+    oddIdxs = testData.dataSource.data.filter(function _getOddIndexedItems(item, idx) { return !(idx % 2); });
+
+havePreviouslyViewed = memoizer2(comparer);
+var firstHalfAndUniqueNames = firstHalf.filter(function _findUniqueNames(item) {
+    return !(havePreviouslyViewed(item));
+});
+
+havePreviouslyViewed = memoizer2(comparer);
+var evensAndUniqueNames = evenIdxs.filter(function _findUniqueNames(item) {
+    return !(havePreviouslyViewed(item));
+});
+
+havePreviouslyViewed = memoizer2(comparer);
+var oddsAndUniqueNames = oddIdxs.filter(function _findUniqueNames(item) {
+    return !(havePreviouslyViewed(item));
+});
+
 describe('Test intersect...', function testIntersect() {
-    function comparer(a, b) { return a.FirstName === b.FirstName; }
-
-    var havePreviouslyViewed = memoizer2(comparer),
-        uniqueFirstNames = testData.dataSource.data.filter(function findUniqueNames(item) {
-            return !havePreviouslyViewed(item);
-        });
-
-    var firstHalf = testData.dataSource.data.slice(0, testData.dataSource.data.length / 2),
-        evenIdxs = testData.dataSource.data.filter(function _getEvenIndexedItems(item, idx) { return idx % 2; }),
-        oddIdxs = testData.dataSource.data.filter(function _getOddIndexedItems(item, idx) { return !(idx % 2); });
-
-    havePreviouslyViewed = memoizer2(comparer);
-    var firstHalfAndUniqueNames = firstHalf.filter(function _findUniqueNames(item) {
-        return !(havePreviouslyViewed(item));
-    });
-
-    havePreviouslyViewed = memoizer2(comparer);
-    var evensAndUniqueNames = evenIdxs.filter(function _findUniqueNames(item) {
-        return !(havePreviouslyViewed(item));
-    });
-
-    havePreviouslyViewed = memoizer2(comparer);
-    var oddsAndUniqueNames = oddIdxs.filter(function _findUniqueNames(item) {
-        return !(havePreviouslyViewed(item));
-    });
-
     describe('... using default equality comparer', function testIntersectWithDefaultEqualityComparer() {
         it('should return source with collection equals source', function testIntersectWithSelf() {
             var intersectIterable = intersect(testData.dataSource.data, testData.dataSource.data),

@@ -1,9 +1,9 @@
 import { concat, except, groupJoin, intersect, join, union, zip } from '../collation/collationFunctions';
 //import { selectThunk, selectManyThunk, orderByThunk, orderByDescendingThunk, groupByThunk, groupByDescendingThunk, flattenData, deepFlattenData } from '../projection/projectionFunctions';
 //import { _takeGenerator, _takeWhileGenerator, _pipelineGenerator, any, all, last } from '../evaluation/evaluationFunctions';
-//import { filterDataWrapper, distinctThunk } from '../limitation/limitationFunctions';
-import { functionTypes, javaScriptTypes } from '../helpers';
+import { distinct, where } from '../limitation/limitationFunctions';
 import { identity } from '../functionalHelpers';
+import { javaScriptTypes } from '../helpers';
 import { createNewQueryableDelegator/*, createNewFilteredQueryableDelegator, createNewOrderedQueryableDelegator*/ } from './queryObjectCreators';
 //import { expressionManager } from '../expressionManager';
 
@@ -116,7 +116,7 @@ var queryable = {
      * @returns {*}
      */
     queryableConcat: function _concat(collection) {
-        return createNewQueryableDelegator(concat(this, collection));
+        return createNewQueryableDelegator(this, concat(this, collection));
     },
 
     /**
@@ -126,59 +126,62 @@ var queryable = {
      * @returns {*}
      */
     queryableExcept: function _except(collection, comparer) {
-        return createNewQueryableDelegator(except(this, collection, comparer));
+        return createNewQueryableDelegator(this, except(this, collection, comparer));
     },
 
     /**
      *@type {function}
      */
     queryableGroupJoin: function _groupJoin(inner, outerSelector, innerSelector, projector, comparer) {
-        return createNewQueryableDelegator(groupJoin(this, inner, outerSelector, innerSelector, projector, comparer));
+        return createNewQueryableDelegator(this, groupJoin(this, inner, outerSelector, innerSelector, projector, comparer));
     },
 
     /**
      *@type {function}
      */
     queryableIntersect: function _intersect(collection, comparer) {
-        return createNewQueryableDelegator(intersect(this, collection, comparer));
+        return createNewQueryableDelegator(this, intersect(this, collection, comparer));
     },
 
     /**
      *@type {function}
      */
     queryableJoin: function _join(inner, outerSelector, innerSelector, projector, comparer) {
-        return createNewQueryableDelegator(join(this, inner, outerSelector, innerSelector, projector, comparer));
+        return createNewQueryableDelegator(this, join(this, inner, outerSelector, innerSelector, projector, comparer));
     },
 
     /**
      *@type {function}
      */
     queryableUnion: function _union(collection, comparer) {
-        return createNewQueryableDelegator(union(this, collection, comparer));
+        return createNewQueryableDelegator(this, union(this, collection, comparer));
     },
 
     /**
      *@type {function}
      */
     queryableZip: function _zip(selector, collection) {
-        return createNewQueryableDelegator(this.source, this._pipeline.concat([{ fn: zip(selector, collection), functionType: functionTypes.atomic }]));
+        return createNewQueryableDelegator(this, zip(this, selector, collection));
+        //return createNewQueryableDelegator(this.source, this._pipeline.concat([{ fn: zip(selector, collection), functionType: functionTypes.atomic }]));
     },
 
     /**
      *@type {function}
      */
-    /*queryableWhere: function _where(field, operator, value) {
-        var filterExpression = expressionManager.isPrototypeOf(field) ? field : Object.create(expressionManager).createExpression(field, operator, value);
+    queryableWhere: function _where(predicate) {
+        return createNewQueryableDelegator(this, where(this, predicate));
+        /*var filterExpression = expressionManager.isPrototypeOf(field) ? field : Object.create(expressionManager).createExpression(field, operator, value);
         return createNewFilteredQueryableDelegator(this.source, this._pipeline.concat([{ fn: filterDataWrapper(filterExpression),
-            functionType: functionTypes.atomic, functionWrapper: basicAtomicFunctionWrapper }]), filterExpression);
-    },*/
+            functionType: functionTypes.atomic, functionWrapper: basicAtomicFunctionWrapper }]), filterExpression);*/
+    },
 
     /**
      *@type {function}
      */
-    /*queryableDistinct: function _distinct(fields) {
-        return createNewQueryableDelegator(this.source, this._pipeline.concat([{ fn: distinctThunk(fields), functionType: functionTypes.atomic }]));
-    },*/
+    queryableDistinct: function _distinct(comparer) {
+        return createNewQueryableDelegator(this, distinct(this, comparer));
+        //return createNewQueryableDelegator(this.source, this._pipeline.concat([{ fn: distinctThunk(fields), functionType: functionTypes.atomic }]));
+    },
 
     /**
      *@type {function}
@@ -212,18 +215,23 @@ var queryable = {
      */
     queryableTakeWhile: function takeWhile(predicate) {
         var res = [];
+
         if (!this._dataComputed) {
             for (let item of this) {
                 if (predicate(item))
                     res = res.concat(item);
-                else return res;
+                else  {
+                    if (predicate.name === 'predicate2')
+                        console.log(res);
+                    return res;
+                }
             }
         }
 
-        for (let item of this._evaluatedData) {
+        /*for (let item of this._evaluatedData) {
             if (predicate(item)) res = res.concat([item]);
             else return res;
-        }
+        }*/
     },
 
     /**

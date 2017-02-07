@@ -1,5 +1,6 @@
 import { defaultEqualityComparer, memoizer2 } from '../helpers';
 
+
 /*
 function union(previousFunc, collection, comparer) {
     comparer = comparer || defaultEqualityComparer;
@@ -142,19 +143,15 @@ function union(source, collection, comparer) {
     comparer = comparer || defaultEqualityComparer;
     var havePreviouslyViewed = memoizer2(comparer);
 
-    function unionFunc(item) {
-        return havePreviouslyViewed(item);
-    }
-
     return function *unionIterator() {
         var res;
         for (let item of source) {
-            res = unionFunc(item);
+            res = havePreviouslyViewed(item);
             if (!res) yield item;
         }
 
         for (let item of collection) {
-            res = unionFunc(item);
+            res = havePreviouslyViewed(item);
             if (!res) yield item;
         }
     };
