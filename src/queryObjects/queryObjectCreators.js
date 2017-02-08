@@ -25,9 +25,9 @@ function createNewQueryableDelegator(source, iterator) {
     /*obj.selectMany = function _selectMany(selector, resSelector) {
         return this.queryableSelectMany(selector, resSelector);
     };*/
-    /*obj.where = function _where(field, operator, value) {
+    obj.where = function _where(field, operator, value) {
         return this.queryableWhere(field, operator, value);
-    };*/
+    };
     obj.concat = function _concat(collection) {
         return this.queryableConcat(collection);
     };
@@ -61,9 +61,9 @@ function createNewQueryableDelegator(source, iterator) {
     /*obj.orderByDescending = function _orderByDescending(field) {
         return this.queryableOrderByDescending(field);
     };*/
-    /*obj.distinct = function _distinct(fields) {
+    obj.distinct = function _distinct(fields) {
         return this.queryableDistinct(fields);
-    };*/
+    };
     /*obj.flatten = function _flatten() {
         return this.queryableFlatten();
     };*/

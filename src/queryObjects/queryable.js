@@ -1,10 +1,11 @@
 import { concat, except, groupJoin, intersect, join, union, zip } from '../collation/collationFunctions';
-//import { selectThunk, selectManyThunk, orderByThunk, orderByDescendingThunk, groupByThunk, groupByDescendingThunk, flattenData, deepFlattenData } from '../projection/projectionFunctions';
-//import { _takeGenerator, _takeWhileGenerator, _pipelineGenerator, any, all, last } from '../evaluation/evaluationFunctions';
+import { all, any, first, last } from '../evaluation/evaluationFunctions';
 import { distinct, where } from '../limitation/limitationFunctions';
 import { identity } from '../functionalHelpers';
 import { javaScriptTypes } from '../helpers';
 import { createNewQueryableDelegator/*, createNewFilteredQueryableDelegator, createNewOrderedQueryableDelegator*/ } from './queryObjectCreators';
+//import { selectThunk, selectManyThunk, orderByThunk, orderByDescendingThunk, groupByThunk, groupByDescendingThunk, flattenData, deepFlattenData } from '../projection/projectionFunctions';
+//import { _takeGenerator, _takeWhileGenerator, _pipelineGenerator, any, all, last } from '../evaluation/evaluationFunctions';
 //import { expressionManager } from '../expressionManager';
 
 
@@ -221,8 +222,6 @@ var queryable = {
                 if (predicate(item))
                     res = res.concat(item);
                 else  {
-                    if (predicate.name === 'predicate2')
-                        console.log(res);
                     return res;
                 }
             }
@@ -238,52 +237,49 @@ var queryable = {
      *@type {function}
      */
     queryableAny: function _any(predicate) {
-        return any(predicate, this.data);
+        return any(this, predicate);
     },
 
     /**
      *@type {function}
      */
     queryableAll: function _all(predicate) {
-        return all(predicate, this.data);
+        return all(this, predicate);
     },
 
     /**
      *@type {function}
      */
-    queryableFirst: function first(predicate) {
-        if (!predicate || typeof predicate !== javaScriptTypes.function) {
-            return this.queryableTake(1)[0];
-        }
-        return this.data.find(predicate);
+    queryableFirst: function _first(predicate) {
+        return first(this, predicate);
     },
 
     /**
      *@type {function}
      */
-    queryableLast: function last(predicate) {
-        return last(predicate, this.data);
+    queryableLast: function _last(predicate) {
+        return last(this, predicate);
     },
 
     /**
      * @type {function}
      */
     queryableToArray: function _toArray() {
-        return this.data.map(identity);
+        return Array.from(this);
     },
 
     /**
      * @type {function}
      */
     queryableToSet: function _toSet() {
-        return new Set(this.data);
+        return new Set(this);
     },
 
     /**
      * @type {function}
      */
     queryableReverse: function _reverse() {
-        return this.data.reverse();
+        return Array.from(this).reverse();
     },
 
     [Symbol.iterator]: function *_iterator() {

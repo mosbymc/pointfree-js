@@ -13,6 +13,10 @@ function namePredicate(item) {
     return item.FirstName.length > 5;
 }
 
+function isObject(item) {
+    return 'object' === typeof item;
+}
+
 queryable.source = testData.dataSource.data;
 
 describe('Test queryable', function testQueryable() {
@@ -25,7 +29,14 @@ describe('Test queryable', function testQueryable() {
             queryableUnion = queryable.queryableUnion(testData.dataSource.data),
             queryableZip = queryable.queryableZip(testData.dataSource.data, nameSelector),
             queryableWhere = queryable.queryableWhere(namePredicate),
-            queryableDistinct = queryable.queryableDistinct();
+            queryableDistinct = queryable.queryableDistinct(),
+            queryableAll = queryable.queryableAll(isObject),
+            queryableAny = queryable.queryableAny(isObject),
+            queryableFirst = queryable.queryableFirst(isObject),
+            queryableLast = queryable.queryableLast(isObject),
+            queryableToArray = queryable.queryableToArray(),
+            queryableToSet = queryable.queryableToSet(),
+            queryableReverse = queryable.queryableReverse();
 
         expect(queryable.isPrototypeOf(concatQueryable)).to.be.true;
         expect(queryable.isPrototypeOf(exceptQueryable)).to.be.true;
@@ -36,6 +47,13 @@ describe('Test queryable', function testQueryable() {
         expect(queryable.isPrototypeOf(queryableZip)).to.be.true;
         expect(queryable.isPrototypeOf(queryableWhere)).to.be.true;
         expect(queryable.isPrototypeOf(queryableDistinct)).to.be.true;
+        queryableAll.should.be.true;
+        queryableAny.should.be.true;
+        queryableFirst.should.eql(testData.dataSource.data[0]);
+        queryableLast.should.eql(testData.dataSource.data[testData.dataSource.data.length - 1]);
+        queryableToArray.should.eql(testData.dataSource.data);
+        queryableToSet.should.eql(new Set(testData.dataSource.data));
+        queryableReverse.should.eql(testData.dataSource.data.reverse());
     });
 
     it('should have a functioning take', function testQueryablesTake() {
@@ -75,4 +93,6 @@ describe('Test queryable', function testQueryable() {
             item.FirstName.should.not.eql('Mark');
         });
     });
+
+
 });
