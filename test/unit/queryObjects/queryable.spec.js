@@ -38,6 +38,8 @@ describe('Test queryable', function testQueryable() {
             queryableToSet = queryable.queryableToSet(),
             queryableReverse = queryable.queryableReverse();
 
+        //queryable object functions that return a new queryable object delegator; check to make sure the
+        //returned object delegates to the queryable object.
         expect(queryable.isPrototypeOf(concatQueryable)).to.be.true;
         expect(queryable.isPrototypeOf(exceptQueryable)).to.be.true;
         expect(queryable.isPrototypeOf(groupJoinQueryable)).to.be.true;
@@ -47,12 +49,19 @@ describe('Test queryable', function testQueryable() {
         expect(queryable.isPrototypeOf(queryableZip)).to.be.true;
         expect(queryable.isPrototypeOf(queryableWhere)).to.be.true;
         expect(queryable.isPrototypeOf(queryableDistinct)).to.be.true;
+
         queryableAll.should.be.true;
         queryableAny.should.be.true;
         queryableFirst.should.eql(testData.dataSource.data[0]);
         queryableLast.should.eql(testData.dataSource.data[testData.dataSource.data.length - 1]);
+
+        Array.prototype.isPrototypeOf(queryableToArray).should.be.true;
         queryableToArray.should.eql(testData.dataSource.data);
+
+        Set.prototype.isPrototypeOf(queryableToSet).should.be.true;
         queryableToSet.should.eql(new Set(testData.dataSource.data));
+
+        Array.prototype.isPrototypeOf(queryableReverse).should.be.true;
         queryableReverse.should.eql(testData.dataSource.data.reverse());
     });
 

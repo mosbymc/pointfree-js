@@ -15,7 +15,6 @@ describe('createNewQueryableDelegator', function testQueryableDelegatorObjectCre
         var queryDelegator = createNewQueryableDelegator(testData.dataSource.data);
 
         expect(queryDelegator).to.exist;
-        queryDelegator.should.be.ok;
 
         //Properties that should be present
         //queryDelegator._data.should.eql(testData.dataSource.data);
@@ -25,44 +24,61 @@ describe('createNewQueryableDelegator', function testQueryableDelegatorObjectCre
         //Functions that should be present
         //queryDelegator._iterator.should.exist;
         //queryDelegator._iterator.should.be.a('function');
+
+        //PROJECTION FUNCTIONS
         //queryDelegator.select.should.exist;
         //queryDelegator.select.should.be.a('function');
-        //queryDelegator.insertInto.should.exist;
-        //queryDelegator.insertInto.should.be.a('function');
-        //queryDelegator.where.should.exist;
-        //queryDelegator.where.should.be.a('function');
+        //queryDelegator.groupBy.should.exist;
+        //queryDelegator.groupBy.should.be.a('function');
+        //queryDelegator.flatten.should.exist;
+        //queryDelegator.flatten.should.be.a('function');
+        //queryDelegator.flattenDeep.should.exist;
+        //queryDelegator.flattenDeep.should.be.a('function');
+
+
+        //COLLATION FUNCTIONS
+        queryDelegator.concat.should.exist;
+        queryDelegator.concat.should.be.a('function');
+        queryDelegator.except.should.exist;
+        queryDelegator.except.should.be.a('function');
+        queryDelegator.groupJoin.should.exist;
+        queryDelegator.groupJoin.should.be.a('function');
+        queryDelegator.intersect.should.exist;
+        queryDelegator.intersect.should.be.a('function');
         queryDelegator.join.should.exist;
         queryDelegator.join.should.be.a('function');
         queryDelegator.union.should.exist;
         queryDelegator.union.should.be.a('function');
         queryDelegator.zip.should.exist;
         queryDelegator.zip.should.be.a('function');
-        queryDelegator.except.should.exist;
-        queryDelegator.except.should.be.a('function');
-        queryDelegator.intersect.should.exist;
-        queryDelegator.intersect.should.be.a('function');
-        //queryDelegator.groupBy.should.exist;
-        //queryDelegator.groupBy.should.be.a('function');
-        //queryDelegator.distinct.should.exist;
-        //queryDelegator.distinct.should.be.a('function');
-        //queryDelegator.flatten.should.exist;
-        //queryDelegator.flatten.should.be.a('function');
-        //queryDelegator.flattenDeep.should.exist;
-        //queryDelegator.flattenDeep.should.be.a('function');
+
+
+        //LIMITATION FUNCTIONS
+        queryDelegator.where.should.exist;
+        queryDelegator.where.should.be.a('function');
+        queryDelegator.distinct.should.exist;
+        queryDelegator.distinct.should.be.a('function');
+
+
+        //EVALUATION FUNCTIONS
+        queryDelegator.all.should.exist;
+        queryDelegator.all.should.be.a('function');
+        queryDelegator.any.should.exist;
+        queryDelegator.any.should.be.a('function');
+        queryDelegator.first.should.exist;
+        queryDelegator.first.should.be.a('function');
+        queryDelegator.last.should.exist;
+        queryDelegator.last.should.be.a('function');
+
+
         queryDelegator._getData.should.exist;
         queryDelegator._getData.should.be.a('function');
         queryDelegator.take.should.exist;
         queryDelegator.take.should.be.a('function');
         queryDelegator.takeWhile.should.exist;
         queryDelegator.takeWhile.should.be.a('function');
-        queryDelegator.any.should.exist;
-        queryDelegator.any.should.be.a('function');
-        queryDelegator.all.should.exist;
-        queryDelegator.all.should.be.a('function');
-        queryDelegator.first.should.exist;
-        queryDelegator.first.should.be.a('function');
-        queryDelegator.last.should.exist;
-        queryDelegator.last.should.be.a('function');
+        //queryDelegator.insertInto.should.exist;
+        //queryDelegator.insertInto.should.be.a('function');
 
         //Functions that should not be present
         expect(queryDelegator.thenBy).to.not.exist;

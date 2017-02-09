@@ -8,16 +8,20 @@ import { queryable } from './queryable';
 import { ifElse, not, isArray, wrap, identity } from '../functionalHelpers';
 //import { expressionManager } from '../expressionManager';
 
+var generatorProto = Object.getPrototypeOf(function *_generator(){});
+
 function createNewQueryableDelegator(source, iterator) {
     var obj = Object.create(queryable);
     obj.source = source;
     obj._evaluatedData = null;
     obj._dataComputed = false;
     obj._currentDataIndex = 0;
+    if (iterator && generatorProto.isPrototypeOf(iterator))
+        obj[Symbol.iterator] = iterator;
     //TODO: may not need to set a default iterator here... if the iterator value is passed in, then
     //TODO: set it, otherwise, don't shadow the queryable's iterator and just let it yield each item
     //TODO: of the source
-    obj[Symbol.iterator] = iterator ? iterator : queryableIterator(source);
+    //obj[Symbol.iterator] = iterator ? iterator : queryableIterator(source);
 
     /*obj.select = function _select(fields) {
         return this.queryableSelect(fields);
@@ -261,13 +265,6 @@ function createNewOrderedQueryableDelegator(data, funcs, fields) {
     return addGetter(obj);
 }
 */
-
-function queryableIterator(source) {
-    return function *iterator() {
-        for (let item in source)
-            yield item;
-    }
-}
 
 function addGetter(obj) {
     return Object.defineProperty(
