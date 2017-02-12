@@ -1,4 +1,4 @@
-import { identity, ifElse, wrap, isArray, not } from '../functionalHelpers';
+import { when, isArray, not } from '../functionalHelpers';
 import { sortData } from  './sortHelpers';
 
 //TODO: I should probably make this take either a "fields" object, or a selector function
@@ -8,20 +8,11 @@ import { sortData } from  './sortHelpers';
 
 //TODO: Since group by functionality will work the same way, it's probably best to think this through
 //TODO: first before committing to a mode of functionality  now.
-function orderBy(source, fields) {
+function orderBy(source, orderObject) {
     return function *orderByIterator() {
-
+        //gather all data from the source before sorting
+        yield sortData(when(not(isArray), Array.from, source), orderObject);
     };
 }
 
-function orderByDescending(fields) {
-    return function groupDataExecutor(data) {
-        return orderData(fields, data);
-    }
-}
-
-function orderData(fields, data) {
-    return sortData(ifElse(not(isArray), wrap, identity, data), fields);
-}
-
-export { orderBy, orderByDescending };
+export { orderBy };

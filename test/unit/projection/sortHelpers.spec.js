@@ -1,4 +1,4 @@
-import { sortData } from '../../../src/projection/sortHelpers';
+import { sortData, sortData2 } from '../../../src/projection/sortHelpers';
 import { testData } from '../../testData';
 
 describe('sortData', function testSortData() {
@@ -66,6 +66,99 @@ describe('sortData', function testSortData() {
                     (+item.Zip).should.be.at.most(previousFieldsValues[0]);
                     item.FirstName.should.be.at.least(previousFieldsValues[1]);
                 }
+            }
+        });
+    });
+});
+
+describe('sort data 2', function test() {
+    var previousFieldsValues = [];
+
+    it('should do stuff', function stuff() {
+        function keySelector(item) {
+            return item.FirstName;
+        }
+
+        function comparer(a, b) {
+            return a <= b;
+        }
+
+        var sortObj = [{ keySelector: keySelector, comparer: comparer, direction: 'asc' }];
+        var sss = sortData2(testData.dataSource.data, sortObj);
+        sss.should.be.an('array');
+        sss.should.have.lengthOf(testData.dataSource.data.length);
+        sss.forEach(function validateResults(item) {
+            if (!previousFieldsValues.length)
+                previousFieldsValues.push(item.FirstName);
+            else {
+                item.FirstName.should.be.at.least(previousFieldsValues[0]);
+                if (item.FirstName !== previousFieldsValues[0])
+                    previousFieldsValues[0] = item.FirstName;
+            }
+        });
+    });
+
+    it('should do other stuff', function otherStuff() {
+        previousFieldsValues.length = 0;
+        function keySelector(item) {
+            return item.FirstName;
+        }
+
+        function comparer(a, b) {
+            return a <= b;
+        }
+
+        var sortObj = [{ keySelector: keySelector, comparer: comparer, direction: 'desc' }];
+        var sss = sortData2(testData.dataSource.data, sortObj);
+
+        sss.should.be.an('array');
+        sss.should.have.lengthOf(testData.dataSource.data.length);
+        sss.forEach(function validateResults(item) {
+            if (!previousFieldsValues.length)
+                previousFieldsValues.push(item.FirstName);
+            else {
+                item.FirstName.should.be.at.most(previousFieldsValues[0]);
+                if (item.FirstName !== previousFieldsValues[0])
+                    previousFieldsValues[0] = item.FirstName;
+            }
+        });
+    });
+
+    it('should do stuff multiple times', function testStuffMoreThanOnce() {
+        previousFieldsValues.length = 0;
+        function keySelector(item) {
+            return item.FirstName;
+        }
+
+        function comparer(a, b) {
+            return a < b;
+        }
+
+        function stateSelector(item) {
+            return item.State;
+        }
+
+        var sortObj = [
+            { keySelector: stateSelector, comparer: comparer, direction: 'asc' },
+            { keySelector: keySelector, comparer: comparer, direction: 'desc' }
+        ];
+
+        var sss = sortData2(testData.dataSource.data, sortObj);
+
+        sss.should.be.an('array');
+        sss.should.have.lengthOf(testData.dataSource.data.length);
+        sss.forEach(function validateResults(item) {
+            if (!previousFieldsValues.length) {
+                previousFieldsValues[0] = item.State;
+                previousFieldsValues[1] = item.FirstName;
+            }
+            else {
+                item.State.should.be.at.least(previousFieldsValues[0]);
+                if (item.State !== previousFieldsValues[0]) {
+                    previousFieldsValues[0] = item.State;
+                    previousFieldsValues[1] = item.FirstName;
+                }
+                else item.FirstName.should.be.at.most(previousFieldsValues[1]);
             }
         });
     });

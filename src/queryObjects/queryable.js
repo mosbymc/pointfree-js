@@ -1,9 +1,10 @@
 import { concat, except, groupJoin, intersect, join, union, zip } from '../collation/collationFunctions';
 import { all, any, first, last } from '../evaluation/evaluationFunctions';
 import { distinct, where } from '../limitation/limitationFunctions';
+import { orderBy, orderByDescending } from '../projection/projectionFunctions';
 import { identity } from '../functionalHelpers';
 import { javaScriptTypes } from '../helpers';
-import { createNewQueryableDelegator/*, createNewFilteredQueryableDelegator, createNewOrderedQueryableDelegator*/ } from './queryObjectCreators';
+import { createNewQueryableDelegator, createNewOrderedQueryableDelegator/*, createNewFilteredQueryableDelegator*/ } from './queryObjectCreators';
 //import { selectThunk, selectManyThunk, orderByThunk, orderByDescendingThunk, groupByThunk, groupByDescendingThunk, flattenData, deepFlattenData } from '../projection/projectionFunctions';
 //import { _takeGenerator, _takeWhileGenerator, _pipelineGenerator, any, all, last } from '../evaluation/evaluationFunctions';
 //import { expressionManager } from '../expressionManager';
@@ -84,18 +85,18 @@ var queryable = {
     /**
      *@type {function}
      */
-    /*queryableOrderBy: function _orderBy(field) {
-        field.dir = 'asc';
-        return createNewOrderedQueryableDelegator(this.source, this._pipeline.concat([{ fn: orderByThunk([field]), functionType: functionTypes.collective }]), [field]);
-    },*/
+    queryableOrderBy: function _orderBy(keySelector, comparer) {
+        var sortObj = { keySelector: keySelector, comparer: comparer, direction: 'asc' };
+        return createNewOrderedQueryableDelegator(this, orderBy(sortObj), sortObj);
+    },
 
     /**
      *@type {function}
      */
-    /*queryableOrderByDescending: function _orderByDescending(field) {
-        field.dir = 'desc';
-        return createNewOrderedQueryableDelegator(this.source, this._pipeline.concat([{ fn: orderByDescendingThunk([field]), functionType: functionTypes.collective }]), [field]);
-    },*/
+    queryableOrderByDescending: function _orderByDescending(keySelector, comparer) {
+        var sortObj = { keySelector: keySelector, comparer: comparer, direction: 'desc' };
+        return createNewOrderedQueryableDelegator(this, orderBy(this, sortObj), sortObj);
+    },
 
     /**
      *@type {function}

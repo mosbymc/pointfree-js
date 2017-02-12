@@ -1,5 +1,6 @@
 import { queryable } from './queryable';
-//import { orderedQueryable } from './orderedQueryable';
+import { orderedQueryable } from './orderedQueryable';
+import { orderBy } from '../projection/projectionFunctions';
 //import { filteredQueryable } from './filteredQueryable';
 //import { filterAppend } from '../limitation/limitationFunctions';
 //import { orderByThunk, orderByDescendingThunk } from '../projection/projectionFunctions';
@@ -174,20 +175,19 @@ function createNewFilteredQueryableDelegator(data, funcs, filterExpression) {
 
     return addGetter(obj);
 }
+*/
 
-function createNewOrderedQueryableDelegator(data, funcs, fields) {
+function createNewOrderedQueryableDelegator(source, iterator, sortObj) {
 
     var obj = Object.create(orderedQueryable);
-    obj.source = data;
+    obj.source = source;
     obj._evaluatedData = null;
     obj._dataComputed = false;
-    obj._pipeline = funcs ? ifElse(not(isArray), wrap, identity, funcs) : [];
-    obj._currentPipelineIndex = 0;
     obj._currentDataIndex = 0;
+    obj._appliedSorts = sortObj;
+    if (iterator && generatorProto.isPrototypeOf(iterator))
+        obj[Symbol.iterator] = iterator;
 
-    obj.select = function _select(fields) {
-        return this.orderedSelect(fields);
-    };
     obj.where = function _where(field, operator, value) {
         return this.orderedWhere(field, operator, value);
     };
@@ -206,17 +206,8 @@ function createNewOrderedQueryableDelegator(data, funcs, fields) {
     obj.intersect = function _intersect(comparer, collection) {
         return this.orderedIntersect(comparer, collection);
     };
-    obj.groupBy = function _groupBy(fields) {
-        return this.orderedGroupBy(fields);
-    };
     obj.distinct = function _distinct(fields) {
         return this.orderedDistinct(fields);
-    };
-    obj.flatten = function _flatten() {
-        return this.orderedFlatten();
-    };
-    obj.flattenDeep = function _flattenDeep() {
-        return this.orderedFlattenDeep();
     };
     obj._getData = function _getData() {
         return this._getData();
@@ -248,23 +239,19 @@ function createNewOrderedQueryableDelegator(data, funcs, fields) {
         return this.orderByDescending(field);
     };
 
-    obj.thenBy = function _thenBy(field) {
-        field.dir = 'asc';
-        var allFields = fields.concat(field);
-        return createNewOrderedQueryableDelegator(this.source, this._pipeline.slice(0, this._pipeline.length - 1)
-            .concat([{ fn: orderByThunk(allFields), functionType: functionTypes.collective }]), allFields);
+    obj.thenBy = function _thenBy(keySelector, comparer) {
+        var sortObj = this._appliedSorts.concat({ keySelector: keySelector, comparer: comparer, direction: 'asc' });
+        return createNewOrderedQueryableDelegator(this.source, orderBy(this, sortObj), sortObj);
     };
 
-    obj.thenByDescending = function thenByDescending(field) {
-        field.dir = 'desc';
-        var allFields = fields.concat(field);
-        return createNewOrderedQueryableDelegator(this.source, this._pipeline.slice(0, this._pipeline.length - 1)
-            .concat([{ fn: orderByDescendingThunk(allFields), functionType: functionTypes.collective }]), allFields)
+    obj.thenByDescending = function thenByDescending(keySelector, comparer) {
+        var sortObj = this._appliedSorts.concat({ keySelector: keySelector, comparer: comparer, direction: 'desc' });
+        return createNewOrderedQueryableDelegator(this.source, orderBy(this, sortObj), sortObj);
     };
 
     return addGetter(obj);
 }
-*/
+
 
 function addGetter(obj) {
     return Object.defineProperty(
