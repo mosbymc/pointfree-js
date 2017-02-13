@@ -1,7 +1,7 @@
 import { concat, except, groupJoin, intersect, join, union, zip } from '../collation/collationFunctions';
 import { all, any, first, last } from '../evaluation/evaluationFunctions';
 import { distinct, where } from '../limitation/limitationFunctions';
-import { orderBy, orderByDescending } from '../projection/projectionFunctions';
+import { deepFlatten, flatten, groupBy, map, orderBy } from '../projection/projectionFunctions';
 import { identity } from '../functionalHelpers';
 import { javaScriptTypes } from '../helpers';
 import { createNewQueryableDelegator, createNewOrderedQueryableDelegator/*, createNewFilteredQueryableDelegator*/ } from './queryObjectCreators';
@@ -68,19 +68,25 @@ var queryable = {
         return createNewQueryableDelegator(this.source, this._pipeline.concat([{ fn: selectManyThunk(selector, resSelector), functionType: functionTypes.atomic }]));
     },*/
 
-    /**
-     *@type {function}
-     */
-    /*queryableGroupBy: function _groupBy(field) {
-        return createNewQueryableDelegator(this.source, this._pipeline.concat([{ fn: groupByThunk(field), functionType: functionTypes.collective }]));
-    },*/
+    queryableMap: function _queryableMap(mapFunc) {
+        return createNewQueryableDelegator(this, map(mapFunc));
+    },
 
     /**
      *@type {function}
      */
-    /*queryableGroupByDescending: function _groupByDescending(field) {
-        return createNewQueryableDelegator(this.source, this._pipeline.concat([{ fn: groupByDescendingThunk(field), functionType: functionTypes.collective }]));
-    },*/
+    queryableGroupBy: function _groupBy(keySelector, comparer) {
+        var groupObj = { keySelector: keySelector, comparer: comparer, direction: 'asc' };
+        return createNewQueryableDelegator(this, groupBy(this, groupObj));
+    },
+
+    /**
+     *@type {function}
+     */
+    queryableGroupByDescending: function _groupByDescending(keySelector, comparer) {
+         var groupObj = { keySelector: keySelector, comparer: comparer, direction: 'desc' };
+         return createNewQueryableDelegator(this, groupBy(this, groupObj));
+    },
 
     /**
      *@type {function}
@@ -101,16 +107,16 @@ var queryable = {
     /**
      *@type {function}
      */
-    /*queryableFlatten: function _flatten() {
-        return createNewQueryableDelegator(this.source, this._pipeline.concat([{ fn: flattenData(), functionType: functionTypes.atomic }]));
-    },*/
+    queryableFlatten: function _flatten() {
+        return createNewQueryableDelegator(this, flatten(this));
+    },
 
     /**
      *@type {function}
      */
-    /*queryableFlattenDeep: function _flattenDeep() {
-        return createNewQueryableDelegator(this.source, this._pipeline.concat([{ fn: deepFlattenData(), functionType: functionTypes.atomic }]));
-    },*/
+    queryableFlattenDeep: function _flattenDeep() {
+        return createNewQueryableDelegator(this, deepFlatten(this));
+    },
 
     /**
      *
@@ -164,7 +170,6 @@ var queryable = {
      */
     queryableZip: function _zip(selector, collection) {
         return createNewQueryableDelegator(this, zip(this, selector, collection));
-        //return createNewQueryableDelegator(this.source, this._pipeline.concat([{ fn: zip(selector, collection), functionType: functionTypes.atomic }]));
     },
 
     /**
@@ -182,7 +187,6 @@ var queryable = {
      */
     queryableDistinct: function _distinct(comparer) {
         return createNewQueryableDelegator(this, distinct(this, comparer));
-        //return createNewQueryableDelegator(this.source, this._pipeline.concat([{ fn: distinctThunk(fields), functionType: functionTypes.atomic }]));
     },
 
     /**

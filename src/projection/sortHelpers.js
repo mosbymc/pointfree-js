@@ -94,7 +94,7 @@ function merge(left, right, field, direction, dataType) {
     else  return [cloneData(right[0])].concat(merge(left, right.slice(1, right.length), field, direction, dataType));
 }
 
-
+/*
 function sortAlgorithm(source, keySelector) {
     return function *sortAlgorithmIterator() {
         var res = [];
@@ -129,6 +129,6 @@ function sortAlgorithm(source, keySelector) {
             }
         }
     }
-}
+}*/
 
 export { sortData, sortData2 };
