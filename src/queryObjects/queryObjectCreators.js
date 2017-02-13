@@ -30,6 +30,9 @@ function createNewQueryableDelegator(source, iterator) {
     /*obj.selectMany = function _selectMany(selector, resSelector) {
         return this.queryableSelectMany(selector, resSelector);
     };*/
+    obj.map = function _map(mapfunc) {
+        return this.queryableMap(mapfunc);
+    };
     obj.where = function _where(field, operator, value) {
         return this.queryableWhere(field, operator, value);
     };
@@ -54,27 +57,27 @@ function createNewQueryableDelegator(source, iterator) {
     obj.zip = function _zip(selector, collection) {
         return this.queryableZip(selector, collection);
     };
-    /*obj.groupBy = function _groupBy(fields, sl) {
-        return this.queryableGroupBy(fields, sl);
-    };*/
-    /*obj.groupByDescending = function _groupByDescending(fields) {
-        return this.queryableGroupByDescending(fields);
-    };*/
-    /*obj.orderBy = function _orderBy(field) {
-        return this.queryableOrderBy(field);
-    };*/
-    /*obj.orderByDescending = function _orderByDescending(field) {
-        return this.queryableOrderByDescending(field);
-    };*/
+    obj.groupBy = function _groupBy(keySelector, comparer) {
+        return this.queryableGroupBy(keySelector, comparer);
+    };
+    obj.groupByDescending = function _groupByDescending(keySelector, comparer) {
+        return this.queryableGroupByDescending(keySelector, comparer);
+    };
+    obj.orderBy = function _orderBy(keySelector, comparer) {
+        return this.queryableOrderBy(keySelector, comparer);
+    };
+    obj.orderByDescending = function _orderByDescending(keySelector, comparer) {
+        return this.queryableOrderByDescending(keySelector, comparer);
+    };
     obj.distinct = function _distinct(fields) {
         return this.queryableDistinct(fields);
     };
-    /*obj.flatten = function _flatten() {
+    obj.flatten = function _flatten() {
         return this.queryableFlatten();
-    };*/
-    /*obj.flattenDeep = function _flattenDeep() {
+    };
+    obj.flattenDeep = function _flattenDeep() {
         return this.queryableFlattenDeep();
-    };*/
+    };
     obj._getData = function _getData() {
         return this._getData();
     };
@@ -270,4 +273,4 @@ function addGetter(obj) {
     );
 }
 
-export { createNewQueryableDelegator/*, createNewFilteredQueryableDelegator, createNewOrderedQueryableDelegator*/ };
+export { createNewQueryableDelegator, createNewOrderedQueryableDelegator };

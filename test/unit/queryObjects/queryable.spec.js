@@ -36,7 +36,14 @@ describe('Test queryable', function testQueryable() {
             queryableLast = queryable.queryableLast(isObject),
             queryableToArray = queryable.queryableToArray(),
             queryableToSet = queryable.queryableToSet(),
-            queryableReverse = queryable.queryableReverse();
+            queryableReverse = queryable.queryableReverse(),
+            queryableMap = queryable.queryableMap(function (item) { return item; }),
+            queryableGroupBy = queryable.queryableGroupBy(function selector(item) { return item.FirstName; }, function comparer(a, b) { return a <= b; }),
+            queryableGroupByDescending = queryable.queryableGroupByDescending(function selector(item) { return item.FirstName; }, function comparer(a, b) { return a <= b; }),
+            queryableOrderBy = queryable.queryableOrderBy(function selector(item) { return item.FirstName; }, function comparer(a, b) { return a <= b; }),
+            queryableOrderByDescending = queryable.queryableOrderByDescending(function selector(item) { return item.FirstName; }, function comparer(a, b) { return a <= b; }),
+            queryableFlatten = queryable.queryableFlatten(),
+            queryableDeepFlatten = queryable.queryableFlattenDeep();
 
         //queryable object functions that return a new queryable object delegator; check to make sure the
         //returned object delegates to the queryable object.
@@ -49,6 +56,13 @@ describe('Test queryable', function testQueryable() {
         expect(queryable.isPrototypeOf(queryableZip)).to.be.true;
         expect(queryable.isPrototypeOf(queryableWhere)).to.be.true;
         expect(queryable.isPrototypeOf(queryableDistinct)).to.be.true;
+        expect(queryable.isPrototypeOf(queryableMap)).to.be.true;
+        expect(queryable.isPrototypeOf(queryableGroupBy)).to.be.true;
+        expect(queryable.isPrototypeOf(queryableGroupByDescending)).to.be.true;
+        expect(queryable.isPrototypeOf(queryableOrderBy)).to.be.true;
+        expect(queryable.isPrototypeOf(queryableOrderByDescending)).to.be.true;
+        expect(queryable.isPrototypeOf(queryableFlatten)).to.be.true;
+        expect(queryable.isPrototypeOf(queryableDeepFlatten)).to.be.true;
 
         queryableAll.should.be.true;
         queryableAny.should.be.true;

@@ -1,15 +1,16 @@
 import { when, isArray, not } from '../functionalHelpers';
-import { sortData } from  './sortHelpers';
+import { sortData2 } from  './sortHelpers';
 
 function groupBy(source, groupObject) {
     return function *groupByIterator() {
         //gather all data from the source before grouping
-        yield groupData(when(not(isArray), Array.from, source), groupObject);
+        var groupedData = groupData(when(not(isArray), Array.from, source), groupObject);
+        for (let item of groupedData) yield item;
     };
 }
 
 function groupData(data, groupObject) {
-    var sortedData = sortData(data, groupObject),
+    var sortedData = sortData2(data, groupObject),
         retData = [];
 
     sortedData.forEach(function _groupSortedData(item) {

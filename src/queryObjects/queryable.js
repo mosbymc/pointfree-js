@@ -4,7 +4,7 @@ import { distinct, where } from '../limitation/limitationFunctions';
 import { deepFlatten, flatten, groupBy, map, orderBy } from '../projection/projectionFunctions';
 import { identity } from '../functionalHelpers';
 import { javaScriptTypes } from '../helpers';
-import { createNewQueryableDelegator, createNewOrderedQueryableDelegator/*, createNewFilteredQueryableDelegator*/ } from './queryObjectCreators';
+import { createNewQueryableDelegator, createNewOrderedQueryableDelegator } from './queryObjectCreators';
 //import { selectThunk, selectManyThunk, orderByThunk, orderByDescendingThunk, groupByThunk, groupByDescendingThunk, flattenData, deepFlattenData } from '../projection/projectionFunctions';
 //import { _takeGenerator, _takeWhileGenerator, _pipelineGenerator, any, all, last } from '../evaluation/evaluationFunctions';
 //import { expressionManager } from '../expressionManager';
@@ -19,6 +19,7 @@ import { createNewQueryableDelegator, createNewOrderedQueryableDelegator/*, crea
  * @type {{
  * queryableSelect: queryable._select,
  * queryableSelectMany: queryable._selectMany,
+ * queryableMap: queryable._queryableMap,
  * queryableGroupBy: queryable._groupBy,
  * queryableGroupByDescending: queryable._groupByDescending,
  * queryableOrderBy: queryable._orderBy,
@@ -68,6 +69,11 @@ var queryable = {
         return createNewQueryableDelegator(this.source, this._pipeline.concat([{ fn: selectManyThunk(selector, resSelector), functionType: functionTypes.atomic }]));
     },*/
 
+    /**
+     *
+     * @param mapFunc
+     * @returns {*}
+     */
     queryableMap: function _queryableMap(mapFunc) {
         return createNewQueryableDelegator(this, map(mapFunc));
     },

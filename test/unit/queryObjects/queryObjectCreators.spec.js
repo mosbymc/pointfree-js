@@ -26,14 +26,14 @@ describe('createNewQueryableDelegator', function testQueryableDelegatorObjectCre
         //queryDelegator._iterator.should.be.a('function');
 
         //PROJECTION FUNCTIONS
-        //queryDelegator.select.should.exist;
-        //queryDelegator.select.should.be.a('function');
-        //queryDelegator.groupBy.should.exist;
-        //queryDelegator.groupBy.should.be.a('function');
-        //queryDelegator.flatten.should.exist;
-        //queryDelegator.flatten.should.be.a('function');
-        //queryDelegator.flattenDeep.should.exist;
-        //queryDelegator.flattenDeep.should.be.a('function');
+        queryDelegator.flatten.should.exist;
+        queryDelegator.flatten.should.be.a('function');
+        queryDelegator.groupBy.should.exist;
+        queryDelegator.groupBy.should.be.a('function');
+        queryDelegator.flatten.should.exist;
+        queryDelegator.flatten.should.be.a('function');
+        queryDelegator.flattenDeep.should.exist;
+        queryDelegator.flattenDeep.should.be.a('function');
 
 
         //COLLATION FUNCTIONS

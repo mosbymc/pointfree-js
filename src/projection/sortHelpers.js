@@ -43,14 +43,12 @@ function sortData2(data, sortObject) {
                 else {
                     if (itemsToSort.length === 1) sortedSubData = sortedSubData.concat(itemsToSort);
                     else {
-                        let comparer = sort.direction === 'asc' ? sort.comparer : not(sort.comparer);
                         sortedSubData = sortedSubData.concat(mergeSort2(itemsToSort, sort.keySelector, comparer));
                     }
                     itemsToSort.length = 0;
                     itemsToSort.push(item);
                 }
                 if (idx === sortedData.length - 1) {
-                    let comparer = sort.direction === 'asc' ? sort.comparer : not(sort.comparer);
                     sortedSubData = sortedSubData.concat(mergeSort2(itemsToSort, sort.keySelector, comparer));
                 }
             });
