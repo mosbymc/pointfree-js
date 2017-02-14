@@ -191,6 +191,9 @@ function createNewOrderedQueryableDelegator(source, iterator, sortObj) {
     if (iterator && generatorProto.isPrototypeOf(iterator))
         obj[Symbol.iterator] = iterator;
 
+    obj.map = function _map(mapfunc) {
+        return this.orderedMap(mapfunc);
+    };
     obj.where = function _where(field, operator, value) {
         return this.orderedWhere(field, operator, value);
     };

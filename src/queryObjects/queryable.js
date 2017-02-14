@@ -75,7 +75,7 @@ var queryable = {
      * @returns {*}
      */
     queryableMap: function _queryableMap(mapFunc) {
-        return createNewQueryableDelegator(this, map(mapFunc));
+        return createNewQueryableDelegator(this, map(this, mapFunc));
     },
 
     /**
@@ -99,7 +99,7 @@ var queryable = {
      */
     queryableOrderBy: function _orderBy(keySelector, comparer) {
         var sortObj = [{ keySelector: keySelector, comparer: comparer, direction: 'asc' }];
-        return createNewOrderedQueryableDelegator(this, orderBy(sortObj), sortObj);
+        return createNewOrderedQueryableDelegator(this, orderBy(this, sortObj), sortObj);
     },
 
     /**

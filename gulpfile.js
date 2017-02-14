@@ -13,6 +13,49 @@ var gulp = require('gulp'),
 gulp.task('help', _.taskListing);
 gulp.task('default', ['help']);
 
+gulp.task('build-dev', ['clean-dev-build'], function _buildDev() {
+    var browserify = require('browserify'),
+        through2 = require('through2'),
+        es2015 = require('babel-plugin-transform-es2015-modules-commonjs'),
+        source = require('vinyl-source-stream'),
+        buffer = require('vinyl-buffer'),
+        uglify = require('gulp-uglify'),
+        sourceMaps = require('gulp-sourcemaps');
+
+    //var b = browserify({ entries: 'src/**/*.js' });
+    return gulp.src('src/**/*.js')
+        .pipe(through2.obj(function _through2(file, enc, next) {
+            browserify(file.path, {})
+                .transform(require('babelify'), { plugins: ['transform-es2015-modules-commonjs'] })
+                .bundle(function _bundle(err, res) {
+                    if (err) return next(err);
+                    file.contents = res;
+                    next(null, file);
+                });
+        }))
+        .on('error', function _error(error) {
+            console.log(error.stack);
+            this.emit('end');
+        })
+        .pipe(require('gulp-rename')('bundle.js'))
+        .pipe(gulp.dest('./dev-build'));
+    /*
+    b.bundle()
+        .pipe(source('query.js'))
+        .pipe(buffer())
+        .pipe(sourceMaps.init({ loadMaps: true }))
+        .pipe(uglify())
+        .on('error', _.log)
+        .pipr(sourceMaps.write('./'))
+        .pipe(gulp.dest('./dev-build'));
+        */
+});
+
+gulp.task('clean-dev-build', function _cleanDevBuild(done) {
+    log('cleaning dev-build bundle.js');
+    clean(config.build + 'bundle.js', done);
+});
+
 gulp.task('plato', function _plato(done) {
     var plato = require('plato');
     plato.inspect(config.build + 'scripts/grid.js', config.plato.report, config.plato.options, function noop(){

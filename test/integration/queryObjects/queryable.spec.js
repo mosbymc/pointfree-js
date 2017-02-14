@@ -1,8 +1,12 @@
 import { queryable } from '../../../src/queryObjects/queryable';
+import { orderedQueryable } from '../../../src/queryObjects/orderedQueryable';
 import { createNewQueryableDelegator } from '../../../src/queryObjects/queryObjectCreators';
 import { testData } from '../../testData';
 
 var firstThird = testData.dataSource.data.slice(0, testData.dataSource.data.length / 3);
+var drillDownData = Array.prototype.concat.apply([], testData.dataSource.data.map(function _getDrillDownData(item) {
+    return item.drillDownData;
+}));
 
 describe('Test queryable object function chaining', function testQueryable() {
     it('should work', function pleaseWork() {
@@ -18,6 +22,7 @@ describe('Test queryable object function chaining', function testQueryable() {
                 return a.FirstName === b.FirstName;
             }).data;
 
+        expect(queryable.isPrototypeOf(queryRes)).to.not.be.true;
         queryRes.should.be.an('array');
         queryRes.should.have.lengthOf(firstThird.length);
         queryRes.should.not.eql(firstThird);    //due to grouping/flattening
@@ -28,6 +33,88 @@ describe('Test queryable object function chaining', function testQueryable() {
             firstThird.some(function _findMatch(it) {
                 return it === item;
             }).should.be.not.true;
+        });
+    });
+
+    it('should chain some more functions', function testMoreFunctionChaining() {
+        var prevName = '';
+        var base = createNewQueryableDelegator(testData.dataSource.data),
+            q1 = base.where(function _pred(item) {
+                return item.FirstName === 'Mark' || item.State === 'NY';
+            }),
+            q2 = q1.orderBy(function _keySelector(item) {
+                return item.LastName;
+            }, function _comparer(a, b) {
+                return a <= b;
+            }),
+            q3 = q2.map(function _fn(item) {
+                return item.drillDownData || [];
+            }),
+            q4 = q3.flatten(),
+            q5 = q4.where(function _pred(item) {
+                return item.Year < '2005';
+            });
+
+        expect(queryable.isPrototypeOf(base)).to.be.true;
+        expect(queryable.isPrototypeOf(base)).to.be.true;
+        expect(queryable.isPrototypeOf(q1)).to.be.true;
+        expect(queryable.isPrototypeOf(q2)).to.be.true;
+        expect(orderedQueryable.isPrototypeOf(q2)).to.be.true;
+        expect(queryable.isPrototypeOf(q3)).to.be.true;
+        expect(queryable.isPrototypeOf(q4)).to.be.true;
+
+        expect(q1._evaluatedData).to.be.null;
+        expect(q2._evaluatedData).to.be.null;
+        expect(q3._evaluatedData).to.be.null;
+        expect(q4._evaluatedData).to.be.null;
+
+        var q1Data = q1.data,
+            q2Data = q2.data,
+            q3Data = q3.data,
+            q4Data = q4.data,
+            q5Data = q5.data;
+
+        q1Data.should.be.an('array');
+        q2Data.should.be.an('array');
+        q3Data.should.be.an('array');
+        q4Data.should.be.an('array');
+        q5Data.should.be.an('array');
+
+        q1Data.length.should.be.lessThan(testData.dataSource.data.length);
+        q3Data.length.should.be.lessThan(drillDownData.length);
+        q4Data.length.should.be.lessThan(drillDownData.length);
+        q5Data.length.should.be.lessThan(drillDownData.length);
+
+        q1Data.forEach(function _validateResults(item) {
+            expect(item.FirstName === 'Mark' || item.State === 'NY').to.be.true;
+        });
+        q2Data.forEach(function _validateResults(item) {
+            if (prevName === '') prevName = item.LastName;
+            item.LastName.should.be.at.least(prevName);
+        });
+        q3Data.forEach(function _validateResults(item) {
+            item.should.be.an('array');
+            item.forEach(function validateItem(it) {
+                it.MechanicName.should.not.be.undefined;
+                it.Make.should.not.be.undefined;
+                it.Model.should.not.be.undefined;
+                it.Year.should.not.be.undefined;
+                it.Doors.should.not.be.undefined;
+                it.EngineType.should.not.be.undefined;
+                it.EngineSize.should.not.be.undefined;
+            });
+        });
+        q4Data.forEach(function _validateResults(item) {
+            item.MechanicName.should.not.be.undefined;
+            item.Make.should.not.be.undefined;
+            item.Model.should.not.be.undefined;
+            item.Year.should.not.be.undefined;
+            item.Doors.should.not.be.undefined;
+            item.EngineType.should.not.be.undefined;
+            item.EngineSize.should.not.be.undefined;
+        });
+        q5Data.forEach(function _validateResults(item) {
+            item.Year.should.be.at.most('2005');
         });
     });
 });
