@@ -89,8 +89,8 @@ describe('Test intersect...', function testIntersect() {
             var intersectIterable = intersect(testData.dataSource.data, testData.dataSource.data, comparer),
                 intersectRes = Array.from(intersectIterable());
 
-            intersectRes.should.have.lengthOf(uniqueFirstNames.length);
-            intersectRes.should.eql(uniqueFirstNames);
+            intersectRes.should.have.lengthOf(testData.dataSource.data.length);
+            intersectRes.should.eql(testData.dataSource.data);
         });
 
         it('should return empty array when second parameter is empty', function testIntersectWithEmptySecondParameter() {
@@ -111,36 +111,35 @@ describe('Test intersect...', function testIntersect() {
             var intersectIterable = intersect(testData.dataSource.data, firstHalf, comparer),
                 intersectRes = Array.from(intersectIterable());
 
-            intersectRes.should.have.lengthOf(firstHalfAndUniqueNames.length);
-            intersectRes.should.eql(firstHalfAndUniqueNames);
+            intersectRes.should.have.lengthOf(testData.dataSource.data.length);
+            intersectRes.should.eql(testData.dataSource.data);
         });
 
         it('should return even indexed items with unique names when intersected with even indexed items', function testIntersectWithEvenIndexedItems() {
-            var intersectIterable = intersect(testData.dataSource.data, evenIdxs, comparer),
+            var intersectIterable = intersect(testData.dataSource.data, evenIdxs, function _comparer(a, b) { return a === b; }),
                 intersectRes = Array.from(intersectIterable());
 
-            intersectRes.should.have.lengthOf(evensAndUniqueNames.length);
+            intersectRes.should.have.lengthOf(testData.dataSource.data.length / 2);
             intersectRes.forEach(function checkForMatchingFirstNames(item, idx) {
-                item.FirstName.should.eql(evensAndUniqueNames[idx].FirstName);
+                item.FirstName.should.eql(evenIdxs[idx].FirstName);
             });
         });
 
         it('should return odd indexed items with unique names when intersected with odd indexed items', function testIntersectWithOddIndexedItems() {
-            var intersectIterable = intersect(testData.dataSource.data, oddIdxs, comparer),
+            var intersectIterable = intersect(testData.dataSource.data, oddIdxs, function _comparer(a, b) { return a === b; }),
                 intersectRes = Array.from(intersectIterable());
 
-            intersectRes.should.have.lengthOf(oddsAndUniqueNames.length);
+            intersectRes.should.have.lengthOf(testData.dataSource.data.length / 2);
             intersectRes.forEach(function checkForMatchingFirstNames(item, idx) {
-                item.FirstName.should.eql(oddsAndUniqueNames[idx].FirstName);
+                item.FirstName.should.eql(oddIdxs[idx].FirstName);
             });
         });
 
         it('should return a single item when collections because of shared .FirstName property', function testIntersectWithNonOverlappingCollections() {
-            var intersectIterable = intersect(oddIdxs, evenIdxs, comparer),
+            var intersectIterable = intersect(oddIdxs, evenIdxs, function _comparer(a, b) { return a === b; }),
                 intersectRes = Array.from(intersectIterable());
 
-            intersectRes.should.have.lengthOf(1);
-            intersectRes[0].FirstName.should.eql('Mark');
+            intersectRes.should.have.lengthOf(0);
         });
     });
 
@@ -178,8 +177,8 @@ describe('Test intersect...', function testIntersect() {
             var intersectIterable = intersect(gen(testData.dataSource.data), gen(testData.dataSource.data), comparer),
                 intersectRes = Array.from(intersectIterable());
 
-            intersectRes.should.have.lengthOf(uniqueFirstNames.length);
-            intersectRes.should.eql(uniqueFirstNames);
+            intersectRes.should.have.lengthOf(testData.dataSource.data.length);
+            intersectRes.should.eql(testData.dataSource.data);
         });
     });
 });

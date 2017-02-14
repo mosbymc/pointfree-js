@@ -2,6 +2,30 @@ import { queryable } from './queryable';
 
 var orderedQueryable = Object.create(queryable);
 
+orderedQueryable.orderedMap = function _orderedMap(mapFunc) {
+    return this.queryableMap(mapFunc);
+};
+
+orderedQueryable.orderedGroupBy = function _orderedGroupBy(keySelector, comparer) {
+    return this.queryableGroupBy(keySelector, comparer);
+};
+
+orderedQueryable.orderedGroupBy = function _orderedGroupBy(keySelector, comparer) {
+    return this.queryableGroupBy(keySelector, comparer);
+};
+
+orderedQueryable.orderedGroupByDescending = function _orderedGroupByDescending(keySelector, comparer) {
+    return this.queryableGroupByDescending(keySelector, comparer);
+};
+
+orderedQueryable.orderedFlatten = function _orderedFlatten() {
+    return this.queryableFlatten();
+};
+
+orderedQueryable.orderedFlattenDeep = function _orderedFlattenDeep() {
+    return this.queryableFlattenDeep();
+};
+
 orderedQueryable.orderedJoin = function _orderedJoin(outer, inner, projector, comparer, collection) {
     return this.queryableJoin(outer, inner, projector, comparer, collection);
 };
@@ -24,6 +48,10 @@ orderedQueryable.orderedUnion = function _orderedUnion(comparer, collection) {
 
 orderedQueryable.orderedZip = function _orderedZip(selector, collection) {
     return this.queryableZip(selector, collection);
+};
+
+orderedQueryable.orderedConat = function _orderedConcat(collection) {
+    return this.queryableConcat(collection);
 };
 
 orderedQueryable.orderedWhere = function _orderedWhere(field, operator, value) {
@@ -56,6 +84,18 @@ orderedQueryable.orderedFirst = function _orderedFirst(predicate) {
 
 orderedQueryable.orderedLast = function _orderedLast(predicate) {
     return this.queryableLast(predicate);
+};
+
+orderedQueryable.orderedToArray = function _orderedToArray() {
+    return this.queryableToArray();
+};
+
+orderedQueryable.orderedToSet = function _orderedToSet() {
+    return this.queryableToSet();
+};
+
+orderedQueryable.orderedReverse = function _orderedReverse() {
+    return this.queryableReverse();
 };
 
 export { orderedQueryable };

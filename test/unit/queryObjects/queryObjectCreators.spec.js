@@ -1,14 +1,5 @@
 import { createNewQueryableDelegator } from '../../../src/queryObjects/queryObjectCreators';
 import { testData } from '../../testData';
-import { functionTypes } from '../../../src/helpers';
-
-function collectiveFunction(data) {
-    return data;
-}
-
-function atomicFunction(item) {
-    return item;
-}
 
 describe('createNewQueryableDelegator', function testQueryableDelegatorObjectCreation() {
     it('should create a new queryable object delegator with actual pipeline array', function testSuccessfulCreation() {
@@ -77,8 +68,6 @@ describe('createNewQueryableDelegator', function testQueryableDelegatorObjectCre
         queryDelegator.take.should.be.a('function');
         queryDelegator.takeWhile.should.exist;
         queryDelegator.takeWhile.should.be.a('function');
-        //queryDelegator.insertInto.should.exist;
-        //queryDelegator.insertInto.should.be.a('function');
 
         //Functions that should not be present
         expect(queryDelegator.thenBy).to.not.exist;

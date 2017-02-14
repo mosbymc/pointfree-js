@@ -1,6 +1,7 @@
-import { sortData, sortData2 } from '../../../src/projection/sortHelpers';
+import { /*sortData,*/ sortData2 } from '../../../src/projection/sortHelpers';
 import { testData } from '../../testData';
 
+/*
 describe('sortData', function testSortData() {
     var previousFieldsValues = [],
         orderedField;
@@ -70,6 +71,7 @@ describe('sortData', function testSortData() {
         });
     });
 });
+*/
 
 describe('sort data 2', function test() {
     var previousFieldsValues = [];

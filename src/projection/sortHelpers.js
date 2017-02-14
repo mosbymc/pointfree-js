@@ -1,6 +1,7 @@
 import { comparator, dataTypeValueNormalizer, cloneData, comparisons, defaultEqualityComparer } from '../helpers';
 import { not } from '../functionalHelpers';
 
+/*
 function sortData(data, fields) {
     var sortedData = data;
     fields.forEach(function _sortItems(field, index) {
@@ -27,6 +28,7 @@ function sortData(data, fields) {
     });
     return sortedData;
 }
+*/
 
 function sortData2(data, sortObject) {
     var sortedData = data;
@@ -75,7 +77,7 @@ function merge2(left, right, keySelector, comparer) {
 
 
 
-
+/*
 function mergeSort(data, field, direction, dataType) {
     if (data.length < 2) return data;
     var middle = parseInt(data.length / 2);
@@ -91,6 +93,7 @@ function merge(left, right, field, direction, dataType) {
         return [cloneData(left[0])].concat(merge(left.slice(1, left.length), right, field, direction, dataType));
     else  return [cloneData(right[0])].concat(merge(left, right.slice(1, right.length), field, direction, dataType));
 }
+*/
 
 /*
 function sortAlgorithm(source, keySelector) {
@@ -129,4 +132,4 @@ function sortAlgorithm(source, keySelector) {
     }
 }*/
 
-export { sortData, sortData2 };
+export { /*sortData,*/ sortData2 };

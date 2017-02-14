@@ -82,7 +82,7 @@ var queryable = {
      *@type {function}
      */
     queryableGroupBy: function _groupBy(keySelector, comparer) {
-        var groupObj = { keySelector: keySelector, comparer: comparer, direction: 'asc' };
+        var groupObj = [{ keySelector: keySelector, comparer: comparer, direction: 'asc' }];
         return createNewQueryableDelegator(this, groupBy(this, groupObj));
     },
 
@@ -90,7 +90,7 @@ var queryable = {
      *@type {function}
      */
     queryableGroupByDescending: function _groupByDescending(keySelector, comparer) {
-         var groupObj = { keySelector: keySelector, comparer: comparer, direction: 'desc' };
+         var groupObj = [{ keySelector: keySelector, comparer: comparer, direction: 'desc' }];
          return createNewQueryableDelegator(this, groupBy(this, groupObj));
     },
 
@@ -98,7 +98,7 @@ var queryable = {
      *@type {function}
      */
     queryableOrderBy: function _orderBy(keySelector, comparer) {
-        var sortObj = { keySelector: keySelector, comparer: comparer, direction: 'asc' };
+        var sortObj = [{ keySelector: keySelector, comparer: comparer, direction: 'asc' }];
         return createNewOrderedQueryableDelegator(this, orderBy(sortObj), sortObj);
     },
 
@@ -106,7 +106,7 @@ var queryable = {
      *@type {function}
      */
     queryableOrderByDescending: function _orderByDescending(keySelector, comparer) {
-        var sortObj = { keySelector: keySelector, comparer: comparer, direction: 'desc' };
+        var sortObj = [{ keySelector: keySelector, comparer: comparer, direction: 'desc' }];
         return createNewOrderedQueryableDelegator(this, orderBy(this, sortObj), sortObj);
     },
 

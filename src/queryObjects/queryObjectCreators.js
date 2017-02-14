@@ -206,8 +206,8 @@ function createNewOrderedQueryableDelegator(source, iterator, sortObj) {
     obj.except = function _except(collection, comparer) {
         return this.orderedExcept(collection, comparer);
     };
-    obj.intersect = function _intersect(comparer, collection) {
-        return this.orderedIntersect(comparer, collection);
+    obj.intersect = function _intersect(collection, comparer) {
+        return this.orderedIntersect(collection, comparer);
     };
     obj.distinct = function _distinct(fields) {
         return this.orderedDistinct(fields);
@@ -265,7 +265,9 @@ function addGetter(obj) {
                 //TODO: form that what is currently here; for now I am going to leave the check for pre-eval-ed data in place
                 if (!this._dataComputed) {
                     //TODO: is this valid for an object that has an iterator? Seems like it should work...
-                    return Array.from(this);
+                    var res = Array.from(this);
+                    this._evaluatedData = res;
+                    return res;
                 }
                 return this._evaluatedData;
             }
