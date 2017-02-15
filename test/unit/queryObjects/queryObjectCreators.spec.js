@@ -9,8 +9,8 @@ describe('createNewQueryableDelegator', function testQueryableDelegatorObjectCre
 
         //Properties that should be present
         //queryDelegator._data.should.eql(testData.dataSource.data);
-        expect(queryDelegator._evaluatedData).to.be.null;
-        queryDelegator._currentDataIndex.should.eql(0);
+        expect(queryDelegator.evaluatedData).to.be.undefined;
+        queryDelegator.dataComputed.should.be.false;
 
         //Functions that should be present
         //queryDelegator._iterator.should.exist;

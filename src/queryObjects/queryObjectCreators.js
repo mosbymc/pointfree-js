@@ -13,10 +13,8 @@ var generatorProto = Object.getPrototypeOf(function *_generator(){});
 
 function createNewQueryableDelegator(source, iterator) {
     var obj = Object.create(queryable);
+    obj.dataComputed = false;
     obj.source = source;
-    obj._evaluatedData = null;
-    obj._dataComputed = false;
-    obj._currentDataIndex = 0;
     if (iterator && generatorProto.isPrototypeOf(iterator))
         obj[Symbol.iterator] = iterator;
     //TODO: may not need to set a default iterator here... if the iterator value is passed in, then
@@ -30,8 +28,8 @@ function createNewQueryableDelegator(source, iterator) {
     /*obj.selectMany = function _selectMany(selector, resSelector) {
         return this.queryableSelectMany(selector, resSelector);
     };*/
-    obj.map = function _map(mapfunc) {
-        return this.queryableMap(mapfunc);
+    obj.map = function _map(mapFunc) {
+        return this.queryableMap(mapFunc);
     };
     obj.where = function _where(field, operator, value) {
         return this.queryableWhere(field, operator, value);
@@ -184,15 +182,13 @@ function createNewOrderedQueryableDelegator(source, iterator, sortObj) {
 
     var obj = Object.create(orderedQueryable);
     obj.source = source;
-    obj._evaluatedData = null;
-    obj._dataComputed = false;
-    obj._currentDataIndex = 0;
+    obj.dataComputed = false;
     obj._appliedSorts = sortObj;
     if (iterator && generatorProto.isPrototypeOf(iterator))
         obj[Symbol.iterator] = iterator;
 
-    obj.map = function _map(mapfunc) {
-        return this.orderedMap(mapfunc);
+    obj.map = function _map(mapFunc) {
+        return this.orderedMap(mapFunc);
     };
     obj.where = function _where(field, operator, value) {
         return this.orderedWhere(field, operator, value);
@@ -266,10 +262,11 @@ function addGetter(obj) {
             get: function _data() {
                 //TODO: not sure if I plan on 'saving' the eval-ed data of a queryable object, and if I do, it'll take a different
                 //TODO: form that what is currently here; for now I am going to leave the check for pre-eval-ed data in place
-                if (!this._dataComputed) {
+                if (!this.dataComputed) {
                     //TODO: is this valid for an object that has an iterator? Seems like it should work...
                     var res = Array.from(this);
-                    this._evaluatedData = res;
+                    this.dataComputed = true;
+                    this.evaluatedData = res;
                     return res;
                 }
                 return this._evaluatedData;

@@ -17,34 +17,34 @@ import { createNewQueryableDelegator, createNewOrderedQueryableDelegator } from 
 /**
  * Primary object to which filteredQueryables and orderedQueryables, as well as the objects passed to consumers, all delegate.
  * @type {{
- * queryableSelect: queryable._select,
- * queryableSelectMany: queryable._selectMany,
- * queryableMap: queryable._queryableMap,
- * queryableGroupBy: queryable._groupBy,
- * queryableGroupByDescending: queryable._groupByDescending,
- * queryableOrderBy: queryable._orderBy,
- * queryableOrderByDescending: queryable._orderByDescending,
- * queryableFlatten: queryable._flatten,
- * queryableFlattenDeep: queryable._flattenDeep,
- * queryableJoin: queryable._join,
- * queryableGroupJoin: queryable._groupJoin,
- * queryableExcept: queryable._except,
- * queryableIntersect: queryable._intersect,
- * queryableUnion: queryable._union,
- * queryableZip: queryable._zip,
- * queryableWhere: queryable._where,
- * queryableDistinct: queryable._distinct,
- * queryableTake: queryable._take,
- * queryableTakeWhile: queryable.takeWhile,
+ * queryableFrom: * _queryableFrom,
+ * queryableMap: * queryable._queryableMap,
+ * queryableGroupBy: * queryable._groupBy,
+ * queryableGroupByDescending: * queryable._groupByDescending,
+ * queryableOrderBy: * queryable._orderBy,
+ * queryableOrderByDescending: * queryable._orderByDescending,
+ * queryableFlatten: * queryable._flatten,
+ * queryableFlattenDeep: * queryable._flattenDeep,
+ * queryableConcat: * queryable._concat,
+ * queryableExcept: * queryable._except,
+ * queryableGroupJoin: * queryable._groupJoin,
+ * queryableIntersect: * queryable._intersect,
+ * queryableJoin: * queryable._join,
+ * queryableUnion: * queryable._union,
+ * queryableZip: * queryable._zip,
+ * queryableWhere: * queryable._where,
+ * queryableDistinct: * queryable._distinct,
+ * queryableTake: * queryable._take,
+ * queryableTakeWhile: * queryable.takeWhile,
  * queryableAny: queryable._any,
  * queryableAll: queryable._all,
- * queryableFirst: queryable.first,
- * queryableLast: queryable.last,
- * queryableToArray: queryable._toArray,
- * queryableToSet: queryable._toSet,
- * queryableReverse: queryable._reverse,
- * [Symbol.iterator]: queryable._iterator
- * }}
+ * queryableFirst: * queryable._first,
+ * queryableLast: * queryable._last,
+ * queryableToArray: * queryable._toArray,
+ * queryableToSet: * queryable._toSet,
+  *queryableReverse: * queryable._reverse,
+  * [Symbol.iterator]: * queryable._iterator
+  * }}
  */
 var queryable = {
     /**
@@ -68,6 +68,52 @@ var queryable = {
     /*queryableSelectMany: function _selectMany(selector, resSelector) {
         return createNewQueryableDelegator(this.source, this._pipeline.concat([{ fn: selectManyThunk(selector, resSelector), functionType: functionTypes.atomic }]));
     },*/
+
+    /**
+     * Getter for underlying _evaluatedData field; Holds an array of data
+     * after enumerating the queryable delegator instance's source
+     * @returns {*}
+     */
+    get evaluatedData() {
+        return this._evaluatedData;
+    },
+
+    /**
+     * Setter for underlying _evaluatedData field; returns either an
+     * array if the queryable delegator instance's source has been
+     * enumerated, or undefined
+     * @param val
+     */
+    set evaluatedData(val) {
+        this._evaluatedData = val;
+    },
+
+    /**
+     * Getter for underlying _dataComputed field; returns true if
+     * the queryable delegator instance's source has been enumerated
+     * and false if not
+     * @returns {*}
+     */
+    get dataComputed() {
+        return this._dataComputed;
+    },
+
+    /**
+     * Setter for underlying _dataComputed field
+     * @param val
+     */
+    set dataComputed(val) {
+        this._dataComputed = val;
+    },
+
+    /**
+     *
+     * @param source
+     * @returns {*}
+     */
+    queryableFrom: function _queryableFrom(source) {
+        return createNewQueryableDelegator(source);
+    },
 
     /**
      *

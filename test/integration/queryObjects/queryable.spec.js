@@ -48,31 +48,47 @@ describe('Test queryable object function chaining', function testQueryable() {
                 return a <= b;
             }),
             q3 = q2.map(function _fn(item) {
-                return item.drillDownData || [];
+                return item.drillDownData;
             }),
             q4 = q3.flatten(),
             q5 = q4.where(function _pred(item) {
                 return item.Year < '2005';
             });
 
+        base.dataComputed.should.be.false;
         expect(queryable.isPrototypeOf(base)).to.be.true;
         expect(queryable.isPrototypeOf(base)).to.be.true;
+        q1.dataComputed.should.be.false;
         expect(queryable.isPrototypeOf(q1)).to.be.true;
+        q2.dataComputed.should.be.false;
         expect(queryable.isPrototypeOf(q2)).to.be.true;
         expect(orderedQueryable.isPrototypeOf(q2)).to.be.true;
+        q3.dataComputed.should.be.false;
         expect(queryable.isPrototypeOf(q3)).to.be.true;
+        q4.dataComputed.should.be.false;
         expect(queryable.isPrototypeOf(q4)).to.be.true;
 
-        expect(q1._evaluatedData).to.be.null;
-        expect(q2._evaluatedData).to.be.null;
-        expect(q3._evaluatedData).to.be.null;
-        expect(q4._evaluatedData).to.be.null;
+        expect(q1.evaluatedData).to.be.undefined;
+        expect(q2.evaluatedData).to.be.undefined;
+        expect(q3.evaluatedData).to.be.undefined;
+        expect(q4.evaluatedData).to.be.undefined;
 
         var q1Data = q1.data,
             q2Data = q2.data,
             q3Data = q3.data,
             q4Data = q4.data,
             q5Data = q5.data;
+
+        q1.evaluatedData.should.eql(q1Data);
+        q1.dataComputed.should.be.true;
+        q2.evaluatedData.should.eql(q2Data);
+        q2.dataComputed.should.be.true;
+        q3.evaluatedData.should.eql(q3Data);
+        q3.dataComputed.should.be.true;
+        q4.evaluatedData.should.eql(q4Data);
+        q4.dataComputed.should.be.true;
+        q5.evaluatedData.should.eql(q5Data);
+        q5.dataComputed.should.be.true;
 
         q1Data.should.be.an('array');
         q2Data.should.be.an('array');

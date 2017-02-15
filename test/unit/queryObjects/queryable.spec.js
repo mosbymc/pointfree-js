@@ -21,6 +21,9 @@ queryable.source = testData.dataSource.data;
 
 describe('Test queryable', function testQueryable() {
     it('should create a new queryable delegate', function testObjectDelegation() {
+        expect(queryable.dataComputed).to.be.undefined;
+        expect(queryable.evaluatedData).to.be.undefined;
+
         var concatQueryable = queryable.queryableConcat(testData.dataSource.data),
             exceptQueryable = queryable.queryableExcept(testData.dataSource.data),
             groupJoinQueryable = queryable.queryableGroupJoin(testData.dataSource.data, nameSelector, nameSelector, nameProjector),
@@ -48,21 +51,37 @@ describe('Test queryable', function testQueryable() {
         //queryable object functions that return a new queryable object delegator; check to make sure the
         //returned object delegates to the queryable object.
         expect(queryable.isPrototypeOf(concatQueryable)).to.be.true;
+        concatQueryable.dataComputed.should.be.false;
         expect(queryable.isPrototypeOf(exceptQueryable)).to.be.true;
+        exceptQueryable.dataComputed.should.be.false;
         expect(queryable.isPrototypeOf(groupJoinQueryable)).to.be.true;
+        groupJoinQueryable.dataComputed.should.be.false;
         expect(queryable.isPrototypeOf(queryableIntersect)).to.be.true;
+        queryableIntersect.dataComputed.should.be.false;
         expect(queryable.isPrototypeOf(queryableJoin)).to.be.true;
+        queryableJoin.dataComputed.should.be.false;
         expect(queryable.isPrototypeOf(queryableUnion)).to.be.true;
+        queryableUnion.dataComputed.should.be.false;
         expect(queryable.isPrototypeOf(queryableZip)).to.be.true;
+        queryableZip.dataComputed.should.be.false;
         expect(queryable.isPrototypeOf(queryableWhere)).to.be.true;
+        queryableWhere.dataComputed.should.be.false;
         expect(queryable.isPrototypeOf(queryableDistinct)).to.be.true;
+        queryableDistinct.dataComputed.should.be.false;
         expect(queryable.isPrototypeOf(queryableMap)).to.be.true;
+        queryableMap.dataComputed.should.be.false;
         expect(queryable.isPrototypeOf(queryableGroupBy)).to.be.true;
+        queryableGroupBy.dataComputed.should.be.false;
         expect(queryable.isPrototypeOf(queryableGroupByDescending)).to.be.true;
+        queryableGroupByDescending.dataComputed.should.be.false;
         expect(queryable.isPrototypeOf(queryableOrderBy)).to.be.true;
+        queryableOrderBy.dataComputed.should.be.false;
         expect(queryable.isPrototypeOf(queryableOrderByDescending)).to.be.true;
+        queryableOrderByDescending.dataComputed.should.be.false;
         expect(queryable.isPrototypeOf(queryableFlatten)).to.be.true;
+        queryableFlatten.dataComputed.should.be.false;
         expect(queryable.isPrototypeOf(queryableDeepFlatten)).to.be.true;
+        queryableDeepFlatten.dataComputed.should.be.false;
 
         queryableAll.should.be.true;
         queryableAny.should.be.true;
@@ -106,7 +125,6 @@ describe('Test queryable', function testQueryable() {
             takeWhile4 = queryable.queryableTakeWhile(predicate4);
 
         takeWhile1.should.have.lengthOf(0);
-        console.log(takeWhile2);
         //takeWhile2.should.have.lengthOf(testData.dataSource.data.length);
         //takeWhile2.should.eql(testData.dataSource.data);
         takeWhile3.forEach(function _checkDrillDownLength(item) {
