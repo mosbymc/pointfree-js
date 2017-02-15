@@ -21,6 +21,8 @@ var wallabify = require('wallabify'),
  return Object.keys(hash);
  };*/
 
+process.env.BABEL_ENV = 'test';
+
 module.exports = function _wallaby(wallaby) {
     return {
         //debug: true,
@@ -45,7 +47,8 @@ module.exports = function _wallaby(wallaby) {
             { pattern: 'node_modules/babel-polyfill/dist/polyfill.js', instrument: false },
             { pattern : 'src/**/*.js', load: false },
             { pattern: 'test/testData.js', load: false },
-            '!test/**/*.spec.js'
+            '!test/**/*.spec.js',
+            '!src/index.js'
         ],
 
         /*

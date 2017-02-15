@@ -13,47 +13,56 @@ var gulp = require('gulp'),
 gulp.task('help', _.taskListing);
 gulp.task('default', ['help']);
 
-gulp.task('build-dev', ['clean-dev-build'], function _buildDev() {
+gulp.task('build-dev', ['clean-dev-build'], function _testTmp() {
+    process.env.BABEL_ENV = 'build';
+    process.env.NODE_ENV = 'build';
+
     var browserify = require('browserify'),
-        through2 = require('through2'),
-        es2015 = require('babel-plugin-transform-es2015-modules-commonjs'),
+        babelify = require('babelify'),
         source = require('vinyl-source-stream'),
         buffer = require('vinyl-buffer'),
         uglify = require('gulp-uglify'),
         sourceMaps = require('gulp-sourcemaps');
 
-    //var b = browserify({ entries: 'src/**/*.js' });
-    return gulp.src('src/**/*.js')
-        .pipe(through2.obj(function _through2(file, enc, next) {
-            browserify(file.path, {})
-                .transform(require('babelify'), { plugins: ['transform-es2015-modules-commonjs'] })
-                .bundle(function _bundle(err, res) {
-                    if (err) return next(err);
-                    file.contents = res;
-                    next(null, file);
-                });
-        }))
-        .on('error', function _error(error) {
-            console.log(error.stack);
-            this.emit('end');
-        })
-        .pipe(require('gulp-rename')('bundle.js'))
-        .pipe(gulp.dest('./dev-build'));
-    /*
-    b.bundle()
-        .pipe(source('query.js'))
+    // set up the browserify instance on a task basis
+    var b = browserify({
+        entries: './src/index.js',
+        debug: true,
+        // defining transforms here will avoid crashing your stream
+        transform: [babelify]
+    });
+
+    return b
+        //.transform(require('babelify'), { presets: [], plugins: ['babel-plugin-transform-es2015-modules-commonjs'] })
+        .bundle()
+        .pipe(source('./src/index.js'))
         .pipe(buffer())
-        .pipe(sourceMaps.init({ loadMaps: true }))
-        .pipe(uglify())
-        .on('error', _.log)
-        .pipr(sourceMaps.write('./'))
-        .pipe(gulp.dest('./dev-build'));
-        */
+        .pipe(sourceMaps.init({loadMaps: true}))
+        // Add transformation tasks to the pipeline here.
+        //.pipe(uglify())
+        //.on('error', _.util.log)
+        .pipe(sourceMaps.write('./'))
+        .pipe(_.rename('bundle.js'))
+        .pipe(gulp.dest('./dev-build/'));
+});
+
+gulp.task('babel-dev', ['clean-tmp'], function _babelDev() {
+    process.env.BABEL_ENV = 'build';
+    process.env.NODE_ENV = 'build';
+
+    return gulp.src('./src/**/*.js')
+        .pipe(_.babel())
+        .pipe(gulp.dest('./tmp'));
 });
 
 gulp.task('clean-dev-build', function _cleanDevBuild(done) {
     log('cleaning dev-build bundle.js');
-    clean(config.build + 'bundle.js', done);
+    clean(config.build + '**/*.js', done);
+});
+
+gulp.task('clean-tmp', function _cleanTmp(done) {
+    log('Cleaning tmp');
+    clean('./tmp', done);
 });
 
 gulp.task('plato', function _plato(done) {
