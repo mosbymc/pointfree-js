@@ -1,4 +1,4 @@
-import { comparisons, defaultEqualityComparer, memoizer, memoizer2,
+import { comparisons, defaultEqualityComparer, defaultGreaterThanComparer, defaultPredicate, memoizer, memoizer2,
     getNumbersFromTime, comparator, dataTypeValueNormalizer, cloneData, cloneArray } from '../../src/helpers';
 import { testData } from '../testData';
 
@@ -77,6 +77,51 @@ describe('defaultEqualityComparer', function testDefaultEqualityComparer() {
         dec7.should.not.be.true;
         dec8.should.not.be.true;
         dec9.should.not.be.true;
+    });
+});
+
+describe('defaultGreaterThanComparer', function testDefaultGreaterThanComparer() {
+    it('should return true when the first item is greater than the second', function testGreaterThanComparerWithGreaterFirstArg() {
+        var dgc1 = defaultGreaterThanComparer(2, 1),
+            dgc2 = defaultGreaterThanComparer('2', '1'),
+            dgc3 = defaultGreaterThanComparer(true, false);
+
+        dgc1.should.be.true;
+        dgc2.should.be.true;
+        dgc3.should.be.true;
+    });
+
+    it('should return false when the first item is less than or equal to the second', function testGreaterThanComparerWithLessThanOrEqualFirstArg() {
+        var dgc1 = defaultGreaterThanComparer(1, 2),
+            dgc2 = defaultGreaterThanComparer('1', '1'),
+            dgc3 = defaultGreaterThanComparer(false, true);
+
+        dgc1.should.not.be.true;
+        dgc2.should.not.be.true;
+        dgc3.should.not.be.true;
+    });
+});
+
+describe('defaultPredicate', function testDefaultPredicate() {
+    it('should always return true', function ensureDefaultPredicateReturnsTrue() {
+        var dp1 = defaultPredicate(),
+            dp2 = defaultPredicate(false),
+            dp3 = defaultPredicate(true),
+            dp4 = defaultPredicate(0),
+            dp5 = defaultPredicate(null),
+            dp6 = true;
+
+        var i = 0;
+        while (i < 20 && dp6) {
+            dp6 = defaultPredicate();
+            ++i;
+        }
+        dp1.should.be.true;
+        dp2.should.be.true;
+        dp3.should.be.true;
+        dp4.should.be.true;
+        dp5.should.be.true;
+        dp6.should.be.true;
     });
 });
 

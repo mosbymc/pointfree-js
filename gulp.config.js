@@ -1,6 +1,6 @@
 module.exports = function _gulpConfig() {
     'use strict';
-    var build = './dev-build/',
+    var build = './dev/',
         src = './src/',
         dev = './dev/',
         test = './test/',

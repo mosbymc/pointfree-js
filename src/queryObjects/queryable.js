@@ -2,12 +2,9 @@ import { concat, except, groupJoin, intersect, join, union, zip } from '../colla
 import { all, any, first, last } from '../evaluation/evaluationFunctions';
 import { distinct, where } from '../limitation/limitationFunctions';
 import { deepFlatten, flatten, groupBy, map, orderBy } from '../projection/projectionFunctions';
-import { identity } from '../functionalHelpers';
-import { javaScriptTypes } from '../helpers';
 import { createNewQueryableDelegator, createNewOrderedQueryableDelegator } from './queryObjectCreators';
-//import { selectThunk, selectManyThunk, orderByThunk, orderByDescendingThunk, groupByThunk, groupByDescendingThunk, flattenData, deepFlattenData } from '../projection/projectionFunctions';
-//import { _takeGenerator, _takeWhileGenerator, _pipelineGenerator, any, all, last } from '../evaluation/evaluationFunctions';
-//import { expressionManager } from '../expressionManager';
+import { generatorProto } from '../helpers';
+import { isArray, wrap } from '../functionalHelpers';
 
 
 //TODO: Not sure if this has been done yet or not, but need a way to create new query/query-type object without
@@ -17,7 +14,7 @@ import { createNewQueryableDelegator, createNewOrderedQueryableDelegator } from 
 /**
  * Primary object to which filteredQueryables and orderedQueryables, as well as the objects passed to consumers, all delegate.
  * @type {{
- * queryableFrom: * _queryableFrom,
+ * queryableFrom: queryable._queryableFrom,
  * queryableMap: * queryable._queryableMap,
  * queryableGroupBy: * queryable._groupBy,
  * queryableGroupByDescending: * queryable._groupByDescending,
@@ -69,6 +66,12 @@ var queryable = {
         return createNewQueryableDelegator(this.source, this._pipeline.concat([{ fn: selectManyThunk(selector, resSelector), functionType: functionTypes.atomic }]));
     },*/
 
+    //TODO: 1) See about initializing the queryable object with the _evaluatedData and _dataComputed
+    //TODO:    properties upfront and making then non-enumerable.
+    //TODO: 2) See if, via closure, I can bypass the need for getters/setters for properties that can
+    //TODO:    ultimately be read and written to directly with a getter/setter property that maintains
+    //TODO:    its own internal state - this would probably need to be done via Object.defineProperty
+    //TODO:    as the closure would have to be shared amongst both the getter and setter
     /**
      * Getter for underlying _evaluatedData field; Holds an array of data
      * after enumerating the queryable delegator instance's source
@@ -107,12 +110,23 @@ var queryable = {
     },
 
     /**
-     *
-     * @param source
-     * @returns {*}
+     * Creates a new queryable delegator object from whatever source value is provided.
+     * @param {*} source - The source argument can be any JavaScript value. It will default
+     * to an empty array if 'undefined' is passed. If the source argument is a generator,
+     * an array, or another queryable, the function will accept it as is; if the source
+     * argument has a [Symbol.iterator] definition, it will call Array.from on the source
+     * before creating a new delegator, otherwise it will wrap the source argument in
+     * as array.
+     * @returns { Object } Returns a new queryable delegator object with its source set
+     * to the value of the provided source argument
      */
-    queryableFrom: function _queryableFrom(source) {
-        return createNewQueryableDelegator(source);
+    queryableFrom: function _queryableFrom(source = []) {
+        //... if the source is a generator, an array, or another queryable, accept it as is...
+        if (generatorProto.isPrototypeOf(source) || isArray(source) || queryable.isPrototypeOf(source))
+            return createNewQueryableDelegator(source);
+        //... otherwise, turn the source into an array before creating a new queryable delegator object;
+        //if it has an iterator, use Array.from, else wrap the source arg in an array...
+        return createNewQueryableDelegator(null !== source && source[Symbol.iterator] ? Array.from(source) : wrap(source));
     },
 
     /**
@@ -125,7 +139,10 @@ var queryable = {
     },
 
     /**
-     *@type {function}
+     *
+     * @param keySelector
+     * @param comparer
+     * @returns {*}
      */
     queryableGroupBy: function _groupBy(keySelector, comparer) {
         var groupObj = [{ keySelector: keySelector, comparer: comparer, direction: 'asc' }];
@@ -133,7 +150,10 @@ var queryable = {
     },
 
     /**
-     *@type {function}
+     *
+     * @param keySelector
+     * @param comparer
+     * @returns {*}
      */
     queryableGroupByDescending: function _groupByDescending(keySelector, comparer) {
          var groupObj = [{ keySelector: keySelector, comparer: comparer, direction: 'desc' }];
@@ -141,7 +161,10 @@ var queryable = {
     },
 
     /**
-     *@type {function}
+     *
+     * @param keySelector
+     * @param comparer
+     * @returns {*}
      */
     queryableOrderBy: function _orderBy(keySelector, comparer) {
         var sortObj = [{ keySelector: keySelector, comparer: comparer, direction: 'asc' }];
@@ -149,7 +172,10 @@ var queryable = {
     },
 
     /**
-     *@type {function}
+     *
+     * @param keySelector
+     * @param comparer
+     * @returns {*}
      */
     queryableOrderByDescending: function _orderByDescending(keySelector, comparer) {
         var sortObj = [{ keySelector: keySelector, comparer: comparer, direction: 'desc' }];
@@ -190,42 +216,65 @@ var queryable = {
     },
 
     /**
-     *@type {function}
+     *
+     * @param inner
+     * @param outerSelector
+     * @param innerSelector
+     * @param projector
+     * @param comparer
+     * @returns {*}
      */
     queryableGroupJoin: function _groupJoin(inner, outerSelector, innerSelector, projector, comparer) {
         return createNewQueryableDelegator(this, groupJoin(this, inner, outerSelector, innerSelector, projector, comparer));
     },
 
     /**
-     *@type {function}
+     *
+     * @param collection
+     * @param comparer
+     * @returns {*}
      */
     queryableIntersect: function _intersect(collection, comparer) {
         return createNewQueryableDelegator(this, intersect(this, collection, comparer));
     },
 
     /**
-     *@type {function}
+     *
+     * @param inner
+     * @param outerSelector
+     * @param innerSelector
+     * @param projector
+     * @param comparer
+     * @returns {*}
      */
     queryableJoin: function _join(inner, outerSelector, innerSelector, projector, comparer) {
         return createNewQueryableDelegator(this, join(this, inner, outerSelector, innerSelector, projector, comparer));
     },
 
     /**
-     *@type {function}
+     *
+     * @param collection
+     * @param comparer
+     * @returns {*}
      */
     queryableUnion: function _union(collection, comparer) {
         return createNewQueryableDelegator(this, union(this, collection, comparer));
     },
 
     /**
-     *@type {function}
+     *
+     * @param selector
+     * @param collection
+     * @returns {*}
      */
     queryableZip: function _zip(selector, collection) {
         return createNewQueryableDelegator(this, zip(this, selector, collection));
     },
 
     /**
-     *@type {function}
+     *
+     * @param predicate
+     * @returns {*}
      */
     queryableWhere: function _where(predicate) {
         return createNewQueryableDelegator(this, where(this, predicate));
@@ -235,14 +284,18 @@ var queryable = {
     },
 
     /**
-     *@type {function}
+     *
+     * @param comparer
+     * @returns {*}
      */
     queryableDistinct: function _distinct(comparer) {
         return createNewQueryableDelegator(this, distinct(this, comparer));
     },
 
     /**
-     *@type {function}
+     *
+     * @param amt
+     * @returns {Array}
      */
     queryableTake: function _take(amt = 1) {
         //TODO: If I decide to 'save' not just a fully evaluated 'source', but also any data from a partially evaluated
@@ -269,7 +322,9 @@ var queryable = {
     },
 
     /**
-     *@type {function}
+     *
+     * @param predicate
+     * @returns {Array}
      */
     queryableTakeWhile: function takeWhile(predicate) {
         var res = [];
@@ -283,66 +338,92 @@ var queryable = {
                 }
             }
         }
-
-        /*for (let item of this._evaluatedData) {
-            if (predicate(item)) res = res.concat([item]);
-            else return res;
-        }*/
     },
 
     /**
-     *@type {function}
+     *
+     * @param predicate
+     * @returns {*}
      */
     queryableAny: function _any(predicate) {
         return any(this, predicate);
     },
 
     /**
-     *@type {function}
+     *
+     * @param predicate
+     * @returns {*}
      */
     queryableAll: function _all(predicate) {
         return all(this, predicate);
     },
 
     /**
-     *@type {function}
+     *
+     * @param predicate
+     * @returns {*}
      */
     queryableFirst: function _first(predicate) {
         return first(this, predicate);
     },
 
     /**
-     *@type {function}
+     *
+     * @param predicate
+     * @returns {*}
      */
     queryableLast: function _last(predicate) {
         return last(this, predicate);
     },
 
     /**
-     * @type {function}
+     *
+     * @returns {Array}
      */
     queryableToArray: function _toArray() {
         return Array.from(this);
     },
 
     /**
-     * @type {function}
+     *
+     * @returns {Set}
      */
     queryableToSet: function _toSet() {
         return new Set(this);
     },
 
     /**
-     * @type {function}
+     *
+     * @returns {Array.<*>}
      */
     queryableReverse: function _reverse() {
         return Array.from(this).reverse();
     },
 
+    /**
+     *
+     */
     [Symbol.iterator]: function *_iterator() {
         for (let item of this.source)
             yield item;
     }
 };
+
+/*
+function createEvaledDateProperty(obj) {
+    var data = null;
+    Object.defineProperty(
+        obj,
+        'evaledData', {
+            get: function _getEvaledData() {
+                return data;
+            },
+            set: function _setEvaledData(val) {
+                data = val;
+            }
+        }
+    );
+}
+*/
 
 export { queryable };

@@ -1,15 +1,9 @@
 import { queryable } from './queryable';
 import { orderedQueryable } from './orderedQueryable';
 import { orderBy } from '../projection/projectionFunctions';
+import { defaultEqualityComparer, defaultPredicate, generatorProto } from '../helpers';
 //import { filteredQueryable } from './filteredQueryable';
 //import { filterAppend } from '../limitation/limitationFunctions';
-//import { orderByThunk, orderByDescendingThunk } from '../projection/projectionFunctions';
-//import { _pipelineGenerator } from '../evaluation/pipelineGenerator';
-//import { functionTypes } from '../helpers';
-import { ifElse, not, isArray, wrap, identity } from '../functionalHelpers';
-//import { expressionManager } from '../expressionManager';
-
-var generatorProto = Object.getPrototypeOf(function *_generator(){});
 
 function createNewQueryableDelegator(source, iterator) {
     var obj = Object.create(queryable);
@@ -31,30 +25,31 @@ function createNewQueryableDelegator(source, iterator) {
     obj.map = function _map(mapFunc) {
         return this.queryableMap(mapFunc);
     };
-    obj.where = function _where(field, operator, value) {
-        return this.queryableWhere(field, operator, value);
+    obj.where = function _where(predicate) {
+        return this.queryableWhere(predicate);
     };
     obj.concat = function _concat(collection) {
         return this.queryableConcat(collection);
     };
-    obj.except = function _except(collection, comparer) {
+    obj.except = function _except(collection, comparer = defaultEqualityComparer) {
         return this.queryableExcept(collection, comparer);
     };
-    obj.groupJoin = function _groupJoin(inner, outerSelector, innerSelector, projector, comparer) {
+    obj.groupJoin = function _groupJoin(inner, outerSelector, innerSelector, projector, comparer = defaultEqualityComparer) {
         return this.queryableGroupJoin(inner, outerSelector, innerSelector, projector, comparer);
     };
-    obj.intersect = function _intersect(collection, comparer) {
+    obj.intersect = function _intersect(collection, comparer = defaultEqualityComparer) {
         return this.queryableIntersect(collection, comparer);
     };
-    obj.join = function _join(inner, outerSelector, innerSelector, projector, comparer) {
+    obj.join = function _join(inner, outerSelector, innerSelector, projector, comparer = defaultEqualityComparer) {
         return this.queryableJoin(inner, outerSelector, innerSelector, projector, comparer);
     };
-    obj.union = function _union(collection, comparer) {
+    obj.union = function _union(collection, comparer = defaultEqualityComparer) {
         return this.queryableUnion(collection, comparer);
     };
     obj.zip = function _zip(selector, collection) {
         return this.queryableZip(selector, collection);
     };
+    //TODO: see if setting up a default value for the group/order comparer is a necessary thing
     obj.groupBy = function _groupBy(keySelector, comparer) {
         return this.queryableGroupBy(keySelector, comparer);
     };
@@ -67,8 +62,8 @@ function createNewQueryableDelegator(source, iterator) {
     obj.orderByDescending = function _orderByDescending(keySelector, comparer) {
         return this.queryableOrderByDescending(keySelector, comparer);
     };
-    obj.distinct = function _distinct(fields) {
-        return this.queryableDistinct(fields);
+    obj.distinct = function _distinct(comparer = defaultEqualityComparer) {
+        return this.queryableDistinct(comparer);
     };
     obj.flatten = function _flatten() {
         return this.queryableFlatten();
@@ -85,10 +80,10 @@ function createNewQueryableDelegator(source, iterator) {
     obj.takeWhile = function _takeWhile(predicate) {
         return this.queryableTakeWhile(predicate);
     };
-    obj.any = function _any(predicate) {
+    obj.any = function _any(predicate = defaultPredicate) {
         return this.queryableAny(predicate);
     };
-    obj.all = function _all(predicate) {
+    obj.all = function _all(predicate = defaultPredicate) {
         return this.queryableAll(predicate);
     };
     obj.first = function _first(predicate) {
@@ -179,7 +174,6 @@ function createNewFilteredQueryableDelegator(data, funcs, filterExpression) {
 */
 
 function createNewOrderedQueryableDelegator(source, iterator, sortObj) {
-
     var obj = Object.create(orderedQueryable);
     obj.source = source;
     obj.dataComputed = false;
@@ -190,26 +184,29 @@ function createNewOrderedQueryableDelegator(source, iterator, sortObj) {
     obj.map = function _map(mapFunc) {
         return this.orderedMap(mapFunc);
     };
-    obj.where = function _where(field, operator, value) {
-        return this.orderedWhere(field, operator, value);
+    obj.where = function _where(predicate) {
+        return this.orderedWhere(predicate);
     };
-    obj.join = function _join(outer, inner, projector, comparer, collection) {
-        return this.orderedJoin(outer, inner, projector, comparer, collection);
+    obj.concat = function _concat(collection) {
+        return this.orderedConcat(collection);
     };
-    obj.union = function _union(comparer, collection) {
-        return this.orderedUnion(comparer, collection);
+    obj.join = function _join(inner, outerSelector, innerSelector, projector, comparer = defaultEqualityComparer) {
+        return this.orderedJoin(inner, outerSelector, innerSelector, projector, comparer);
     };
-    obj.zip = function _zip() {
-        return this.orderedZip();
+    obj.union = function _union(collection, comparer = defaultEqualityComparer) {
+        return this.orderedUnion(collection, comparer);
     };
-    obj.except = function _except(collection, comparer) {
+    obj.zip = function _zip(selector, collection) {
+        return this.orderedZip(selector, collection);
+    };
+    obj.except = function _except(collection, comparer = defaultEqualityComparer) {
         return this.orderedExcept(collection, comparer);
     };
-    obj.intersect = function _intersect(collection, comparer) {
+    obj.intersect = function _intersect(collection, comparer = defaultEqualityComparer) {
         return this.orderedIntersect(collection, comparer);
     };
-    obj.distinct = function _distinct(fields) {
-        return this.orderedDistinct(fields);
+    obj.distinct = function _distinct(comparer = defaultEqualityComparer) {
+        return this.orderedDistinct(comparer);
     };
     obj._getData = function _getData() {
         return this._getData();
@@ -220,10 +217,10 @@ function createNewOrderedQueryableDelegator(source, iterator, sortObj) {
     obj.takeWhile = function _takeWhile(predicate) {
         return this.orderedTakeWhile(predicate);
     };
-    obj.any = function _any(predicate) {
+    obj.any = function _any(predicate = defaultPredicate) {
         return this.orderedAny(predicate);
     };
-    obj.all = function _all(predicate) {
+    obj.all = function _all(predicate = defaultPredicate) {
         return this.orderedAll(predicate);
     };
     obj.first = function _first(predicate) {
@@ -233,12 +230,23 @@ function createNewOrderedQueryableDelegator(source, iterator, sortObj) {
         return this.orderedLast(predicate);
     };
 
-    obj.orderBy = function _orderBy(field) {
-        return this.thenBy(field);
+    //Shadow the orderBy/orderByDescending function of the delegate so that if another
+    //orderBy/orderByDescending function is immediately chained to an orderedQueryable
+    //delegator object, it will treat it as a thenBy/thenByDescending call respectively.
+    //TODO: These could also be treated as no-ops, or a deliberate re-ordering of the
+    //TODO: source; I feel the latter would be an odd thing do to, so it might not
+    //TODO: make sense to treat it that way.
+
+    //TODO: Rather than shadowing, I could make the queryable's orderBy/orderByDescending
+    //TODO: functions check the context object's prototype; if it finds that the
+    //TODO: orderedQueryable is in the context's prototype chain, then it could treat
+    //TODO: the function call differently
+    obj.orderBy = function _orderBy(keySelector, comparer) {
+        return this.thenBy(keySelector, comparer);
     };
 
-    obj.orderByDescending = function _orderByDescending(field) {
-        return this.orderByDescending(field);
+    obj.orderByDescending = function _orderByDescending(keySelector, comparer) {
+        return this.thenByDescending(keySelector, comparer);
     };
 
     obj.thenBy = function _thenBy(keySelector, comparer) {
@@ -269,7 +277,7 @@ function addGetter(obj) {
                     this.evaluatedData = res;
                     return res;
                 }
-                return this._evaluatedData;
+                return this.evaluatedData;
             }
         }
     );

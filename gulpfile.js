@@ -13,7 +13,7 @@ var gulp = require('gulp'),
 gulp.task('help', _.taskListing);
 gulp.task('default', ['help']);
 
-gulp.task('build-dev', ['clean-dev-build'], function _testTmp() {
+gulp.task('build-dev', ['clean-dev'], function _testTmp() {
     process.env.BABEL_ENV = 'build';
     process.env.NODE_ENV = 'build';
 
@@ -43,7 +43,7 @@ gulp.task('build-dev', ['clean-dev-build'], function _testTmp() {
         //.on('error', _.util.log)
         .pipe(sourceMaps.write('./'))
         .pipe(_.rename('bundle.js'))
-        .pipe(gulp.dest('./dev-build/'));
+        .pipe(gulp.dest('./dev/'));
 });
 
 gulp.task('babel-dev', ['clean-tmp'], function _babelDev() {
@@ -55,9 +55,9 @@ gulp.task('babel-dev', ['clean-tmp'], function _babelDev() {
         .pipe(gulp.dest('./tmp'));
 });
 
-gulp.task('clean-dev-build', function _cleanDevBuild(done) {
-    log('cleaning dev-build bundle.js');
-    clean(config.build + '**/*.js', done);
+gulp.task('clean-dev', function _cleanDevBuild(done) {
+    log('cleaning dev bundle.js');
+    clean(config.build + 'bundle.js', done);
 });
 
 gulp.task('clean-tmp', function _cleanTmp(done) {

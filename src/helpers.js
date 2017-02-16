@@ -62,30 +62,21 @@ var dataTypes = {
     dateTimeChar: '[\\d\\.:\\sAMP\\-\\/]'
 };
 
-/*
- function *_iterator(items) {
- if (this._dataComputed) {
- for (var item of items)
- yield item;
- }
- else {
- yield _pipelineGenerator(this._data, this._pipeline);
- }
- }
- */
-
 var emptyObj = Object.create(null);
 
 function defaultEqualityComparer(a, b) {
     return a === b;
 }
 
-/*
- function dataHandler(func) {
- func(this._data);
- return this;
- }
- */
+function defaultGreaterThanComparer(a, b) {
+    return a > b;
+}
+
+function defaultPredicate() {
+    return true;
+}
+
+var generatorProto = Object.getPrototypeOf(function *_generator(){});
 
 function memoizer() {
     var cache = new Set();
@@ -258,5 +249,5 @@ function cloneArray(arr) {
     return newArr;
 }
 
-export { functionTypes, javaScriptTypes, comparisons, dataTypes, /*_iterator,*/ defaultEqualityComparer, /*dataHandler,*/ memoizer, memoizer2,
-    getNumbersFromTime, comparator, dataTypeValueNormalizer, cloneData, cloneArray, operationTypes, emptyObj };
+export { functionTypes, javaScriptTypes, comparisons, dataTypes, defaultEqualityComparer, defaultGreaterThanComparer, defaultPredicate, memoizer, memoizer2,
+    getNumbersFromTime, comparator, dataTypeValueNormalizer, cloneData, cloneArray, operationTypes, emptyObj, generatorProto };

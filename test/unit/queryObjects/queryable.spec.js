@@ -135,5 +135,41 @@ describe('Test queryable', function testQueryable() {
         });
     });
 
+    it('should create a new queryable delegator object with appropriate source form', function testQueryableDotFrom() {
+        function genWrapper(data) {
+            return function *genny() {
+                for (let item of data)
+                    yield item;
+            }
+        }
 
+        var stringSource = 'This is a stringy source';
+
+        var q1 = queryable.queryableFrom(testData.dataSource.data),
+            q2 = queryable.queryableFrom(genWrapper(testData.dataSource.data)),
+            q3 = queryable.queryableFrom(q1),
+            q4 = queryable.queryableFrom(),
+            q5 = queryable.queryableFrom(null),
+            q6 = queryable.queryableFrom({ a: 1, b: 2}),
+            q7 = queryable.queryableFrom(stringSource),
+            q8 = queryable.queryableFrom(1),
+            q9 = queryable.queryableFrom(false);
+
+        console.log(q3);
+        q1.source.should.eql(testData.dataSource.data);
+        q2.source.should.not.eql(testData.dataSource.data);
+        q3.source.should.eql(q1);
+        q4.source.should.be.an('array');
+        q4.source.should.have.lengthOf(0);
+        q5.source.should.be.an('array');
+        q5.source.should.have.lengthOf(1);
+        q6.source.should.be.an('array');
+        q6.source.should.have.lengthOf(1);
+        q7.source.should.be.an('array');
+        q7.source.should.have.lengthOf(stringSource.length);
+        q8.source.should.be.an('array');
+        q8.source.should.have.lengthOf(1);
+        q9.source.should.be.an('array');
+        q9.source.should.have.lengthOf(1);
+    });
 });

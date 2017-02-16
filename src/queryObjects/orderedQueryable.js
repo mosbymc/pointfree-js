@@ -26,8 +26,8 @@ orderedQueryable.orderedFlattenDeep = function _orderedFlattenDeep() {
     return this.queryableFlattenDeep();
 };
 
-orderedQueryable.orderedJoin = function _orderedJoin(outer, inner, projector, comparer, collection) {
-    return this.queryableJoin(outer, inner, projector, comparer, collection);
+orderedQueryable.orderedJoin = function _orderedJoin(inner, outerSelector, innerSelector, projector, comparer) {
+    return this.queryableJoin(inner, outerSelector, innerSelector, projector, comparer);
 };
 
 orderedQueryable.orderedGroupJoin = function _orderedGroupJoin(outer, inner, projector, comparer, collection) {
@@ -50,16 +50,16 @@ orderedQueryable.orderedZip = function _orderedZip(selector, collection) {
     return this.queryableZip(selector, collection);
 };
 
-orderedQueryable.orderedConat = function _orderedConcat(collection) {
+orderedQueryable.orderedConcat = function _orderedConcat(collection) {
     return this.queryableConcat(collection);
 };
 
-orderedQueryable.orderedWhere = function _orderedWhere(field, operator, value) {
-    return this.queryableWhere(field, operator, value);
+orderedQueryable.orderedWhere = function _orderedWhere(predicate) {
+    return this.queryableWhere(predicate);
 };
 
-orderedQueryable.orderedDistinct = function _orderedDistinct(fields) {
-    return this.queryableDistinct(fields);
+orderedQueryable.orderedDistinct = function _orderedDistinct(comparer) {
+    return this.queryableDistinct(comparer);
 };
 
 orderedQueryable.orderedTake = function _orderedTake(amt = 1) {
