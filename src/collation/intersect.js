@@ -18,7 +18,7 @@ function intersect(source, collection, comparer) {
         }*/
         collection = when(not(isArray), Array.from, collection);
         for (let item of source) {
-            if (collection.some(function _checkEquivalency(it) {
+            if (undefined !== item && collection.some(function _checkEquivalency(it) {
                     return comparer(item, it);
                 }))
             {

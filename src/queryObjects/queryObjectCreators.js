@@ -2,8 +2,6 @@ import { queryable } from './queryable';
 import { orderedQueryable } from './orderedQueryable';
 import { orderBy } from '../projection/projectionFunctions';
 import { defaultEqualityComparer, defaultPredicate, generatorProto } from '../helpers';
-//import { filteredQueryable } from './filteredQueryable';
-//import { filterAppend } from '../limitation/limitationFunctions';
 
 function createNewQueryableDelegator(source, iterator) {
     var obj = Object.create(queryable);
@@ -11,17 +9,7 @@ function createNewQueryableDelegator(source, iterator) {
     obj.source = source;
     if (iterator && generatorProto.isPrototypeOf(iterator))
         obj[Symbol.iterator] = iterator;
-    //TODO: may not need to set a default iterator here... if the iterator value is passed in, then
-    //TODO: set it, otherwise, don't shadow the queryable's iterator and just let it yield each item
-    //TODO: of the source
-    //obj[Symbol.iterator] = iterator ? iterator : queryableIterator(source);
 
-    /*obj.select = function _select(fields) {
-        return this.queryableSelect(fields);
-    };*/
-    /*obj.selectMany = function _selectMany(selector, resSelector) {
-        return this.queryableSelectMany(selector, resSelector);
-    };*/
     obj.map = function _map(mapFunc) {
         return this.queryableMap(mapFunc);
     };
@@ -71,14 +59,17 @@ function createNewQueryableDelegator(source, iterator) {
     obj.flattenDeep = function _flattenDeep() {
         return this.queryableFlattenDeep();
     };
-    obj._getData = function _getData() {
-        return this._getData();
-    };
     obj.take = function _take(amt = 1) {
         return this.queryableTake(amt);
     };
     obj.takeWhile = function _takeWhile(predicate) {
         return this.queryableTakeWhile(predicate);
+    };
+    obj.skip = function _skip(amt = 1) {
+        return this.queryableSkip(amt);
+    };
+    obj.skipWhile = function _skipWhile(predicate) {
+        return this.queryableSkipWhile(predicate);
     };
     obj.any = function _any(predicate = defaultPredicate) {
         return this.queryableAny(predicate);
@@ -94,84 +85,6 @@ function createNewQueryableDelegator(source, iterator) {
     };
     return addGetter(obj);
 }
-
-/*
-function createNewFilteredQueryableDelegator(data, funcs, filterExpression) {
-    if (!expressionManager.isPrototypeOf(filterExpression)) return;
-
-    var obj = Object.create(filteredQueryable);
-    obj.source = data;
-    obj._evaluatedData = null;
-    obj._dataComputed = false;
-    obj._pipeline = funcs ? ifElse(not(isArray), wrap, identity, funcs) : [];
-    obj._currentPipelineIndex = 0;
-    obj._currentDataIndex = 0;
-
-    obj.select = function _select(fields) {
-        return this.filteredSelect(fields);
-    };
-    obj.where = function _where(field, operator, value) {
-        return this.filteredWhere(field, operator, value);
-    };
-    obj.join = function _join(outer, inner, projector, comparer, collection) {
-        return this.filteredJoin(outer, inner, projector, comparer, collection);
-    };
-    obj.union = function _union(comparer, collection) {
-        return this.filteredUnion(comparer, collection);
-    };
-    obj.zip = function _zip() {
-        return this.filteredZip();
-    };
-    obj.except = function _except(collection, comparer) {
-        return this.filteredExcept(collection, comparer);
-    };
-    obj.intersect = function _intersect(comparer, collection) {
-        return this.filteredIntersect(comparer, collection);
-    };
-    obj.groupBy = function _groupBy(fields, sl) {
-        return this.filteredGroupBy(fields, sl);
-    };
-    obj.distinct = function _distinct(fields) {
-        return this.filteredDistinct(fields);
-    };
-    obj.flatten = function _flatten() {
-        return this.filteredFlatten();
-    };
-    obj.flattenDeep = function _flattenDeep() {
-        return this.filteredFlattenDeep();
-    };
-    obj._getData = function _getData() {
-        return this._getData();
-    };
-    obj.take = function _take(amt = 1) {
-        return this.filteredTake(amt);
-    };
-    obj.takeWhile = function _takeWhile(predicate) {
-        return this.filteredTakeWhile(predicate);
-    };
-    obj.any = function _any(predicate) {
-        return this.filteredAny(predicate);
-    };
-    obj.all = function _all(predicate) {
-        return this.filteredAll(predicate);
-    };
-    obj.first = function _first(predicate) {
-        return this.filteredFirst(predicate);
-    };
-    obj.last = function _last(predicate) {
-        return this.filteredLast(predicate);
-    };
-
-    obj.and = filterAppend(filterExpression, 'and');
-    obj.or = filterAppend(filterExpression, 'or');
-    obj.nand = filterAppend(filterExpression, 'nand');
-    obj.nor = filterAppend(filterExpression, 'nor');
-    obj.xand = filterAppend(filterExpression, 'xand');
-    obj.xor = filterAppend(filterExpression, 'xor');
-
-    return addGetter(obj);
-}
-*/
 
 function createNewOrderedQueryableDelegator(source, iterator, sortObj) {
     var obj = Object.create(orderedQueryable);
@@ -199,8 +112,17 @@ function createNewOrderedQueryableDelegator(source, iterator, sortObj) {
     obj.zip = function _zip(selector, collection) {
         return this.orderedZip(selector, collection);
     };
+    obj.groupBy = function _groupBy(keySelector, comparer) {
+        return this.queryableGroupBy(keySelector, comparer);
+    };
+    obj.groupByDescending = function _groupByDescending(keySelector, comparer) {
+        return this.queryableGroupByDescending(keySelector, comparer);
+    };
     obj.except = function _except(collection, comparer = defaultEqualityComparer) {
         return this.orderedExcept(collection, comparer);
+    };
+    obj.groupJoin = function _groupJoin(inner, outerSelector, innerSelector, projector, comparer = defaultEqualityComparer) {
+        return this.queryableGroupJoin(inner, outerSelector, innerSelector, projector, comparer);
     };
     obj.intersect = function _intersect(collection, comparer = defaultEqualityComparer) {
         return this.orderedIntersect(collection, comparer);
@@ -208,14 +130,23 @@ function createNewOrderedQueryableDelegator(source, iterator, sortObj) {
     obj.distinct = function _distinct(comparer = defaultEqualityComparer) {
         return this.orderedDistinct(comparer);
     };
-    obj._getData = function _getData() {
-        return this._getData();
+    obj.flatten = function _flatten() {
+        return this.queryableFlatten();
+    };
+    obj.flattenDeep = function _flattenDeep() {
+        return this.queryableFlattenDeep();
     };
     obj.take = function _take(amt = 1) {
         return this.orderedTake(amt);
     };
     obj.takeWhile = function _takeWhile(predicate) {
         return this.orderedTakeWhile(predicate);
+    };
+    obj.skip = function _skip(amt = 1) {
+        return this.orderedSkip(amt);
+    };
+    obj.skipWhile = function _skipWhile(predicate) {
+        return this.orderedSkipWhile(predicate);
     };
     obj.any = function _any(predicate = defaultPredicate) {
         return this.orderedAny(predicate);

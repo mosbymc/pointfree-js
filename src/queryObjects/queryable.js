@@ -11,6 +11,30 @@ import { isArray, wrap } from '../functionalHelpers';
 //TODO: needing to first evaluate the data by pumping it through the pipeline first; rather creating a new
 //TODO: query/query-type object would be better served by passing all the unprocessed data;
 
+/*
+  - Aggregate/reduce (https://msdn.microsoft.com/en-us/library/bb548744(v=vs.110).aspx)
+  - Ancestors (https://msdn.microsoft.com/en-us/library/bb353466(v=vs.110).aspx)
+  - AsEnumerable (https://msdn.microsoft.com/en-us/library/bb335435(v=vs.110).aspx)
+  - AsQueryable (https://msdn.microsoft.com/en-us/library/bb507003(v=vs.110).aspx)
+  - Average (https://msdn.microsoft.com/en-us/library/bb549067(v=vs.110).aspx)
+  - Contains (https://msdn.microsoft.com/en-us/library/bb352880(v=vs.110).aspx)
+  - Count/length (https://msdn.microsoft.com/en-us/library/bb338038(v=vs.110).aspx)
+  - DefaultIfEmpty (https://msdn.microsoft.com/en-us/library/bb360179(v=vs.110).aspx)
+  - DescendantNodes (https://msdn.microsoft.com/en-us/library/bb336780(v=vs.110).aspx)
+  - Descendants (https://msdn.microsoft.com/en-us/library/bb337483(v=vs.110).aspx)
+  - FirstOrDefault (https://msdn.microsoft.com/en-us/library/bb340482(v=vs.110).aspx)
+  - LastOrDefault (https://msdn.microsoft.com/en-us/library/bb301849(v=vs.110).aspx)
+  - Max (https://msdn.microsoft.com/en-us/library/bb347632(v=vs.110).aspx)
+  - Min (https://msdn.microsoft.com/en-us/library/bb352408(v=vs.110).aspx)
+  - SequenceEqual (https://msdn.microsoft.com/en-us/library/bb348567(v=vs.110).aspx)
+  - Single (https://msdn.microsoft.com/en-us/library/bb155325(v=vs.110).aspx)
+  - SingleOrDefault (https://msdn.microsoft.com/en-us/library/bb342451(v=vs.110).aspx)
+  - Skip (https://msdn.microsoft.com/en-us/library/bb358985(v=vs.110).aspx)
+  - SkipWhile (https://msdn.microsoft.com/en-us/library/bb549075(v=vs.110).aspx)
+  - Sum (https://msdn.microsoft.com/en-us/library/bb549046(v=vs.110).aspx)
+  -
+ */
+
 /**
  * Primary object to which filteredQueryables and orderedQueryables, as well as the objects passed to consumers, all delegate.
  * @type {{
@@ -65,6 +89,13 @@ var queryable = {
     /*queryableSelectMany: function _selectMany(selector, resSelector) {
         return createNewQueryableDelegator(this.source, this._pipeline.concat([{ fn: selectManyThunk(selector, resSelector), functionType: functionTypes.atomic }]));
     },*/
+    get source() {
+        return this._source;
+    },
+
+    set source(val) {
+        this._source = val;
+    },
 
     //TODO: 1) See about initializing the queryable object with the _evaluatedData and _dataComputed
     //TODO:    properties upfront and making then non-enumerable.
@@ -110,6 +141,29 @@ var queryable = {
     },
 
     /**
+     * Extension function that allows new functionality to be applied to
+     * the queryable object
+     * @param {string} propName - The name of the new queryable property; must be unique
+     * @param {function} fn - A function that defines the new queryable functionality and
+     * will be called when this new queryable property is invoked.
+     *
+     * NOTE: The fn parameter must be a non-generator function that take one or more
+     * arguments and returns a generator function that knows how to iterate the data
+     * and yield out each item one at a time. The first argument must be the 'source'
+     * argument of the function which will be what the returned generator must iterate
+     * in order to retrieve the items it work work on. The function may work on all
+     * the data as a single set, or it can iterate it's queryable source and apply the
+     * functionality to a single item before yielding that item and calling for the next.
+     */
+    extend: function _extend(propName, fn) {
+        if (!queryable[propName]) {
+            queryable[propName] = function(...args) {
+                return createNewQueryableDelegator(this, fn(this, ...args));
+            };
+        }
+    },
+
+    /**
      * Creates a new queryable delegator object from whatever source value is provided.
      * @param {*} source - The source argument can be any JavaScript value. It will default
      * to an empty array if 'undefined' is passed. If the source argument is a generator,
@@ -120,7 +174,7 @@ var queryable = {
      * @returns { Object } Returns a new queryable delegator object with its source set
      * to the value of the provided source argument
      */
-    queryableFrom: function _queryableFrom(source = []) {
+    from: function _from(source = []) {
         //... if the source is a generator, an array, or another queryable, accept it as is...
         if (generatorProto.isPrototypeOf(source) || isArray(source) || queryable.isPrototypeOf(source))
             return createNewQueryableDelegator(source);
@@ -297,15 +351,15 @@ var queryable = {
      * @param amt
      * @returns {Array}
      */
-    queryableTake: function _take(amt = 1) {
+    queryableTake: function _take(amt) {
         //TODO: If I decide to 'save' not just a fully evaluated 'source', but also any data from a partially evaluated
         //TODO: 'source', then I'll probably have to re-think my strategy of wrapping each 'method's' iterator with
         //TODO: the standard queryable iterator as it may not work as needed.
         //TODO:
-        //TODO: I'll also have to change this 'method' as it should take as much of the pre-evaluated date as possible
+        //TODO: I'll also have to change this 'method' as it should take as much of the pre-evaluated data as possible
         //TODO: before evaluating any remaining data the it needs from the source.
-        if (!amt) return;
-        if (!this._dataComputed) {
+        if (!amt) return [];
+        if (!this.dataComputed) {
             var res = [],
                 idx = 0;
 
@@ -318,7 +372,7 @@ var queryable = {
             }
             return res;
         }
-        return this._evaluatedData.slice(0, amt);
+        return this.evaluatedData.slice(0, amt);
     },
 
     /**
@@ -327,17 +381,53 @@ var queryable = {
      * @returns {Array}
      */
     queryableTakeWhile: function takeWhile(predicate) {
-        var res = [];
+        var res = [],
+            source = this.dataComputed ? this.evaluatedData : this;
 
-        if (!this._dataComputed) {
-            for (let item of this) {
-                if (predicate(item))
-                    res = res.concat(item);
-                else  {
-                    return res;
-                }
+        for (let item of source) {
+            if (predicate(item))
+                res = res.concat(item);
+            else  {
+                return res;
             }
         }
+    },
+
+    /**
+     *
+     * @param amt
+     * @returns {*}
+     */
+    queryableSkip: function skip(amt) {
+        var source = this.dataComputed ? this.evaluatedData : this.source,
+            idx = 0,
+            res = [];
+
+        for (let item of source) {
+            if (idx >= amt)
+                res = res.concat(item);
+            ++idx;
+        }
+        return res;
+    },
+
+    /**
+     *
+     * @param predicate
+     * @returns {Array}
+     */
+    queryableSkipWhile: function skipWhile(predicate) {
+        var source = this.dataComputed ? this.evaluatedData : this.source,
+            hasFailed = false,
+            res = [];
+
+        for (let item of source) {
+            if (!hasFailed && !predicate(item))
+                hasFailed = true;
+            if (hasFailed)
+                res = res.concat(item);
+        }
+        return res;
     },
 
     /**

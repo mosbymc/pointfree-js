@@ -62,12 +62,20 @@ orderedQueryable.orderedDistinct = function _orderedDistinct(comparer) {
     return this.queryableDistinct(comparer);
 };
 
-orderedQueryable.orderedTake = function _orderedTake(amt = 1) {
+orderedQueryable.orderedTake = function _orderedTake(amt) {
     return this.queryableTake(amt);
 };
 
 orderedQueryable.orderedTakeWhile = function _orderedTakeWhile(predicate) {
     return this.queryableTakeWhile(predicate);
+};
+
+orderedQueryable.orderedSkip = function _orderedSkip(amt) {
+    return this.queryableSkip(amt);
+};
+
+orderedQueryable.orderedSkipWhile = function _orderedSkipWhile(predicate) {
+    return this.queryableSkipWhile(predicate);
 };
 
 orderedQueryable.orderedAny = function _orderedAny(predicate) {

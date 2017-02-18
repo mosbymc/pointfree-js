@@ -29,7 +29,7 @@ function isFunction(fn) {
 function not(fn) {
     return function _not(...rest) {
         return !fn(...rest);
-    }
+    };
 }
 
 function or(a, b, item) {
@@ -51,7 +51,7 @@ function curryN(length, received, fn) {
         if (length > combined.length)
             return curryN(length, combined, fn);
         return fn.call(this, ...combined);
-    }
+    };
 }
 
 export { identity, ifElse, when, wrap, isArray, isObject, isFunction, not, or, and, curry };

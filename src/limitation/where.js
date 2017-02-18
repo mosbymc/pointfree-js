@@ -4,7 +4,7 @@ function where(source, predicate) {
             if (predicate(item))
                 yield item;
         }
-    }
+    };
 }
 
 export { where };

@@ -4,12 +4,43 @@ module.exports = function _gulpConfig() {
         src = './src/',
         dev = './dev/',
         test = './test/',
-        report = test + 'report/';
+        report = test + 'report/',
+        scripts = [
+            src + 'collation/collationFunctions.js',
+            src + 'collation/concat.js',
+            src + 'collation/except.js',
+            src + 'collation/groupJoin.js',
+            src + 'collation/intersect.js',
+            src + 'collation/join.js',
+            src + 'collation/union.js',
+            src + 'collation/zip.js',
+            src + 'evaluation/evaluationFunctions.js',
+            src + 'evaluation/all.js',
+            src + 'evaluation/any.js',
+            src + 'evaluation/first.js',
+            src + 'evaluation/last.js',
+            src + 'limitation/limitationFunctions.js',
+            src + 'limitation/distinct.js',
+            src + 'limitation/where.js',
+            src + 'projection/projectionFunctions.js',
+            src + 'projection/deepFlatten.js',
+            src + 'projection/flatten.js',
+            src + 'projection/groupBy.js',
+            src + 'projection/map.js',
+            src + 'projection/orderBy.js',
+            src + 'projection/sortHelpers.js',
+            src + 'queryObjects/queryable.js',
+            src + 'queryObjects/orderedQueryable.js',
+            src + 'queryObjects/queryObjectCreators.js',
+            src + 'functionalHelpers.js',
+            src + 'helpers.js'
+        ];
 
     return {
         buildJs: build + 'scripts/grid.js',
         build: build,
         src: src,
+        scripts: scripts,
         srcRootJs: src + '/',
         srcCollationJs: src +'collation/',
         srcEvaluationJs: src + 'evaluation/',
@@ -38,8 +69,7 @@ module.exports = function _gulpConfig() {
         plato: {
             report: './plato',
             options: {
-                title: 'grid-plato',
-                jshint: __dirname + '/.jshintrc'
+                title: 'queryable-plato'
             }
         },
         js: [

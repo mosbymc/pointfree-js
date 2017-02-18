@@ -13,11 +13,17 @@ function namePredicate(item) {
     return item.FirstName.length > 5;
 }
 
+function comparer(a, b) {
+    return a === b;
+}
+
 function isObject(item) {
     return 'object' === typeof item;
 }
 
-queryable.source = testData.dataSource.data;
+beforeEach(function setSource() {
+    queryable.source = testData.dataSource.data;
+});
 
 describe('Test queryable', function testQueryable() {
     it('should create a new queryable delegate', function testObjectDelegation() {
@@ -26,8 +32,9 @@ describe('Test queryable', function testQueryable() {
 
         var concatQueryable = queryable.queryableConcat(testData.dataSource.data),
             exceptQueryable = queryable.queryableExcept(testData.dataSource.data),
-            groupJoinQueryable = queryable.queryableGroupJoin(testData.dataSource.data, nameSelector, nameSelector, nameProjector),
+            groupJoinQueryable = queryable.queryableGroupJoin(testData.dataSource.data, nameSelector, nameSelector, nameProjector, comparer),
             queryableIntersect = queryable.queryableIntersect(testData.dataSource.data),
+            queryableGroupJoin = queryable.queryableGroupJoin(testData.dataSource.data, nameSelector, nameSelector, nameProjector, comparer),
             queryableJoin = queryable.queryableJoin(testData.dataSource.data, nameSelector, nameSelector, nameProjector),
             queryableUnion = queryable.queryableUnion(testData.dataSource.data),
             queryableZip = queryable.queryableZip(testData.dataSource.data, nameSelector),
@@ -58,6 +65,8 @@ describe('Test queryable', function testQueryable() {
         groupJoinQueryable.dataComputed.should.be.false;
         expect(queryable.isPrototypeOf(queryableIntersect)).to.be.true;
         queryableIntersect.dataComputed.should.be.false;
+        expect(queryable.isPrototypeOf(queryableGroupJoin)).to.be.true;
+        queryableGroupJoin.dataComputed.should.be.false;
         expect(queryable.isPrototypeOf(queryableJoin)).to.be.true;
         queryableJoin.dataComputed.should.be.false;
         expect(queryable.isPrototypeOf(queryableUnion)).to.be.true;
@@ -98,13 +107,29 @@ describe('Test queryable', function testQueryable() {
         queryableReverse.should.eql(testData.dataSource.data.reverse());
     });
 
+    it('should properly extend the queryable object', function testQueryableExtension() {
+        queryable.extend('testFunc', function _testFunc(source) {
+            return function *testFuncIterator() {
+                for (let item of source) yield item;
+            }
+        });
+
+        var q1 = queryable.from(testData.dataSource.data),
+            q2 = q1.testFunc(),
+            q2Data = q2.data;
+
+        expect(queryable.isPrototypeOf(q2)).to.be.true;
+        q2Data.should.have.lengthOf(testData.dataSource.data.length);
+        q2Data.should.eql(testData.dataSource.data);
+    });
+
     it('should have a functioning take', function testQueryablesTake() {
         var noItems = queryable.queryableTake(0),
-            singleItem = queryable.queryableTake(),
+            singleItem = queryable.queryableTake(1),
             fiveItems = queryable.queryableTake(5),
             allItems = queryable.queryableTake(testData.dataSource.data.length);
 
-        expect(noItems).to.be.undefined;
+        noItems.should.have.lengthOf(0);
         singleItem.should.have.lengthOf(1);
         singleItem.should.eql(testData.dataSource.data.slice(0, 1));
         fiveItems.should.have.lengthOf(5);
@@ -135,6 +160,69 @@ describe('Test queryable', function testQueryable() {
         });
     });
 
+    it('should take the shortcut if the queryable\'s has been evaluated', function testShortCut() {
+        queryable.dataComputed = true;
+        queryable.evaluatedData = testData.dataSource.data;
+
+        var take = queryable.queryableTake(5),
+            takeWhile = queryable.queryableTakeWhile(function _takeWhile(item) {
+                return item.FirstName !== 'Mark';
+            });
+
+        take.should.have.lengthOf(5);
+        take.should.eql(testData.dataSource.data.slice(0, 5));
+
+        takeWhile.forEach(function _validateResult(item) {
+            item.FirstName.should.not.eql('Mark');
+        }) ;
+    });
+
+    it('should have a functioning skip', function testSkip() {
+        queryable.dataComputed = false;
+        var allItems = queryable.queryableSkip(0),
+            lessOne = queryable.queryableSkip(1),
+            lessFive = queryable.queryableSkip(5),
+            noItems = queryable.queryableSkip(testData.dataSource.data.length);
+
+        allItems.should.have.lengthOf(testData.dataSource.data.length);
+        allItems.should.eql(testData.dataSource.data);
+        lessOne.should.have.lengthOf(testData.dataSource.data.length - 1);
+        lessOne.should.eql(testData.dataSource.data.slice(1));
+        lessFive.should.have.lengthOf(testData.dataSource.data.length - 5);
+        lessFive.should.eql(testData.dataSource.data.slice(5));
+        noItems.should.have.lengthOf(0);
+    });
+
+    it('should have a functioning ski[ while', function testQueryableSkipWhile() {
+        queryable.dataComputed = false;
+        function predicate1() { return false; }
+        function predicate2() { return true; }
+        function predicate3(item) { return item.State === 'NY' || item.State === 'NJ'; }
+
+        var skipWhile1 = queryable.queryableSkipWhile(predicate1),
+            skipWhile2 = queryable.queryableSkipWhile(predicate2),
+            skipWhile3 = queryable.queryableSkipWhile(predicate3);
+
+        skipWhile1.should.have.lengthOf(testData.dataSource.data.length);
+        skipWhile1.should.eql(testData.dataSource.data);
+        skipWhile2.should.have.lengthOf(0);
+        skipWhile3[0].State.should.not.eql('NY');
+        skipWhile3[0].State.should.not.eql('NJ');
+    });
+
+    it('should take the shortcut if the queryable\'s has been evaluated on skip and skipWhile', function testShortCut() {
+        queryable.dataComputed = true;
+        queryable.evaluatedData = testData.dataSource.data;
+
+        var skip = queryable.queryableSkip(10),
+            skipWhile = queryable.queryableSkipWhile(function _pred() { return false; });
+
+        skip.should.have.lengthOf(testData.dataSource.data.length - 10);
+        skip.should.eql(testData.dataSource.data.slice(10));
+        skipWhile.should.have.lengthOf(testData.dataSource.data.length);
+        skipWhile.should.eql(testData.dataSource.data);
+    });
+
     it('should create a new queryable delegator object with appropriate source form', function testQueryableDotFrom() {
         function genWrapper(data) {
             return function *genny() {
@@ -145,17 +233,16 @@ describe('Test queryable', function testQueryable() {
 
         var stringSource = 'This is a stringy source';
 
-        var q1 = queryable.queryableFrom(testData.dataSource.data),
-            q2 = queryable.queryableFrom(genWrapper(testData.dataSource.data)),
-            q3 = queryable.queryableFrom(q1),
-            q4 = queryable.queryableFrom(),
-            q5 = queryable.queryableFrom(null),
-            q6 = queryable.queryableFrom({ a: 1, b: 2}),
-            q7 = queryable.queryableFrom(stringSource),
-            q8 = queryable.queryableFrom(1),
-            q9 = queryable.queryableFrom(false);
+        var q1 = queryable.from(testData.dataSource.data),
+            q2 = queryable.from(genWrapper(testData.dataSource.data)),
+            q3 = queryable.from(q1),
+            q4 = queryable.from(),
+            q5 = queryable.from(null),
+            q6 = queryable.from({ a: 1, b: 2}),
+            q7 = queryable.from(stringSource),
+            q8 = queryable.from(1),
+            q9 = queryable.from(false);
 
-        console.log(q3);
         q1.source.should.eql(testData.dataSource.data);
         q2.source.should.not.eql(testData.dataSource.data);
         q3.source.should.eql(q1);

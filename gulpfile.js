@@ -33,7 +33,6 @@ gulp.task('build-dev', ['clean-dev'], function _testTmp() {
     });
 
     return b
-        //.transform(require('babelify'), { presets: [], plugins: ['babel-plugin-transform-es2015-modules-commonjs'] })
         .bundle()
         .pipe(source('./src/index.js'))
         .pipe(buffer())
@@ -67,7 +66,7 @@ gulp.task('clean-tmp', function _cleanTmp(done) {
 
 gulp.task('plato', function _plato(done) {
     var plato = require('plato');
-    plato.inspect(config.build + 'scripts/grid.js', config.plato.report, config.plato.options, function noop(){
+    plato.inspect(config.scripts, config.plato.report, config.plato.options, function noop(){
         done();
     });
 });

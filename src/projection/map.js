@@ -1,7 +1,8 @@
 function map(source, fn) {
     return function *mapIterator() {
         for (let item of source) {
-            yield fn(item);
+            let res = fn(item);
+            if (undefined !== res) yield res;
         }
     };
 }

@@ -12,7 +12,9 @@ function orderBy(source, orderObject) {
     return function *orderByIterator() {
         //gather all data from the source before sorting
         var orderedData = sortData2(when(not(isArray), Array.from, source), orderObject);
-        for (let item of orderedData) yield item;
+        for (let item of orderedData) {
+            if (undefined !== item) yield item;
+        }
     };
 }
 

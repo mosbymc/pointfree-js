@@ -1,4 +1,4 @@
-import { when, ifElse, wrap, isArray, isObject, not, and } from '../functionalHelpers';
+import { when, ifElse, isArray, isObject } from '../functionalHelpers';
 
 function deepFlatten(source) {
     return function *iterator() {

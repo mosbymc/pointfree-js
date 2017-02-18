@@ -77,7 +77,8 @@ describe('Test queryable object function chaining', function testQueryable() {
             q2Data = q2.data,
             q3Data = q3.data,
             q4Data = q4.data,
-            q5Data = q5.data;
+            q5Data = q5.data,
+            q6Data = q5.data;
 
         q1.evaluatedData.should.eql(q1Data);
         q1.dataComputed.should.be.true;
@@ -89,6 +90,8 @@ describe('Test queryable object function chaining', function testQueryable() {
         q4.dataComputed.should.be.true;
         q5.evaluatedData.should.eql(q5Data);
         q5.dataComputed.should.be.true;
+        q5.evaluatedData.should.eql(q6Data);
+        q6Data.should.eql(q5Data);
 
         q1Data.should.be.an('array');
         q2Data.should.be.an('array');

@@ -86,7 +86,7 @@ function memoizer() {
             return false;
         }
         return true;
-    }
+    };
 }
 
 //TODO: this will have to be changed as the false value could be a legit value for a collection...
@@ -106,7 +106,7 @@ function memoizer2(comparer) {
         }
         items[items.length] = item;
         return false;
-    }
+    };
 }
 
 function comparator(type, val, base) {

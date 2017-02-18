@@ -1,0 +1,568 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Plato - ./src/queryObjects/queryable.js</title>
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="">
+  <meta name="author" content="">
+
+  <!--[if lt IE 9]>
+  <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
+  <![endif]-->
+
+  <link href="../../assets/css/vendor/morris.css" rel="stylesheet">
+  <link href="../../assets/css/vendor/bootstrap.css" rel="stylesheet">
+  <link href="../../assets/css/vendor/font-awesome.css" rel="stylesheet">
+  <link href="../../assets/css/vendor/codemirror.css" rel="stylesheet">
+  <link href="../../assets/css/plato.css" rel="stylesheet">
+  <link href="../../assets/css/plato-file.css" rel="stylesheet">
+
+</head>
+
+<body>
+
+<div class="navbar navbar-fixed-top">
+  <div class="container">
+    <a class="navbar-brand" href="http://github.com/es-analysis/plato">Plato on Github</a>
+    <ul class="nav navbar-nav">
+      <li>
+        <a href="../../index.html">Report Home</a>
+      </li>
+    </ul>
+  </div>
+</div>
+
+<div class="jumbotron">
+  <div class="container">
+    <h1>./src/queryObjects/queryable.js</h1>
+  </div>
+</div>
+
+<div class="container aggregate-stats">
+  <div class="row">
+    <div class="col-md-6">
+      <h2 class="header">Maintainability <a href="http://blogs.msdn.com/b/codeanalysis/archive/2007/11/20/maintainability-index-range-and-meaning.aspx"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="A value between 0 and 100 that represents the relative ease of maintaining the code. A high value means better maintainability." data-original-title="Maintainability Index"  data-container="body"></i></a></h2>
+      <p class="stat">79.80</p>
+    </div>
+    <div class="col-md-6">
+      <h2 class="header">Lines of code <i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="Source Lines of Code / Logical Lines of Code" data-original-title="SLOC/LSLOC" data-container="body"></i></h2>
+      <p class="stat">451</p>
+    </div>
+  </div>
+  <div class="row historical">
+    <div class="col-md-6">
+      <p id="chart_historical_maint" class="chart"></p>
+    </div>
+    <div class="col-md-6">
+      <p id="chart_historical_sloc" class="chart"></p>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-md-6">
+      <h2 class="header">Difficulty  <a href="http://en.wikipedia.org/wiki/Halstead_complexity_measures"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="The difficulty measure is related to the difficulty of the program to write or understand." data-original-title="Difficulty" data-container="body"></i></a></h2>
+      <p class="stat">46.62</p>
+    </div>
+    <div class="col-md-6">
+      <h2 class="header">Estimated Errors  <a href="http://en.wikipedia.org/wiki/Halstead_complexity_measures"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="Halstead's delivered bugs is an estimate for the number of errors in the implementation." data-original-title="Delivered Bugs" data-container="body"></i></a></h2>
+      <p class="stat">1.61</p>
+    </div>
+  </div>
+</div>
+
+<div class="container charts">
+  <div class="row">
+    <h2 class="header">Function weight</h2>
+  </div>
+  <div class="row">
+    <div class="col-md-6">
+      <h3 class="chart-header">By Complexity <a href="http://en.wikipedia.org/wiki/Cyclomatic_complexity"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="This metric counts the number of distinct paths through a block of code. Lower values are better." data-original-title="Cyclomatic Complexity" data-container="body"></i></a></h3>
+      <div id="fn-by-complexity" class="stat"></div>
+    </div>
+    <div class="col-md-6">
+      <h3 class="chart-header">By SLOC  <i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="Source Lines of Code / Logical Lines of Code" data-original-title="SLOC/LSLOC" data-container="body"></i></h3>
+      <div id="fn-by-sloc" class="stat"></div>
+    </div>
+  </div>
+</div>
+
+<div class="container">
+  <div class="row">
+    <textarea id="file-source" class="col-md-12">import { concat, except, groupJoin, intersect, join, union, zip } from &#039;../collation/collationFunctions&#039;;
+import { all, any, first, last } from &#039;../evaluation/evaluationFunctions&#039;;
+import { distinct, where } from &#039;../limitation/limitationFunctions&#039;;
+import { deepFlatten, flatten, groupBy, map, orderBy } from &#039;../projection/projectionFunctions&#039;;
+import { createNewQueryableDelegator, createNewOrderedQueryableDelegator } from &#039;./queryObjectCreators&#039;;
+import { generatorProto } from &#039;../helpers&#039;;
+import { isArray, wrap } from &#039;../functionalHelpers&#039;;
+
+
+//TODO: Not sure if this has been done yet or not, but need a way to create new query/query-type object without
+//TODO: needing to first evaluate the data by pumping it through the pipeline first; rather creating a new
+//TODO: query/query-type object would be better served by passing all the unprocessed data;
+
+/**
+ * Primary object to which filteredQueryables and orderedQueryables, as well as the objects passed to consumers, all delegate.
+ * @type {{
+ * queryableFrom: queryable._queryableFrom,
+ * queryableMap: * queryable._queryableMap,
+ * queryableGroupBy: * queryable._groupBy,
+ * queryableGroupByDescending: * queryable._groupByDescending,
+ * queryableOrderBy: * queryable._orderBy,
+ * queryableOrderByDescending: * queryable._orderByDescending,
+ * queryableFlatten: * queryable._flatten,
+ * queryableFlattenDeep: * queryable._flattenDeep,
+ * queryableConcat: * queryable._concat,
+ * queryableExcept: * queryable._except,
+ * queryableGroupJoin: * queryable._groupJoin,
+ * queryableIntersect: * queryable._intersect,
+ * queryableJoin: * queryable._join,
+ * queryableUnion: * queryable._union,
+ * queryableZip: * queryable._zip,
+ * queryableWhere: * queryable._where,
+ * queryableDistinct: * queryable._distinct,
+ * queryableTake: * queryable._take,
+ * queryableTakeWhile: * queryable.takeWhile,
+ * queryableAny: queryable._any,
+ * queryableAll: queryable._all,
+ * queryableFirst: * queryable._first,
+ * queryableLast: * queryable._last,
+ * queryableToArray: * queryable._toArray,
+ * queryableToSet: * queryable._toSet,
+  *queryableReverse: * queryable._reverse,
+  * [Symbol.iterator]: * queryable._iterator
+  * }}
+ */
+var queryable = {
+    /**
+     * Projects each element of a sequence into a new form.
+     * @param selector
+     * @param context
+     * @returns {Object}
+     */
+    /*queryableSelect: function _select(selector, context) {
+        return createNewQueryableDelegator(this.source, this._pipeline.concat([{ fn: selectThunk(selector, context), functionType: functionTypes.atomic }]));
+    },*/
+
+    /**
+     * Projects each element of a sequence to an array and flattens the resulting sequences into one sequence.
+     * @method selectMany
+     * @type {function}
+     * @param {function} selector - (Required) A transform function to apply to each element.
+     * @param resSelector
+     * @returns {Array} - The array of type of the elements of the sequence returned by selector.
+     */
+    /*queryableSelectMany: function _selectMany(selector, resSelector) {
+        return createNewQueryableDelegator(this.source, this._pipeline.concat([{ fn: selectManyThunk(selector, resSelector), functionType: functionTypes.atomic }]));
+    },*/
+
+    //TODO: 1) See about initializing the queryable object with the _evaluatedData and _dataComputed
+    //TODO:    properties upfront and making then non-enumerable.
+    //TODO: 2) See if, via closure, I can bypass the need for getters/setters for properties that can
+    //TODO:    ultimately be read and written to directly with a getter/setter property that maintains
+    //TODO:    its own internal state - this would probably need to be done via Object.defineProperty
+    //TODO:    as the closure would have to be shared amongst both the getter and setter
+    /**
+     * Getter for underlying _evaluatedData field; Holds an array of data
+     * after enumerating the queryable delegator instance&#039;s source
+     * @returns {*}
+     */
+    get evaluatedData() {
+        return this._evaluatedData;
+    },
+
+    /**
+     * Setter for underlying _evaluatedData field; returns either an
+     * array if the queryable delegator instance&#039;s source has been
+     * enumerated, or undefined
+     * @param val
+     */
+    set evaluatedData(val) {
+        this._evaluatedData = val;
+    },
+
+    /**
+     * Getter for underlying _dataComputed field; returns true if
+     * the queryable delegator instance&#039;s source has been enumerated
+     * and false if not
+     * @returns {*}
+     */
+    get dataComputed() {
+        return this._dataComputed;
+    },
+
+    /**
+     * Setter for underlying _dataComputed field
+     * @param val
+     */
+    set dataComputed(val) {
+        this._dataComputed = val;
+    },
+
+    /**
+     * Extension function that allows new functionality to be applied to
+     * the queryable object
+     * @param {string} propName - The name of the new queryable property; must be unique
+     * @param {function} fn - A function that defines the new queryable functionality and
+     * will be called when this new queryable property is invoked.
+     *
+     * NOTE: The fn parameter must be a non-generator function that take one or more
+     * arguments and returns a generator function that knows how to iterate the data
+     * and yield out each item one at a time. The first argument must be the &#039;source&#039;
+     * argument of the function which will be what the returned generator must iterate
+     * in order to retrieve the items it work work on. The function may work on all
+     * the data as a single set, or it can iterate it&#039;s queryable source and apply the
+     * functionality to a single item before yielding that item and calling for the next.
+     */
+    extend: function _extend(propName, fn) {
+        if (!queryable[propName]) {
+            queryable[propName] = function(...args) {
+                return createNewQueryableDelegator(this, fn(this, ...args));
+            };
+        }
+    },
+
+    /**
+     * Creates a new queryable delegator object from whatever source value is provided.
+     * @param {*} source - The source argument can be any JavaScript value. It will default
+     * to an empty array if &#039;undefined&#039; is passed. If the source argument is a generator,
+     * an array, or another queryable, the function will accept it as is; if the source
+     * argument has a [Symbol.iterator] definition, it will call Array.from on the source
+     * before creating a new delegator, otherwise it will wrap the source argument in
+     * as array.
+     * @returns { Object } Returns a new queryable delegator object with its source set
+     * to the value of the provided source argument
+     */
+    from: function _from(source = []) {
+        //... if the source is a generator, an array, or another queryable, accept it as is...
+        if (generatorProto.isPrototypeOf(source) || isArray(source) || queryable.isPrototypeOf(source))
+            return createNewQueryableDelegator(source);
+        //... otherwise, turn the source into an array before creating a new queryable delegator object;
+        //if it has an iterator, use Array.from, else wrap the source arg in an array...
+        return createNewQueryableDelegator(null !== source &amp;&amp; source[Symbol.iterator] ? Array.from(source) : wrap(source));
+    },
+
+    /**
+     *
+     * @param mapFunc
+     * @returns {*}
+     */
+    queryableMap: function _queryableMap(mapFunc) {
+        return createNewQueryableDelegator(this, map(this, mapFunc));
+    },
+
+    /**
+     *
+     * @param keySelector
+     * @param comparer
+     * @returns {*}
+     */
+    queryableGroupBy: function _groupBy(keySelector, comparer) {
+        var groupObj = [{ keySelector: keySelector, comparer: comparer, direction: &#039;asc&#039; }];
+        return createNewQueryableDelegator(this, groupBy(this, groupObj));
+    },
+
+    /**
+     *
+     * @param keySelector
+     * @param comparer
+     * @returns {*}
+     */
+    queryableGroupByDescending: function _groupByDescending(keySelector, comparer) {
+         var groupObj = [{ keySelector: keySelector, comparer: comparer, direction: &#039;desc&#039; }];
+         return createNewQueryableDelegator(this, groupBy(this, groupObj));
+    },
+
+    /**
+     *
+     * @param keySelector
+     * @param comparer
+     * @returns {*}
+     */
+    queryableOrderBy: function _orderBy(keySelector, comparer) {
+        var sortObj = [{ keySelector: keySelector, comparer: comparer, direction: &#039;asc&#039; }];
+        return createNewOrderedQueryableDelegator(this, orderBy(this, sortObj), sortObj);
+    },
+
+    /**
+     *
+     * @param keySelector
+     * @param comparer
+     * @returns {*}
+     */
+    queryableOrderByDescending: function _orderByDescending(keySelector, comparer) {
+        var sortObj = [{ keySelector: keySelector, comparer: comparer, direction: &#039;desc&#039; }];
+        return createNewOrderedQueryableDelegator(this, orderBy(this, sortObj), sortObj);
+    },
+
+    /**
+     *@type {function}
+     */
+    queryableFlatten: function _flatten() {
+        return createNewQueryableDelegator(this, flatten(this));
+    },
+
+    /**
+     *@type {function}
+     */
+    queryableFlattenDeep: function _flattenDeep() {
+        return createNewQueryableDelegator(this, deepFlatten(this));
+    },
+
+    /**
+     *
+     * @param collection
+     * @returns {*}
+     */
+    queryableConcat: function _concat(collection) {
+        return createNewQueryableDelegator(this, concat(this, collection));
+    },
+
+    /**
+     *
+     * @param collection
+     * @param comparer
+     * @returns {*}
+     */
+    queryableExcept: function _except(collection, comparer) {
+        return createNewQueryableDelegator(this, except(this, collection, comparer));
+    },
+
+    /**
+     *
+     * @param inner
+     * @param outerSelector
+     * @param innerSelector
+     * @param projector
+     * @param comparer
+     * @returns {*}
+     */
+    queryableGroupJoin: function _groupJoin(inner, outerSelector, innerSelector, projector, comparer) {
+        return createNewQueryableDelegator(this, groupJoin(this, inner, outerSelector, innerSelector, projector, comparer));
+    },
+
+    /**
+     *
+     * @param collection
+     * @param comparer
+     * @returns {*}
+     */
+    queryableIntersect: function _intersect(collection, comparer) {
+        return createNewQueryableDelegator(this, intersect(this, collection, comparer));
+    },
+
+    /**
+     *
+     * @param inner
+     * @param outerSelector
+     * @param innerSelector
+     * @param projector
+     * @param comparer
+     * @returns {*}
+     */
+    queryableJoin: function _join(inner, outerSelector, innerSelector, projector, comparer) {
+        return createNewQueryableDelegator(this, join(this, inner, outerSelector, innerSelector, projector, comparer));
+    },
+
+    /**
+     *
+     * @param collection
+     * @param comparer
+     * @returns {*}
+     */
+    queryableUnion: function _union(collection, comparer) {
+        return createNewQueryableDelegator(this, union(this, collection, comparer));
+    },
+
+    /**
+     *
+     * @param selector
+     * @param collection
+     * @returns {*}
+     */
+    queryableZip: function _zip(selector, collection) {
+        return createNewQueryableDelegator(this, zip(this, selector, collection));
+    },
+
+    /**
+     *
+     * @param predicate
+     * @returns {*}
+     */
+    queryableWhere: function _where(predicate) {
+        return createNewQueryableDelegator(this, where(this, predicate));
+        /*var filterExpression = expressionManager.isPrototypeOf(field) ? field : Object.create(expressionManager).createExpression(field, operator, value);
+        return createNewFilteredQueryableDelegator(this.source, this._pipeline.concat([{ fn: filterDataWrapper(filterExpression),
+            functionType: functionTypes.atomic, functionWrapper: basicAtomicFunctionWrapper }]), filterExpression);*/
+    },
+
+    /**
+     *
+     * @param comparer
+     * @returns {*}
+     */
+    queryableDistinct: function _distinct(comparer) {
+        return createNewQueryableDelegator(this, distinct(this, comparer));
+    },
+
+    /**
+     *
+     * @param amt
+     * @returns {Array}
+     */
+    queryableTake: function _take(amt = 1) {
+        //TODO: If I decide to &#039;save&#039; not just a fully evaluated &#039;source&#039;, but also any data from a partially evaluated
+        //TODO: &#039;source&#039;, then I&#039;ll probably have to re-think my strategy of wrapping each &#039;method&#039;s&#039; iterator with
+        //TODO: the standard queryable iterator as it may not work as needed.
+        //TODO:
+        //TODO: I&#039;ll also have to change this &#039;method&#039; as it should take as much of the pre-evaluated date as possible
+        //TODO: before evaluating any remaining data the it needs from the source.
+        if (!amt) return;
+        if (!this._dataComputed) {
+            var res = [],
+                idx = 0;
+
+            for (let item of this) {
+                if (idx &lt; amt)
+                    res = res.concat(item);
+                else
+                    break;
+                ++idx;
+            }
+            return res;
+        }
+        return this.evaluatedData.slice(0, amt);
+    },
+
+    /**
+     *
+     * @param predicate
+     * @returns {Array}
+     */
+    queryableTakeWhile: function takeWhile(predicate) {
+        var res = [],
+            source = this.dataComputed ? this.evaluatedData : this;
+
+        for (let item of source) {
+            if (predicate(item))
+                res = res.concat(item);
+            else  {
+                return res;
+            }
+        }
+    },
+
+    /**
+     *
+     * @param predicate
+     * @returns {*}
+     */
+    queryableAny: function _any(predicate) {
+        return any(this, predicate);
+    },
+
+    /**
+     *
+     * @param predicate
+     * @returns {*}
+     */
+    queryableAll: function _all(predicate) {
+        return all(this, predicate);
+    },
+
+    /**
+     *
+     * @param predicate
+     * @returns {*}
+     */
+    queryableFirst: function _first(predicate) {
+        return first(this, predicate);
+    },
+
+    /**
+     *
+     * @param predicate
+     * @returns {*}
+     */
+    queryableLast: function _last(predicate) {
+        return last(this, predicate);
+    },
+
+    /**
+     *
+     * @returns {Array}
+     */
+    queryableToArray: function _toArray() {
+        return Array.from(this);
+    },
+
+    /**
+     *
+     * @returns {Set}
+     */
+    queryableToSet: function _toSet() {
+        return new Set(this);
+    },
+
+    /**
+     *
+     * @returns {Array.&lt;*&gt;}
+     */
+    queryableReverse: function _reverse() {
+        return Array.from(this).reverse();
+    },
+
+    /**
+     *
+     */
+    [Symbol.iterator]: function *_iterator() {
+        for (let item of this.source)
+            yield item;
+    }
+};
+
+/*
+function createEvaledDateProperty(obj) {
+    var data = null;
+    Object.defineProperty(
+        obj,
+        &#039;evaledData&#039;, {
+            get: function _getEvaledData() {
+                return data;
+            },
+            set: function _setEvaledData(val) {
+                data = val;
+            }
+        }
+    );
+}
+*/
+
+export { queryable };</textarea>
+  </div>
+</div>
+
+<footer class="footer">
+  <div class="container">
+    <p>.</p>
+  </div>
+</footer>
+
+<script type="text/html" id="complexity-popover-template">
+  <div class="complexity-notice">
+    Complexity : {{ cyclomatic }} <br>
+    Length : {{ halstead.length }} <br>
+    Difficulty : {{ halstead.difficulty.toFixed(2) }} <br>
+    Est # bugs : {{ halstead.bugs.toFixed(2) }}<br>
+  </div>
+</script>
+
+<script type="text/javascript" src="../../assets/scripts/bundles/core-bundle.js"></script>
+<script type="text/javascript" src="../../assets/scripts/bundles/codemirror.js"></script>
+<script type="text/javascript" src="../../assets/scripts/codemirror.markpopovertext.js"></script>
+<script type="text/javascript" src="report.js"></script>
+<script type="text/javascript" src="report.history.js"></script>
+<script type="text/javascript" src="../../assets/scripts/plato-file.js"></script>
+</body>
+</html>
