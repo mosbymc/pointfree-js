@@ -44,11 +44,11 @@
   <div class="row">
     <div class="col-md-6">
       <h2 class="header">Maintainability <a href="http://blogs.msdn.com/b/codeanalysis/archive/2007/11/20/maintainability-index-range-and-meaning.aspx"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="A value between 0 and 100 that represents the relative ease of maintaining the code. A high value means better maintainability." data-original-title="Maintainability Index"  data-container="body"></i></a></h2>
-      <p class="stat">79.80</p>
+      <p class="stat">77.48</p>
     </div>
     <div class="col-md-6">
       <h2 class="header">Lines of code <i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="Source Lines of Code / Logical Lines of Code" data-original-title="SLOC/LSLOC" data-container="body"></i></h2>
-      <p class="stat">451</p>
+      <p class="stat">519</p>
     </div>
   </div>
   <div class="row historical">
@@ -62,11 +62,11 @@
   <div class="row">
     <div class="col-md-6">
       <h2 class="header">Difficulty  <a href="http://en.wikipedia.org/wiki/Halstead_complexity_measures"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="The difficulty measure is related to the difficulty of the program to write or understand." data-original-title="Difficulty" data-container="body"></i></a></h2>
-      <p class="stat">46.62</p>
+      <p class="stat">52.09</p>
     </div>
     <div class="col-md-6">
       <h2 class="header">Estimated Errors  <a href="http://en.wikipedia.org/wiki/Halstead_complexity_measures"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="Halstead's delivered bugs is an estimate for the number of errors in the implementation." data-original-title="Delivered Bugs" data-container="body"></i></a></h2>
-      <p class="stat">1.61</p>
+      <p class="stat">1.88</p>
     </div>
   </div>
 </div>
@@ -101,6 +101,30 @@ import { isArray, wrap } from &#039;../functionalHelpers&#039;;
 //TODO: Not sure if this has been done yet or not, but need a way to create new query/query-type object without
 //TODO: needing to first evaluate the data by pumping it through the pipeline first; rather creating a new
 //TODO: query/query-type object would be better served by passing all the unprocessed data;
+
+/*
+  - Aggregate/reduce (https://msdn.microsoft.com/en-us/library/bb548744(v=vs.110).aspx)
+  - Ancestors (https://msdn.microsoft.com/en-us/library/bb353466(v=vs.110).aspx)
+  - AsEnumerable (https://msdn.microsoft.com/en-us/library/bb335435(v=vs.110).aspx)
+  - AsQueryable (https://msdn.microsoft.com/en-us/library/bb507003(v=vs.110).aspx)
+  - Average (https://msdn.microsoft.com/en-us/library/bb549067(v=vs.110).aspx)
+  - Contains (https://msdn.microsoft.com/en-us/library/bb352880(v=vs.110).aspx)
+  - Count/length (https://msdn.microsoft.com/en-us/library/bb338038(v=vs.110).aspx)
+  - DefaultIfEmpty (https://msdn.microsoft.com/en-us/library/bb360179(v=vs.110).aspx)
+  - DescendantNodes (https://msdn.microsoft.com/en-us/library/bb336780(v=vs.110).aspx)
+  - Descendants (https://msdn.microsoft.com/en-us/library/bb337483(v=vs.110).aspx)
+  - FirstOrDefault (https://msdn.microsoft.com/en-us/library/bb340482(v=vs.110).aspx)
+  - LastOrDefault (https://msdn.microsoft.com/en-us/library/bb301849(v=vs.110).aspx)
+  - Max (https://msdn.microsoft.com/en-us/library/bb347632(v=vs.110).aspx)
+  - Min (https://msdn.microsoft.com/en-us/library/bb352408(v=vs.110).aspx)
+  - SequenceEqual (https://msdn.microsoft.com/en-us/library/bb348567(v=vs.110).aspx)
+  - Single (https://msdn.microsoft.com/en-us/library/bb155325(v=vs.110).aspx)
+  - SingleOrDefault (https://msdn.microsoft.com/en-us/library/bb342451(v=vs.110).aspx)
+  - Skip (https://msdn.microsoft.com/en-us/library/bb358985(v=vs.110).aspx)
+  - SkipWhile (https://msdn.microsoft.com/en-us/library/bb549075(v=vs.110).aspx)
+  - Sum (https://msdn.microsoft.com/en-us/library/bb549046(v=vs.110).aspx)
+  -
+ */
 
 /**
  * Primary object to which filteredQueryables and orderedQueryables, as well as the objects passed to consumers, all delegate.
@@ -156,6 +180,13 @@ var queryable = {
     /*queryableSelectMany: function _selectMany(selector, resSelector) {
         return createNewQueryableDelegator(this.source, this._pipeline.concat([{ fn: selectManyThunk(selector, resSelector), functionType: functionTypes.atomic }]));
     },*/
+    get source() {
+        return this._source;
+    },
+
+    set source(val) {
+        this._source = val;
+    },
 
     //TODO: 1) See about initializing the queryable object with the _evaluatedData and _dataComputed
     //TODO:    properties upfront and making then non-enumerable.
@@ -411,15 +442,15 @@ var queryable = {
      * @param amt
      * @returns {Array}
      */
-    queryableTake: function _take(amt = 1) {
+    queryableTake: function _take(amt) {
         //TODO: If I decide to &#039;save&#039; not just a fully evaluated &#039;source&#039;, but also any data from a partially evaluated
         //TODO: &#039;source&#039;, then I&#039;ll probably have to re-think my strategy of wrapping each &#039;method&#039;s&#039; iterator with
         //TODO: the standard queryable iterator as it may not work as needed.
         //TODO:
-        //TODO: I&#039;ll also have to change this &#039;method&#039; as it should take as much of the pre-evaluated date as possible
+        //TODO: I&#039;ll also have to change this &#039;method&#039; as it should take as much of the pre-evaluated data as possible
         //TODO: before evaluating any remaining data the it needs from the source.
-        if (!amt) return;
-        if (!this._dataComputed) {
+        if (!amt) return [];
+        if (!this.dataComputed) {
             var res = [],
                 idx = 0;
 
@@ -451,6 +482,43 @@ var queryable = {
                 return res;
             }
         }
+    },
+
+    /**
+     *
+     * @param amt
+     * @returns {*}
+     */
+    queryableSkip: function skip(amt) {
+        var source = this.dataComputed ? this.evaluatedData : this.source,
+            idx = 0,
+            res = [];
+
+        for (let item of source) {
+            if (idx &gt;= amt)
+                res = res.concat(item);
+            ++idx;
+        }
+        return res;
+    },
+
+    /**
+     *
+     * @param predicate
+     * @returns {Array}
+     */
+    queryableSkipWhile: function skipWhile(predicate) {
+        var source = this.dataComputed ? this.evaluatedData : this.source,
+            hasFailed = false,
+            res = [];
+
+        for (let item of source) {
+            if (!hasFailed &amp;&amp; !predicate(item))
+                hasFailed = true;
+            if (hasFailed)
+                res = res.concat(item);
+        }
+        return res;
     },
 
     /**

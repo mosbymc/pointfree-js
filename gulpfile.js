@@ -64,9 +64,20 @@ gulp.task('clean-tmp', function _cleanTmp(done) {
     clean('./tmp', done);
 });
 
-gulp.task('plato', function _plato(done) {
+gulp.task('plato', ['strip-comments', 'generate-plato'], function _plato(done) {
+    log('Cleaning: ' + _.util.colors.blue('./tmpPlato'));
+    del('./tmpPlato', done);
+});
+
+gulp.task('strip-comments', function stipComments() {
+    return gulp.src(config.src + '**/*.js')
+        .pipe(_.stripComments())
+        .pipe(gulp.dest('./tmpPlato'));
+});
+
+gulp.task('generate-plato', function _plato(done) {
     var plato = require('plato');
-    plato.inspect(config.scripts, config.plato.report, config.plato.options, function noop(){
+    plato.inspect(config.platoScripts, config.plato.report, config.plato.options, function noop(){
         done();
     });
 });

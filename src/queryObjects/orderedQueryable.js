@@ -10,10 +10,6 @@ orderedQueryable.orderedGroupBy = function _orderedGroupBy(keySelector, comparer
     return this.queryableGroupBy(keySelector, comparer);
 };
 
-orderedQueryable.orderedGroupBy = function _orderedGroupBy(keySelector, comparer) {
-    return this.queryableGroupBy(keySelector, comparer);
-};
-
 orderedQueryable.orderedGroupByDescending = function _orderedGroupByDescending(keySelector, comparer) {
     return this.queryableGroupByDescending(keySelector, comparer);
 };
@@ -94,15 +90,15 @@ orderedQueryable.orderedLast = function _orderedLast(predicate) {
     return this.queryableLast(predicate);
 };
 
-orderedQueryable.orderedToArray = function _orderedToArray() {
+orderedQueryable.orderedQueryableToArray = function _orderedQueryableToArray() {
     return this.queryableToArray();
 };
 
-orderedQueryable.orderedToSet = function _orderedToSet() {
+orderedQueryable.orderedQueryableToSet = function _orderedQueryableToSet() {
     return this.queryableToSet();
 };
 
-orderedQueryable.orderedReverse = function _orderedReverse() {
+orderedQueryable.orderedQueryableReverse = function _orderedQueryableReverse() {
     return this.queryableReverse();
 };
 

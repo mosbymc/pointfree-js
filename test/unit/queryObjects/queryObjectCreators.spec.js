@@ -20,9 +20,9 @@ function comparer(a, b) {
     return a === b;
 }
 
-function isObject(item) {
-    return 'object' === typeof item;
-}
+function keySelector(item) { return item.State; }
+function lessThanComparer(a, b) { return a < b; }
+var sortObj = [{ keySelector: keySelector, comparer: lessThanComparer, direction: 'asc' }];
 
 describe('createNewQueryableDelegator', function testQueryableDelegatorObjectCreation() {
     it('should create a new queryable object delegator with actual pipeline array', function testSuccessfulCreation() {
@@ -98,12 +98,21 @@ describe('createNewQueryableDelegator', function testQueryableDelegatorObjectCre
         queryDelegator.skipWhile.should.exist;
         queryDelegator.skipWhile.should.be.a('function');
 
+
+        //MUTATION FUNCTIONS
+        queryDelegator.toArray.should.exist;
+        queryDelegator.toArray.should.be.a('function');
+        queryDelegator.toSet.should.exist;
+        queryDelegator.toSet.should.be.a('function');
+        queryDelegator.reverse.should.exist;
+        queryDelegator.reverse.should.be.a('function');
+
         //Functions that should not be present
         expect(queryDelegator.thenBy).to.not.exist;
         expect(queryDelegator.thenByDescending).to.not.exist;
     });
 
-    it('should return a queryable or orderedQueryable in all cases', function testDefaultParameterValues() {
+    it('should return a queryable or orderedQueryable in all cases', function testQueryableReturningFunctions() {
         var baseDelegate = createNewQueryableDelegator(testData.dataSource.data),
             mapDelegate = baseDelegate.map(function (item) { return item.State; }),
             whereDelegate = baseDelegate.where(namePredicate),
@@ -141,14 +150,60 @@ describe('createNewQueryableDelegator', function testQueryableDelegatorObjectCre
         expect(queryable.isPrototypeOf(flattenDelegate)).to.be.true;
         expect(queryable.isPrototypeOf(flattenDeepDelegate)).to.be.true;
     });
+
+    it('should return a non-queryable object in all cases', function testNonQueryableReturningFunctions() {
+        var baseDelegate = createNewQueryableDelegator(testData.dataSource.data),
+            take = baseDelegate.take(5),
+            takeWhile = baseDelegate.takeWhile(function _predicate(item) { return item.drillDownData.length > 4; }),
+            skip = baseDelegate.skip(40),
+            skipWhile = baseDelegate.skipWhile(function _predicate(item) { return item.drillDownData.length > 5; }),
+            any1 = baseDelegate.any(),
+            any2 = baseDelegate.any(function _predicate(item) { return item.FirstName === 'Mike'; }),
+            all1 = baseDelegate.all(),
+            all2 = baseDelegate.all(function _predicate(item) { return item.drillDownData.length; }),
+            first1 = baseDelegate.first(),
+            first2 = baseDelegate.first(function _predicate(item) { return item.FirstName === 'Phillip J.'; }),
+            last1 = baseDelegate.last(),
+            last2 = baseDelegate.last(function _predicate(item) { return item.FirstName === 'Mark'; }),
+            toArray = baseDelegate.toArray(),
+            toSet = baseDelegate.toSet(),
+            reverse = baseDelegate.reverse();
+
+        expect(queryable.isPrototypeOf(take)).to.be.false;
+        take.should.be.an('array');
+        expect(queryable.isPrototypeOf(takeWhile)).to.be.false;
+        takeWhile.should.be.an('array');
+        expect(queryable.isPrototypeOf(skip)).to.be.false;
+        skip.should.be.an('array');
+        expect(queryable.isPrototypeOf(skipWhile)).to.be.false;
+        skipWhile.should.be.an('array');
+        expect(queryable.isPrototypeOf(any1)).to.be.false;
+        any1.should.be.true;
+        expect(queryable.isPrototypeOf(any2)).to.be.false;
+        any2.should.be.false;
+        expect(queryable.isPrototypeOf(all1)).to.be.false;
+        all1.should.be.true;
+        expect(queryable.isPrototypeOf(all2)).to.be.false;
+        all2.should.be.true;
+        expect(queryable.isPrototypeOf(first1)).to.be.false;
+        first1.should.eql(testData.dataSource.data[0]);
+        expect(queryable.isPrototypeOf(first2)).to.be.false;
+        first2.should.eql(testData.dataSource.data[0]);
+        expect(queryable.isPrototypeOf(last1)).to.be.false;
+        last1.should.eql(testData.dataSource.data[testData.dataSource.data.length - 1]);
+        expect(queryable.isPrototypeOf(last2)).to.be.false;
+        last2.should.eql(testData.dataSource.data[testData.dataSource.data.length - 1]);
+        expect(queryable.isPrototypeOf(toArray)).to.be.false;
+        toArray.should.be.an('array');
+        expect(queryable.isPrototypeOf(toSet)).to.be.false;
+        expect(queryable.isPrototypeOf(reverse)).to.be.false;
+        reverse.should.be.an('array');
+    });
 });
 
 describe('createNewOrderedQueryableDelegator', function testCreateNewQueryableDelegator() {
     it('should create a new queryable object delegator with actual pipeline array', function testSuccessfulCreation() {
-        function keySelector(item) { return item.State; }
-        function comparer(a, b) { return a < b; }
-        var sortObj = [{ keySelector: keySelector, comparer: comparer, direction: 'asc' }];
-        var orderedQueryDelegator = createNewOrderedQueryableDelegator(this, orderBy(this, sortObj), sortObj);
+        var orderedQueryDelegator = createNewOrderedQueryableDelegator(testData.dataSource.data, orderBy(testData.dataSource.data, sortObj), sortObj);
 
         expect(orderedQueryDelegator).to.exist;
 
@@ -223,13 +278,19 @@ describe('createNewOrderedQueryableDelegator', function testCreateNewQueryableDe
         orderedQueryDelegator.skip.should.be.a('function');
         orderedQueryDelegator.skipWhile.should.exist;
         orderedQueryDelegator.skipWhile.should.be.a('function');
+
+
+        //MUTATION FUNCTIONS
+        orderedQueryDelegator.toArray.should.exist;
+        orderedQueryDelegator.toArray.should.be.a('function');
+        orderedQueryDelegator.toSet.should.exist;
+        orderedQueryDelegator.toSet.should.be.a('function');
+        orderedQueryDelegator.reverse.should.exist;
+        orderedQueryDelegator.reverse.should.be.a('function');
     });
 
-    it('should return a queryable or orderedQueryable in all cases', function testDefaultParameterValues() {
-        function keySelector(item) { return item.State; }
-        function comparer(a, b) { return a < b; }
-        var sortObj = [{ keySelector: keySelector, comparer: comparer, direction: 'asc' }];
-        var basedOrderedDelegate = createNewOrderedQueryableDelegator(this, orderBy(this, sortObj), sortObj),
+    it('should return a queryable or orderedQueryable in all cases', function testQueryableReturningFunctions() {
+        var basedOrderedDelegate = createNewOrderedQueryableDelegator(testData.dataSource.data, orderBy(testData.dataSource.data, sortObj), sortObj),
             mapDelegate = basedOrderedDelegate.map(function (item) { return item.State; }),
             whereDelegate = basedOrderedDelegate.where(namePredicate),
             concatDelegate = basedOrderedDelegate.concat([1, 2, 3, 4]),
@@ -271,5 +332,50 @@ describe('createNewOrderedQueryableDelegator', function testCreateNewQueryableDe
         expect(queryable.isPrototypeOf(distinctDelegate)).to.be.true;
         expect(queryable.isPrototypeOf(flattenDelegate)).to.be.true;
         expect(queryable.isPrototypeOf(flattenDeepDelegate)).to.be.true;
+    });
+
+    it('should return a non-queryable object in all cases', function testNonQueryableReturningFunctions() {
+        var basedOrderedDelegate = createNewOrderedQueryableDelegator(testData.dataSource.data, orderBy(testData.dataSource.data, sortObj), sortObj),
+            take = basedOrderedDelegate.take(5),
+            takeWhile = basedOrderedDelegate.takeWhile(function _predicate(item) { return item.drillDownData.length > 4; }),
+            skip = basedOrderedDelegate.skip(40),
+            skipWhile = basedOrderedDelegate.skipWhile(function _predicate(item) { return item.drillDownData.length > 5; }),
+            any1 = basedOrderedDelegate.any(),
+            any2 = basedOrderedDelegate.any(function _predicate(item) { return item.FirstName === 'Mike'; }),
+            all1 = basedOrderedDelegate.all(),
+            all2 = basedOrderedDelegate.all(function _predicate(item) { return item.drillDownData.length; }),
+            first1 = basedOrderedDelegate.first(),
+            first2 = basedOrderedDelegate.first(function _predicate(item) { return item.FirstName === 'Phillip J.'; }),
+            last1 = basedOrderedDelegate.last(),
+            last2 = basedOrderedDelegate.last(function _predicate(item) { return item.FirstName === 'Mark'; }),
+            toArray = basedOrderedDelegate.toArray(),
+            toSet = basedOrderedDelegate.toSet(),
+            reverse = basedOrderedDelegate.reverse();
+
+        expect(queryable.isPrototypeOf(take)).to.be.false;
+        take.should.be.an('array');
+        expect(queryable.isPrototypeOf(takeWhile)).to.be.false;
+        takeWhile.should.be.an('array');
+        expect(queryable.isPrototypeOf(skip)).to.be.false;
+        skip.should.be.an('array');
+        expect(queryable.isPrototypeOf(skipWhile)).to.be.false;
+        skipWhile.should.be.an('array');
+        expect(queryable.isPrototypeOf(any1)).to.be.false;
+        any1.should.be.true;
+        expect(queryable.isPrototypeOf(any2)).to.be.false;
+        any2.should.be.false;
+        expect(queryable.isPrototypeOf(all1)).to.be.false;
+        all1.should.be.true;
+        expect(queryable.isPrototypeOf(all2)).to.be.false;
+        all2.should.be.true;
+        expect(queryable.isPrototypeOf(first1)).to.be.false;
+        expect(queryable.isPrototypeOf(first2)).to.be.false;
+        expect(queryable.isPrototypeOf(last1)).to.be.false;
+        expect(queryable.isPrototypeOf(last2)).to.be.false;
+        expect(queryable.isPrototypeOf(toArray)).to.be.false;
+        toArray.should.be.an('array');
+        expect(queryable.isPrototypeOf(toSet)).to.be.false;
+        expect(queryable.isPrototypeOf(reverse)).to.be.false;
+        reverse.should.be.an('array');
     });
 });

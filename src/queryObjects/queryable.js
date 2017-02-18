@@ -3,7 +3,7 @@ import { all, any, first, last } from '../evaluation/evaluationFunctions';
 import { distinct, where } from '../limitation/limitationFunctions';
 import { deepFlatten, flatten, groupBy, map, orderBy } from '../projection/projectionFunctions';
 import { createNewQueryableDelegator, createNewOrderedQueryableDelegator } from './queryObjectCreators';
-import { generatorProto } from '../helpers';
+import { generatorProto, defaultPredicate } from '../helpers';
 import { isArray, wrap } from '../functionalHelpers';
 
 
@@ -380,7 +380,7 @@ var queryable = {
      * @param predicate
      * @returns {Array}
      */
-    queryableTakeWhile: function takeWhile(predicate) {
+    queryableTakeWhile: function takeWhile(predicate = defaultPredicate) {
         var res = [],
             source = this.dataComputed ? this.evaluatedData : this;
 
@@ -416,7 +416,7 @@ var queryable = {
      * @param predicate
      * @returns {Array}
      */
-    queryableSkipWhile: function skipWhile(predicate) {
+    queryableSkipWhile: function skipWhile(predicate = defaultPredicate) {
         var source = this.dataComputed ? this.evaluatedData : this.source,
             hasFailed = false,
             res = [];
@@ -435,7 +435,7 @@ var queryable = {
      * @param predicate
      * @returns {*}
      */
-    queryableAny: function _any(predicate) {
+    queryableAny: function _any(predicate = defaultPredicate) {
         return any(this, predicate);
     },
 
@@ -444,7 +444,7 @@ var queryable = {
      * @param predicate
      * @returns {*}
      */
-    queryableAll: function _all(predicate) {
+    queryableAll: function _all(predicate = defaultPredicate) {
         return all(this, predicate);
     },
 
@@ -453,7 +453,7 @@ var queryable = {
      * @param predicate
      * @returns {*}
      */
-    queryableFirst: function _first(predicate) {
+    queryableFirst: function _first(predicate = defaultPredicate) {
         return first(this, predicate);
     },
 
@@ -462,7 +462,7 @@ var queryable = {
      * @param predicate
      * @returns {*}
      */
-    queryableLast: function _last(predicate) {
+    queryableLast: function _last(predicate = defaultPredicate) {
         return last(this, predicate);
     },
 

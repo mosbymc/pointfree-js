@@ -1,7 +1,7 @@
 import { queryable } from './queryable';
 import { orderedQueryable } from './orderedQueryable';
 import { orderBy } from '../projection/projectionFunctions';
-import { defaultEqualityComparer, defaultPredicate, generatorProto } from '../helpers';
+import { defaultEqualityComparer, generatorProto } from '../helpers';
 
 function createNewQueryableDelegator(source, iterator) {
     var obj = Object.create(queryable);
@@ -71,10 +71,10 @@ function createNewQueryableDelegator(source, iterator) {
     obj.skipWhile = function _skipWhile(predicate) {
         return this.queryableSkipWhile(predicate);
     };
-    obj.any = function _any(predicate = defaultPredicate) {
+    obj.any = function _any(predicate) {
         return this.queryableAny(predicate);
     };
-    obj.all = function _all(predicate = defaultPredicate) {
+    obj.all = function _all(predicate) {
         return this.queryableAll(predicate);
     };
     obj.first = function _first(predicate) {
@@ -82,6 +82,15 @@ function createNewQueryableDelegator(source, iterator) {
     };
     obj.last = function _last(predicate) {
         return this.queryableLast(predicate);
+    };
+    obj.toArray = function _toArray() {
+        return this.queryableToArray();
+    };
+    obj.toSet = function _toSet() {
+        return this.queryableToSet();
+    };
+    obj.reverse = function _reverse() {
+        return this.queryableReverse();
     };
     return addGetter(obj);
 }
@@ -113,16 +122,16 @@ function createNewOrderedQueryableDelegator(source, iterator, sortObj) {
         return this.orderedZip(selector, collection);
     };
     obj.groupBy = function _groupBy(keySelector, comparer) {
-        return this.queryableGroupBy(keySelector, comparer);
+        return this.orderedGroupBy(keySelector, comparer);
     };
     obj.groupByDescending = function _groupByDescending(keySelector, comparer) {
-        return this.queryableGroupByDescending(keySelector, comparer);
+        return this.orderedGroupByDescending(keySelector, comparer);
     };
     obj.except = function _except(collection, comparer = defaultEqualityComparer) {
         return this.orderedExcept(collection, comparer);
     };
     obj.groupJoin = function _groupJoin(inner, outerSelector, innerSelector, projector, comparer = defaultEqualityComparer) {
-        return this.queryableGroupJoin(inner, outerSelector, innerSelector, projector, comparer);
+        return this.orderedGroupJoin(inner, outerSelector, innerSelector, projector, comparer);
     };
     obj.intersect = function _intersect(collection, comparer = defaultEqualityComparer) {
         return this.orderedIntersect(collection, comparer);
@@ -131,10 +140,10 @@ function createNewOrderedQueryableDelegator(source, iterator, sortObj) {
         return this.orderedDistinct(comparer);
     };
     obj.flatten = function _flatten() {
-        return this.queryableFlatten();
+        return this.orderedFlatten();
     };
     obj.flattenDeep = function _flattenDeep() {
-        return this.queryableFlattenDeep();
+        return this.orderedFlattenDeep();
     };
     obj.take = function _take(amt = 1) {
         return this.orderedTake(amt);
@@ -148,10 +157,10 @@ function createNewOrderedQueryableDelegator(source, iterator, sortObj) {
     obj.skipWhile = function _skipWhile(predicate) {
         return this.orderedSkipWhile(predicate);
     };
-    obj.any = function _any(predicate = defaultPredicate) {
+    obj.any = function _any(predicate) {
         return this.orderedAny(predicate);
     };
-    obj.all = function _all(predicate = defaultPredicate) {
+    obj.all = function _all(predicate) {
         return this.orderedAll(predicate);
     };
     obj.first = function _first(predicate) {
@@ -159,6 +168,15 @@ function createNewOrderedQueryableDelegator(source, iterator, sortObj) {
     };
     obj.last = function _last(predicate) {
         return this.orderedLast(predicate);
+    };
+    obj.toArray = function _toArray() {
+        return this.orderedQueryableToArray();
+    };
+    obj.toSet = function _toSet() {
+        return this.orderedQueryableToSet();
+    };
+    obj.reverse = function _reverse() {
+        return this.orderedQueryableReverse();
     };
 
     //Shadow the orderBy/orderByDescending function of the delegate so that if another
