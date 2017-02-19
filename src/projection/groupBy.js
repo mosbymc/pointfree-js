@@ -1,5 +1,5 @@
 import { when, isArray, not } from '../functionalHelpers';
-import { sortData2 } from  './sortHelpers';
+import { sortData } from  './sortHelpers';
 
 function groupBy(source, groupObject) {
     return function *groupByIterator() {
@@ -10,7 +10,7 @@ function groupBy(source, groupObject) {
 }
 
 function groupData(data, groupObject) {
-    var sortedData = sortData2(data, groupObject),
+    var sortedData = sortData(data, groupObject),
         retData = [];
 
     sortedData.forEach(function _groupSortedData(item) {

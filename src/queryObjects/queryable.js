@@ -38,7 +38,7 @@ import { isArray, wrap } from '../functionalHelpers';
 /**
  * Primary object to which filteredQueryables and orderedQueryables, as well as the objects passed to consumers, all delegate.
  * @type {{
- * queryableFrom: queryable._queryableFrom,
+ * queryableFrom: * queryable._queryableFrom,
  * queryableMap: * queryable._queryableMap,
  * queryableGroupBy: * queryable._groupBy,
  * queryableGroupByDescending: * queryable._groupByDescending,
@@ -119,6 +119,7 @@ var queryable = {
      * @param val
      */
     set evaluatedData(val) {
+        this._dataComputed = true;
         this._evaluatedData = val;
     },
 

@@ -1,4 +1,4 @@
-import { /*sortData,*/ sortData2 } from '../../../src/projection/sortHelpers';
+import { /*sortData,*/ sortData } from '../../../src/projection/sortHelpers';
 import { testData } from '../../testData';
 
 /*
@@ -86,7 +86,7 @@ describe('sort data 2', function test() {
         }
 
         var sortObj = [{ keySelector: keySelector, comparer: comparer, direction: 'asc' }];
-        var sss = sortData2(testData.dataSource.data, sortObj);
+        var sss = sortData(testData.dataSource.data, sortObj);
         sss.should.be.an('array');
         sss.should.have.lengthOf(testData.dataSource.data.length);
         sss.forEach(function validateResults(item) {
@@ -111,7 +111,7 @@ describe('sort data 2', function test() {
         }
 
         var sortObj = [{ keySelector: keySelector, comparer: comparer, direction: 'desc' }];
-        var sss = sortData2(testData.dataSource.data, sortObj);
+        var sss = sortData(testData.dataSource.data, sortObj);
 
         sss.should.be.an('array');
         sss.should.have.lengthOf(testData.dataSource.data.length);
@@ -145,7 +145,7 @@ describe('sort data 2', function test() {
             { keySelector: keySelector, comparer: comparer, direction: 'desc' }
         ];
 
-        var sss = sortData2(testData.dataSource.data, sortObj);
+        var sss = sortData(testData.dataSource.data, sortObj);
 
         sss.should.be.an('array');
         sss.should.have.lengthOf(testData.dataSource.data.length);

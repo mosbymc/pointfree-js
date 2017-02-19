@@ -1,5 +1,5 @@
 import { when, isArray, not } from '../functionalHelpers';
-import { sortData2 } from  './sortHelpers';
+import { sortData } from  './sortHelpers';
 
 //TODO: I should probably make this take either a "fields" object, or a selector function
 //TODO: It also seems an insertion sort would work better in terms of lazy evaluation... of course, if
@@ -11,7 +11,7 @@ import { sortData2 } from  './sortHelpers';
 function orderBy(source, orderObject) {
     return function *orderByIterator() {
         //gather all data from the source before sorting
-        var orderedData = sortData2(when(not(isArray), Array.from, source), orderObject);
+        var orderedData = sortData(when(not(isArray), Array.from, source), orderObject);
         for (let item of orderedData) {
             if (undefined !== item) yield item;
         }
