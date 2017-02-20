@@ -13,8 +13,13 @@ function deepMap(source, fn) {
         while (results.length) yield results.shift();
 
         function recursiveMap(item) {
-            if (isArray(item))
-                return recursiveMap(item);
+            if (isArray(item)) {
+                var res = [];
+                for (let it of item) {
+                    res = res.concat(recursiveMap(it));
+                }
+                return res;
+            }
             return fn(item);
         }
     };

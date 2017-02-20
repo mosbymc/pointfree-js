@@ -3,7 +3,7 @@ import { testData } from '../../testData';
 
 describe('Test zip...', function testZip() {
     function zipSelector(a, b) {
-        return { source:a, collection: b };
+        return { source: a, collection: b };
     }
 
     var zipTestData = new Array(54);

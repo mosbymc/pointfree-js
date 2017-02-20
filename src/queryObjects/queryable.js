@@ -1,6 +1,6 @@
 import { addFront, concat, except, groupJoin, intersect, join, union, zip } from '../collation/collationFunctions';
-import { all, any, first, fold, last, single } from '../evaluation/evaluationFunctions';
-import { distinct, where } from '../limitation/limitationFunctions';
+import { all, any, first, fold, last, length } from '../evaluation/evaluationFunctions';
+import { distinct, ofType, where } from '../limitation/limitationFunctions';
 import { deepFlatten, deepMap, flatten, groupBy, map, orderBy } from '../projection/projectionFunctions';
 import { createNewQueryableDelegator, createNewOrderedQueryableDelegator } from './queryObjectCreators';
 import { generatorProto, defaultPredicate } from '../helpers';
@@ -16,7 +16,6 @@ import { isArray, wrap } from '../functionalHelpers';
   - AsEnumerable (https://msdn.microsoft.com/en-us/library/bb335435(v=vs.110).aspx)
   - AsQueryable (https://msdn.microsoft.com/en-us/library/bb507003(v=vs.110).aspx)
   - Contains (https://msdn.microsoft.com/en-us/library/bb352880(v=vs.110).aspx)
-  - Count/length (https://msdn.microsoft.com/en-us/library/bb338038(v=vs.110).aspx)
   - DefaultIfEmpty (https://msdn.microsoft.com/en-us/library/bb360179(v=vs.110).aspx)
   - DescendantNodes (https://msdn.microsoft.com/en-us/library/bb336780(v=vs.110).aspx)
   - Descendants (https://msdn.microsoft.com/en-us/library/bb337483(v=vs.110).aspx)
@@ -25,7 +24,6 @@ import { isArray, wrap } from '../functionalHelpers';
   - Max (https://msdn.microsoft.com/en-us/library/bb347632(v=vs.110).aspx)
   - Min (https://msdn.microsoft.com/en-us/library/bb352408(v=vs.110).aspx)
   - SequenceEqual (https://msdn.microsoft.com/en-us/library/bb348567(v=vs.110).aspx)
-  - SingleOrDefault (https://msdn.microsoft.com/en-us/library/bb342451(v=vs.110).aspx)
  */
 
 /**
@@ -245,7 +243,7 @@ var queryable = {
     },
 
     /**
-     * 
+     *
      * @param fn
      * @returns {*}
      */
@@ -347,6 +345,15 @@ var queryable = {
         /*var filterExpression = expressionManager.isPrototypeOf(field) ? field : Object.create(expressionManager).createExpression(field, operator, value);
         return createNewFilteredQueryableDelegator(this.source, this._pipeline.concat([{ fn: filterDataWrapper(filterExpression),
             functionType: functionTypes.atomic, functionWrapper: basicAtomicFunctionWrapper }]), filterExpression);*/
+    },
+
+    /**
+     *
+     * @param type
+     * @returns {*}
+     */
+    queryableOfType: function _queryableOfType(type) {
+        return createNewQueryableDelegator(this, ofType(this, type));
     },
 
     /**
@@ -486,6 +493,14 @@ var queryable = {
      */
     queryableLast: function _last(predicate = defaultPredicate) {
         return last(this, predicate);
+    },
+
+    /**
+     *
+     * @returns {*}
+     */
+    queryableLength: function _queryableLength() {
+        return length(this);
     },
 
     //TODO: not sure if it makes sense to add these. They are in-place modifiers, which I don't really

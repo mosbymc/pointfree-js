@@ -24,6 +24,14 @@ var javaScriptTypes = {
     'undefined': 'undefined'
 };
 
+var javaScriptPrimitiveTypes = {
+    'undefined': javaScriptTypes.undefined,
+    'number': javaScriptTypes.number,
+    'string': javaScriptTypes.string,
+    'boolean': javaScriptTypes.boolean,
+    'symbol': javaScriptTypes.symbol
+};
+
 var comparisons = {
     strictEquality: 'eq',
     looseEquality: '==',
@@ -249,5 +257,5 @@ function cloneArray(arr) {
     return newArr;
 }
 
-export { functionTypes, javaScriptTypes, comparisons, dataTypes, defaultEqualityComparer, defaultGreaterThanComparer, defaultPredicate, memoizer, memoizer2,
+export { functionTypes, javaScriptTypes, javaScriptPrimitiveTypes, comparisons, dataTypes, defaultEqualityComparer, defaultGreaterThanComparer, defaultPredicate, memoizer, memoizer2,
     getNumbersFromTime, comparator, dataTypeValueNormalizer, cloneData, cloneArray, operationTypes, emptyObj, generatorProto };

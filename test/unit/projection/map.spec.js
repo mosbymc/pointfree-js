@@ -7,7 +7,7 @@ function _identity(item) {
 
 describe('Test map...', function testMap() {
     it('should return full names of all test data items', function testMap() {
-        var mapIterable = map(testData.dataSource.data, function fullNam(item) { return item.FirstName + ' ' + item.LastName; }),
+        var mapIterable = map(testData.dataSource.data, function fullName(item) { return item.FirstName + ' ' + item.LastName; }),
             mapRes = Array.from(mapIterable());
 
         mapRes.should.have.lengthOf(testData.dataSource.data.length);

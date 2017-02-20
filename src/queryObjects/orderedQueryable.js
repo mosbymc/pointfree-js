@@ -2,6 +2,10 @@ import { queryable } from './queryable';
 
 var orderedQueryable = Object.create(queryable);
 
+orderedQueryable.orderedDeepMap = function _orderedDeepMap(fn) {
+    return this.queryableDeepMap(fn);
+};
+
 orderedQueryable.orderedMap = function _orderedMap(mapFunc) {
     return this.queryableMap(mapFunc);
 };
@@ -46,12 +50,20 @@ orderedQueryable.orderedZip = function _orderedZip(selector, collection) {
     return this.queryableZip(selector, collection);
 };
 
+orderedQueryable.orderedAddFront = function _orderedAddFront(enumerable) {
+    return this.queryableAddFront(enumerable);
+};
+
 orderedQueryable.orderedConcat = function _orderedConcat(collection) {
     return this.queryableConcat(collection);
 };
 
 orderedQueryable.orderedWhere = function _orderedWhere(predicate) {
     return this.queryableWhere(predicate);
+};
+
+orderedQueryable.orderedOfType = function _orderedOfType(type) {
+    return this.queryableOfType(type);
 };
 
 orderedQueryable.orderedDistinct = function _orderedDistinct(comparer) {
@@ -86,8 +98,16 @@ orderedQueryable.orderedFirst = function _orderedFirst(predicate) {
     return this.queryableFirst(predicate);
 };
 
+orderedQueryable.orderedFold = function _orderedFold(fn, initial) {
+    return this.queryableFold(fn, initial);
+};
+
 orderedQueryable.orderedLast = function _orderedLast(predicate) {
     return this.queryableLast(predicate);
+};
+
+orderedQueryable.orderedLength = function _orderedLength() {
+    return this.queryableLength();
 };
 
 orderedQueryable.orderedQueryableToArray = function _orderedQueryableToArray() {

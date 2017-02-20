@@ -22,7 +22,8 @@ orderedQueryable.source = testData.dataSource.data;
 
 describe('Test orderedQueryable... ', function testOrderedQueryable() {
     it('should create a new queryable delegate', function testObjectDelegation() {
-        var concatQueryable = orderedQueryable.orderedConcat(testData.dataSource.data),
+        var queryableAddFront = orderedQueryable.orderedAddFront([1, 2, 3, 4, 5]),
+            concatQueryable = orderedQueryable.orderedConcat(testData.dataSource.data),
             exceptQueryable = orderedQueryable.orderedExcept(testData.dataSource.data),
             groupJoinQueryable = orderedQueryable.orderedGroupJoin(testData.dataSource.data, nameSelector, nameSelector, nameProjector),
             queryableIntersect = orderedQueryable.orderedIntersect(testData.dataSource.data),
@@ -30,15 +31,19 @@ describe('Test orderedQueryable... ', function testOrderedQueryable() {
             queryableUnion = orderedQueryable.orderedUnion(testData.dataSource.data),
             queryableZip = orderedQueryable.orderedZip(testData.dataSource.data, nameSelector),
             queryableWhere = orderedQueryable.orderedWhere(namePredicate),
+            queryableOfType = orderedQueryable.orderedOfType('object'),
             queryableDistinct = orderedQueryable.orderedDistinct(),
             queryableAll = orderedQueryable.orderedAll(isObject),
             queryableAny = orderedQueryable.orderedAny(isObject),
             queryableFirst = orderedQueryable.orderedFirst(isObject),
+            queryableFold = orderedQueryable.orderedFold(function _fold(val, cur, idx){ return val + idx}, 0),
             queryableLast = orderedQueryable.orderedLast(isObject),
+            queryableLength = orderedQueryable.orderedLength(),
             queryableToArray = orderedQueryable.orderedQueryableToArray(),
             queryableToSet = orderedQueryable.orderedQueryableToSet(),
             queryableReverse = orderedQueryable.orderedQueryableReverse(),
             queryableMap = orderedQueryable.orderedMap(function (item) { return item; }),
+            queryableDeepMap = orderedQueryable.orderedDeepMap(function() {}),
             queryableGroupBy = orderedQueryable.orderedGroupBy(function selector(item) { return item.FirstName; }, function comparer(a, b) { return a <= b; }),
             queryableGroupByDescending = orderedQueryable.orderedGroupByDescending(function selector(item) { return item.FirstName; }, function comparer(a, b) { return a <= b; }),
             queryableOrderBy = orderedQueryable.queryableOrderBy(function selector(item) { return item.FirstName; }, function comparer(a, b) { return a <= b; }),
@@ -48,6 +53,7 @@ describe('Test orderedQueryable... ', function testOrderedQueryable() {
 
         //queryable object functions that return a new queryable object delegator; check to make sure the
         //returned object delegates to the queryable object.
+        expect(queryable.isPrototypeOf(queryableAddFront)).to.be.true;
         expect(queryable.isPrototypeOf(concatQueryable)).to.be.true;
         expect(queryable.isPrototypeOf(exceptQueryable)).to.be.true;
         expect(queryable.isPrototypeOf(groupJoinQueryable)).to.be.true;
@@ -56,8 +62,10 @@ describe('Test orderedQueryable... ', function testOrderedQueryable() {
         expect(queryable.isPrototypeOf(queryableUnion)).to.be.true;
         expect(queryable.isPrototypeOf(queryableZip)).to.be.true;
         expect(queryable.isPrototypeOf(queryableWhere)).to.be.true;
+        expect(queryable.isPrototypeOf(queryableOfType)).to.be.true;
         expect(queryable.isPrototypeOf(queryableDistinct)).to.be.true;
         expect(queryable.isPrototypeOf(queryableMap)).to.be.true;
+        expect(queryable.isPrototypeOf(queryableDeepMap)).to.be.true;
         expect(queryable.isPrototypeOf(queryableGroupBy)).to.be.true;
         expect(queryable.isPrototypeOf(queryableGroupByDescending)).to.be.true;
         expect(orderedQueryable.isPrototypeOf(queryableOrderBy)).to.be.true;
@@ -74,7 +82,11 @@ describe('Test orderedQueryable... ', function testOrderedQueryable() {
         queryableAll.should.be.true;
         queryableAny.should.be.true;
         queryableFirst.should.eql(testData.dataSource.data[0]);
+        queryableFold.should.be.a('number');
+        queryableFold.should.eql(1431);
         queryableLast.should.eql(testData.dataSource.data[testData.dataSource.data.length - 1]);
+        queryableLength.should.be.a('number');
+        queryableLength.should.eql(testData.dataSource.data.length);
 
         Array.prototype.isPrototypeOf(queryableToArray).should.be.true;
         queryableToArray.should.eql(testData.dataSource.data);
