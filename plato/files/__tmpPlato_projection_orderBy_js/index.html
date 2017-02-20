@@ -90,12 +90,12 @@
 <div class="container">
   <div class="row">
     <textarea id="file-source" class="col-md-12">import { when, isArray, not } from &#039;../functionalHelpers&#039;;
-import { sortData2 } from  &#039;./sortHelpers&#039;;
+import { sortData } from  &#039;./sortHelpers&#039;;
 
 
 function orderBy(source, orderObject) {
     return function *orderByIterator() {
-        var orderedData = sortData2(when(not(isArray), Array.from, source), orderObject);
+        var orderedData = sortData(when(not(isArray), Array.from, source), orderObject);
         for (let item of orderedData) {
             if (undefined !== item) yield item;
         }

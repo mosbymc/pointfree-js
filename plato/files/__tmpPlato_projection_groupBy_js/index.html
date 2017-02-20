@@ -90,7 +90,7 @@
 <div class="container">
   <div class="row">
     <textarea id="file-source" class="col-md-12">import { when, isArray, not } from &#039;../functionalHelpers&#039;;
-import { sortData2 } from  &#039;./sortHelpers&#039;;
+import { sortData } from  &#039;./sortHelpers&#039;;
 
 function groupBy(source, groupObject) {
     return function *groupByIterator() {
@@ -100,7 +100,7 @@ function groupBy(source, groupObject) {
 }
 
 function groupData(data, groupObject) {
-    var sortedData = sortData2(data, groupObject),
+    var sortedData = sortData(data, groupObject),
         retData = [];
 
     sortedData.forEach(function _groupSortedData(item) {

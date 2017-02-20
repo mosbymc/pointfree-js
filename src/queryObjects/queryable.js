@@ -1,7 +1,7 @@
-import { concat, except, groupJoin, intersect, join, union, zip } from '../collation/collationFunctions';
-import { all, any, first, last } from '../evaluation/evaluationFunctions';
+import { addFront, concat, except, groupJoin, intersect, join, union, zip } from '../collation/collationFunctions';
+import { all, any, first, fold, last, single } from '../evaluation/evaluationFunctions';
 import { distinct, where } from '../limitation/limitationFunctions';
-import { deepFlatten, flatten, groupBy, map, orderBy } from '../projection/projectionFunctions';
+import { deepFlatten, deepMap, flatten, groupBy, map, orderBy } from '../projection/projectionFunctions';
 import { createNewQueryableDelegator, createNewOrderedQueryableDelegator } from './queryObjectCreators';
 import { generatorProto, defaultPredicate } from '../helpers';
 import { isArray, wrap } from '../functionalHelpers';
@@ -12,11 +12,9 @@ import { isArray, wrap } from '../functionalHelpers';
 //TODO: query/query-type object would be better served by passing all the unprocessed data;
 
 /*
-  - Aggregate/reduce (https://msdn.microsoft.com/en-us/library/bb548744(v=vs.110).aspx)
   - Ancestors (https://msdn.microsoft.com/en-us/library/bb353466(v=vs.110).aspx)
   - AsEnumerable (https://msdn.microsoft.com/en-us/library/bb335435(v=vs.110).aspx)
   - AsQueryable (https://msdn.microsoft.com/en-us/library/bb507003(v=vs.110).aspx)
-  - Average (https://msdn.microsoft.com/en-us/library/bb549067(v=vs.110).aspx)
   - Contains (https://msdn.microsoft.com/en-us/library/bb352880(v=vs.110).aspx)
   - Count/length (https://msdn.microsoft.com/en-us/library/bb338038(v=vs.110).aspx)
   - DefaultIfEmpty (https://msdn.microsoft.com/en-us/library/bb360179(v=vs.110).aspx)
@@ -27,12 +25,7 @@ import { isArray, wrap } from '../functionalHelpers';
   - Max (https://msdn.microsoft.com/en-us/library/bb347632(v=vs.110).aspx)
   - Min (https://msdn.microsoft.com/en-us/library/bb352408(v=vs.110).aspx)
   - SequenceEqual (https://msdn.microsoft.com/en-us/library/bb348567(v=vs.110).aspx)
-  - Single (https://msdn.microsoft.com/en-us/library/bb155325(v=vs.110).aspx)
   - SingleOrDefault (https://msdn.microsoft.com/en-us/library/bb342451(v=vs.110).aspx)
-  - Skip (https://msdn.microsoft.com/en-us/library/bb358985(v=vs.110).aspx)
-  - SkipWhile (https://msdn.microsoft.com/en-us/library/bb549075(v=vs.110).aspx)
-  - Sum (https://msdn.microsoft.com/en-us/library/bb549046(v=vs.110).aspx)
-  -
  */
 
 /**
@@ -252,6 +245,24 @@ var queryable = {
     },
 
     /**
+     * 
+     * @param fn
+     * @returns {*}
+     */
+    queryableDeepMap: function _queryableDeepMap(fn) {
+        return createNewQueryableDelegator(this, deepMap(this, fn));
+    },
+
+    /**
+     *
+     * @param enumerable
+     * @returns {*}
+     */
+    queryableAddFront: function _queryableAddFront(enumerable) {
+        return createNewQueryableDelegator(this, addFront(this, enumerable));
+    },
+
+    /**
      *
      * @param collection
      * @returns {*}
@@ -460,11 +471,42 @@ var queryable = {
 
     /**
      *
+     * @param fn
+     * @param initial
+     * @returns {*}
+     */
+    queryableFold: function _queryableFold(fn, initial) {
+        return fold(this, fn, initial);
+    },
+
+    /**
+     *
      * @param predicate
      * @returns {*}
      */
     queryableLast: function _last(predicate = defaultPredicate) {
         return last(this, predicate);
+    },
+
+    //TODO: not sure if it makes sense to add these. They are in-place modifiers, which I don't really
+    //TODO: want to have. It is a mutation-supporting functionality that doesn't return a new queryable
+    //TODO: delegate when invoked.
+    //TODO: However, it would make sense to allow for a functionality that 'concatenates' to the front
+    //TODO: of the collection.
+    queryablePush: function _queryablePush() {
+
+    },
+
+    queryablePop: function _queryablePop() {
+
+    },
+
+    queryableUnshift: function _queryableUnshift() {
+
+    },
+
+    queryableShift: function _queryableShift() {
+
     },
 
     /**

@@ -89,13 +89,13 @@
 
 <div class="container">
   <div class="row">
-    <textarea id="file-source" class="col-md-12">function concat(source, collection) {
+    <textarea id="file-source" class="col-md-12">function concat(source, enumerable) {
     return function *concatIterator() {
         for (let item of source) {
             if (undefined !== item) yield item;
         }
 
-        for (let item of collection) {
+        for (let item of enumerable) {
             if (undefined !== item) yield item;
         }
     };

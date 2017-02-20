@@ -44,11 +44,11 @@
   <div class="row">
     <div class="col-md-6">
       <h2 class="header">Maintainability <a href="http://blogs.msdn.com/b/codeanalysis/archive/2007/11/20/maintainability-index-range-and-meaning.aspx"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="A value between 0 and 100 that represents the relative ease of maintaining the code. A high value means better maintainability." data-original-title="Maintainability Index"  data-container="body"></i></a></h2>
-      <p class="stat">77.48</p>
+      <p class="stat">79.51</p>
     </div>
     <div class="col-md-6">
       <h2 class="header">Lines of code <i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="Source Lines of Code / Logical Lines of Code" data-original-title="SLOC/LSLOC" data-container="body"></i></h2>
-      <p class="stat">213</p>
+      <p class="stat">242</p>
     </div>
   </div>
   <div class="row historical">
@@ -62,11 +62,11 @@
   <div class="row">
     <div class="col-md-6">
       <h2 class="header">Difficulty  <a href="http://en.wikipedia.org/wiki/Halstead_complexity_measures"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="The difficulty measure is related to the difficulty of the program to write or understand." data-original-title="Difficulty" data-container="body"></i></a></h2>
-      <p class="stat">52.09</p>
+      <p class="stat">50.29</p>
     </div>
     <div class="col-md-6">
       <h2 class="header">Estimated Errors  <a href="http://en.wikipedia.org/wiki/Halstead_complexity_measures"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="Halstead's delivered bugs is an estimate for the number of errors in the implementation." data-original-title="Delivered Bugs" data-container="body"></i></a></h2>
-      <p class="stat">1.88</p>
+      <p class="stat">2.13</p>
     </div>
   </div>
 </div>
@@ -89,12 +89,12 @@
 
 <div class="container">
   <div class="row">
-    <textarea id="file-source" class="col-md-12">import { concat, except, groupJoin, intersect, join, union, zip } from &#039;../collation/collationFunctions&#039;;
-import { all, any, first, last } from &#039;../evaluation/evaluationFunctions&#039;;
+    <textarea id="file-source" class="col-md-12">import { addFront, concat, except, groupJoin, intersect, join, union, zip } from &#039;../collation/collationFunctions&#039;;
+import { all, any, first, fold, last, single } from &#039;../evaluation/evaluationFunctions&#039;;
 import { distinct, where } from &#039;../limitation/limitationFunctions&#039;;
-import { deepFlatten, flatten, groupBy, map, orderBy } from &#039;../projection/projectionFunctions&#039;;
+import { deepFlatten, deepMap, flatten, groupBy, map, orderBy } from &#039;../projection/projectionFunctions&#039;;
 import { createNewQueryableDelegator, createNewOrderedQueryableDelegator } from &#039;./queryObjectCreators&#039;;
-import { generatorProto } from &#039;../helpers&#039;;
+import { generatorProto, defaultPredicate } from &#039;../helpers&#039;;
 import { isArray, wrap } from &#039;../functionalHelpers&#039;;
 
 
@@ -115,6 +115,7 @@ var queryable = {
     },
 
     set evaluatedData(val) {
+        this._dataComputed = true;
         this._evaluatedData = val;
     },
 
@@ -172,6 +173,14 @@ var queryable = {
         return createNewQueryableDelegator(this, deepFlatten(this));
     },
 
+    queryableDeepMap: function _queryableDeepMap(fn) {
+        return createNewQueryableDelegator(this, deepMap(this, fn));
+    },
+
+    queryableAddFront: function _queryableAddFront(enumerable) {
+        return createNewQueryableDelegator(this, addFront(this, enumerable));
+    },
+
     queryableConcat: function _concat(collection) {
         return createNewQueryableDelegator(this, concat(this, collection));
     },
@@ -226,7 +235,7 @@ var queryable = {
         return this.evaluatedData.slice(0, amt);
     },
 
-    queryableTakeWhile: function takeWhile(predicate) {
+    queryableTakeWhile: function takeWhile(predicate = defaultPredicate) {
         var res = [],
             source = this.dataComputed ? this.evaluatedData : this;
 
@@ -252,7 +261,7 @@ var queryable = {
         return res;
     },
 
-    queryableSkipWhile: function skipWhile(predicate) {
+    queryableSkipWhile: function skipWhile(predicate = defaultPredicate) {
         var source = this.dataComputed ? this.evaluatedData : this.source,
             hasFailed = false,
             res = [];
@@ -266,20 +275,40 @@ var queryable = {
         return res;
     },
 
-    queryableAny: function _any(predicate) {
+    queryableAny: function _any(predicate = defaultPredicate) {
         return any(this, predicate);
     },
 
-    queryableAll: function _all(predicate) {
+    queryableAll: function _all(predicate = defaultPredicate) {
         return all(this, predicate);
     },
 
-    queryableFirst: function _first(predicate) {
+    queryableFirst: function _first(predicate = defaultPredicate) {
         return first(this, predicate);
     },
 
-    queryableLast: function _last(predicate) {
+    queryableFold: function _queryableFold(fn, initial) {
+        return fold(this, fn, initial);
+    },
+
+    queryableLast: function _last(predicate = defaultPredicate) {
         return last(this, predicate);
+    },
+
+    queryablePush: function _queryablePush() {
+
+    },
+
+    queryablePop: function _queryablePop() {
+
+    },
+
+    queryableUnshift: function _queryableUnshift() {
+
+    },
+
+    queryableShift: function _queryableShift() {
+
     },
 
     queryableToArray: function _toArray() {

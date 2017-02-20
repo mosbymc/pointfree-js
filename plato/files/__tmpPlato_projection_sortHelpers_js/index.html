@@ -48,7 +48,7 @@
     </div>
     <div class="col-md-6">
       <h2 class="header">Lines of code <i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="Source Lines of Code / Logical Lines of Code" data-original-title="SLOC/LSLOC" data-container="body"></i></h2>
-      <p class="stat">54</p>
+      <p class="stat">49</p>
     </div>
   </div>
   <div class="row historical">
@@ -92,12 +92,11 @@
     <textarea id="file-source" class="col-md-12">import { comparator, dataTypeValueNormalizer, cloneData, comparisons, defaultEqualityComparer } from &#039;../helpers&#039;;
 import { not } from &#039;../functionalHelpers&#039;;
 
-
-function sortData2(data, sortObject) {
+function sortData(data, sortObject) {
     var sortedData = data;
     sortObject.forEach(function _sortItems(sort, index) {
         let comparer = sort.direction === &#039;asc&#039; ? sort.comparer : not(sort.comparer);
-        if (index === 0) sortedData = mergeSort2(data, sort.keySelector, comparer);
+        if (index === 0) sortedData = mergeSort(data, sort.keySelector, comparer);
         else {
             let sortedSubData = [],
                 itemsToSort = [],
@@ -108,13 +107,13 @@ function sortData2(data, sortObject) {
                 else {
                     if (itemsToSort.length === 1) sortedSubData = sortedSubData.concat(itemsToSort);
                     else {
-                        sortedSubData = sortedSubData.concat(mergeSort2(itemsToSort, sort.keySelector, comparer));
+                        sortedSubData = sortedSubData.concat(mergeSort(itemsToSort, sort.keySelector, comparer));
                     }
                     itemsToSort.length = 0;
                     itemsToSort.push(item);
                 }
                 if (idx === sortedData.length - 1) {
-                    sortedSubData = sortedSubData.concat(mergeSort2(itemsToSort, sort.keySelector, comparer));
+                    sortedSubData = sortedSubData.concat(mergeSort(itemsToSort, sort.keySelector, comparer));
                 }
             });
             sortedData = sortedSubData;
@@ -123,26 +122,22 @@ function sortData2(data, sortObject) {
     return sortedData;
 }
 
-function mergeSort2(data, keySelector, comparer) {
+function mergeSort(data, keySelector, comparer) {
     if (data.length &lt; 2) return data;
     var middle = parseInt(data.length / 2);
-    return merge2(mergeSort2(data.slice(0, middle), keySelector, comparer), mergeSort2(data.slice(middle), keySelector, comparer), keySelector, comparer);
+    return merge(mergeSort(data.slice(0, middle), keySelector, comparer), mergeSort(data.slice(middle), keySelector, comparer), keySelector, comparer);
 }
 
-function merge2(left, right, keySelector, comparer) {
+function merge(left, right, keySelector, comparer) {
     if (!left.length) return right;
     if (!right.length) return left;
 
     if (comparer(keySelector(left[0]), keySelector(right[0])))
-        return [cloneData(left[0])].concat(merge2(left.slice(1, left.length), right, keySelector, comparer));
-    return [cloneData(right[0])].concat(merge2(left, right.slice(1, right.length), keySelector, comparer));
+        return [cloneData(left[0])].concat(merge(left.slice(1, left.length), right, keySelector, comparer));
+    return [cloneData(right[0])].concat(merge(left, right.slice(1, right.length), keySelector, comparer));
 }
 
-
-
-
-
-export {  sortData2 };</textarea>
+export { sortData };</textarea>
   </div>
 </div>
 
