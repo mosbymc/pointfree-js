@@ -7,6 +7,8 @@ function createNewQueryableDelegator(source, iterator) {
     var obj = Object.create(queryable);
     obj.dataComputed = false;
     obj.source = source;
+    //if the iterator param has been passed and is a generator, set it as the object's
+    //iterator; other wise let the object delegate to the queryable's iterator
     if (iterator && generatorProto.isPrototypeOf(iterator))
         obj[Symbol.iterator] = iterator;
 
@@ -86,6 +88,9 @@ function createNewQueryableDelegator(source, iterator) {
     obj.all = function _all(predicate) {
         return this.queryableAll(predicate);
     };
+    obj.contains = function _contains(val, comparer) {
+        return this.queryableContains(val, comparer);
+    };
     obj.first = function _first(predicate) {
         return this.queryableFirst(predicate);
     };
@@ -114,7 +119,12 @@ function createNewOrderedQueryableDelegator(source, iterator, sortObj) {
     var obj = Object.create(orderedQueryable);
     obj.source = source;
     obj.dataComputed = false;
+    //Need to maintain a list of all the sorts that have been applied; effectively,
+    //the underlying sorting function will only be called a single time for
+    //all sorts.
     obj._appliedSorts = sortObj;
+    //if the iterator param has been passed and is a generator, set it as the object's
+    //iterator; other wise let the object delegate to the queryable's iterator
     if (iterator && generatorProto.isPrototypeOf(iterator))
         obj[Symbol.iterator] = iterator;
 
@@ -186,6 +196,9 @@ function createNewOrderedQueryableDelegator(source, iterator, sortObj) {
     };
     obj.all = function _all(predicate) {
         return this.orderedAll(predicate);
+    };
+    obj.contains = function _contains(val, comparer) {
+        return this.orderedContains(val, comparer);
     };
     obj.first = function _first(predicate) {
         return this.orderedFirst(predicate);

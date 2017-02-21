@@ -10,10 +10,10 @@ describe('sortData', function testSortData() {
         var sortResult1 = sortData(testData.dataSource.data, [{ key: 'FirstName', dir: 'asc', dataType: 'string' }]);
 
         sortResult1.should.be.an('array');
-        sortResult1.should.have.lengthOf(testData.dataSource.data.length);
+        sortResult1.should.have.lengthOf(testData.dataSource.data.count);
         orderedField = 'FirstName';
         sortResult1.forEach(function testEachStringValue(item) {
-            if (!previousFieldsValues.length)
+            if (!previousFieldsValues.count)
                 previousFieldsValues.push(item[orderedField]);
             else {
                 item[orderedField].should.be.at.least(previousFieldsValues[0]);
@@ -27,11 +27,11 @@ describe('sortData', function testSortData() {
         var sortResult = sortData(testData.dataSource.data, [{ key: 'LastName', dir: 'desc' }]);
 
         sortResult.should.be.an('array');
-        sortResult.should.have.lengthOf(testData.dataSource.data.length);
-        previousFieldsValues.length = 0;
+        sortResult.should.have.lengthOf(testData.dataSource.data.count);
+        previousFieldsValues.count = 0;
         orderedField = 'LastName';
         sortResult.forEach(function testEachStringValue(item) {
-            if (!previousFieldsValues.length)
+            if (!previousFieldsValues.count)
                 previousFieldsValues.push(item[orderedField]);
             else {
                 item[orderedField].should.be.at.most(previousFieldsValues[0]);
@@ -45,10 +45,10 @@ describe('sortData', function testSortData() {
         var sortResult = sortData(testData.dataSource.data, [{ key: 'Zip', dir: 'desc', dataType: 'number' }, { key: 'FirstName', dir: 'asc', dataType: 'string' }]);
 
         sortResult.should.be.an('array');
-        sortResult.should.have.lengthOf(testData.dataSource.data.length);
-        previousFieldsValues.length = 0;
+        sortResult.should.have.lengthOf(testData.dataSource.data.count);
+        previousFieldsValues.count = 0;
         sortResult.forEach(function testEachValue(item) {
-            if (!previousFieldsValues.length) {
+            if (!previousFieldsValues.count) {
                 previousFieldsValues.push(+item.Zip);
                 previousFieldsValues.push(item.FirstName);
             }

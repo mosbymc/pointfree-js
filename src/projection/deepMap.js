@@ -5,9 +5,17 @@ function deepMap(source, fn) {
         var results = [];
         for (let item of source) {
             let res = recursiveMap(item);
-            if (isArray(res)) results = results.concat(res);
-            if (results.length) yield results.shift();
-            else if (undefined !== res) yield res;
+            if (results.length) {
+                results = results.concat(res);
+                yield results.shift();
+            }
+            else if (undefined !== res) {
+                if (isArray(res)) {
+                    yield res.shift();
+                    results = results.concat(res);
+                }
+                else yield res;
+            }
         }
 
         while (results.length) yield results.shift();

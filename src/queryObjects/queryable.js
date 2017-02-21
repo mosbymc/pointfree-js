@@ -1,33 +1,13 @@
 import { addFront, concat, except, groupJoin, intersect, join, union, zip } from '../collation/collationFunctions';
-import { all, any, first, fold, last, length } from '../evaluation/evaluationFunctions';
+import { all, any, contains, first, fold, last, count } from '../evaluation/evaluationFunctions';
 import { distinct, ofType, where } from '../limitation/limitationFunctions';
 import { deepFlatten, deepMap, flatten, groupBy, map, orderBy } from '../projection/projectionFunctions';
 import { createNewQueryableDelegator, createNewOrderedQueryableDelegator } from './queryObjectCreators';
 import { generatorProto, defaultPredicate } from '../helpers';
 import { isArray, wrap } from '../functionalHelpers';
 
-
-//TODO: Not sure if this has been done yet or not, but need a way to create new query/query-type object without
-//TODO: needing to first evaluate the data by pumping it through the pipeline first; rather creating a new
-//TODO: query/query-type object would be better served by passing all the unprocessed data;
-
-/*
-  - Ancestors (https://msdn.microsoft.com/en-us/library/bb353466(v=vs.110).aspx)
-  - AsEnumerable (https://msdn.microsoft.com/en-us/library/bb335435(v=vs.110).aspx)
-  - AsQueryable (https://msdn.microsoft.com/en-us/library/bb507003(v=vs.110).aspx)
-  - Contains (https://msdn.microsoft.com/en-us/library/bb352880(v=vs.110).aspx)
-  - DefaultIfEmpty (https://msdn.microsoft.com/en-us/library/bb360179(v=vs.110).aspx)
-  - DescendantNodes (https://msdn.microsoft.com/en-us/library/bb336780(v=vs.110).aspx)
-  - Descendants (https://msdn.microsoft.com/en-us/library/bb337483(v=vs.110).aspx)
-  - FirstOrDefault (https://msdn.microsoft.com/en-us/library/bb340482(v=vs.110).aspx)
-  - LastOrDefault (https://msdn.microsoft.com/en-us/library/bb301849(v=vs.110).aspx)
-  - Max (https://msdn.microsoft.com/en-us/library/bb347632(v=vs.110).aspx)
-  - Min (https://msdn.microsoft.com/en-us/library/bb352408(v=vs.110).aspx)
-  - SequenceEqual (https://msdn.microsoft.com/en-us/library/bb348567(v=vs.110).aspx)
- */
-
 /**
- * Primary object to which filteredQueryables and orderedQueryables, as well as the objects passed to consumers, all delegate.
+ * Primary object to which orderedQueryables, as well as the objects passed to consumers, all delegate.
  * @type {{
  * queryableFrom: * queryable._queryableFrom,
  * queryableMap: * queryable._queryableMap,
@@ -262,21 +242,21 @@ var queryable = {
 
     /**
      *
-     * @param collection
+     * @param enumerable
      * @returns {*}
      */
-    queryableConcat: function _concat(collection) {
-        return createNewQueryableDelegator(this, concat(this, collection));
+    queryableConcat: function _concat(enumerable) {
+        return createNewQueryableDelegator(this, concat(this, enumerable));
     },
 
     /**
      *
      * @param collection
-     * @param comparer
+     * @param enumerable
      * @returns {*}
      */
-    queryableExcept: function _except(collection, comparer) {
-        return createNewQueryableDelegator(this, except(this, collection, comparer));
+    queryableExcept: function _except(collection, enumerable) {
+        return createNewQueryableDelegator(this, except(this, collection, enumerable));
     },
 
     /**
@@ -295,11 +275,11 @@ var queryable = {
     /**
      *
      * @param collection
-     * @param comparer
+     * @param enumerable
      * @returns {*}
      */
-    queryableIntersect: function _intersect(collection, comparer) {
-        return createNewQueryableDelegator(this, intersect(this, collection, comparer));
+    queryableIntersect: function _intersect(collection, enumerable) {
+        return createNewQueryableDelegator(this, intersect(this, collection, enumerable));
     },
 
     /**
@@ -318,21 +298,21 @@ var queryable = {
     /**
      *
      * @param collection
-     * @param comparer
+     * @param enumerable
      * @returns {*}
      */
-    queryableUnion: function _union(collection, comparer) {
-        return createNewQueryableDelegator(this, union(this, collection, comparer));
+    queryableUnion: function _union(collection, enumerable) {
+        return createNewQueryableDelegator(this, union(this, collection, enumerable));
     },
 
     /**
      *
      * @param selector
-     * @param collection
+     * @param enumerable
      * @returns {*}
      */
-    queryableZip: function _zip(selector, collection) {
-        return createNewQueryableDelegator(this, zip(this, selector, collection));
+    queryableZip: function _zip(selector, enumerable) {
+        return createNewQueryableDelegator(this, zip(this, selector, enumerable));
     },
 
     /**
@@ -469,6 +449,16 @@ var queryable = {
 
     /**
      *
+     * @param val
+     * @param comparer
+     * @returns {*}
+     */
+    queryableContains: function _queryableContains(val, comparer) {
+        return contains(this, val, comparer);
+    },
+
+    /**
+     *
      * @param predicate
      * @returns {*}
      */
@@ -500,28 +490,7 @@ var queryable = {
      * @returns {*}
      */
     queryableLength: function _queryableLength() {
-        return length(this);
-    },
-
-    //TODO: not sure if it makes sense to add these. They are in-place modifiers, which I don't really
-    //TODO: want to have. It is a mutation-supporting functionality that doesn't return a new queryable
-    //TODO: delegate when invoked.
-    //TODO: However, it would make sense to allow for a functionality that 'concatenates' to the front
-    //TODO: of the collection.
-    queryablePush: function _queryablePush() {
-
-    },
-
-    queryablePop: function _queryablePop() {
-
-    },
-
-    queryableUnshift: function _queryableUnshift() {
-
-    },
-
-    queryableShift: function _queryableShift() {
-
+        return count(this);
     },
 
     /**

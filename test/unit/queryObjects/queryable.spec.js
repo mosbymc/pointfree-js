@@ -44,6 +44,7 @@ describe('Test queryable', function testQueryable() {
             queryableDistinct = queryable.queryableDistinct(),
             queryableAll = queryable.queryableAll(isObject),
             queryableAny = queryable.queryableAny(isObject),
+            queryableContains = queryable.queryableContains(testData.dataSource.data[0]),
             queryableFold = queryable.queryableFold(function _fold(val, cur, idx){ return val + idx}, 0),
             queryableFirst = queryable.queryableFirst(isObject),
             queryableLast = queryable.queryableLast(isObject),
@@ -105,6 +106,7 @@ describe('Test queryable', function testQueryable() {
 
         queryableAll.should.be.true;
         queryableAny.should.be.true;
+        queryableContains.should.be.true;
         queryableFirst.should.eql(testData.dataSource.data[0]);
         queryableFold.should.be.a('number');
         queryableFold.should.eql(1431);
@@ -165,7 +167,7 @@ describe('Test queryable', function testQueryable() {
             takeWhile4 = queryable.queryableTakeWhile(predicate4);
 
         takeWhile1.should.have.lengthOf(0);
-        //takeWhile2.should.have.lengthOf(testData.dataSource.data.length);
+        //takeWhile2.should.have.lengthOf(testData.dataSource.data.count);
         //takeWhile2.should.eql(testData.dataSource.data);
         takeWhile3.forEach(function _checkDrillDownLength(item) {
             item.drillDownData.length.should.be.at.least(5);

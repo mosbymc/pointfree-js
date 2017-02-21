@@ -91,17 +91,17 @@
   <div class="row">
     <textarea id="file-source" class="col-md-12">import { when, not, isArray } from &#039;../functionalHelpers&#039;;
 
-function zip(source, collection, selector) {
+function zip(source, enumerable, selector) {
     return function *zipIterator() {
         var res,
             idx = 0;
-        collection = when(not(isArray), Array.from, collection);
+        enumerable = when(not(isArray), Array.from, enumerable);
 
-        if (collection.length &lt; 1) return [];
+        if (enumerable.length &lt; 1) return [];
 
         for (let item of source) {
-            if (idx &gt; collection.length) return;
-            res = selector(item, collection[idx]);
+            if (idx &gt; enumerable.length) return;
+            res = selector(item, enumerable[idx]);
             if (undefined !== res) yield res;
             ++idx;
         }

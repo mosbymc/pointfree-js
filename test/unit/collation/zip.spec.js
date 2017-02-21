@@ -14,7 +14,7 @@ describe('Test zip...', function testZip() {
     var zipTestData2 = zipTestData.concat(zipTestData);
 
     describe('... using arrays', function testZipWithArrays() {
-        it('should return full length of source when collection is same length', function testZipWithEqualLengthArray() {
+        it('should return full count of source when collection is same count', function testZipWithEqualLengthArray() {
             var zipIterable = zip(testData.dataSource.data, zipTestData, zipSelector),
                 zipRes = Array.from(zipIterable());
 
@@ -57,7 +57,7 @@ describe('Test zip...', function testZip() {
                 yield item;
         }
 
-        it('should return full length of source when collection is the same length', function testZipWithGeneratorContainingSameAmount() {
+        it('should return full count of source when collection is the same count', function testZipWithGeneratorContainingSameAmount() {
             var zipIterable = zip(testData.dataSource.data, gen(zipTestData), zipSelector),
                 zipRes = Array.from(zipIterable());
 
@@ -82,7 +82,7 @@ describe('Test zip...', function testZip() {
             zipRes.should.have.lengthOf(0);
         });
 
-        it('should return full source length when both params are generators and have data', function testZipWithEmptyCollection() {
+        it('should return full source count when both params are generators and have data', function testZipWithEmptyCollection() {
             var zipIterable = zip(gen(testData.dataSource.data), gen(testData.dataSource.data), zipSelector),
                 zipRes = Array.from(zipIterable());
 

@@ -44,11 +44,11 @@
   <div class="row">
     <div class="col-md-6">
       <h2 class="header">Maintainability <a href="http://blogs.msdn.com/b/codeanalysis/archive/2007/11/20/maintainability-index-range-and-meaning.aspx"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="A value between 0 and 100 that represents the relative ease of maintaining the code. A high value means better maintainability." data-original-title="Maintainability Index"  data-container="body"></i></a></h2>
-      <p class="stat">79.51</p>
+      <p class="stat">80.07</p>
     </div>
     <div class="col-md-6">
       <h2 class="header">Lines of code <i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="Source Lines of Code / Logical Lines of Code" data-original-title="SLOC/LSLOC" data-container="body"></i></h2>
-      <p class="stat">242</p>
+      <p class="stat">253</p>
     </div>
   </div>
   <div class="row historical">
@@ -62,11 +62,11 @@
   <div class="row">
     <div class="col-md-6">
       <h2 class="header">Difficulty  <a href="http://en.wikipedia.org/wiki/Halstead_complexity_measures"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="The difficulty measure is related to the difficulty of the program to write or understand." data-original-title="Difficulty" data-container="body"></i></a></h2>
-      <p class="stat">50.29</p>
+      <p class="stat">49.87</p>
     </div>
     <div class="col-md-6">
       <h2 class="header">Estimated Errors  <a href="http://en.wikipedia.org/wiki/Halstead_complexity_measures"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="Halstead's delivered bugs is an estimate for the number of errors in the implementation." data-original-title="Delivered Bugs" data-container="body"></i></a></h2>
-      <p class="stat">2.13</p>
+      <p class="stat">2.24</p>
     </div>
   </div>
 </div>
@@ -90,13 +90,12 @@
 <div class="container">
   <div class="row">
     <textarea id="file-source" class="col-md-12">import { addFront, concat, except, groupJoin, intersect, join, union, zip } from &#039;../collation/collationFunctions&#039;;
-import { all, any, first, fold, last, single } from &#039;../evaluation/evaluationFunctions&#039;;
-import { distinct, where } from &#039;../limitation/limitationFunctions&#039;;
+import { all, any, contains, first, fold, last, count } from &#039;../evaluation/evaluationFunctions&#039;;
+import { distinct, ofType, where } from &#039;../limitation/limitationFunctions&#039;;
 import { deepFlatten, deepMap, flatten, groupBy, map, orderBy } from &#039;../projection/projectionFunctions&#039;;
 import { createNewQueryableDelegator, createNewOrderedQueryableDelegator } from &#039;./queryObjectCreators&#039;;
 import { generatorProto, defaultPredicate } from &#039;../helpers&#039;;
 import { isArray, wrap } from &#039;../functionalHelpers&#039;;
-
 
 
 
@@ -181,36 +180,40 @@ var queryable = {
         return createNewQueryableDelegator(this, addFront(this, enumerable));
     },
 
-    queryableConcat: function _concat(collection) {
-        return createNewQueryableDelegator(this, concat(this, collection));
+    queryableConcat: function _concat(enumerable) {
+        return createNewQueryableDelegator(this, concat(this, enumerable));
     },
 
-    queryableExcept: function _except(collection, comparer) {
-        return createNewQueryableDelegator(this, except(this, collection, comparer));
+    queryableExcept: function _except(collection, enumerable) {
+        return createNewQueryableDelegator(this, except(this, collection, enumerable));
     },
 
     queryableGroupJoin: function _groupJoin(inner, outerSelector, innerSelector, projector, comparer) {
         return createNewQueryableDelegator(this, groupJoin(this, inner, outerSelector, innerSelector, projector, comparer));
     },
 
-    queryableIntersect: function _intersect(collection, comparer) {
-        return createNewQueryableDelegator(this, intersect(this, collection, comparer));
+    queryableIntersect: function _intersect(collection, enumerable) {
+        return createNewQueryableDelegator(this, intersect(this, collection, enumerable));
     },
 
     queryableJoin: function _join(inner, outerSelector, innerSelector, projector, comparer) {
         return createNewQueryableDelegator(this, join(this, inner, outerSelector, innerSelector, projector, comparer));
     },
 
-    queryableUnion: function _union(collection, comparer) {
-        return createNewQueryableDelegator(this, union(this, collection, comparer));
+    queryableUnion: function _union(collection, enumerable) {
+        return createNewQueryableDelegator(this, union(this, collection, enumerable));
     },
 
-    queryableZip: function _zip(selector, collection) {
-        return createNewQueryableDelegator(this, zip(this, selector, collection));
+    queryableZip: function _zip(selector, enumerable) {
+        return createNewQueryableDelegator(this, zip(this, selector, enumerable));
     },
 
     queryableWhere: function _where(predicate) {
         return createNewQueryableDelegator(this, where(this, predicate));
+    },
+
+    queryableOfType: function _queryableOfType(type) {
+        return createNewQueryableDelegator(this, ofType(this, type));
     },
 
     queryableDistinct: function _distinct(comparer) {
@@ -283,6 +286,10 @@ var queryable = {
         return all(this, predicate);
     },
 
+    queryableContains: function _queryableContains(val, comparer) {
+        return contains(this, val, comparer);
+    },
+
     queryableFirst: function _first(predicate = defaultPredicate) {
         return first(this, predicate);
     },
@@ -293,6 +300,10 @@ var queryable = {
 
     queryableLast: function _last(predicate = defaultPredicate) {
         return last(this, predicate);
+    },
+
+    queryableLength: function _queryableLength() {
+        return count(this);
     },
 
     queryablePush: function _queryablePush() {

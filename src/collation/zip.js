@@ -1,16 +1,16 @@
 import { when, not, isArray } from '../functionalHelpers';
 
-function zip(source, collection, selector) {
+function zip(source, enumerable, selector) {
     return function *zipIterator() {
         var res,
             idx = 0;
-        collection = when(not(isArray), Array.from, collection);
+        enumerable = when(not(isArray), Array.from, enumerable);
 
-        if (collection.length < 1) return [];
+        if (enumerable.length < 1) return [];
 
         for (let item of source) {
-            if (idx > collection.length) return;
-            res = selector(item, collection[idx]);
+            if (idx > enumerable.length) return;
+            res = selector(item, enumerable[idx]);
             if (undefined !== res) yield res;
             ++idx;
         }

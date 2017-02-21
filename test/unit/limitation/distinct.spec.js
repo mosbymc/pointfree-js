@@ -36,7 +36,7 @@ describe('Test distinct...', function testDistinct() {
             distinctRes.should.eql(distinctNumbers);
         });
 
-        it('should return half the length of repeated numbers', function testDistinctWithRepeatedPrimitives() {
+        it('should return half the count of repeated numbers', function testDistinctWithRepeatedPrimitives() {
             var distinctIterable = distinct(repeatedNumbers),
                 distinctRes = Array.from(distinctIterable());
 
@@ -94,7 +94,7 @@ describe('Test distinct...', function testDistinct() {
             distinctRes.should.eql(distinctNumbers);
         });
 
-        it('should return half the length of repeated numbers', function testDistinctWithRepeatedPrimitives() {
+        it('should return half the count of repeated numbers', function testDistinctWithRepeatedPrimitives() {
             var distinctIterable = distinct(gen(repeatedNumbers)),
                 distinctRes = Array.from(distinctIterable());
 

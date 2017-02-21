@@ -1,8 +1,9 @@
 import { all } from './all';
 import { any } from './any';
+import { contains } from './contains';
 import { first } from './first';
 import { fold } from './fold';
 import { last } from './last';
-import { length } from './length';
+import { count } from './count';
 
-export { all, any, first, fold, last, length };
+export { all, any, contains, first, fold, last, count };

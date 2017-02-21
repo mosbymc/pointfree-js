@@ -1,7 +1,7 @@
 import { defaultEqualityComparer } from '../helpers';
 import { when, not, isArray } from '../functionalHelpers';
 
-function intersect(source, collection, comparer) {
+function intersect(source, enumerable, comparer) {
     comparer = comparer || defaultEqualityComparer;
 
     return function *intersectIterator() {
@@ -16,9 +16,9 @@ function intersect(source, collection, comparer) {
             collection = when(not(isArray), Array.from, collection);
             if (!res && ~collection.findIndex(function findMatchingItem(it) { return comparer(item, it); })) yield item;
         }*/
-        collection = when(not(isArray), Array.from, collection);
+        enumerable = when(not(isArray), Array.from, enumerable);
         for (let item of source) {
-            if (undefined !== item && collection.some(function _checkEquivalency(it) {
+            if (undefined !== item && enumerable.some(function _checkEquivalency(it) {
                     return comparer(item, it);
                 }))
             {

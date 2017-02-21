@@ -44,11 +44,11 @@
   <div class="row">
     <div class="col-md-6">
       <h2 class="header">Maintainability <a href="http://blogs.msdn.com/b/codeanalysis/archive/2007/11/20/maintainability-index-range-and-meaning.aspx"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="A value between 0 and 100 that represents the relative ease of maintaining the code. A high value means better maintainability." data-original-title="Maintainability Index"  data-container="body"></i></a></h2>
-      <p class="stat">92.40</p>
+      <p class="stat">92.44</p>
     </div>
     <div class="col-md-6">
       <h2 class="header">Lines of code <i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="Source Lines of Code / Logical Lines of Code" data-original-title="SLOC/LSLOC" data-container="body"></i></h2>
-      <p class="stat">105</p>
+      <p class="stat">129</p>
     </div>
   </div>
   <div class="row historical">
@@ -62,11 +62,11 @@
   <div class="row">
     <div class="col-md-6">
       <h2 class="header">Difficulty  <a href="http://en.wikipedia.org/wiki/Halstead_complexity_measures"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="The difficulty measure is related to the difficulty of the program to write or understand." data-original-title="Difficulty" data-container="body"></i></a></h2>
-      <p class="stat">10.86</p>
+      <p class="stat">10.79</p>
     </div>
     <div class="col-md-6">
       <h2 class="header">Estimated Errors  <a href="http://en.wikipedia.org/wiki/Halstead_complexity_measures"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="Halstead's delivered bugs is an estimate for the number of errors in the implementation." data-original-title="Delivered Bugs" data-container="body"></i></a></h2>
-      <p class="stat">0.81</p>
+      <p class="stat">1.02</p>
     </div>
   </div>
 </div>
@@ -93,6 +93,10 @@
 
 var orderedQueryable = Object.create(queryable);
 
+orderedQueryable.orderedDeepMap = function _orderedDeepMap(fn) {
+    return this.queryableDeepMap(fn);
+};
+
 orderedQueryable.orderedMap = function _orderedMap(mapFunc) {
     return this.queryableMap(mapFunc);
 };
@@ -117,32 +121,40 @@ orderedQueryable.orderedJoin = function _orderedJoin(inner, outerSelector, inner
     return this.queryableJoin(inner, outerSelector, innerSelector, projector, comparer);
 };
 
-orderedQueryable.orderedGroupJoin = function _orderedGroupJoin(outer, inner, projector, comparer, collection) {
-    return this.queryableGroupJoin(outer, inner, projector, comparer, collection);
+orderedQueryable.orderedGroupJoin = function _orderedGroupJoin(inner, outerSelector, innerSelector, projector, comparer) {
+    return this.queryableGroupJoin(inner, outerSelector, innerSelector, projector, comparer);
 };
 
-orderedQueryable.orderedExcept = function _orderedExcept(comparer, collection) {
-    return this.queryableExcept(comparer, collection);
+orderedQueryable.orderedExcept = function _orderedExcept(comparer, enumerable) {
+    return this.queryableExcept(comparer, enumerable);
 };
 
-orderedQueryable.orderedIntersect = function _orderedIntersect(comparer, collection) {
-    return this.queryableIntersect(comparer, collection);
+orderedQueryable.orderedIntersect = function _orderedIntersect(comparer, enumerable) {
+    return this.queryableIntersect(comparer, enumerable);
 };
 
-orderedQueryable.orderedUnion = function _orderedUnion(comparer, collection) {
-    return this.queryableUnion(comparer, collection);
+orderedQueryable.orderedUnion = function _orderedUnion(comparer, enumerable) {
+    return this.queryableUnion(comparer, enumerable);
 };
 
-orderedQueryable.orderedZip = function _orderedZip(selector, collection) {
-    return this.queryableZip(selector, collection);
+orderedQueryable.orderedZip = function _orderedZip(selector, enumerable) {
+    return this.queryableZip(selector, enumerable);
 };
 
-orderedQueryable.orderedConcat = function _orderedConcat(collection) {
-    return this.queryableConcat(collection);
+orderedQueryable.orderedAddFront = function _orderedAddFront(enumerable) {
+    return this.queryableAddFront(enumerable);
+};
+
+orderedQueryable.orderedConcat = function _orderedConcat(enumerable) {
+    return this.queryableConcat(enumerable);
 };
 
 orderedQueryable.orderedWhere = function _orderedWhere(predicate) {
     return this.queryableWhere(predicate);
+};
+
+orderedQueryable.orderedOfType = function _orderedOfType(type) {
+    return this.queryableOfType(type);
 };
 
 orderedQueryable.orderedDistinct = function _orderedDistinct(comparer) {
@@ -173,12 +185,24 @@ orderedQueryable.orderedAll = function _orderedAll(predicate) {
     return this.queryableAll(predicate);
 };
 
+orderedQueryable.orderedContains = function _orderedContains(val, comparer) {
+    return this.queryableContains(val, comparer);
+};
+
 orderedQueryable.orderedFirst = function _orderedFirst(predicate) {
     return this.queryableFirst(predicate);
 };
 
+orderedQueryable.orderedFold = function _orderedFold(fn, initial) {
+    return this.queryableFold(fn, initial);
+};
+
 orderedQueryable.orderedLast = function _orderedLast(predicate) {
     return this.queryableLast(predicate);
+};
+
+orderedQueryable.orderedLength = function _orderedLength() {
+    return this.queryableLength();
 };
 
 orderedQueryable.orderedQueryableToArray = function _orderedQueryableToArray() {

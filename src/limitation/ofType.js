@@ -2,6 +2,13 @@ import { javaScriptTypes } from '../helpers';
 
 function ofType(source, type) {
     return function *ofTypeIterator() {
+        function _checkTypeKeys(key) {
+            return key in objItem;
+        }
+        function _checkItemKeys(key) {
+            return key in type;
+        }
+
         if (type in javaScriptTypes) {
             for (let item of source) {
                 if (javaScriptTypes[type] === typeof item) yield item;
@@ -19,18 +26,12 @@ function ofType(source, type) {
                 }
             }
             else {
-                for (let item of source) {
-                    if (type.isPrototypeOf(item))
-                        yield item;
-                    else if (javaScriptTypes.object === typeof item
-                        && null !== item
-                        && Object.keys(type).every(function _checkTypeKeys(key) {
-                            return key in item;
-                        })
-                        && Object.keys(item).every(function _checkItemKeys(key) {
-                            return key in type;
-                        })) {
-                        yield item;
+                for (var objItem of source) {
+                    if (type.isPrototypeOf(objItem))
+                        yield objItem;
+                    else if (javaScriptTypes.object === typeof objItem && null !== objItem &&
+                        Object.keys(type).every(_checkTypeKeys) && Object.keys(objItem).every(_checkItemKeys)) {
+                        yield objItem;
                     }
                 }
             }

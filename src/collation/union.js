@@ -1,6 +1,6 @@
 import { defaultEqualityComparer, memoizer2 } from '../helpers';
 
-function union(source, collection, comparer) {
+function union(source, enumerable, comparer) {
     comparer = comparer || defaultEqualityComparer;
     var havePreviouslyViewed = memoizer2(comparer);
 
@@ -11,7 +11,7 @@ function union(source, collection, comparer) {
             if (!res) yield item;
         }
 
-        for (let item of collection) {
+        for (let item of enumerable) {
             res = havePreviouslyViewed(item);
             if (!res) yield item;
         }

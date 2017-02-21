@@ -44,7 +44,6 @@ describe('Test deep map', function testDeepMap() {
 
         var deepMapIterable = deepMap(data, identity),
             deepMapRes = Array.from(deepMapIterable());
-
         deepMapRes.should.have.lengthOf(18);
         deepMapRes.forEach(function validateResults(item, idx) {
             item.should.eql(idx + 1);

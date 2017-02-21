@@ -91,6 +91,8 @@ describe('createNewQueryableDelegator', function testQueryableDelegatorObjectCre
         queryDelegator.all.should.be.a('function');
         queryDelegator.any.should.exist;
         queryDelegator.any.should.be.a('function');
+        queryDelegator.contains.should.exist;
+        queryDelegator.contains.should.be.a('function');
         queryDelegator.first.should.exist;
         queryDelegator.first.should.be.a('function');
         queryDelegator.fold.should.exist;
@@ -179,6 +181,7 @@ describe('createNewQueryableDelegator', function testQueryableDelegatorObjectCre
             any2 = baseDelegate.any(function _predicate(item) { return item.FirstName === 'Mike'; }),
             all1 = baseDelegate.all(),
             all2 = baseDelegate.all(function _predicate(item) { return item.drillDownData.length; }),
+            contains = baseDelegate.contains(testData.dataSource.data[0]),
             first1 = baseDelegate.first(),
             first2 = baseDelegate.first(function _predicate(item) { return item.FirstName === 'Phillip J.'; }),
             fold = baseDelegate.fold(function _fold(val, cur, idx){ return val + idx}, 0),
@@ -205,6 +208,8 @@ describe('createNewQueryableDelegator', function testQueryableDelegatorObjectCre
         all1.should.be.true;
         expect(queryable.isPrototypeOf(all2)).to.be.false;
         all2.should.be.true;
+        expect(queryable.isPrototypeOf(contains)).to.be.false;
+        contains.should.be.true;
         expect(queryable.isPrototypeOf(first1)).to.be.false;
         first1.should.eql(testData.dataSource.data[0]);
         expect(queryable.isPrototypeOf(first2)).to.be.false;
@@ -298,6 +303,8 @@ describe('createNewOrderedQueryableDelegator', function testCreateNewQueryableDe
         orderedQueryDelegator.all.should.be.a('function');
         orderedQueryDelegator.any.should.exist;
         orderedQueryDelegator.any.should.be.a('function');
+        orderedQueryDelegator.contains.should.exist;
+        orderedQueryDelegator.contains.should.be.a('function');
         orderedQueryDelegator.first.should.exist;
         orderedQueryDelegator.first.should.be.a('function');
         orderedQueryDelegator.fold.should.exist;
@@ -388,6 +395,7 @@ describe('createNewOrderedQueryableDelegator', function testCreateNewQueryableDe
             any2 = basedOrderedDelegate.any(function _predicate(item) { return item.FirstName === 'Mike'; }),
             all1 = basedOrderedDelegate.all(),
             all2 = basedOrderedDelegate.all(function _predicate(item) { return item.drillDownData.length; }),
+            contains = basedOrderedDelegate.contains(testData.dataSource.data[0]),
             first1 = basedOrderedDelegate.first(),
             first2 = basedOrderedDelegate.first(function _predicate(item) { return item.FirstName === 'Phillip J.'; }),
             fold = basedOrderedDelegate.fold(function _fold(val, cur, idx){ return val + idx}, 0),
@@ -414,6 +422,8 @@ describe('createNewOrderedQueryableDelegator', function testCreateNewQueryableDe
         all1.should.be.true;
         expect(queryable.isPrototypeOf(all2)).to.be.false;
         all2.should.be.true;
+        expect(queryable.isPrototypeOf(contains)).to.be.false;
+        contains.should.be.true;
         expect(queryable.isPrototypeOf(first1)).to.be.false;
         expect(queryable.isPrototypeOf(first2)).to.be.false;
         expect(queryable.isPrototypeOf(fold)).to.be.false;

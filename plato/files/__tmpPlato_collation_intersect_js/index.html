@@ -92,13 +92,13 @@
     <textarea id="file-source" class="col-md-12">import { defaultEqualityComparer } from &#039;../helpers&#039;;
 import { when, not, isArray } from &#039;../functionalHelpers&#039;;
 
-function intersect(source, collection, comparer) {
+function intersect(source, enumerable, comparer) {
     comparer = comparer || defaultEqualityComparer;
 
     return function *intersectIterator() {
-        collection = when(not(isArray), Array.from, collection);
+        enumerable = when(not(isArray), Array.from, enumerable);
         for (let item of source) {
-            if (undefined !== item &amp;&amp; collection.some(function _checkEquivalency(it) {
+            if (undefined !== item &amp;&amp; enumerable.some(function _checkEquivalency(it) {
                     return comparer(item, it);
                 }))
             {

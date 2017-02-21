@@ -41,7 +41,7 @@ function and(a, b, item) {
 }
 
 function curry(fn) {
-    if (!fn.length) return fn;
+    if (!fn.length || 1 === fn.length) return fn;
     return curryN(fn.length, [], fn);
 }
 

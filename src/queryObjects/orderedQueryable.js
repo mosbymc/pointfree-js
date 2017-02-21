@@ -30,32 +30,32 @@ orderedQueryable.orderedJoin = function _orderedJoin(inner, outerSelector, inner
     return this.queryableJoin(inner, outerSelector, innerSelector, projector, comparer);
 };
 
-orderedQueryable.orderedGroupJoin = function _orderedGroupJoin(outer, inner, projector, comparer, collection) {
-    return this.queryableGroupJoin(outer, inner, projector, comparer, collection);
+orderedQueryable.orderedGroupJoin = function _orderedGroupJoin(inner, outerSelector, innerSelector, projector, comparer) {
+    return this.queryableGroupJoin(inner, outerSelector, innerSelector, projector, comparer);
 };
 
-orderedQueryable.orderedExcept = function _orderedExcept(comparer, collection) {
-    return this.queryableExcept(comparer, collection);
+orderedQueryable.orderedExcept = function _orderedExcept(comparer, enumerable) {
+    return this.queryableExcept(comparer, enumerable);
 };
 
-orderedQueryable.orderedIntersect = function _orderedIntersect(comparer, collection) {
-    return this.queryableIntersect(comparer, collection);
+orderedQueryable.orderedIntersect = function _orderedIntersect(comparer, enumerable) {
+    return this.queryableIntersect(comparer, enumerable);
 };
 
-orderedQueryable.orderedUnion = function _orderedUnion(comparer, collection) {
-    return this.queryableUnion(comparer, collection);
+orderedQueryable.orderedUnion = function _orderedUnion(comparer, enumerable) {
+    return this.queryableUnion(comparer, enumerable);
 };
 
-orderedQueryable.orderedZip = function _orderedZip(selector, collection) {
-    return this.queryableZip(selector, collection);
+orderedQueryable.orderedZip = function _orderedZip(selector, enumerable) {
+    return this.queryableZip(selector, enumerable);
 };
 
 orderedQueryable.orderedAddFront = function _orderedAddFront(enumerable) {
     return this.queryableAddFront(enumerable);
 };
 
-orderedQueryable.orderedConcat = function _orderedConcat(collection) {
-    return this.queryableConcat(collection);
+orderedQueryable.orderedConcat = function _orderedConcat(enumerable) {
+    return this.queryableConcat(enumerable);
 };
 
 orderedQueryable.orderedWhere = function _orderedWhere(predicate) {
@@ -92,6 +92,10 @@ orderedQueryable.orderedAny = function _orderedAny(predicate) {
 
 orderedQueryable.orderedAll = function _orderedAll(predicate) {
     return this.queryableAll(predicate);
+};
+
+orderedQueryable.orderedContains = function _orderedContains(val, comparer) {
+    return this.queryableContains(val, comparer);
 };
 
 orderedQueryable.orderedFirst = function _orderedFirst(predicate) {

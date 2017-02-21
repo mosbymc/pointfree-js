@@ -35,6 +35,7 @@ describe('Test orderedQueryable... ', function testOrderedQueryable() {
             queryableDistinct = orderedQueryable.orderedDistinct(),
             queryableAll = orderedQueryable.orderedAll(isObject),
             queryableAny = orderedQueryable.orderedAny(isObject),
+            queryableContains = orderedQueryable.orderedContains(testData.dataSource.data[0]),
             queryableFirst = orderedQueryable.orderedFirst(isObject),
             queryableFold = orderedQueryable.orderedFold(function _fold(val, cur, idx){ return val + idx}, 0),
             queryableLast = orderedQueryable.orderedLast(isObject),
@@ -81,6 +82,7 @@ describe('Test orderedQueryable... ', function testOrderedQueryable() {
 
         queryableAll.should.be.true;
         queryableAny.should.be.true;
+        queryableContains.should.be.true;
         queryableFirst.should.eql(testData.dataSource.data[0]);
         queryableFold.should.be.a('number');
         queryableFold.should.eql(1431);
