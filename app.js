@@ -17,3 +17,5 @@ app.use('/', router);
 app.listen(PORT);
 
 console.log("Static file server running at\n => http://localhost:" + PORT + "/\nCTRL + C to shutdown");
+//connect module uses debug module
+//express module uses debug module

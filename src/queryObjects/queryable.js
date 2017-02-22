@@ -6,6 +6,9 @@ import { createNewQueryableDelegator, createNewOrderedQueryableDelegator } from 
 import { generatorProto, defaultPredicate } from '../helpers';
 import { isArray, wrap } from '../functionalHelpers';
 
+//TODO: need to determine a better way to "hide" queryable delegate prototype functionality. Browser's
+//TODO: are wanting to display both functions on the delegate and on the prototype(s).
+
 /**
  * Primary object to which orderedQueryables, as well as the objects passed to consumers, all delegate.
  * @type {{

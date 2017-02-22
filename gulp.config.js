@@ -19,6 +19,7 @@ module.exports = function _gulpConfig() {
             tmpPlato + 'evaluation/evaluationFunctions.js',
             tmpPlato + 'evaluation/all.js',
             tmpPlato + 'evaluation/any.js',
+            tmpPlato + 'evaluation/counts.js',
             tmpPlato + 'evaluation/first.js',
             tmpPlato + 'evaluation/fold.js',
             tmpPlato + 'evaluation/last.js',
