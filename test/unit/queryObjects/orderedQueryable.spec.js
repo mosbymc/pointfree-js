@@ -1,5 +1,4 @@
-import { orderedQueryable } from '../../../src/queryObjects/orderedQueryable';
-import { queryable } from '../../../src/queryObjects/queryable';
+import { queryable, orderedQueryable } from '../../../src/queryObjects/queryable';
 import { testData } from '../../testData';
 
 function nameSelector(item) {
@@ -22,35 +21,33 @@ orderedQueryable.source = testData.dataSource.data;
 
 describe('Test orderedQueryable... ', function testOrderedQueryable() {
     it('should create a new queryable delegate', function testObjectDelegation() {
-        var queryableAddFront = orderedQueryable.orderedAddFront([1, 2, 3, 4, 5]),
-            concatQueryable = orderedQueryable.orderedConcat(testData.dataSource.data),
-            exceptQueryable = orderedQueryable.orderedExcept(testData.dataSource.data),
-            groupJoinQueryable = orderedQueryable.orderedGroupJoin(testData.dataSource.data, nameSelector, nameSelector, nameProjector),
-            queryableIntersect = orderedQueryable.orderedIntersect(testData.dataSource.data),
-            queryableJoin = orderedQueryable.orderedJoin(testData.dataSource.data, nameSelector, nameSelector, nameProjector),
-            queryableUnion = orderedQueryable.orderedUnion(testData.dataSource.data),
-            queryableZip = orderedQueryable.orderedZip(testData.dataSource.data, nameSelector),
-            queryableWhere = orderedQueryable.orderedWhere(namePredicate),
-            queryableOfType = orderedQueryable.orderedOfType('object'),
-            queryableDistinct = orderedQueryable.orderedDistinct(),
-            queryableAll = orderedQueryable.orderedAll(isObject),
-            queryableAny = orderedQueryable.orderedAny(isObject),
-            queryableContains = orderedQueryable.orderedContains(testData.dataSource.data[0]),
-            queryableFirst = orderedQueryable.orderedFirst(isObject),
-            queryableFold = orderedQueryable.orderedFold(function _fold(val, cur, idx){ return val + idx}, 0),
-            queryableLast = orderedQueryable.orderedLast(isObject),
-            queryableLength = orderedQueryable.orderedLength(),
-            queryableToArray = orderedQueryable.orderedQueryableToArray(),
-            queryableToSet = orderedQueryable.orderedQueryableToSet(),
-            queryableReverse = orderedQueryable.orderedQueryableReverse(),
-            queryableMap = orderedQueryable.orderedMap(function (item) { return item; }),
-            queryableDeepMap = orderedQueryable.orderedDeepMap(function() {}),
-            queryableGroupBy = orderedQueryable.orderedGroupBy(function selector(item) { return item.FirstName; }, function comparer(a, b) { return a <= b; }),
-            queryableGroupByDescending = orderedQueryable.orderedGroupByDescending(function selector(item) { return item.FirstName; }, function comparer(a, b) { return a <= b; }),
-            queryableOrderBy = orderedQueryable.queryableOrderBy(function selector(item) { return item.FirstName; }, function comparer(a, b) { return a <= b; }),
-            queryableOrderByDescending = orderedQueryable.queryableOrderByDescending(function selector(item) { return item.FirstName; }, function comparer(a, b) { return a <= b; }),
-            queryableFlatten = orderedQueryable.orderedFlatten(),
-            queryableDeepFlatten = orderedQueryable.orderedFlattenDeep();
+        var queryableAddFront = orderedQueryable.addFront([1, 2, 3, 4, 5]),
+            concatQueryable = orderedQueryable.concat(testData.dataSource.data),
+            exceptQueryable = orderedQueryable.except(testData.dataSource.data),
+            groupJoinQueryable = orderedQueryable.groupJoin(testData.dataSource.data, nameSelector, nameSelector, nameProjector),
+            queryableIntersect = orderedQueryable.intersect(testData.dataSource.data),
+            queryableJoin = orderedQueryable.join(testData.dataSource.data, nameSelector, nameSelector, nameProjector),
+            queryableUnion = orderedQueryable.union(testData.dataSource.data),
+            queryableZip = orderedQueryable.zip(testData.dataSource.data, nameSelector),
+            queryableWhere = orderedQueryable.where(namePredicate),
+            queryableOfType = orderedQueryable.ofType('object'),
+            queryableDistinct = orderedQueryable.distinct(),
+            queryableAll = orderedQueryable.all(isObject),
+            queryableAny = orderedQueryable.any(isObject),
+            queryableContains = orderedQueryable.contains(testData.dataSource.data[0]),
+            queryableFirst = orderedQueryable.first(isObject),
+            queryableFold = orderedQueryable.fold(function _fold(val, cur, idx){ return val + idx}, 0),
+            queryableLast = orderedQueryable.last(isObject),
+            queryableLength = orderedQueryable.count(),
+            queryableToArray = orderedQueryable.toArray(),
+            queryableToSet = orderedQueryable.toSet(),
+            queryableReverse = orderedQueryable.reverse(),
+            queryableMap = orderedQueryable.map(function (item) { return item; }),
+            queryableDeepMap = orderedQueryable.deepMap(function() {}),
+            queryableGroupBy = orderedQueryable.groupBy(function selector(item) { return item.FirstName; }, function comparer(a, b) { return a <= b; }),
+            queryableGroupByDescending = orderedQueryable.groupByDescending(function selector(item) { return item.FirstName; }, function comparer(a, b) { return a <= b; }),
+            queryableFlatten = orderedQueryable.flatten(),
+            queryableDeepFlatten = orderedQueryable.deepFlatten();
 
         //queryable object functions that return a new queryable object delegator; check to make sure the
         //returned object delegates to the queryable object.
@@ -69,8 +66,6 @@ describe('Test orderedQueryable... ', function testOrderedQueryable() {
         expect(queryable.isPrototypeOf(queryableDeepMap)).to.be.true;
         expect(queryable.isPrototypeOf(queryableGroupBy)).to.be.true;
         expect(queryable.isPrototypeOf(queryableGroupByDescending)).to.be.true;
-        expect(orderedQueryable.isPrototypeOf(queryableOrderBy)).to.be.true;
-        expect(orderedQueryable.isPrototypeOf(queryableOrderByDescending)).to.be.true;
         expect(queryable.isPrototypeOf(queryableFlatten)).to.be.true;
         expect(queryable.isPrototypeOf(queryableDeepFlatten)).to.be.true;
 

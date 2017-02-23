@@ -1,6 +1,5 @@
 import { createNewQueryableDelegator, createNewOrderedQueryableDelegator } from '../../../src/queryObjects/queryObjectCreators';
-import { queryable } from '../../../src/queryObjects/queryable';
-import { orderedQueryable } from '../../../src/queryObjects/orderedQueryable';
+import { queryable, orderedQueryable } from '../../../src/queryObjects/queryable';
 import { orderBy } from '../../../src/projection/orderBy';
 import { testData } from '../../testData';
 
@@ -48,8 +47,8 @@ describe('createNewQueryableDelegator', function testQueryableDelegatorObjectCre
         queryDelegator.groupBy.should.be.a('function');
         queryDelegator.flatten.should.exist;
         queryDelegator.flatten.should.be.a('function');
-        queryDelegator.flattenDeep.should.exist;
-        queryDelegator.flattenDeep.should.be.a('function');
+        queryDelegator.deepFlatten.should.exist;
+        queryDelegator.deepFlatten.should.be.a('function');
         queryDelegator.map.should.exist;
         queryDelegator.map.should.be.a('function');
         queryDelegator.orderBy.should.exist;
@@ -99,8 +98,8 @@ describe('createNewQueryableDelegator', function testQueryableDelegatorObjectCre
         queryDelegator.fold.should.be.a('function');
         queryDelegator.last.should.exist;
         queryDelegator.last.should.be.a('function');
-        queryDelegator.length.should.exist;
-        queryDelegator.length.should.be.a('function');
+        queryDelegator.count.should.exist;
+        queryDelegator.count.should.be.a('function');
 
 
         queryDelegator.take.should.exist;
@@ -146,7 +145,7 @@ describe('createNewQueryableDelegator', function testQueryableDelegatorObjectCre
             orderByDescendingDelegate = baseDelegate.orderByDescending(nameSelector, comparer),
             distinctDelegate = baseDelegate.distinct(),
             flattenDelegate = baseDelegate.flatten(),
-            flattenDeepDelegate = baseDelegate.flattenDeep();
+            flattenDeepDelegate = baseDelegate.deepFlatten();
 
         expect(queryable.isPrototypeOf(mapDelegate)).to.be.true;
         expect(queryable.isPrototypeOf(deepMapDelegate)).to.be.true;
@@ -162,9 +161,7 @@ describe('createNewQueryableDelegator', function testQueryableDelegatorObjectCre
         expect(queryable.isPrototypeOf(zipDelegate)).to.be.true;
         expect(queryable.isPrototypeOf(groupByDelegate)).to.be.true;
         expect(queryable.isPrototypeOf(groupByDescendingDelegate)).to.be.true;
-        expect(queryable.isPrototypeOf(orderByDelegate)).to.be.true;
         expect(orderedQueryable.isPrototypeOf(orderByDelegate)).to.be.true;
-        expect(queryable.isPrototypeOf(orderByDescendingDelegate)).to.be.true;
         expect(orderedQueryable.isPrototypeOf(orderByDescendingDelegate)).to.be.true;
         expect(queryable.isPrototypeOf(distinctDelegate)).to.be.true;
         expect(queryable.isPrototypeOf(flattenDelegate)).to.be.true;
@@ -187,7 +184,7 @@ describe('createNewQueryableDelegator', function testQueryableDelegatorObjectCre
             fold = baseDelegate.fold(function _fold(val, cur, idx){ return val + idx}, 0),
             last1 = baseDelegate.last(),
             last2 = baseDelegate.last(function _predicate(item) { return item.FirstName === 'Mark'; }),
-            length = baseDelegate.length(),
+            length = baseDelegate.count(),
             toArray = baseDelegate.toArray(),
             toSet = baseDelegate.toSet(),
             reverse = baseDelegate.reverse();
@@ -258,12 +255,8 @@ describe('createNewOrderedQueryableDelegator', function testCreateNewQueryableDe
         orderedQueryDelegator.groupBy.should.be.a('function');
         orderedQueryDelegator.flatten.should.exist;
         orderedQueryDelegator.flatten.should.be.a('function');
-        orderedQueryDelegator.flattenDeep.should.exist;
-        orderedQueryDelegator.flattenDeep.should.be.a('function');
-        orderedQueryDelegator.orderBy.should.exist;
-        orderedQueryDelegator.orderBy.should.be.a('function');
-        orderedQueryDelegator.orderByDescending.should.exist;
-        orderedQueryDelegator.orderByDescending.should.be.a('function');
+        orderedQueryDelegator.deepFlatten.should.exist;
+        orderedQueryDelegator.deepFlatten.should.be.a('function');
         orderedQueryDelegator.thenBy.should.exist;
         orderedQueryDelegator.thenBy.should.be.a('function');
         orderedQueryDelegator.thenByDescending.should.exist;
@@ -311,8 +304,8 @@ describe('createNewOrderedQueryableDelegator', function testCreateNewQueryableDe
         orderedQueryDelegator.fold.should.be.a('function');
         orderedQueryDelegator.last.should.exist;
         orderedQueryDelegator.last.should.be.a('function');
-        orderedQueryDelegator.length.should.exist;
-        orderedQueryDelegator.length.should.be.a('function');
+        orderedQueryDelegator.count.should.exist;
+        orderedQueryDelegator.count.should.be.a('function');
 
 
         orderedQueryDelegator.take.should.exist;
@@ -350,13 +343,11 @@ describe('createNewOrderedQueryableDelegator', function testCreateNewQueryableDe
             zipDelegate = basedOrderedDelegate.zip(nameSelector, testData.dataSource.data),
             groupByDelegate = basedOrderedDelegate.groupBy(nameSelector, comparer),
             groupByDescendingDelegate = basedOrderedDelegate.groupByDescending(nameSelector, comparer),
-            orderByDelegate = basedOrderedDelegate.orderBy(nameSelector, comparer),
-            orderByDescendingDelegate = basedOrderedDelegate.orderByDescending(nameSelector, comparer),
             thenByDelegate = basedOrderedDelegate.thenBy(nameSelector, comparer),
             thenByDescendingDelegate = basedOrderedDelegate.thenByDescending(nameSelector, comparer),
             distinctDelegate = basedOrderedDelegate.distinct(),
             flattenDelegate = basedOrderedDelegate.flatten(),
-            flattenDeepDelegate = basedOrderedDelegate.flattenDeep();
+            flattenDeepDelegate = basedOrderedDelegate.deepFlatten();
 
         expect(queryable.isPrototypeOf(mapDelegate)).to.be.true;
         expect(queryable.isPrototypeOf(deepMapDelegate)).to.be.true;
@@ -372,13 +363,9 @@ describe('createNewOrderedQueryableDelegator', function testCreateNewQueryableDe
         expect(queryable.isPrototypeOf(zipDelegate)).to.be.true;
         expect(queryable.isPrototypeOf(groupByDelegate)).to.be.true;
         expect(queryable.isPrototypeOf(groupByDescendingDelegate)).to.be.true;
-        expect(queryable.isPrototypeOf(orderByDelegate)).to.be.true;
-        expect(orderedQueryable.isPrototypeOf(orderByDelegate)).to.be.true;
-        expect(queryable.isPrototypeOf(orderByDescendingDelegate)).to.be.true;
-        expect(orderedQueryable.isPrototypeOf(orderByDescendingDelegate)).to.be.true;
-        expect(queryable.isPrototypeOf(thenByDelegate)).to.be.true;
+        expect(queryable.isPrototypeOf(thenByDelegate)).to.be.false;
         expect(orderedQueryable.isPrototypeOf(thenByDelegate)).to.be.true;
-        expect(queryable.isPrototypeOf(thenByDescendingDelegate)).to.be.true;
+        expect(queryable.isPrototypeOf(thenByDescendingDelegate)).to.be.false;
         expect(orderedQueryable.isPrototypeOf(thenByDescendingDelegate)).to.be.true;
         expect(queryable.isPrototypeOf(distinctDelegate)).to.be.true;
         expect(queryable.isPrototypeOf(flattenDelegate)).to.be.true;
@@ -401,7 +388,7 @@ describe('createNewOrderedQueryableDelegator', function testCreateNewQueryableDe
             fold = basedOrderedDelegate.fold(function _fold(val, cur, idx){ return val + idx}, 0),
             last1 = basedOrderedDelegate.last(),
             last2 = basedOrderedDelegate.last(function _predicate(item) { return item.FirstName === 'Mark'; }),
-            length = basedOrderedDelegate.length(),
+            length = basedOrderedDelegate.count(),
             toArray = basedOrderedDelegate.toArray(),
             toSet = basedOrderedDelegate.toSet(),
             reverse = basedOrderedDelegate.reverse();

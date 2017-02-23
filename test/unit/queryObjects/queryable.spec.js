@@ -30,36 +30,36 @@ describe('Test queryable', function testQueryable() {
         expect(queryable.dataComputed).to.be.undefined;
         expect(queryable.evaluatedData).to.be.undefined;
 
-        var queryableAddFront = queryable.queryableAddFront([1, 2, 3, 4, 5]),
-            concatQueryable = queryable.queryableConcat(testData.dataSource.data),
-            exceptQueryable = queryable.queryableExcept(testData.dataSource.data),
-            groupJoinQueryable = queryable.queryableGroupJoin(testData.dataSource.data, nameSelector, nameSelector, nameProjector, comparer),
-            queryableIntersect = queryable.queryableIntersect(testData.dataSource.data),
-            queryableGroupJoin = queryable.queryableGroupJoin(testData.dataSource.data, nameSelector, nameSelector, nameProjector, comparer),
-            queryableJoin = queryable.queryableJoin(testData.dataSource.data, nameSelector, nameSelector, nameProjector),
-            queryableUnion = queryable.queryableUnion(testData.dataSource.data),
-            queryableZip = queryable.queryableZip(testData.dataSource.data, nameSelector),
-            queryableWhere = queryable.queryableWhere(namePredicate),
-            queryableOfType = queryable.queryableOfType('object'),
-            queryableDistinct = queryable.queryableDistinct(),
-            queryableAll = queryable.queryableAll(isObject),
-            queryableAny = queryable.queryableAny(isObject),
-            queryableContains = queryable.queryableContains(testData.dataSource.data[0]),
-            queryableFold = queryable.queryableFold(function _fold(val, cur, idx){ return val + idx}, 0),
-            queryableFirst = queryable.queryableFirst(isObject),
-            queryableLast = queryable.queryableLast(isObject),
-            queryableLength = queryable.queryableLength(),
-            queryableToArray = queryable.queryableToArray(),
-            queryableToSet = queryable.queryableToSet(),
-            queryableReverse = queryable.queryableReverse(),
-            queryableDeepMap = queryable.queryableDeepMap(function() {}),
-            queryableMap = queryable.queryableMap(function (item) { return item; }),
-            queryableGroupBy = queryable.queryableGroupBy(function selector(item) { return item.FirstName; }, function comparer(a, b) { return a <= b; }),
-            queryableGroupByDescending = queryable.queryableGroupByDescending(function selector(item) { return item.FirstName; }, function comparer(a, b) { return a <= b; }),
-            queryableOrderBy = queryable.queryableOrderBy(function selector(item) { return item.FirstName; }, function comparer(a, b) { return a <= b; }),
-            queryableOrderByDescending = queryable.queryableOrderByDescending(function selector(item) { return item.FirstName; }, function comparer(a, b) { return a <= b; }),
-            queryableFlatten = queryable.queryableFlatten(),
-            queryableDeepFlatten = queryable.queryableFlattenDeep();
+        var queryableAddFront = queryable.addFront([1, 2, 3, 4, 5]),
+            concatQueryable = queryable.concat(testData.dataSource.data),
+            exceptQueryable = queryable.except(testData.dataSource.data),
+            groupJoinQueryable = queryable.groupJoin(testData.dataSource.data, nameSelector, nameSelector, nameProjector, comparer),
+            queryableIntersect = queryable.intersect(testData.dataSource.data),
+            queryableGroupJoin = queryable.groupJoin(testData.dataSource.data, nameSelector, nameSelector, nameProjector, comparer),
+            queryableJoin = queryable.join(testData.dataSource.data, nameSelector, nameSelector, nameProjector),
+            queryableUnion = queryable.union(testData.dataSource.data),
+            queryableZip = queryable.zip(testData.dataSource.data, nameSelector),
+            queryableWhere = queryable.where(namePredicate),
+            queryableOfType = queryable.ofType('object'),
+            queryableDistinct = queryable.distinct(),
+            queryableAll = queryable.all(isObject),
+            queryableAny = queryable.any(isObject),
+            queryableContains = queryable.contains(testData.dataSource.data[0]),
+            queryableFold = queryable.fold(function _fold(val, cur, idx){ return val + idx}, 0),
+            queryableFirst = queryable.first(isObject),
+            queryableLast = queryable.last(isObject),
+            queryableLength = queryable.count(),
+            queryableToArray = queryable.toArray(),
+            queryableToSet = queryable.toSet(),
+            queryableReverse = queryable.reverse(),
+            queryableDeepMap = queryable.deepMap(function() {}),
+            queryableMap = queryable.map(function (item) { return item; }),
+            queryableGroupBy = queryable.groupBy(function selector(item) { return item.FirstName; }, function comparer(a, b) { return a <= b; }),
+            queryableGroupByDescending = queryable.groupByDescending(function selector(item) { return item.FirstName; }, function comparer(a, b) { return a <= b; }),
+            queryableOrderBy = queryable.orderBy(function selector(item) { return item.FirstName; }, function comparer(a, b) { return a <= b; }),
+            queryableOrderByDescending = queryable.orderByDescending(function selector(item) { return item.FirstName; }, function comparer(a, b) { return a <= b; }),
+            queryableFlatten = queryable.flatten(),
+            queryableDeepFlatten = queryable.deepFlatten();
 
         //queryable object functions that return a new queryable object delegator; check to make sure the
         //returned object delegates to the queryable object.
@@ -95,9 +95,9 @@ describe('Test queryable', function testQueryable() {
         queryableGroupBy.dataComputed.should.be.false;
         expect(queryable.isPrototypeOf(queryableGroupByDescending)).to.be.true;
         queryableGroupByDescending.dataComputed.should.be.false;
-        expect(queryable.isPrototypeOf(queryableOrderBy)).to.be.true;
+        expect(queryable.isPrototypeOf(queryableOrderBy)).to.be.false;
         queryableOrderBy.dataComputed.should.be.false;
-        expect(queryable.isPrototypeOf(queryableOrderByDescending)).to.be.true;
+        expect(queryable.isPrototypeOf(queryableOrderByDescending)).to.be.false;
         queryableOrderByDescending.dataComputed.should.be.false;
         expect(queryable.isPrototypeOf(queryableFlatten)).to.be.true;
         queryableFlatten.dataComputed.should.be.false;
@@ -141,10 +141,10 @@ describe('Test queryable', function testQueryable() {
     });
 
     it('should have a functioning take', function testQueryablesTake() {
-        var noItems = queryable.queryableTake(0),
-            singleItem = queryable.queryableTake(1),
-            fiveItems = queryable.queryableTake(5),
-            allItems = queryable.queryableTake(testData.dataSource.data.length);
+        var noItems = queryable.take(0),
+            singleItem = queryable.take(1),
+            fiveItems = queryable.take(5),
+            allItems = queryable.take(testData.dataSource.data.length);
 
         noItems.should.have.lengthOf(0);
         singleItem.should.have.lengthOf(1);
@@ -161,10 +161,10 @@ describe('Test queryable', function testQueryable() {
         function predicate3(item) { return item.drillDownData.length >= 5; }
         function predicate4(item) { return item.FirstName !== 'Mark'; }
 
-        var takeWhile1 = queryable.queryableTakeWhile(predicate1),
-            takeWhile2 = queryable.queryableTakeWhile(predicate2),
-            takeWhile3 = queryable.queryableTakeWhile(predicate3),
-            takeWhile4 = queryable.queryableTakeWhile(predicate4);
+        var takeWhile1 = queryable.takeWhile(predicate1),
+            takeWhile2 = queryable.takeWhile(predicate2),
+            takeWhile3 = queryable.takeWhile(predicate3),
+            takeWhile4 = queryable.takeWhile(predicate4);
 
         takeWhile1.should.have.lengthOf(0);
         //takeWhile2.should.have.lengthOf(testData.dataSource.data.count);
@@ -181,8 +181,8 @@ describe('Test queryable', function testQueryable() {
         queryable.dataComputed = true;
         queryable.evaluatedData = testData.dataSource.data;
 
-        var take = queryable.queryableTake(5),
-            takeWhile = queryable.queryableTakeWhile(function _takeWhile(item) {
+        var take = queryable.take(5),
+            takeWhile = queryable.takeWhile(function _takeWhile(item) {
                 return item.FirstName !== 'Mark';
             });
 
@@ -196,10 +196,10 @@ describe('Test queryable', function testQueryable() {
 
     it('should have a functioning skip', function testSkip() {
         queryable.dataComputed = false;
-        var allItems = queryable.queryableSkip(0),
-            lessOne = queryable.queryableSkip(1),
-            lessFive = queryable.queryableSkip(5),
-            noItems = queryable.queryableSkip(testData.dataSource.data.length);
+        var allItems = queryable.skip(0),
+            lessOne = queryable.skip(1),
+            lessFive = queryable.skip(5),
+            noItems = queryable.skip(testData.dataSource.data.length);
 
         allItems.should.have.lengthOf(testData.dataSource.data.length);
         allItems.should.eql(testData.dataSource.data);
@@ -216,9 +216,9 @@ describe('Test queryable', function testQueryable() {
         function predicate2() { return true; }
         function predicate3(item) { return item.State === 'NY' || item.State === 'NJ'; }
 
-        var skipWhile1 = queryable.queryableSkipWhile(predicate1),
-            skipWhile2 = queryable.queryableSkipWhile(predicate2),
-            skipWhile3 = queryable.queryableSkipWhile(predicate3);
+        var skipWhile1 = queryable.skipWhile(predicate1),
+            skipWhile2 = queryable.skipWhile(predicate2),
+            skipWhile3 = queryable.skipWhile(predicate3);
 
         skipWhile1.should.have.lengthOf(testData.dataSource.data.length);
         skipWhile1.should.eql(testData.dataSource.data);
@@ -231,8 +231,8 @@ describe('Test queryable', function testQueryable() {
         queryable.dataComputed = true;
         queryable.evaluatedData = testData.dataSource.data;
 
-        var skip = queryable.queryableSkip(10),
-            skipWhile = queryable.queryableSkipWhile(function _pred() { return false; });
+        var skip = queryable.skip(10),
+            skipWhile = queryable.skipWhile(function _pred() { return false; });
 
         skip.should.have.lengthOf(testData.dataSource.data.length - 10);
         skip.should.eql(testData.dataSource.data.slice(10));

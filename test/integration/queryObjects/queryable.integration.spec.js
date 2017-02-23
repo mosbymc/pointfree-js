@@ -1,5 +1,4 @@
-import { queryable } from '../../../src/queryObjects/queryable';
-import { orderedQueryable } from '../../../src/queryObjects/orderedQueryable';
+import { queryable, orderedQueryable } from '../../../src/queryObjects/queryable';
 import { createNewQueryableDelegator } from '../../../src/queryObjects/queryObjectCreators';
 import { testData } from '../../testData';
 
@@ -61,7 +60,7 @@ describe('Test queryable object function chaining', function testQueryable() {
         q1.dataComputed.should.be.false;
         expect(queryable.isPrototypeOf(q1)).to.be.true;
         q2.dataComputed.should.be.false;
-        expect(queryable.isPrototypeOf(q2)).to.be.true;
+        expect(queryable.isPrototypeOf(q2)).to.be.false;
         expect(orderedQueryable.isPrototypeOf(q2)).to.be.true;
         q3.dataComputed.should.be.false;
         expect(queryable.isPrototypeOf(q3)).to.be.true;
