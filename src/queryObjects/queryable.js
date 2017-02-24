@@ -52,16 +52,8 @@ import { isArray, wrap } from '../functionalHelpers';
  * }}
  */
 var queryable_core = {
-    get source() {
-        return this._source;
-    },
-
-    set source(val) {
-        this._source = val;
-    },
-
     //TODO: 1) See about initializing the queryable object with the _evaluatedData and _dataComputed
-    //TODO:    properties upfront and making then non-enumerable.
+    //TODO:    properties upfront and making them non-enumerable.
     //TODO: 2) See if, via closure, I can bypass the need for getters/setters for properties that can
     //TODO:    ultimately be read and written to directly with a getter/setter property that maintains
     //TODO:    its own internal state - this would probably need to be done via Object.defineProperty
@@ -140,7 +132,7 @@ var queryable_core = {
      */
     from: function _from(source = []) {
         //... if the source is a generator, an array, or another queryable, accept it as is...
-        if (generatorProto.isPrototypeOf(source) || isArray(source) || queryable.isPrototypeOf(source))
+        if (generatorProto.isPrototypeOf(source) || isArray(source) || queryable_core.isPrototypeOf(source))
             return createNewQueryableDelegator(source);
         //... otherwise, turn the source into an array before creating a new queryable delegator object;
         //if it has an iterator, use Array.from, else wrap the source arg in an array...

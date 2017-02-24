@@ -773,7 +773,7 @@ var _queryable = require('./queryObjects/queryable');
 
 window.queryable = _queryable.queryable || {};
 
-},{"./queryObjects/queryObjectCreators":34,"./queryObjects/queryable":35}],21:[function(require,module,exports){
+},{"./queryObjects/queryObjectCreators":33,"./queryObjects/queryable":34}],21:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -1178,151 +1178,9 @@ exports.sortData = sortData;
 Object.defineProperty(exports, "__esModule", {
     value: true
 });
-exports.orderedQueryable = undefined;
-
-var _queryable = require('./queryable');
-
-var orderedQueryable = Object.create(_queryable.queryable);
-
-orderedQueryable.orderedDeepMap = function _orderedDeepMap(fn) {
-    return this.queryableDeepMap(fn);
-};
-
-orderedQueryable.orderedMap = function _orderedMap(mapFunc) {
-    return this.queryableMap(mapFunc);
-};
-
-orderedQueryable.orderedGroupBy = function _orderedGroupBy(keySelector, comparer) {
-    return this.queryableGroupBy(keySelector, comparer);
-};
-
-orderedQueryable.orderedGroupByDescending = function _orderedGroupByDescending(keySelector, comparer) {
-    return this.queryableGroupByDescending(keySelector, comparer);
-};
-
-orderedQueryable.orderedFlatten = function _orderedFlatten() {
-    return this.queryableFlatten();
-};
-
-orderedQueryable.orderedFlattenDeep = function _orderedFlattenDeep() {
-    return this.queryableFlattenDeep();
-};
-
-orderedQueryable.orderedJoin = function _orderedJoin(inner, outerSelector, innerSelector, projector, comparer) {
-    return this.queryableJoin(inner, outerSelector, innerSelector, projector, comparer);
-};
-
-orderedQueryable.orderedGroupJoin = function _orderedGroupJoin(inner, outerSelector, innerSelector, projector, comparer) {
-    return this.queryableGroupJoin(inner, outerSelector, innerSelector, projector, comparer);
-};
-
-orderedQueryable.orderedExcept = function _orderedExcept(comparer, enumerable) {
-    return this.queryableExcept(comparer, enumerable);
-};
-
-orderedQueryable.orderedIntersect = function _orderedIntersect(comparer, enumerable) {
-    return this.queryableIntersect(comparer, enumerable);
-};
-
-orderedQueryable.orderedUnion = function _orderedUnion(comparer, enumerable) {
-    return this.queryableUnion(comparer, enumerable);
-};
-
-orderedQueryable.orderedZip = function _orderedZip(selector, enumerable) {
-    return this.queryableZip(selector, enumerable);
-};
-
-orderedQueryable.orderedAddFront = function _orderedAddFront(enumerable) {
-    return this.queryableAddFront(enumerable);
-};
-
-orderedQueryable.orderedConcat = function _orderedConcat(enumerable) {
-    return this.queryableConcat(enumerable);
-};
-
-orderedQueryable.orderedWhere = function _orderedWhere(predicate) {
-    return this.queryableWhere(predicate);
-};
-
-orderedQueryable.orderedOfType = function _orderedOfType(type) {
-    return this.queryableOfType(type);
-};
-
-orderedQueryable.orderedDistinct = function _orderedDistinct(comparer) {
-    return this.queryableDistinct(comparer);
-};
-
-orderedQueryable.orderedTake = function _orderedTake(amt) {
-    return this.queryableTake(amt);
-};
-
-orderedQueryable.orderedTakeWhile = function _orderedTakeWhile(predicate) {
-    return this.queryableTakeWhile(predicate);
-};
-
-orderedQueryable.orderedSkip = function _orderedSkip(amt) {
-    return this.queryableSkip(amt);
-};
-
-orderedQueryable.orderedSkipWhile = function _orderedSkipWhile(predicate) {
-    return this.queryableSkipWhile(predicate);
-};
-
-orderedQueryable.orderedAny = function _orderedAny(predicate) {
-    return this.queryableAny(predicate);
-};
-
-orderedQueryable.orderedAll = function _orderedAll(predicate) {
-    return this.queryableAll(predicate);
-};
-
-orderedQueryable.orderedContains = function _orderedContains(val, comparer) {
-    return this.queryableContains(val, comparer);
-};
-
-orderedQueryable.orderedFirst = function _orderedFirst(predicate) {
-    return this.queryableFirst(predicate);
-};
-
-orderedQueryable.orderedFold = function _orderedFold(fn, initial) {
-    return this.queryableFold(fn, initial);
-};
-
-orderedQueryable.orderedLast = function _orderedLast(predicate) {
-    return this.queryableLast(predicate);
-};
-
-orderedQueryable.orderedLength = function _orderedLength() {
-    return this.queryableLength();
-};
-
-orderedQueryable.orderedQueryableToArray = function _orderedQueryableToArray() {
-    return this.queryableToArray();
-};
-
-orderedQueryable.orderedQueryableToSet = function _orderedQueryableToSet() {
-    return this.queryableToSet();
-};
-
-orderedQueryable.orderedQueryableReverse = function _orderedQueryableReverse() {
-    return this.queryableReverse();
-};
-
-exports.orderedQueryable = orderedQueryable;
-
-},{"./queryable":35}],34:[function(require,module,exports){
-'use strict';
-
-Object.defineProperty(exports, "__esModule", {
-    value: true
-});
 exports.createNewOrderedQueryableDelegator = exports.createNewQueryableDelegator = undefined;
 
 var _queryable = require('./queryable');
-
-var _orderedQueryable = require('./orderedQueryable');
-
-var _projectionFunctions = require('../projection/projectionFunctions');
 
 var _helpers = require('../helpers');
 
@@ -1333,112 +1191,12 @@ function createNewQueryableDelegator(source, iterator) {
     //if the iterator param has been passed and is a generator, set it as the object's
     //iterator; other wise let the object delegate to the queryable's iterator
     if (iterator && _helpers.generatorProto.isPrototypeOf(iterator)) obj[Symbol.iterator] = iterator;
-
-    obj.map = function _map(mapFunc) {
-        return this.queryableMap(mapFunc);
-    };
-    obj.where = function _where(predicate) {
-        return this.queryableWhere(predicate);
-    };
-    obj.addFront = function _addFront(enumerable) {
-        return this.queryableAddFront(enumerable);
-    };
-    obj.concat = function _concat(collection) {
-        return this.queryableConcat(collection);
-    };
-    obj.deepMap = function _deepMap(fn) {
-        return this.queryableDeepMap(fn);
-    };
-    obj.except = function _except(collection, comparer = _helpers.defaultEqualityComparer) {
-        return this.queryableExcept(collection, comparer);
-    };
-    obj.groupJoin = function _groupJoin(inner, outerSelector, innerSelector, projector, comparer = _helpers.defaultEqualityComparer) {
-        return this.queryableGroupJoin(inner, outerSelector, innerSelector, projector, comparer);
-    };
-    obj.intersect = function _intersect(collection, comparer = _helpers.defaultEqualityComparer) {
-        return this.queryableIntersect(collection, comparer);
-    };
-    obj.join = function _join(inner, outerSelector, innerSelector, projector, comparer = _helpers.defaultEqualityComparer) {
-        return this.queryableJoin(inner, outerSelector, innerSelector, projector, comparer);
-    };
-    obj.union = function _union(collection, comparer = _helpers.defaultEqualityComparer) {
-        return this.queryableUnion(collection, comparer);
-    };
-    obj.zip = function _zip(selector, collection) {
-        return this.queryableZip(selector, collection);
-    };
-    //TODO: see if setting up a default value for the group/order comparer is a necessary thing
-    obj.groupBy = function _groupBy(keySelector, comparer) {
-        return this.queryableGroupBy(keySelector, comparer);
-    };
-    obj.groupByDescending = function _groupByDescending(keySelector, comparer) {
-        return this.queryableGroupByDescending(keySelector, comparer);
-    };
-    obj.orderBy = function _orderBy(keySelector, comparer) {
-        return this.queryableOrderBy(keySelector, comparer);
-    };
-    obj.orderByDescending = function _orderByDescending(keySelector, comparer) {
-        return this.queryableOrderByDescending(keySelector, comparer);
-    };
-    obj.distinct = function _distinct(comparer = _helpers.defaultEqualityComparer) {
-        return this.queryableDistinct(comparer);
-    };
-    obj.ofType = function _ofType(type) {
-        return this.queryableOfType(type);
-    };
-    obj.flatten = function _flatten() {
-        return this.queryableFlatten();
-    };
-    obj.flattenDeep = function _flattenDeep() {
-        return this.queryableFlattenDeep();
-    };
-    obj.take = function _take(amt = 1) {
-        return this.queryableTake(amt);
-    };
-    obj.takeWhile = function _takeWhile(predicate) {
-        return this.queryableTakeWhile(predicate);
-    };
-    obj.skip = function _skip(amt = 1) {
-        return this.queryableSkip(amt);
-    };
-    obj.skipWhile = function _skipWhile(predicate) {
-        return this.queryableSkipWhile(predicate);
-    };
-    obj.any = function _any(predicate) {
-        return this.queryableAny(predicate);
-    };
-    obj.all = function _all(predicate) {
-        return this.queryableAll(predicate);
-    };
-    obj.contains = function _contains(val, comparer) {
-        return this.queryableContains(val, comparer);
-    };
-    obj.first = function _first(predicate) {
-        return this.queryableFirst(predicate);
-    };
-    obj.fold = function _fold(fn, initial) {
-        return this.queryableFold(fn, initial);
-    };
-    obj.last = function _last(predicate) {
-        return this.queryableLast(predicate);
-    };
-    obj.length = function _length() {
-        return this.queryableLength();
-    };
-    obj.toArray = function _toArray() {
-        return this.queryableToArray();
-    };
-    obj.toSet = function _toSet() {
-        return this.queryableToSet();
-    };
-    obj.reverse = function _reverse() {
-        return this.queryableReverse();
-    };
+    tmpGetter(obj);
     return addGetter(obj);
 }
 
 function createNewOrderedQueryableDelegator(source, iterator, sortObj) {
-    var obj = Object.create(_orderedQueryable.orderedQueryable);
+    var obj = Object.create(_queryable.orderedQueryable);
     obj.source = source;
     obj.dataComputed = false;
     //Need to maintain a list of all the sorts that have been applied; effectively,
@@ -1448,129 +1206,6 @@ function createNewOrderedQueryableDelegator(source, iterator, sortObj) {
     //if the iterator param has been passed and is a generator, set it as the object's
     //iterator; other wise let the object delegate to the queryable's iterator
     if (iterator && _helpers.generatorProto.isPrototypeOf(iterator)) obj[Symbol.iterator] = iterator;
-
-    obj.map = function _map(mapFunc) {
-        return this.orderedMap(mapFunc);
-    };
-    obj.where = function _where(predicate) {
-        return this.orderedWhere(predicate);
-    };
-    obj.addFront = function _addFront(enumerable) {
-        return this.orderedAddFront(enumerable);
-    };
-    obj.concat = function _concat(collection) {
-        return this.orderedConcat(collection);
-    };
-    obj.deepMap = function _deepMap(fn) {
-        return this.orderedDeepMap(fn);
-    };
-    obj.join = function _join(inner, outerSelector, innerSelector, projector, comparer = _helpers.defaultEqualityComparer) {
-        return this.orderedJoin(inner, outerSelector, innerSelector, projector, comparer);
-    };
-    obj.union = function _union(collection, comparer = _helpers.defaultEqualityComparer) {
-        return this.orderedUnion(collection, comparer);
-    };
-    obj.zip = function _zip(selector, collection) {
-        return this.orderedZip(selector, collection);
-    };
-    obj.groupBy = function _groupBy(keySelector, comparer) {
-        return this.orderedGroupBy(keySelector, comparer);
-    };
-    obj.groupByDescending = function _groupByDescending(keySelector, comparer) {
-        return this.orderedGroupByDescending(keySelector, comparer);
-    };
-    obj.except = function _except(collection, comparer = _helpers.defaultEqualityComparer) {
-        return this.orderedExcept(collection, comparer);
-    };
-    obj.groupJoin = function _groupJoin(inner, outerSelector, innerSelector, projector, comparer = _helpers.defaultEqualityComparer) {
-        return this.orderedGroupJoin(inner, outerSelector, innerSelector, projector, comparer);
-    };
-    obj.intersect = function _intersect(collection, comparer = _helpers.defaultEqualityComparer) {
-        return this.orderedIntersect(collection, comparer);
-    };
-    obj.distinct = function _distinct(comparer = _helpers.defaultEqualityComparer) {
-        return this.orderedDistinct(comparer);
-    };
-    obj.ofType = function _ofType(type) {
-        return this.orderedOfType(type);
-    };
-    obj.flatten = function _flatten() {
-        return this.orderedFlatten();
-    };
-    obj.flattenDeep = function _flattenDeep() {
-        return this.orderedFlattenDeep();
-    };
-    obj.take = function _take(amt = 1) {
-        return this.orderedTake(amt);
-    };
-    obj.takeWhile = function _takeWhile(predicate) {
-        return this.orderedTakeWhile(predicate);
-    };
-    obj.skip = function _skip(amt = 1) {
-        return this.orderedSkip(amt);
-    };
-    obj.skipWhile = function _skipWhile(predicate) {
-        return this.orderedSkipWhile(predicate);
-    };
-    obj.any = function _any(predicate) {
-        return this.orderedAny(predicate);
-    };
-    obj.all = function _all(predicate) {
-        return this.orderedAll(predicate);
-    };
-    obj.contains = function _contains(val, comparer) {
-        return this.orderedContains(val, comparer);
-    };
-    obj.first = function _first(predicate) {
-        return this.orderedFirst(predicate);
-    };
-    obj.fold = function _fold(fn, initial) {
-        return this.orderedFold(fn, initial);
-    };
-    obj.last = function _last(predicate) {
-        return this.orderedLast(predicate);
-    };
-    obj.length = function _length() {
-        return this.orderedLength();
-    };
-    obj.toArray = function _toArray() {
-        return this.orderedQueryableToArray();
-    };
-    obj.toSet = function _toSet() {
-        return this.orderedQueryableToSet();
-    };
-    obj.reverse = function _reverse() {
-        return this.orderedQueryableReverse();
-    };
-
-    //Shadow the orderBy/orderByDescending function of the delegate so that if another
-    //orderBy/orderByDescending function is immediately chained to an orderedQueryable
-    //delegator object, it will treat it as a thenBy/thenByDescending call respectively.
-    //TODO: These could also be treated as no-ops, or a deliberate re-ordering of the
-    //TODO: source; I feel the latter would be an odd thing do to, so it might not
-    //TODO: make sense to treat it that way.
-
-    //TODO: Rather than shadowing, I could make the queryable's orderBy/orderByDescending
-    //TODO: functions check the context object's prototype; if it finds that the
-    //TODO: orderedQueryable is in the context's prototype chain, then it could treat
-    //TODO: the function call differently
-    obj.orderBy = function _orderBy(keySelector, comparer) {
-        return this.thenBy(keySelector, comparer);
-    };
-
-    obj.orderByDescending = function _orderByDescending(keySelector, comparer) {
-        return this.thenByDescending(keySelector, comparer);
-    };
-
-    obj.thenBy = function _thenBy(keySelector, comparer) {
-        var sortObj = this._appliedSorts.concat({ keySelector: keySelector, comparer: comparer, direction: 'asc' });
-        return createNewOrderedQueryableDelegator(this.source, (0, _projectionFunctions.orderBy)(this, sortObj), sortObj);
-    };
-
-    obj.thenByDescending = function thenByDescending(keySelector, comparer) {
-        var sortObj = this._appliedSorts.concat({ keySelector: keySelector, comparer: comparer, direction: 'desc' });
-        return createNewOrderedQueryableDelegator(this.source, (0, _projectionFunctions.orderBy)(this, sortObj), sortObj);
-    };
 
     return addGetter(obj);
 }
@@ -1592,16 +1227,64 @@ function addGetter(obj) {
     });
 }
 
+function tmpGetter(obj) {
+    var evaluatedData = null,
+        dataComputed = false,
+        source;
+
+    return Object.defineProperties(obj, {
+        'tmp_evaluatedData': {
+            get: function _getEvaluatedData() {
+                return evaluatedData;
+            },
+            set: function _setEvaluatedData(val) {
+                evaluatedData = val;
+                dataComputed = true;
+            }
+        },
+        'tmp_dataComputed': {
+            get: function _getDataComputed() {
+                return dataComputed;
+            },
+            set: function _setDataComputed(val) {
+                dataComputed = val;
+            }
+        },
+        'tmp_source': {
+            get: function _getSource() {
+                return source;
+            },
+            set: function _setSource(val) {
+                source = val;
+            }
+        },
+        'tmp_data': {
+            get: function _data() {
+                //TODO: not sure if I plan on 'saving' the eval-ed data of a queryable object, and if I do, it'll take a different
+                //TODO: form that what is currently here; for now I am going to leave the check for pre-eval-ed data in place
+                if (!this.dataComputed) {
+                    //TODO: is this valid for an object that has an iterator? Seems like it should work...
+                    var res = Array.from(this);
+                    this.dataComputed = true;
+                    this.evaluatedData = res;
+                    return res;
+                }
+                return this.evaluatedData;
+            }
+        }
+    });
+}
+
 exports.createNewQueryableDelegator = createNewQueryableDelegator;
 exports.createNewOrderedQueryableDelegator = createNewOrderedQueryableDelegator;
 
-},{"../helpers":19,"../projection/projectionFunctions":31,"./orderedQueryable":33,"./queryable":35}],35:[function(require,module,exports){
+},{"../helpers":19,"./queryable":34}],34:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
     value: true
 });
-exports.queryable = undefined;
+exports.orderedQueryable = exports.queryable = exports.queryable_core = undefined;
 
 var _collationFunctions = require('../collation/collationFunctions');
 
@@ -1617,68 +1300,52 @@ var _helpers = require('../helpers');
 
 var _functionalHelpers = require('../functionalHelpers');
 
+//TODO: need to determine a better way to "hide" queryable delegate prototype functionality. Browser's
+//TODO: are wanting to display both functions on the delegate and on the prototype(s).
+
 /**
- * Primary object to which orderedQueryables, as well as the objects passed to consumers, all delegate.
+ *
  * @type {{
- * queryableFrom: * queryable._queryableFrom,
- * queryableMap: * queryable._queryableMap,
- * queryableGroupBy: * queryable._groupBy,
- * queryableGroupByDescending: * queryable._groupByDescending,
- * queryableOrderBy: * queryable._orderBy,
- * queryableOrderByDescending: * queryable._orderByDescending,
- * queryableFlatten: * queryable._flatten,
- * queryableFlattenDeep: * queryable._flattenDeep,
- * queryableConcat: * queryable._concat,
- * queryableExcept: * queryable._except,
- * queryableGroupJoin: * queryable._groupJoin,
- * queryableIntersect: * queryable._intersect,
- * queryableJoin: * queryable._join,
- * queryableUnion: * queryable._union,
- * queryableZip: * queryable._zip,
- * queryableWhere: * queryable._where,
- * queryableDistinct: * queryable._distinct,
- * queryableTake: * queryable._take,
- * queryableTakeWhile: * queryable.takeWhile,
- * queryableAny: queryable._any,
- * queryableAll: queryable._all,
- * queryableFirst: * queryable._first,
- * queryableLast: * queryable._last,
- * queryableToArray: * queryable._toArray,
- * queryableToSet: * queryable._toSet,
-  *queryableReverse: * queryable._reverse,
-  * [Symbol.iterator]: * queryable._iterator
-  * }}
+ * source, source,
+ * evaluatedData: *, evaluatedData: *,
+ * dataComputed: *, dataComputed: *,
+ * extend: queryable_core._extend,
+ * from: queryable_core._from,
+ * map: queryable_core._map,
+ * groupBy: queryable_core._groupBy,
+ * groupByDescending: queryable_core._groupByDescending,
+ * flatten: queryable_core._flatten,
+ * deepFlatten: queryable_core._deepFlatten,
+ * deepMap: queryable_core._deepMap,
+ * addFront: queryable_core._addFront,
+ * concat: queryable_core._concat,
+ * except: queryable_core._except,
+ * groupJoin: queryable_core._groupJoin,
+ * intersect: queryable_core._intersect,
+ * join: queryable_core._join,
+ * union: queryable_core._union,
+ * zip: queryable_core._zip,
+ * where: queryable_core._where,
+ * ofType: queryable_core._ofType,
+ * distinct: queryable_core._distinct,
+ * take: queryable_core._take,
+ * takeWhile: queryable_core._takeWhile,
+ * skip: queryable_core._skip,
+ * skipWhile: queryable_core._skipWhile,
+ * any: queryable_core._any,
+ * all: queryable_core._all,
+ * contains: queryable_core._contains,
+ * first: queryable_core._first,
+ * fold: queryable_core._fold,
+ * last: queryable_core._last,
+ * count: queryable_core._count,
+ * toArray: queryable_core._toArray,
+ * toSet: queryable_core._toSet,
+ * reverse: queryable_core._reverse,
+ * [Symbol.iterator]: queryable_core._iterator
+ * }}
  */
-var queryable = {
-    /**
-     * Projects each element of a sequence into a new form.
-     * @param selector
-     * @param context
-     * @returns {Object}
-     */
-    /*queryableSelect: function _select(selector, context) {
-        return createNewQueryableDelegator(this.source, this._pipeline.concat([{ fn: selectThunk(selector, context), functionType: functionTypes.atomic }]));
-    },*/
-
-    /**
-     * Projects each element of a sequence to an array and flattens the resulting sequences into one sequence.
-     * @method selectMany
-     * @type {function}
-     * @param {function} selector - (Required) A transform function to apply to each element.
-     * @param resSelector
-     * @returns {Array} - The array of type of the elements of the sequence returned by selector.
-     */
-    /*queryableSelectMany: function _selectMany(selector, resSelector) {
-        return createNewQueryableDelegator(this.source, this._pipeline.concat([{ fn: selectManyThunk(selector, resSelector), functionType: functionTypes.atomic }]));
-    },*/
-    get source() {
-        return this._source;
-    },
-
-    set source(val) {
-        this._source = val;
-    },
-
+var queryable_core = {
     //TODO: 1) See about initializing the queryable object with the _evaluatedData and _dataComputed
     //TODO:    properties upfront and making then non-enumerable.
     //TODO: 2) See if, via closure, I can bypass the need for getters/setters for properties that can
@@ -1759,7 +1426,7 @@ var queryable = {
      */
     from: function _from(source = []) {
         //... if the source is a generator, an array, or another queryable, accept it as is...
-        if (_helpers.generatorProto.isPrototypeOf(source) || (0, _functionalHelpers.isArray)(source) || queryable.isPrototypeOf(source)) return (0, _queryObjectCreators.createNewQueryableDelegator)(source);
+        if (_helpers.generatorProto.isPrototypeOf(source) || (0, _functionalHelpers.isArray)(source) || queryable_core.isPrototypeOf(source)) return (0, _queryObjectCreators.createNewQueryableDelegator)(source);
         //... otherwise, turn the source into an array before creating a new queryable delegator object;
         //if it has an iterator, use Array.from, else wrap the source arg in an array...
         return (0, _queryObjectCreators.createNewQueryableDelegator)(null !== source && source[Symbol.iterator] ? Array.from(source) : (0, _functionalHelpers.wrap)(source));
@@ -1770,7 +1437,7 @@ var queryable = {
      * @param mapFunc
      * @returns {*}
      */
-    queryableMap: function _queryableMap(mapFunc) {
+    map: function _map(mapFunc) {
         return (0, _queryObjectCreators.createNewQueryableDelegator)(this, (0, _projectionFunctions.map)(this, mapFunc));
     },
 
@@ -1780,7 +1447,7 @@ var queryable = {
      * @param comparer
      * @returns {*}
      */
-    queryableGroupBy: function _groupBy(keySelector, comparer) {
+    groupBy: function _groupBy(keySelector, comparer) {
         var groupObj = [{ keySelector: keySelector, comparer: comparer, direction: 'asc' }];
         return (0, _queryObjectCreators.createNewQueryableDelegator)(this, (0, _projectionFunctions.groupBy)(this, groupObj));
     },
@@ -1791,44 +1458,22 @@ var queryable = {
      * @param comparer
      * @returns {*}
      */
-    queryableGroupByDescending: function _groupByDescending(keySelector, comparer) {
+    groupByDescending: function _groupByDescending(keySelector, comparer) {
         var groupObj = [{ keySelector: keySelector, comparer: comparer, direction: 'desc' }];
         return (0, _queryObjectCreators.createNewQueryableDelegator)(this, (0, _projectionFunctions.groupBy)(this, groupObj));
     },
 
     /**
-     *
-     * @param keySelector
-     * @param comparer
-     * @returns {*}
-     */
-    queryableOrderBy: function _orderBy(keySelector, comparer) {
-        var sortObj = [{ keySelector: keySelector, comparer: comparer, direction: 'asc' }];
-        return (0, _queryObjectCreators.createNewOrderedQueryableDelegator)(this, (0, _projectionFunctions.orderBy)(this, sortObj), sortObj);
-    },
-
-    /**
-     *
-     * @param keySelector
-     * @param comparer
-     * @returns {*}
-     */
-    queryableOrderByDescending: function _orderByDescending(keySelector, comparer) {
-        var sortObj = [{ keySelector: keySelector, comparer: comparer, direction: 'desc' }];
-        return (0, _queryObjectCreators.createNewOrderedQueryableDelegator)(this, (0, _projectionFunctions.orderBy)(this, sortObj), sortObj);
-    },
-
-    /**
      *@type {function}
      */
-    queryableFlatten: function _flatten() {
+    flatten: function _flatten() {
         return (0, _queryObjectCreators.createNewQueryableDelegator)(this, (0, _projectionFunctions.flatten)(this));
     },
 
     /**
      *@type {function}
      */
-    queryableFlattenDeep: function _flattenDeep() {
+    deepFlatten: function _deepFlatten() {
         return (0, _queryObjectCreators.createNewQueryableDelegator)(this, (0, _projectionFunctions.deepFlatten)(this));
     },
 
@@ -1837,7 +1482,7 @@ var queryable = {
      * @param fn
      * @returns {*}
      */
-    queryableDeepMap: function _queryableDeepMap(fn) {
+    deepMap: function _deepMap(fn) {
         return (0, _queryObjectCreators.createNewQueryableDelegator)(this, (0, _projectionFunctions.deepMap)(this, fn));
     },
 
@@ -1846,7 +1491,7 @@ var queryable = {
      * @param enumerable
      * @returns {*}
      */
-    queryableAddFront: function _queryableAddFront(enumerable) {
+    addFront: function _addFront(enumerable) {
         return (0, _queryObjectCreators.createNewQueryableDelegator)(this, (0, _collationFunctions.addFront)(this, enumerable));
     },
 
@@ -1855,7 +1500,7 @@ var queryable = {
      * @param enumerable
      * @returns {*}
      */
-    queryableConcat: function _concat(enumerable) {
+    concat: function _concat(enumerable) {
         return (0, _queryObjectCreators.createNewQueryableDelegator)(this, (0, _collationFunctions.concat)(this, enumerable));
     },
 
@@ -1865,7 +1510,7 @@ var queryable = {
      * @param enumerable
      * @returns {*}
      */
-    queryableExcept: function _except(collection, enumerable) {
+    except: function _except(collection, enumerable) {
         return (0, _queryObjectCreators.createNewQueryableDelegator)(this, (0, _collationFunctions.except)(this, collection, enumerable));
     },
 
@@ -1878,7 +1523,7 @@ var queryable = {
      * @param comparer
      * @returns {*}
      */
-    queryableGroupJoin: function _groupJoin(inner, outerSelector, innerSelector, projector, comparer) {
+    groupJoin: function _groupJoin(inner, outerSelector, innerSelector, projector, comparer) {
         return (0, _queryObjectCreators.createNewQueryableDelegator)(this, (0, _collationFunctions.groupJoin)(this, inner, outerSelector, innerSelector, projector, comparer));
     },
 
@@ -1888,7 +1533,7 @@ var queryable = {
      * @param enumerable
      * @returns {*}
      */
-    queryableIntersect: function _intersect(collection, enumerable) {
+    intersect: function _intersect(collection, enumerable) {
         return (0, _queryObjectCreators.createNewQueryableDelegator)(this, (0, _collationFunctions.intersect)(this, collection, enumerable));
     },
 
@@ -1901,7 +1546,7 @@ var queryable = {
      * @param comparer
      * @returns {*}
      */
-    queryableJoin: function _join(inner, outerSelector, innerSelector, projector, comparer) {
+    join: function _join(inner, outerSelector, innerSelector, projector, comparer) {
         return (0, _queryObjectCreators.createNewQueryableDelegator)(this, (0, _collationFunctions.join)(this, inner, outerSelector, innerSelector, projector, comparer));
     },
 
@@ -1911,7 +1556,7 @@ var queryable = {
      * @param enumerable
      * @returns {*}
      */
-    queryableUnion: function _union(collection, enumerable) {
+    union: function _union(collection, enumerable) {
         return (0, _queryObjectCreators.createNewQueryableDelegator)(this, (0, _collationFunctions.union)(this, collection, enumerable));
     },
 
@@ -1921,7 +1566,7 @@ var queryable = {
      * @param enumerable
      * @returns {*}
      */
-    queryableZip: function _zip(selector, enumerable) {
+    zip: function _zip(selector, enumerable) {
         return (0, _queryObjectCreators.createNewQueryableDelegator)(this, (0, _collationFunctions.zip)(this, selector, enumerable));
     },
 
@@ -1930,11 +1575,8 @@ var queryable = {
      * @param predicate
      * @returns {*}
      */
-    queryableWhere: function _where(predicate) {
+    where: function _where(predicate) {
         return (0, _queryObjectCreators.createNewQueryableDelegator)(this, (0, _limitationFunctions.where)(this, predicate));
-        /*var filterExpression = expressionManager.isPrototypeOf(field) ? field : Object.create(expressionManager).createExpression(field, operator, value);
-        return createNewFilteredQueryableDelegator(this.source, this._pipeline.concat([{ fn: filterDataWrapper(filterExpression),
-            functionType: functionTypes.atomic, functionWrapper: basicAtomicFunctionWrapper }]), filterExpression);*/
     },
 
     /**
@@ -1942,7 +1584,7 @@ var queryable = {
      * @param type
      * @returns {*}
      */
-    queryableOfType: function _queryableOfType(type) {
+    ofType: function _ofType(type) {
         return (0, _queryObjectCreators.createNewQueryableDelegator)(this, (0, _limitationFunctions.ofType)(this, type));
     },
 
@@ -1951,7 +1593,7 @@ var queryable = {
      * @param comparer
      * @returns {*}
      */
-    queryableDistinct: function _distinct(comparer) {
+    distinct: function _distinct(comparer) {
         return (0, _queryObjectCreators.createNewQueryableDelegator)(this, (0, _limitationFunctions.distinct)(this, comparer));
     },
 
@@ -1960,7 +1602,7 @@ var queryable = {
      * @param amt
      * @returns {Array}
      */
-    queryableTake: function _take(amt) {
+    take: function _take(amt) {
         //TODO: If I decide to 'save' not just a fully evaluated 'source', but also any data from a partially evaluated
         //TODO: 'source', then I'll probably have to re-think my strategy of wrapping each 'method's' iterator with
         //TODO: the standard queryable iterator as it may not work as needed.
@@ -1986,7 +1628,7 @@ var queryable = {
      * @param predicate
      * @returns {Array}
      */
-    queryableTakeWhile: function takeWhile(predicate = _helpers.defaultPredicate) {
+    takeWhile: function _takeWhile(predicate = _helpers.defaultPredicate) {
         var res = [],
             source = this.dataComputed ? this.evaluatedData : this;
 
@@ -2002,7 +1644,7 @@ var queryable = {
      * @param amt
      * @returns {*}
      */
-    queryableSkip: function skip(amt) {
+    skip: function _skip(amt) {
         var source = this.dataComputed ? this.evaluatedData : this.source,
             idx = 0,
             res = [];
@@ -2019,7 +1661,7 @@ var queryable = {
      * @param predicate
      * @returns {Array}
      */
-    queryableSkipWhile: function skipWhile(predicate = _helpers.defaultPredicate) {
+    skipWhile: function _skipWhile(predicate = _helpers.defaultPredicate) {
         var source = this.dataComputed ? this.evaluatedData : this.source,
             hasFailed = false,
             res = [];
@@ -2036,7 +1678,7 @@ var queryable = {
      * @param predicate
      * @returns {*}
      */
-    queryableAny: function _any(predicate = _helpers.defaultPredicate) {
+    any: function _any(predicate = _helpers.defaultPredicate) {
         return (0, _evaluationFunctions.any)(this, predicate);
     },
 
@@ -2045,7 +1687,7 @@ var queryable = {
      * @param predicate
      * @returns {*}
      */
-    queryableAll: function _all(predicate = _helpers.defaultPredicate) {
+    all: function _all(predicate = _helpers.defaultPredicate) {
         return (0, _evaluationFunctions.all)(this, predicate);
     },
 
@@ -2055,7 +1697,7 @@ var queryable = {
      * @param comparer
      * @returns {*}
      */
-    queryableContains: function _queryableContains(val, comparer) {
+    contains: function _contains(val, comparer) {
         return (0, _evaluationFunctions.contains)(this, val, comparer);
     },
 
@@ -2064,7 +1706,7 @@ var queryable = {
      * @param predicate
      * @returns {*}
      */
-    queryableFirst: function _first(predicate = _helpers.defaultPredicate) {
+    first: function _first(predicate = _helpers.defaultPredicate) {
         return (0, _evaluationFunctions.first)(this, predicate);
     },
 
@@ -2074,7 +1716,7 @@ var queryable = {
      * @param initial
      * @returns {*}
      */
-    queryableFold: function _queryableFold(fn, initial) {
+    fold: function _fold(fn, initial) {
         return (0, _evaluationFunctions.fold)(this, fn, initial);
     },
 
@@ -2083,7 +1725,7 @@ var queryable = {
      * @param predicate
      * @returns {*}
      */
-    queryableLast: function _last(predicate = _helpers.defaultPredicate) {
+    last: function _last(predicate = _helpers.defaultPredicate) {
         return (0, _evaluationFunctions.last)(this, predicate);
     },
 
@@ -2091,7 +1733,7 @@ var queryable = {
      *
      * @returns {*}
      */
-    queryableLength: function _queryableLength() {
+    count: function _count() {
         return (0, _evaluationFunctions.count)(this);
     },
 
@@ -2099,7 +1741,7 @@ var queryable = {
      *
      * @returns {Array}
      */
-    queryableToArray: function _toArray() {
+    toArray: function _toArray() {
         return Array.from(this);
     },
 
@@ -2107,7 +1749,7 @@ var queryable = {
      *
      * @returns {Set}
      */
-    queryableToSet: function _toSet() {
+    toSet: function _toSet() {
         return new Set(this);
     },
 
@@ -2115,7 +1757,7 @@ var queryable = {
      *
      * @returns {Array.<*>}
      */
-    queryableReverse: function _reverse() {
+    reverse: function _reverse() {
         return Array.from(this).reverse();
     },
 
@@ -2127,25 +1769,42 @@ var queryable = {
     }
 };
 
-/*
-function createEvaledDateProperty(obj) {
-    var data = null;
-    Object.defineProperty(
-        obj,
-        'evaledData', {
-            get: function _getEvaledData() {
-                return data;
-            },
-            set: function _setEvaledData(val) {
-                data = val;
-            }
-        }
-    );
-}
-*/
+var queryable = Object.create(queryable_core);
 
+queryable.orderBy = function _orderBy(keySelector, comparer) {
+    var sortObj = [{ keySelector: keySelector, comparer: comparer, direction: 'asc' }];
+    return (0, _queryObjectCreators.createNewOrderedQueryableDelegator)(this, (0, _projectionFunctions.orderBy)(this, sortObj), sortObj);
+};
+
+queryable.orderByDescending = function _orderByDescending(keySelector, comparer) {
+    var sortObj = [{ keySelector: keySelector, comparer: comparer, direction: 'desc' }];
+    return (0, _queryObjectCreators.createNewOrderedQueryableDelegator)(this, (0, _projectionFunctions.orderBy)(this, sortObj), sortObj);
+};
+
+var orderedQueryable = Object.create(queryable_core);
+
+orderedQueryable._appliedSort = [];
+
+//In these two functions, feeding the call to "orderBy" with the .source property of the queryable delegate
+//rather than the delegate itself, effectively excludes the previous call to the orderBy/orderByDescending
+//since the iterator exists on the delegate, not on its source. Each subsequent call to thenBy/thenByDescending
+//will continue to exclude the previous call's iterator... effectively what we're doing is ignoring all the
+//prior calls made to orderBy/orderByDescending/thenBy/thenByDescending and calling it once but with an array
+//of the the requested sorts.
+orderedQueryable.thenBy = function _thenBy(keySelector, comparer) {
+    var sortObj = this._appliedSorts.concat({ keySelector: keySelector, comparer: comparer, direction: 'asc' });
+    return (0, _queryObjectCreators.createNewOrderedQueryableDelegator)(this.source, (0, _projectionFunctions.orderBy)(this, sortObj), sortObj);
+};
+
+orderedQueryable.thenByDescending = function thenByDescending(keySelector, comparer) {
+    var sortObj = this._appliedSorts.concat({ keySelector: keySelector, comparer: comparer, direction: 'desc' });
+    return (0, _queryObjectCreators.createNewOrderedQueryableDelegator)(this.source, (0, _projectionFunctions.orderBy)(this, sortObj), sortObj);
+};
+
+exports.queryable_core = queryable_core;
 exports.queryable = queryable;
+exports.orderedQueryable = orderedQueryable;
 
-},{"../collation/collationFunctions":2,"../evaluation/evaluationFunctions":14,"../functionalHelpers":18,"../helpers":19,"../limitation/limitationFunctions":22,"../projection/projectionFunctions":31,"./queryObjectCreators":34}]},{},[20])
+},{"../collation/collationFunctions":2,"../evaluation/evaluationFunctions":14,"../functionalHelpers":18,"../helpers":19,"../limitation/limitationFunctions":22,"../projection/projectionFunctions":31,"./queryObjectCreators":33}]},{},[20])
 
 //# sourceMappingURL=index.js.map
