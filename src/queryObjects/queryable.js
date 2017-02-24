@@ -52,12 +52,24 @@ import { isArray, wrap } from '../functionalHelpers';
  * }}
  */
 var queryable_core = {
+    //source: [],
+    //evaluatedData: null,
+    //dataComputed: false
+
     //TODO: 1) See about initializing the queryable object with the _evaluatedData and _dataComputed
     //TODO:    properties upfront and making them non-enumerable.
     //TODO: 2) See if, via closure, I can bypass the need for getters/setters for properties that can
     //TODO:    ultimately be read and written to directly with a getter/setter property that maintains
     //TODO:    its own internal state - this would probably need to be done via Object.defineProperty
     //TODO:    as the closure would have to be shared amongst both the getter and setter
+    get source() {
+        return this._source;
+    },
+
+    set source(val) {
+        this._source = val;
+    },
+
     /**
      * Getter for underlying _evaluatedData field; Holds an array of data
      * after enumerating the queryable delegator instance's source

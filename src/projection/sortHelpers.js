@@ -1,4 +1,4 @@
-import { comparator, dataTypeValueNormalizer, cloneData, comparisons, defaultEqualityComparer } from '../helpers';
+import { cloneData, defaultEqualityComparer } from '../helpers';
 import { not } from '../functionalHelpers';
 
 function sortData(data, sortObject) {
@@ -15,6 +15,10 @@ function sortData(data, sortObject) {
                     itemsToSort.push(item);
                 else {
                     if (itemsToSort.length === 1) sortedSubData = sortedSubData.concat(itemsToSort);
+                    else if (itemsToSort.length === 2) {
+                        sortedSubData = comparer(sort.keySelector(itemsToSort[0]), sort.keySelector(itemsToSort[1])) ? 
+                            sortedSubData.concat(itemsToSort) : sortedSubData.concat(itemsToSort.reverse());
+                    }
                     else {
                         sortedSubData = sortedSubData.concat(mergeSort(itemsToSort, sort.keySelector, comparer));
                     }

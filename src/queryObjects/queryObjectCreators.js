@@ -3,20 +3,21 @@ import { generatorProto } from '../helpers';
 
 function createNewQueryableDelegator(source, iterator) {
     var obj = Object.create(queryable);
-    obj.dataComputed = false;
-    obj.source = source;
+    obj._dataComputed = false;
+    obj._source = source;
+    obj._evaluatedData = null;
     //if the iterator param has been passed and is a generator, set it as the object's
     //iterator; other wise let the object delegate to the queryable's iterator
     if (iterator && generatorProto.isPrototypeOf(iterator))
         obj[Symbol.iterator] = iterator;
-    tmpGetter(obj);
     return addGetter(obj);
 }
 
 function createNewOrderedQueryableDelegator(source, iterator, sortObj) {
     var obj = Object.create(orderedQueryable);
-    obj.source = source;
-    obj.dataComputed = false;
+    obj._source = source;
+    obj._dataComputed = false;
+    obj._evaluatedData = null;
     //Need to maintain a list of all the sorts that have been applied; effectively,
     //the underlying sorting function will only be called a single time for
     //all sorts.
@@ -50,38 +51,34 @@ function addGetter(obj) {
 }
 
 function tmpGetter(obj) {
-    var evaluatedData = null,
-        dataComputed = false,
-        source;
-
     return Object.defineProperties(
         obj, {
-            'tmp_evaluatedData': {
+            'evaluatedData': {
                 get: function _getEvaluatedData() {
-                    return evaluatedData;
+                    return this._evaluatedData;
                 },
                 set: function _setEvaluatedData(val) {
-                    evaluatedData = val;
-                    dataComputed = true;
+                    this._evaluatedData = val;
+                    this._dataComputed = true;
                 }
             },
-            'tmp_dataComputed': {
+            'dataComputed': {
                 get: function _getDataComputed() {
-                    return dataComputed;
+                    return this._dataComputed;
                 },
                 set: function _setDataComputed(val) {
-                    dataComputed = val;
+                    this._dataComputed = val;
                 }
             },
-            'tmp_source': {
+            'source': {
                 get: function _getSource() {
-                    return source;
+                    return this._source;
                 },
                 set: function _setSource(val) {
-                    source = val;
+                    this._source = val;
                 }
             },
-            'tmp_data': {
+            'data': {
                 get: function _data() {
                     //TODO: not sure if I plan on 'saving' the eval-ed data of a queryable object, and if I do, it'll take a different
                     //TODO: form that what is currently here; for now I am going to leave the check for pre-eval-ed data in place
