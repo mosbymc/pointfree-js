@@ -11,12 +11,14 @@ function sortData(data, sortObject) {
                 itemsToSort = [],
                 prevKeySelector = sortObject[index - 1].keySelector;
             sortedData.forEach(function _sortData(item, idx) {
+                //TODO: re-examine this logic; I think it is in reverse order
                 if (!itemsToSort.length || defaultEqualityComparer(prevKeySelector(itemsToSort[0]), prevKeySelector(item)))
                     itemsToSort.push(item);
                 else {
+                    //TODO: see if there's a realistic way that length === 1 || 2 could be combined into one statement
                     if (itemsToSort.length === 1) sortedSubData = sortedSubData.concat(itemsToSort);
                     else if (itemsToSort.length === 2) {
-                        sortedSubData = comparer(sort.keySelector(itemsToSort[0]), sort.keySelector(itemsToSort[1])) ? 
+                        sortedSubData = comparer(sort.keySelector(itemsToSort[0]), sort.keySelector(itemsToSort[1])) ?
                             sortedSubData.concat(itemsToSort) : sortedSubData.concat(itemsToSort.reverse());
                     }
                     else {
