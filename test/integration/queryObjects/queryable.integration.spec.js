@@ -67,10 +67,10 @@ describe('Test queryable object function chaining', function testQueryable() {
         q4.dataComputed.should.be.false;
         expect(queryable.isPrototypeOf(q4)).to.be.true;
 
-        expect(q1.evaluatedData).to.be.null;
-        expect(q2.evaluatedData).to.be.null;
-        expect(q3.evaluatedData).to.be.null;
-        expect(q4.evaluatedData).to.be.null;
+        expect(q1.evaluatedData).to.be.undefined;
+        expect(q2.evaluatedData).to.be.undefined;
+        expect(q3.evaluatedData).to.be.undefined;
+        expect(q4.evaluatedData).to.be.undefined;
 
         var q1Data = q1.data,
             q2Data = q2.data,
