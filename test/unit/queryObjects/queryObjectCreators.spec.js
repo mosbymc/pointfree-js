@@ -31,7 +31,7 @@ describe('createNewQueryableDelegator', function testQueryableDelegatorObjectCre
 
         //Properties that should be present
         //queryDelegator._data.should.eql(testData.dataSource.data);
-        expect(queryDelegator.evaluatedData).to.be.null;
+        expect(queryDelegator.evaluatedData).to.be.undefined;
         queryDelegator.dataComputed.should.be.false;
 
         //Functions that should be present
@@ -237,7 +237,7 @@ describe('createNewOrderedQueryableDelegator', function testCreateNewQueryableDe
 
         //Properties that should be present
         //queryDelegator._data.should.eql(testData.dataSource.data);
-        expect(orderedQueryDelegator.evaluatedData).to.be.null;
+        expect(orderedQueryDelegator.evaluatedData).to.be.undefined;
         orderedQueryDelegator.dataComputed.should.be.false;
 
         //Functions that should be present

@@ -62,10 +62,23 @@ var queryable_core = {
     //TODO:    ultimately be read and written to directly with a getter/setter property that maintains
     //TODO:    its own internal state - this would probably need to be done via Object.defineProperty
     //TODO:    as the closure would have to be shared amongst both the getter and setter
+
+    //Using getters for these properties because there's a chance the setting and/or getting
+    //functionality could change; this will allow for a consistent interface while the
+    //logic beneath changes
+
+    /**
+     * Getter for the underlying source object of the queryable
+     * @returns {*}
+     */
     get source() {
         return this._source;
     },
 
+    /**
+     * 
+     * @param val
+     */
     set source(val) {
         this._source = val;
     },
