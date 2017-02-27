@@ -1,7 +1,7 @@
-import { defaultEqualityComparer, memoizer2 } from '../helpers';
+import { defaultEqualityComparer, memoizer } from '../helpers';
 
 function distinct(source, comparer = defaultEqualityComparer) {
-    var havePreviouslyViewed = memoizer2(comparer);
+    var havePreviouslyViewed = memoizer(comparer);
 
     return function *distinctIterator() {
         for (let item of source) {

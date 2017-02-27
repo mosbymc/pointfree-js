@@ -10,13 +10,18 @@ import { isArray, wrap } from '../functionalHelpers';
 //TODO: are wanting to display both functions on the delegate and on the prototype(s).
 
 /**
- *
+ * Object that contains the core functionality; both the queryable and orderedQueryable
+ * objects delegate to this object for all functionality besides orderBy/orderByDescending
+ * and thenBy/thenByDescending respectively. Getter/setters are present for state-manipulation
+ * at the consumer-object level, as well as to provide default values for a consumer-level
+ * object at creation if not specified.
  * @type {{
- * source, source,
- * evaluatedData: *, evaluatedData: *,
- * dataComputed: *, dataComputed: *,
- * extend: queryable_core._extend,
- * from: queryable_core._from,
+ * source,
+ * source,
+ * evaluatedData: *,
+ * evaluatedData: *,
+ * dataComputed: *,
+ * dataComputed: *,
  * map: queryable_core._map,
  * groupBy: queryable_core._groupBy,
  * groupByDescending: queryable_core._groupByDescending,
@@ -52,17 +57,6 @@ import { isArray, wrap } from '../functionalHelpers';
  * }}
  */
 var queryable_core = {
-    //source: [],
-    //evaluatedData: null,
-    //dataComputed: false
-
-    //TODO: 1) See about initializing the queryable object with the _evaluatedData and _dataComputed
-    //TODO:    properties upfront and making them non-enumerable.
-    //TODO: 2) See if, via closure, I can bypass the need for getters/setters for properties that can
-    //TODO:    ultimately be read and written to directly with a getter/setter property that maintains
-    //TODO:    its own internal state - this would probably need to be done via Object.defineProperty
-    //TODO:    as the closure would have to be shared amongst both the getter and setter
-
     //Using getters for these properties because there's a chance the setting and/or getting
     //functionality could change; this will allow for a consistent interface while the
     //logic beneath changes
@@ -76,7 +70,7 @@ var queryable_core = {
     },
 
     /**
-     * 
+     * Setter for the underlying source object of the queryable
      * @param val
      */
     set source(val) {
@@ -119,49 +113,6 @@ var queryable_core = {
      */
     set dataComputed(val) {
         this._dataComputed = val;
-    },
-
-    /**
-     * Extension function that allows new functionality to be applied to
-     * the queryable object
-     * @param {string} propName - The name of the new queryable property; must be unique
-     * @param {function} fn - A function that defines the new queryable functionality and
-     * will be called when this new queryable property is invoked.
-     *
-     * NOTE: The fn parameter must be a non-generator function that take one or more
-     * arguments and returns a generator function that knows how to iterate the data
-     * and yield out each item one at a time. The first argument must be the 'source'
-     * argument of the function which will be what the returned generator must iterate
-     * in order to retrieve the items it work work on. The function may work on all
-     * the data as a single set, or it can iterate it's queryable source and apply the
-     * functionality to a single item before yielding that item and calling for the next.
-     */
-    extend: function _extend(propName, fn) {
-        if (!queryable[propName]) {
-            queryable[propName] = function(...args) {
-                return createNewQueryableDelegator(this, fn(this, ...args));
-            };
-        }
-    },
-
-    /**
-     * Creates a new queryable delegator object from whatever source value is provided.
-     * @param {*} source - The source argument can be any JavaScript value. It will default
-     * to an empty array if 'undefined' is passed. If the source argument is a generator,
-     * an array, or another queryable, the function will accept it as is; if the source
-     * argument has a [Symbol.iterator] definition, it will call Array.from on the source
-     * before creating a new delegator, otherwise it will wrap the source argument in
-     * as array.
-     * @returns { Object } Returns a new queryable delegator object with its source set
-     * to the value of the provided source argument
-     */
-    from: function _from(source = []) {
-        //... if the source is a generator, an array, or another queryable, accept it as is...
-        if (generatorProto.isPrototypeOf(source) || isArray(source) || queryable_core.isPrototypeOf(source))
-            return createNewQueryableDelegator(source);
-        //... otherwise, turn the source into an array before creating a new queryable delegator object;
-        //if it has an iterator, use Array.from, else wrap the source arg in an array...
-        return createNewQueryableDelegator(null !== source && source[Symbol.iterator] ? Array.from(source) : wrap(source));
     },
 
     /**
@@ -340,7 +291,7 @@ var queryable_core = {
         //TODO: the standard queryable iterator as it may not work as needed.
         //TODO:
         //TODO: I'll also have to change this 'method' as it should take as much of the pre-evaluated data as possible
-        //TODO: before evaluating any remaining data the it needs from the source.
+        //TODO: before evaluating any remaining data that it needs from the source.
         if (!amt) return [];
         if (!this.dataComputed) {
             var res = [],
@@ -502,29 +453,44 @@ var queryable_core = {
     },
 
     /**
-     *
+     * Base iterator to which all queryable_core delegator objects
+     * delegate to for iteration if for some reason an iterator wasn't
+     * set on the delegator at the time of creation.
      */
     [Symbol.iterator]: function *_iterator() {
-        for (let item of this.source)
+        var data = Array.from(this.source);
+        for (let item of data)
             yield item;
     }
 };
 
-var queryable = Object.create(queryable_core);
+var internal_queryable = Object.create(queryable_core);
 
-queryable.orderBy = function _orderBy(keySelector, comparer) {
+/**
+ *
+ * @param keySelector
+ * @param comparer
+ * @returns {*}
+ */
+internal_queryable.orderBy = function _orderBy(keySelector, comparer) {
     var sortObj = [{ keySelector: keySelector, comparer: comparer, direction: 'asc' }];
     return createNewOrderedQueryableDelegator(this, orderBy(this, sortObj), sortObj);
 };
 
-queryable.orderByDescending = function _orderByDescending(keySelector, comparer) {
+/**
+ *
+ * @param keySelector
+ * @param comparer
+ * @returns {*}
+ */
+internal_queryable.orderByDescending = function _orderByDescending(keySelector, comparer) {
     var sortObj = [{ keySelector: keySelector, comparer: comparer, direction: 'desc' }];
     return createNewOrderedQueryableDelegator(this, orderBy(this, sortObj), sortObj);
 };
 
-var orderedQueryable = Object.create(queryable_core);
+var internal_orderedQueryable = Object.create(queryable_core);
 
-orderedQueryable._appliedSort = [];
+internal_orderedQueryable._appliedSort = [];
 
 //In these two functions, feeding the call to "orderBy" with the .source property of the queryable delegate
 //rather than the delegate itself, effectively excludes the previous call to the orderBy/orderByDescending
@@ -532,14 +498,88 @@ orderedQueryable._appliedSort = [];
 //will continue to exclude the previous call's iterator... effectively what we're doing is ignoring all the
 //prior calls made to orderBy/orderByDescending/thenBy/thenByDescending and calling it once but with an array
 //of the the requested sorts.
-orderedQueryable.thenBy = function _thenBy(keySelector, comparer) {
+
+/**
+ *
+ * @param keySelector
+ * @param comparer
+ * @returns {*}
+ */
+internal_orderedQueryable.thenBy = function _thenBy(keySelector, comparer) {
     var sortObj = this._appliedSorts.concat({ keySelector: keySelector, comparer: comparer, direction: 'asc' });
     return createNewOrderedQueryableDelegator(this.source, orderBy(this, sortObj), sortObj);
 };
 
-orderedQueryable.thenByDescending = function thenByDescending(keySelector, comparer) {
+/**
+ *
+ * @param keySelector
+ * @param comparer
+ * @returns {*}
+ */
+internal_orderedQueryable.thenByDescending = function thenByDescending(keySelector, comparer) {
     var sortObj = this._appliedSorts.concat({ keySelector: keySelector, comparer: comparer, direction: 'desc' });
     return createNewOrderedQueryableDelegator(this.source, orderBy(this, sortObj), sortObj);
 };
 
-export { queryable_core, queryable, orderedQueryable };
+//TODO: consider added a function property to this object that can create a new consumer-level
+//TODO: so that the queryable_core object can call that function for each deferred execution
+//TODO: function rather than creating the consumer-level objects itself. This may to resolve
+//TODO: the circular dependency that I am dealing with between queryable_core, queryObjectCreators
+//TODO: function, and the internal_queryable/internal_orderedQueryable objects.
+/**
+ *
+ * @type {{
+ *      extend: queryable._extend,
+ *      from: queryable._from
+ * }}
+ */
+var queryable = {
+    /**
+     * Extension function that allows new functionality to be applied to
+     * the queryable object
+     * @param {string} propName - The name of the new queryable property; must be unique
+     * @param {function} fn - A function that defines the new queryable functionality and
+     * will be called when this new queryable property is invoked.
+     *
+     * NOTE: The fn parameter must be a non-generator function that takes one or more
+     * arguments and returns a generator function that knows how to iterate the data
+     * and yield out each item one at a time. The first argument must be the 'source'
+     * argument of the function which will be what the returned generator must iterate
+     * in order to retrieve the items it work work on. The function may work on all
+     * the data as a single set, or it can iterate it's queryable source and apply the
+     * functionality to a single item before yielding that item and calling for the next.
+     * The source argument may be any iterable object, generally an array or another
+     * queryable; the returned generator needs either turn the iterable into an array
+     * using Array#from if all the data is needed up front, or iterate the source in
+     * a for-of loop if each item is only needed one-at-a-time.
+     */
+    extend: function _extend(propName, fn) {
+        if (!queryable_core[propName]) {
+            queryable_core[propName] = function(...args) {
+                return createNewQueryableDelegator(this, fn(this, ...args));
+            };
+        }
+    },
+
+    /**
+     * Creates a new queryable delegator object from whatever source value is provided.
+     * @param {*} source - The source argument can be any JavaScript value. It will default
+     * to an empty array if 'undefined' is passed. If the source argument is a generator,
+     * an array, or another queryable, the function will accept it as is; if the source
+     * argument has a [Symbol.iterator] definition, it will call Array.from on the source
+     * before creating a new delegator, otherwise it will wrap the source argument in
+     * as array.
+     * @returns { Object } Returns a new queryable delegator object with its source set
+     * to the value of the provided source argument
+     */
+    from: function _from(source = []) {
+        //... if the source is a generator, an array, or another queryable, accept it as is...
+        if (generatorProto.isPrototypeOf(source) || isArray(source) || queryable_core.isPrototypeOf(source))
+            return createNewQueryableDelegator(source);
+        //... otherwise, turn the source into an array before creating a new queryable delegator object;
+        //if it has an iterator, use Array.from, else wrap the source arg in an array...
+        return createNewQueryableDelegator(null !== source && source[Symbol.iterator] ? Array.from(source) : wrap(source));
+    }
+};
+
+export { queryable_core, internal_queryable, internal_orderedQueryable, queryable };

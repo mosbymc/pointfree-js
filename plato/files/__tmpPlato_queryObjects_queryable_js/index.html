@@ -44,11 +44,11 @@
   <div class="row">
     <div class="col-md-6">
       <h2 class="header">Maintainability <a href="http://blogs.msdn.com/b/codeanalysis/archive/2007/11/20/maintainability-index-range-and-meaning.aspx"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="A value between 0 and 100 that represents the relative ease of maintaining the code. A high value means better maintainability." data-original-title="Maintainability Index"  data-container="body"></i></a></h2>
-      <p class="stat">80.07</p>
+      <p class="stat">78.24</p>
     </div>
     <div class="col-md-6">
       <h2 class="header">Lines of code <i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="Source Lines of Code / Logical Lines of Code" data-original-title="SLOC/LSLOC" data-container="body"></i></h2>
-      <p class="stat">253</p>
+      <p class="stat">255</p>
     </div>
   </div>
   <div class="row historical">
@@ -62,11 +62,11 @@
   <div class="row">
     <div class="col-md-6">
       <h2 class="header">Difficulty  <a href="http://en.wikipedia.org/wiki/Halstead_complexity_measures"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="The difficulty measure is related to the difficulty of the program to write or understand." data-original-title="Difficulty" data-container="body"></i></a></h2>
-      <p class="stat">49.87</p>
+      <p class="stat">64.34</p>
     </div>
     <div class="col-md-6">
       <h2 class="header">Estimated Errors  <a href="http://en.wikipedia.org/wiki/Halstead_complexity_measures"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="Halstead's delivered bugs is an estimate for the number of errors in the implementation." data-original-title="Delivered Bugs" data-container="body"></i></a></h2>
-      <p class="stat">2.24</p>
+      <p class="stat">2.45</p>
     </div>
   </div>
 </div>
@@ -92,14 +92,13 @@
     <textarea id="file-source" class="col-md-12">import { addFront, concat, except, groupJoin, intersect, join, union, zip } from &#039;../collation/collationFunctions&#039;;
 import { all, any, contains, first, fold, last, count } from &#039;../evaluation/evaluationFunctions&#039;;
 import { distinct, ofType, where } from &#039;../limitation/limitationFunctions&#039;;
-import { deepFlatten, deepMap, flatten, groupBy, map, orderBy } from &#039;../projection/projectionFunctions&#039;;
+import { deepFlatten, deepMap, flatten, groupBy, orderBy, map } from &#039;../projection/projectionFunctions&#039;;
 import { createNewQueryableDelegator, createNewOrderedQueryableDelegator } from &#039;./queryObjectCreators&#039;;
 import { generatorProto, defaultPredicate } from &#039;../helpers&#039;;
 import { isArray, wrap } from &#039;../functionalHelpers&#039;;
 
 
-
-var queryable = {
+var queryable_core = {
 
     get source() {
         return this._source;
@@ -126,101 +125,77 @@ var queryable = {
         this._dataComputed = val;
     },
 
-    extend: function _extend(propName, fn) {
-        if (!queryable[propName]) {
-            queryable[propName] = function(...args) {
-                return createNewQueryableDelegator(this, fn(this, ...args));
-            };
-        }
-    },
-
-    from: function _from(source = []) {
-        if (generatorProto.isPrototypeOf(source) || isArray(source) || queryable.isPrototypeOf(source))
-            return createNewQueryableDelegator(source);
-        return createNewQueryableDelegator(null !== source &amp;&amp; source[Symbol.iterator] ? Array.from(source) : wrap(source));
-    },
-
-    queryableMap: function _queryableMap(mapFunc) {
+    map: function _map(mapFunc) {
         return createNewQueryableDelegator(this, map(this, mapFunc));
     },
 
-    queryableGroupBy: function _groupBy(keySelector, comparer) {
+    groupBy: function _groupBy(keySelector, comparer) {
         var groupObj = [{ keySelector: keySelector, comparer: comparer, direction: &#039;asc&#039; }];
         return createNewQueryableDelegator(this, groupBy(this, groupObj));
     },
 
-    queryableGroupByDescending: function _groupByDescending(keySelector, comparer) {
-         var groupObj = [{ keySelector: keySelector, comparer: comparer, direction: &#039;desc&#039; }];
-         return createNewQueryableDelegator(this, groupBy(this, groupObj));
+    groupByDescending: function _groupByDescending(keySelector, comparer) {
+        var groupObj = [{ keySelector: keySelector, comparer: comparer, direction: &#039;desc&#039; }];
+        return createNewQueryableDelegator(this, groupBy(this, groupObj));
     },
 
-    queryableOrderBy: function _orderBy(keySelector, comparer) {
-        var sortObj = [{ keySelector: keySelector, comparer: comparer, direction: &#039;asc&#039; }];
-        return createNewOrderedQueryableDelegator(this, orderBy(this, sortObj), sortObj);
-    },
-
-    queryableOrderByDescending: function _orderByDescending(keySelector, comparer) {
-        var sortObj = [{ keySelector: keySelector, comparer: comparer, direction: &#039;desc&#039; }];
-        return createNewOrderedQueryableDelegator(this, orderBy(this, sortObj), sortObj);
-    },
-
-    queryableFlatten: function _flatten() {
+    flatten: function _flatten() {
         return createNewQueryableDelegator(this, flatten(this));
     },
 
-    queryableFlattenDeep: function _flattenDeep() {
+    deepFlatten: function _deepFlatten() {
         return createNewQueryableDelegator(this, deepFlatten(this));
     },
 
-    queryableDeepMap: function _queryableDeepMap(fn) {
+    deepMap: function _deepMap(fn) {
         return createNewQueryableDelegator(this, deepMap(this, fn));
     },
 
-    queryableAddFront: function _queryableAddFront(enumerable) {
+    addFront: function _addFront(enumerable) {
         return createNewQueryableDelegator(this, addFront(this, enumerable));
     },
 
-    queryableConcat: function _concat(enumerable) {
+    concat: function _concat(enumerable) {
         return createNewQueryableDelegator(this, concat(this, enumerable));
     },
 
-    queryableExcept: function _except(collection, enumerable) {
+    except: function _except(collection, enumerable) {
         return createNewQueryableDelegator(this, except(this, collection, enumerable));
     },
 
-    queryableGroupJoin: function _groupJoin(inner, outerSelector, innerSelector, projector, comparer) {
+    groupJoin: function _groupJoin(inner, outerSelector, innerSelector, projector, comparer) {
         return createNewQueryableDelegator(this, groupJoin(this, inner, outerSelector, innerSelector, projector, comparer));
     },
 
-    queryableIntersect: function _intersect(collection, enumerable) {
+    intersect: function _intersect(collection, enumerable) {
         return createNewQueryableDelegator(this, intersect(this, collection, enumerable));
     },
 
-    queryableJoin: function _join(inner, outerSelector, innerSelector, projector, comparer) {
+    join: function _join(inner, outerSelector, innerSelector, projector, comparer) {
         return createNewQueryableDelegator(this, join(this, inner, outerSelector, innerSelector, projector, comparer));
     },
 
-    queryableUnion: function _union(collection, enumerable) {
+    union: function _union(collection, enumerable) {
         return createNewQueryableDelegator(this, union(this, collection, enumerable));
     },
 
-    queryableZip: function _zip(selector, enumerable) {
+    zip: function _zip(selector, enumerable) {
         return createNewQueryableDelegator(this, zip(this, selector, enumerable));
     },
 
-    queryableWhere: function _where(predicate) {
+    where: function _where(predicate) {
         return createNewQueryableDelegator(this, where(this, predicate));
     },
 
-    queryableOfType: function _queryableOfType(type) {
+    ofType: function _ofType(type) {
         return createNewQueryableDelegator(this, ofType(this, type));
     },
 
-    queryableDistinct: function _distinct(comparer) {
+    distinct: function _distinct(comparer) {
         return createNewQueryableDelegator(this, distinct(this, comparer));
     },
 
-    queryableTake: function _take(amt) {
+    take: function _take(amt) {
         if (!amt) return [];
         if (!this.dataComputed) {
             var res = [],
@@ -238,7 +213,7 @@ var queryable = {
         return this.evaluatedData.slice(0, amt);
     },
 
-    queryableTakeWhile: function takeWhile(predicate = defaultPredicate) {
+    takeWhile: function _takeWhile(predicate = defaultPredicate) {
         var res = [],
             source = this.dataComputed ? this.evaluatedData : this;
 
@@ -251,7 +226,7 @@ var queryable = {
         }
     },
 
-    queryableSkip: function skip(amt) {
+    skip: function _skip(amt) {
         var source = this.dataComputed ? this.evaluatedData : this.source,
             idx = 0,
             res = [];
@@ -264,7 +239,7 @@ var queryable = {
         return res;
     },
 
-    queryableSkipWhile: function skipWhile(predicate = defaultPredicate) {
+    skipWhile: function _skipWhile(predicate = defaultPredicate) {
         var source = this.dataComputed ? this.evaluatedData : this.source,
             hasFailed = false,
             res = [];
@@ -278,70 +253,97 @@ var queryable = {
         return res;
     },
 
-    queryableAny: function _any(predicate = defaultPredicate) {
+    any: function _any(predicate = defaultPredicate) {
         return any(this, predicate);
     },
 
-    queryableAll: function _all(predicate = defaultPredicate) {
+    all: function _all(predicate = defaultPredicate) {
         return all(this, predicate);
     },
 
-    queryableContains: function _queryableContains(val, comparer) {
+    contains: function _contains(val, comparer) {
         return contains(this, val, comparer);
     },
 
-    queryableFirst: function _first(predicate = defaultPredicate) {
+    first: function _first(predicate = defaultPredicate) {
         return first(this, predicate);
     },
 
-    queryableFold: function _queryableFold(fn, initial) {
+    fold: function _fold(fn, initial) {
         return fold(this, fn, initial);
     },
 
-    queryableLast: function _last(predicate = defaultPredicate) {
+    last: function _last(predicate = defaultPredicate) {
         return last(this, predicate);
     },
 
-    queryableLength: function _queryableLength() {
+    count: function _count() {
         return count(this);
     },
 
-    queryablePush: function _queryablePush() {
-
-    },
-
-    queryablePop: function _queryablePop() {
-
-    },
-
-    queryableUnshift: function _queryableUnshift() {
-
-    },
-
-    queryableShift: function _queryableShift() {
-
-    },
-
-    queryableToArray: function _toArray() {
+    toArray: function _toArray() {
         return Array.from(this);
     },
 
-    queryableToSet: function _toSet() {
+    toSet: function _toSet() {
         return new Set(this);
     },
 
-    queryableReverse: function _reverse() {
+    reverse: function _reverse() {
         return Array.from(this).reverse();
     },
 
     [Symbol.iterator]: function *_iterator() {
-        for (let item of this.source)
+        var data = Array.from(this.source);
+        for (let item of data)
             yield item;
     }
 };
 
+var internal_queryable = Object.create(queryable_core);
 
-export { queryable };</textarea>
+internal_queryable.orderBy = function _orderBy(keySelector, comparer) {
+    var sortObj = [{ keySelector: keySelector, comparer: comparer, direction: &#039;asc&#039; }];
+    return createNewOrderedQueryableDelegator(this, orderBy(this, sortObj), sortObj);
+};
+
+internal_queryable.orderByDescending = function _orderByDescending(keySelector, comparer) {
+    var sortObj = [{ keySelector: keySelector, comparer: comparer, direction: &#039;desc&#039; }];
+    return createNewOrderedQueryableDelegator(this, orderBy(this, sortObj), sortObj);
+};
+
+var internal_orderedQueryable = Object.create(queryable_core);
+
+internal_orderedQueryable._appliedSort = [];
+
+
+internal_orderedQueryable.thenBy = function _thenBy(keySelector, comparer) {
+    var sortObj = this._appliedSorts.concat({ keySelector: keySelector, comparer: comparer, direction: &#039;asc&#039; });
+    return createNewOrderedQueryableDelegator(this.source, orderBy(this, sortObj), sortObj);
+};
+
+internal_orderedQueryable.thenByDescending = function thenByDescending(keySelector, comparer) {
+    var sortObj = this._appliedSorts.concat({ keySelector: keySelector, comparer: comparer, direction: &#039;desc&#039; });
+    return createNewOrderedQueryableDelegator(this.source, orderBy(this, sortObj), sortObj);
+};
+
+var queryable = {
+    extend: function _extend(propName, fn) {
+        if (!queryable_core[propName]) {
+            queryable_core[propName] = function(...args) {
+                return createNewQueryableDelegator(this, fn(this, ...args));
+            };
+        }
+    },
+
+    from: function _from(source = []) {
+        if (generatorProto.isPrototypeOf(source) || isArray(source) || queryable_core.isPrototypeOf(source))
+            return createNewQueryableDelegator(source);
+        return createNewQueryableDelegator(null !== source &amp;&amp; source[Symbol.iterator] ? Array.from(source) : wrap(source));
+    }
+};
+
+export { queryable_core, internal_queryable, internal_orderedQueryable, queryable };</textarea>
   </div>
 </div>
 

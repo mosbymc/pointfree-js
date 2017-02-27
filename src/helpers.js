@@ -1,19 +1,3 @@
-var functionTypes = {
-    atomic: 'atomic',
-    collective: 'collective',
-    initiatory: 'initiatory',
-    collation: 'collation',
-    evaluation: 'evaluation',
-    limitation: 'limitation',
-    projection: 'projection'
-};
-
-var operationTypes = {
-    atomic: 'atomic',
-    collective: 'collective',
-    initiatory: 'initiatory'
-};
-
 var javaScriptTypes = {
     'function': 'function',
     'object': 'object',
@@ -22,14 +6,6 @@ var javaScriptTypes = {
     'symbol': 'symbol',
     'string': 'string',
     'undefined': 'undefined'
-};
-
-var javaScriptPrimitiveTypes = {
-    'undefined': javaScriptTypes.undefined,
-    'number': javaScriptTypes.number,
-    'string': javaScriptTypes.string,
-    'boolean': javaScriptTypes.boolean,
-    'symbol': javaScriptTypes.symbol
 };
 
 var comparisons = {
@@ -70,8 +46,6 @@ var dataTypes = {
     dateTimeChar: '[\\d\\.:\\sAMP\\-\\/]'
 };
 
-var emptyObj = Object.create(null);
-
 function defaultEqualityComparer(a, b) {
     return a === b;
 }
@@ -86,21 +60,10 @@ function defaultPredicate() {
 
 var generatorProto = Object.getPrototypeOf(function *_generator(){});
 
-function memoizer() {
-    var cache = new Set();
-    return function memoizeForMeWillYa(item) {
-        if (!cache.has(item)) {
-            cache.add(item);
-            return false;
-        }
-        return true;
-    };
-}
-
 //TODO: this will have to be changed as the false value could be a legit value for a collection...
 //TODO:... I'm thinking reusing the 'flag' object to indicate the end of the list for the .next functions
 //TODO: should be reusable here to indicate a 'false' value
-function memoizer2(comparer) {
+function memoizer(comparer) {
     comparer = comparer || defaultEqualityComparer;
     //TODO: need to make another change here... ideally, no queryable function should ever pass an undefined value to
     //TODO: the memoizer, but I don't want to depend on that. The problem here is that, if the defaultEqualityComparer is
@@ -115,122 +78,6 @@ function memoizer2(comparer) {
         items[items.length] = item;
         return false;
     };
-}
-
-function comparator(type, val, base) {
-    switch (type) {
-        case 'eq':
-        case '===':
-            return val === base;
-        case '==':
-            return val == base;
-        case 'neq':
-        case '!==':
-            return val !== base;
-        case '!=':
-            return val != base;
-        case 'gte':
-        case '>=':
-            return val >= base;
-        case 'gt':
-        case '>':
-            return val > base;
-        case 'lte':
-        case '<=':
-            return val <= base;
-        case 'lt':
-        case '<':
-            return val < base;
-        case 'not':
-        case '!':
-        case 'falsey':
-            return !val;
-        case 'truthy':
-            return !!val;
-        case 'ct':
-            return !!~val.toString().toLowerCase().indexOf(base.toString().toLowerCase());
-        case 'nct':
-            return !~val.toString().toLowerCase().indexOf(base.toString().toLowerCase());
-        case 'startsWith':
-            return val.toString().substring(0, base.toString().length) === base.toString();
-        case 'endsWith':
-            return val.toString().substring((val.length - base.toString().length), val.length) === base.toString();
-    }
-}
-
-function dataTypeValueNormalizer(dataType, val) {
-    if (val == null) return val;
-    switch(dataType) {
-        case 'time':
-            var value = getNumbersFromTime(val);
-            if (val.indexOf('PM') > -1) value[0] += 12;
-            return convertTimeArrayToSeconds(value);
-        case 'datetime':
-            let dateTimeRegex = new RegExp(dataTypes.datetime),
-                execVal1;
-            if (dateTimeRegex.test(val)) {
-                execVal1 = dateTimeRegex.exec(val);
-
-                var dateComp1 = execVal1[2],
-                    timeComp1 = execVal1[42];
-                timeComp1 = getNumbersFromTime(timeComp1);
-                if (timeComp1[3] && timeComp1[3] === 'PM')
-                    timeComp1[0] += 12;
-                let month = execVal1[23] || execVal1[28],
-                    day = execVal1[25] || execVal1[26],
-                    year = execVal1[29];
-                dateComp1 = new Date(year, month, day);
-                return dateComp1.getTime() + convertTimeArrayToSeconds(timeComp1);
-            }
-            else return 0;
-        case 'number':
-            return parseFloat(val);
-        case 'date':
-            let dateRegex = new RegExp(dataTypes.date),
-                execVal;
-            if (dateRegex.test(val)) {
-                execVal = dateRegex.exec(val);
-                let day = execVal[23] || execVal[24],
-                    month = execVal[21] || execVal[26],
-                    year = execVal[27];
-                return new Date(year, month, day);
-            }
-            return new Date();
-        case 'boolean':
-        default:
-            return val.toString();
-    }
-}
-
-function getNumbersFromTime(val) {
-    var re = new RegExp("^(0?[1-9]|1[012])(?:(?:(:|\\.)([0-5]\\d))(?:\\2([0-5]\\d))?)?(?:(\\ [AP]M))$|^([01]?\\d|2[0-3])(?:(?:(:|\\.)([0-5]\\d))(?:\\7([0-5]\\d))?)$");
-    if (!re.test(val)) return [12, '00', '00','AM'];
-    var timeGroups = re.exec(val),
-        hours = timeGroups[1] ? +timeGroups[1] : +timeGroups[6],
-        minutes, seconds, meridiem, retVal = [];
-    if (timeGroups[2]) {
-        minutes = timeGroups[3] || '00';
-        seconds = timeGroups[4]  || '00';
-        meridiem = timeGroups[5].replace(' ', '') || null;
-    }
-    else if (timeGroups[6]) {
-        minutes = timeGroups[8] || '00';
-        seconds = timeGroups[9] || '00';
-    }
-    else{
-        minutes = '00';
-        seconds = '00';
-    }
-    retVal.push(hours);
-    retVal.push(minutes);
-    retVal.push(seconds);
-    if (meridiem) retVal.push(meridiem);
-    return retVal;
-}
-
-function convertTimeArrayToSeconds(timeArray) {
-    var hourVal = parseInt(timeArray[0].toString()) === 12 || parseInt(timeArray[0].toString()) === 24 ? parseInt(timeArray[0].toString()) - 12 : parseInt(timeArray[0]);
-    return 3660 * hourVal + 60 * parseInt(timeArray[1]) + parseInt(timeArray[2]);
 }
 
 function cloneData(data) { //Clones data so pass-by-reference doesn't mess up the values in other grids.
@@ -257,5 +104,5 @@ function cloneArray(arr) {
     return newArr;
 }
 
-export { functionTypes, javaScriptTypes, javaScriptPrimitiveTypes, comparisons, dataTypes, defaultEqualityComparer, defaultGreaterThanComparer, defaultPredicate, memoizer, memoizer2,
-    getNumbersFromTime, comparator, dataTypeValueNormalizer, cloneData, cloneArray, operationTypes, emptyObj, generatorProto };
+export { javaScriptTypes, comparisons, dataTypes, defaultEqualityComparer, defaultGreaterThanComparer, defaultPredicate, memoizer,
+    cloneData, cloneArray, generatorProto };

@@ -1,4 +1,4 @@
-import { queryable, orderedQueryable } from '../../../src/queryObjects/queryable';
+import { internal_queryable, internal_orderedQueryable } from '../../../src/queryObjects/queryable';
 import { createNewQueryableDelegator } from '../../../src/queryObjects/queryObjectCreators';
 import { testData } from '../../testData';
 
@@ -21,7 +21,7 @@ describe('Test queryable object function chaining', function testQueryable() {
                 return a.FirstName === b.FirstName;
             }).data;
 
-        expect(queryable.isPrototypeOf(queryRes)).to.not.be.true;
+        expect(internal_queryable.isPrototypeOf(queryRes)).to.not.be.true;
         queryRes.should.be.an('array');
         queryRes.should.have.lengthOf(firstThird.length);
         queryRes.should.not.eql(firstThird);    //due to grouping/flattening
@@ -55,17 +55,17 @@ describe('Test queryable object function chaining', function testQueryable() {
             });
 
         base.dataComputed.should.be.false;
-        expect(queryable.isPrototypeOf(base)).to.be.true;
-        expect(queryable.isPrototypeOf(base)).to.be.true;
+        expect(internal_queryable.isPrototypeOf(base)).to.be.true;
+        expect(internal_queryable.isPrototypeOf(base)).to.be.true;
         q1.dataComputed.should.be.false;
-        expect(queryable.isPrototypeOf(q1)).to.be.true;
+        expect(internal_queryable.isPrototypeOf(q1)).to.be.true;
         q2.dataComputed.should.be.false;
-        expect(queryable.isPrototypeOf(q2)).to.be.false;
-        expect(orderedQueryable.isPrototypeOf(q2)).to.be.true;
+        expect(internal_queryable.isPrototypeOf(q2)).to.be.false;
+        expect(internal_orderedQueryable.isPrototypeOf(q2)).to.be.true;
         q3.dataComputed.should.be.false;
-        expect(queryable.isPrototypeOf(q3)).to.be.true;
+        expect(internal_queryable.isPrototypeOf(q3)).to.be.true;
         q4.dataComputed.should.be.false;
-        expect(queryable.isPrototypeOf(q4)).to.be.true;
+        expect(internal_queryable.isPrototypeOf(q4)).to.be.true;
 
         expect(q1.evaluatedData).to.be.undefined;
         expect(q2.evaluatedData).to.be.undefined;

@@ -89,10 +89,10 @@
 
 <div class="container">
   <div class="row">
-    <textarea id="file-source" class="col-md-12">import { defaultEqualityComparer, memoizer2 } from &#039;../helpers&#039;;
+    <textarea id="file-source" class="col-md-12">import { defaultEqualityComparer, memoizer } from &#039;../helpers&#039;;
 
 function distinct(source, comparer = defaultEqualityComparer) {
-    var havePreviouslyViewed = memoizer2(comparer);
+    var havePreviouslyViewed = memoizer(comparer);
 
     return function *distinctIterator() {
         for (let item of source) {

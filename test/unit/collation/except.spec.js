@@ -1,11 +1,11 @@
 import { except } from '../../../src/collation/except';
-import { memoizer2 } from '../../../src/helpers';
+import { memoizer } from '../../../src/helpers';
 import { testData } from '../../testData';
 
 describe('Test except...', function testExcept() {
     function comparer(a, b) { return a.FirstName === b.FirstName; }
 
-    var havePreviouslyViewed = memoizer2(comparer),
+    var havePreviouslyViewed = memoizer(comparer),
         uniqueFirstNames = testData.dataSource.data.filter(function findUniqueNames(item) {
             return !havePreviouslyViewed(item) && item.FirstName !== 'Mark';
         });

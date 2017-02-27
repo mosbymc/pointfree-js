@@ -1,8 +1,8 @@
-import { defaultEqualityComparer, memoizer2 } from '../helpers';
+import { defaultEqualityComparer, memoizer } from '../helpers';
 
 function union(source, enumerable, comparer) {
     comparer = comparer || defaultEqualityComparer;
-    var havePreviouslyViewed = memoizer2(comparer);
+    var havePreviouslyViewed = memoizer(comparer);
 
     return function *unionIterator() {
         var res;

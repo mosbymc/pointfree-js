@@ -1,11 +1,11 @@
 import { union } from '../../../src/collation/union';
-import { memoizer2 } from '../../../src/helpers';
+import { memoizer } from '../../../src/helpers';
 import { testData } from '../../testData';
 
 describe('Test union...', function testUnion() {
     function comparer(a, b) { return a.FirstName === b.FirstName; }
 
-    var havePreviouslyViewed = memoizer2(comparer),
+    var havePreviouslyViewed = memoizer(comparer),
         uniqueFirstNames = testData.dataSource.data.filter(function findUniqueNames(item) {
             return !havePreviouslyViewed(item);
         });
