@@ -37,7 +37,7 @@ module.exports = function _gulpConfig() {
             tmpPlato + 'projection/orderBy.js',
             tmpPlato + 'projection/sortHelpers.js',
             tmpPlato + 'queryObjects/queryable.js',
-            tmpPlato + 'queryObjects/queryObjectCreators.js',
+            tmpPlato + 'queryObjects/queryDelegatorCreators.js',
             tmpPlato + 'functionalHelpers.js',
             tmpPlato + 'helpers.js'
         ];

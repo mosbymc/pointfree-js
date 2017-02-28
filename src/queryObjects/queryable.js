@@ -2,12 +2,9 @@ import { addFront, concat, except, groupJoin, intersect, join, union, zip } from
 import { all, any, contains, first, fold, last, count } from '../evaluation/evaluationFunctions';
 import { distinct, ofType, where } from '../limitation/limitationFunctions';
 import { deepFlatten, deepMap, flatten, groupBy, orderBy, map } from '../projection/projectionFunctions';
-import { createNewQueryableDelegator, createNewOrderedQueryableDelegator } from './queryObjectCreators';
+import { createNewQueryableDelegator, createNewOrderedQueryableDelegator } from './queryDelegatorCreators';
 import { generatorProto, defaultPredicate } from '../helpers';
 import { isArray, wrap } from '../functionalHelpers';
-
-//TODO: need to determine a better way to "hide" queryable delegate prototype functionality. Browser's
-//TODO: are wanting to display both functions on the delegate and on the prototype(s).
 
 /**
  * Object that contains the core functionality; both the queryable and orderedQueryable
@@ -179,7 +176,10 @@ var queryable_core = {
     },
 
     /**
-     *
+     * Concatenates two lists by appending the "method's" list argument to the
+     * queryable's source. This function is a deferred execution call that returns
+     * a new queryable object delegator instance that contains all the requisite
+     * information on how to perform the operation.
      * @param enumerable
      * @returns {*}
      */
@@ -188,17 +188,30 @@ var queryable_core = {
     },
 
     /**
-     *
-     * @param collection
+     * Produces a list that contains the set difference between the queryable object
+     * and the list that is passed as a function argument. A comparer function may be
+     * provided to the function that determines the equality/inequality of the items in
+     * each list; if left undefined, the function will use a default equality comparer.
+     * This function is a deferred execution call that returns a new queryable
+     * object delegator instance that contains all the requisite information on
+     * how to perform the operation.
+     * equality comparer.
      * @param enumerable
+     * @param comparer
      * @returns {*}
      */
-    except: function _except(collection, enumerable) {
-        return createNewQueryableDelegator(this, except(this, collection, enumerable));
+    except: function _except(enumerable, comparer) {
+        return createNewQueryableDelegator(this, except(this, enumerable, comparer));
     },
 
     /**
-     *
+     * Correlates the items in two lists based on the equality of a key and groups
+     * all items that share the same key. A comparer function may be provided to
+     * the function that determines the equality/inequality of the items in each
+     * list; if left undefined, the function will use a default equality comparer.
+     * This function is a deferred execution call that returns a new queryable
+     * object delegator instance that contains all the requisite information on
+     * how to perform the operation.
      * @param inner
      * @param outerSelector
      * @param innerSelector
@@ -211,17 +224,28 @@ var queryable_core = {
     },
 
     /**
-     *
-     * @param collection
+     * Produces the set intersection of the queryable object's source and the list
+     * that is passed as a function argument. A comparer function may be
+     * provided to the function that determines the equality/inequality of the items in
+     * each list; if left undefined, the function will use a default equality comparer.
+     * This function is a deferred execution call that returns a new queryable
+     * object delegator instance that contains all the requisite information on
+     * how to perform the operation.
      * @param enumerable
+     * @param comparer
      * @returns {*}
      */
-    intersect: function _intersect(collection, enumerable) {
-        return createNewQueryableDelegator(this, intersect(this, collection, enumerable));
+    intersect: function _intersect(enumerable, comparer) {
+        return createNewQueryableDelegator(this, intersect(this, enumerable, comparer));
     },
 
     /**
-     *
+     * Correlates the items in two lists based on the equality of items in each
+     * list. A comparer function may be provided to the function that determines
+     * the equality/inequality of the items in each list; if left undefined, the
+     * function will use a default equality comparer. This function is a deferred
+     * execution call that returns a new queryable object delegator instance that
+     * contains all the requisite information on how to perform the operation.
      * @param inner
      * @param outerSelector
      * @param innerSelector
@@ -234,17 +258,27 @@ var queryable_core = {
     },
 
     /**
-     *
-     * @param collection
+     * Produces the set union of two lists by selecting each unique item in both
+     * lists. A comparer function may be provided to the function that determines
+     * the equality/inequality of the items in each list; if left undefined, the
+     * function will use a default equality comparer. This function is a deferred
+     * execution call that returns a new queryable object delegator instance that
+     * contains all the requisite information on how to perform the operation.
      * @param enumerable
+     * @param comparer
      * @returns {*}
      */
-    union: function _union(collection, enumerable) {
-        return createNewQueryableDelegator(this, union(this, collection, enumerable));
+    union: function _union(enumerable, comparer) {
+        return createNewQueryableDelegator(this, union(this, enumerable, comparer));
     },
 
     /**
-     *
+     * Produces a list of the items in the queryable object and the list passed as
+     * a function argument. A comparer function may be provided to the function that determines
+     * the equality/inequality of the items in each list; if left undefined, the
+     * function will use a default equality comparer. This function is a deferred
+     * execution call that returns a new queryable object delegator instance that
+     * contains all the requisite information on how to perform the operation.
      * @param selector
      * @param enumerable
      * @returns {*}
@@ -464,6 +498,13 @@ var queryable_core = {
     }
 };
 
+/**
+ * A queryable_core delegator object that, in addition to the delegatable functionality
+ * it has from the queryable_core object, also exposes .orderBy and .orderByDescending
+ * functions. These functions allow a consumer to sort a queryable object's data by
+ * a given key.
+ * @type {queryable_core}
+ */
 var internal_queryable = Object.create(queryable_core);
 
 /**
@@ -488,6 +529,12 @@ internal_queryable.orderByDescending = function _orderByDescending(keySelector, 
     return createNewOrderedQueryableDelegator(this, orderBy(this, sortObj), sortObj);
 };
 
+/**
+ * A queryable_core delegator object that, in addition to the delegatable functionality
+ * it has from the queryable_core object, also exposes .thenBy and .thenByDescending
+ * functions. These functions allow a consumer to sort more on than a single column.
+ * @type {queryable_core}
+ */
 var internal_orderedQueryable = Object.create(queryable_core);
 
 internal_orderedQueryable._appliedSort = [];
@@ -527,11 +574,11 @@ internal_orderedQueryable.thenByDescending = function thenByDescending(keySelect
 //TODO: the circular dependency that I am dealing with between queryable_core, queryObjectCreators
 //TODO: function, and the internal_queryable/internal_orderedQueryable objects.
 /**
- *
- * @type {{
- *      extend: queryable._extend,
- *      from: queryable._from
- * }}
+ * Public API for consumers to create new object instance that delegate to a queryable object
+ * for functionality. This object also has a ".extend" function property that can extend the
+ * functionality of all queryable objects by allowing a consumer to define their own function
+ * that will be invokable on all queryable objects.
+ * @type {{extend: queryable._extend, from: queryable._from}}
  */
 var queryable = {
     /**

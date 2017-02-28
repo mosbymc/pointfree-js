@@ -1,5 +1,5 @@
 import { internal_queryable, internal_orderedQueryable } from '../../../src/queryObjects/queryable';
-import { createNewQueryableDelegator } from '../../../src/queryObjects/queryObjectCreators';
+import { createNewQueryableDelegator } from '../../../src/queryObjects/queryDelegatorCreators';
 import { testData } from '../../testData';
 
 var firstThird = testData.dataSource.data.slice(0, testData.dataSource.data.length / 3);

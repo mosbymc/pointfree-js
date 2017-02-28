@@ -1,4 +1,4 @@
-import { createNewQueryableDelegator, createNewOrderedQueryableDelegator } from '../../../src/queryObjects/queryObjectCreators';
+import { createNewQueryableDelegator, createNewOrderedQueryableDelegator } from '../../../src/queryObjects/queryDelegatorCreators';
 import { internal_queryable, internal_orderedQueryable } from '../../../src/queryObjects/queryable';
 import { orderBy } from '../../../src/projection/orderBy';
 import { testData } from '../../testData';
