@@ -44,11 +44,11 @@
   <div class="row">
     <div class="col-md-6">
       <h2 class="header">Maintainability <a href="http://blogs.msdn.com/b/codeanalysis/archive/2007/11/20/maintainability-index-range-and-meaning.aspx"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="A value between 0 and 100 that represents the relative ease of maintaining the code. A high value means better maintainability." data-original-title="Maintainability Index"  data-container="body"></i></a></h2>
-      <p class="stat">78.24</p>
+      <p class="stat">78.27</p>
     </div>
     <div class="col-md-6">
       <h2 class="header">Lines of code <i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="Source Lines of Code / Logical Lines of Code" data-original-title="SLOC/LSLOC" data-container="body"></i></h2>
-      <p class="stat">255</p>
+      <p class="stat">254</p>
     </div>
   </div>
   <div class="row historical">
@@ -93,10 +93,9 @@
 import { all, any, contains, first, fold, last, count } from &#039;../evaluation/evaluationFunctions&#039;;
 import { distinct, ofType, where } from &#039;../limitation/limitationFunctions&#039;;
 import { deepFlatten, deepMap, flatten, groupBy, orderBy, map } from &#039;../projection/projectionFunctions&#039;;
-import { createNewQueryableDelegator, createNewOrderedQueryableDelegator } from &#039;./queryObjectCreators&#039;;
+import { createNewQueryableDelegator, createNewOrderedQueryableDelegator } from &#039;./queryDelegatorCreators&#039;;
 import { generatorProto, defaultPredicate } from &#039;../helpers&#039;;
 import { isArray, wrap } from &#039;../functionalHelpers&#039;;
-
 
 var queryable_core = {
 
@@ -159,24 +158,24 @@ var queryable_core = {
         return createNewQueryableDelegator(this, concat(this, enumerable));
     },
 
-    except: function _except(collection, enumerable) {
-        return createNewQueryableDelegator(this, except(this, collection, enumerable));
+    except: function _except(enumerable, comparer) {
+        return createNewQueryableDelegator(this, except(this, enumerable, comparer));
     },
 
     groupJoin: function _groupJoin(inner, outerSelector, innerSelector, projector, comparer) {
         return createNewQueryableDelegator(this, groupJoin(this, inner, outerSelector, innerSelector, projector, comparer));
     },
 
-    intersect: function _intersect(collection, enumerable) {
-        return createNewQueryableDelegator(this, intersect(this, collection, enumerable));
+    intersect: function _intersect(enumerable, comparer) {
+        return createNewQueryableDelegator(this, intersect(this, enumerable, comparer));
     },
 
     join: function _join(inner, outerSelector, innerSelector, projector, comparer) {
         return createNewQueryableDelegator(this, join(this, inner, outerSelector, innerSelector, projector, comparer));
     },
 
-    union: function _union(collection, enumerable) {
-        return createNewQueryableDelegator(this, union(this, collection, enumerable));
+    union: function _union(enumerable, comparer) {
+        return createNewQueryableDelegator(this, union(this, enumerable, comparer));
     },
 
     zip: function _zip(selector, enumerable) {
@@ -203,7 +202,7 @@ var queryable_core = {
 
             for (let item of this) {
                 if (idx &lt; amt)
-                    res = res.concat(item);
+                    res[res.length] = item;
                 else
                     break;
                 ++idx;
@@ -219,7 +218,7 @@ var queryable_core = {
 
         for (let item of source) {
             if (predicate(item))
-                res = res.concat(item);
+                res[res.length] = item;
             else  {
                 return res;
             }
@@ -233,7 +232,7 @@ var queryable_core = {
 
         for (let item of source) {
             if (idx &gt;= amt)
-                res = res.concat(item);
+                res[res.length] = item;
             ++idx;
         }
         return res;
@@ -248,7 +247,7 @@ var queryable_core = {
             if (!hasFailed &amp;&amp; !predicate(item))
                 hasFailed = true;
             if (hasFailed)
-                res = res.concat(item);
+                res[res.length] = item;
         }
         return res;
     },

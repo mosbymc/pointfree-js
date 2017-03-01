@@ -1,7 +1,7 @@
 {
   "disallowAnonymousFunctions": true,
   "disallowArrowFunctions": true,
-  "disallowKeywords": ["with", "eval", "class"],
+  "disallowKeywords": ["with", "eval", "class", "new"],
   "disallowShorthandArrowFunctions": true,
   "requireSemicolons": true,
   "disallowMultipleLineBreaks": true,
@@ -10,5 +10,5 @@
   "disallowSpacesInCallExpression": true,
   "disallowTrailingComma": true,
   "validateQuoteMarks": "'",
-  "excludeFiles": ["./routes/**", "./tests/**", "./**", "./public/**", "./.tmp/**", "./dist/**", "./node_modules/**", "./tests/**", "./yuidoc/**"]
+  "excludeFiles": ["./routes/**", "./test/**", "./**", "./.tmp/**", "./dist/**", "./node_modules/**", "./yuidoc/**", "./plato/**", "./platoTmp/**", "./dev/**"]
 }

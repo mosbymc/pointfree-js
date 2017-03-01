@@ -8,6 +8,7 @@
   "unused": true,
   "eqnull": true,
   "validthis": true,
+  "noyield": true,
   "predef": [
     "require",
     "module",

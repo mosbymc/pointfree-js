@@ -320,12 +320,6 @@ var queryable_core = {
      * @returns {Array}
      */
     take: function _take(amt) {
-        //TODO: If I decide to 'save' not just a fully evaluated 'source', but also any data from a partially evaluated
-        //TODO: 'source', then I'll probably have to re-think my strategy of wrapping each 'method's' iterator with
-        //TODO: the standard queryable iterator as it may not work as needed.
-        //TODO:
-        //TODO: I'll also have to change this 'method' as it should take as much of the pre-evaluated data as possible
-        //TODO: before evaluating any remaining data that it needs from the source.
         if (!amt) return [];
         if (!this.dataComputed) {
             var res = [],
@@ -333,7 +327,7 @@ var queryable_core = {
 
             for (let item of this) {
                 if (idx < amt)
-                    res = res.concat(item);
+                    res[res.length] = item;
                 else
                     break;
                 ++idx;
@@ -354,7 +348,7 @@ var queryable_core = {
 
         for (let item of source) {
             if (predicate(item))
-                res = res.concat(item);
+                res[res.length] = item;
             else  {
                 return res;
             }
@@ -362,8 +356,12 @@ var queryable_core = {
     },
 
     /**
-     *
-     * @param amt
+     * Skips over a specified number of items in the source and returns the
+     * remaining items. If no amount is specified, an empty array is returned;
+     * Otherwise, an array containing the items collected from the source is
+     * returned.
+     * @param {number} amt - The number of items in the source to skip before
+     * returning the remainder.
      * @returns {*}
      */
     skip: function _skip(amt) {
@@ -373,7 +371,7 @@ var queryable_core = {
 
         for (let item of source) {
             if (idx >= amt)
-                res = res.concat(item);
+                res[res.length] = item;
             ++idx;
         }
         return res;
@@ -393,7 +391,7 @@ var queryable_core = {
             if (!hasFailed && !predicate(item))
                 hasFailed = true;
             if (hasFailed)
-                res = res.concat(item);
+                res[res.length] = item;
         }
         return res;
     },
@@ -568,7 +566,7 @@ internal_orderedQueryable.thenByDescending = function thenByDescending(keySelect
     return createNewOrderedQueryableDelegator(this.source, orderBy(this, sortObj), sortObj);
 };
 
-//TODO: consider added a function property to this object that can create a new consumer-level
+//TODO: consider adding a function property to this object that can create a new consumer-level
 //TODO: so that the queryable_core object can call that function for each deferred execution
 //TODO: function rather than creating the consumer-level objects itself. This may to resolve
 //TODO: the circular dependency that I am dealing with between queryable_core, queryObjectCreators
