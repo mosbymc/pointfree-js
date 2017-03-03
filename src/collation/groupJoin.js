@@ -1,10 +1,12 @@
 import { defaultEqualityComparer } from '../helpers';
+import { when, not, isArray } from '../functionalHelpers';
 
 function groupJoin(outer, inner, outerSelector, innerSelector, projector, comparer) {
     comparer = comparer || defaultEqualityComparer;
 
     return function *groupJoinIterator() {
         var innerGroups = [];
+        inner = when(not(isArray), Array.from, inner);
         for (let innerItem of inner) {
             var innerRes = innerSelector(innerItem);
             var matchingGroup = innerGroups.find(_findInnerGroup);

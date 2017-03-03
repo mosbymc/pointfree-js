@@ -1,11 +1,16 @@
 (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
-"use strict";
+'use strict';
 
 Object.defineProperty(exports, "__esModule", {
     value: true
 });
+exports.addFront = undefined;
+
+var _functionalHelpers = require('../functionalHelpers');
+
 function addFront(source, enumerable) {
     return function* addFront() {
+        enumerable = (0, _functionalHelpers.when)((0, _functionalHelpers.not)(_functionalHelpers.isArray), Array.from, enumerable);
         for (let item of enumerable) {
             if (undefined !== item) yield item;
         }
@@ -18,7 +23,7 @@ function addFront(source, enumerable) {
 
 exports.addFront = addFront;
 
-},{}],2:[function(require,module,exports){
+},{"../functionalHelpers":18}],2:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -52,17 +57,22 @@ exports.union = _union.union;
 exports.zip = _zip.zip;
 
 },{"./addFront":1,"./concat":3,"./except":4,"./groupJoin":5,"./intersect":6,"./join":7,"./union":8,"./zip":9}],3:[function(require,module,exports){
-"use strict";
+'use strict';
 
 Object.defineProperty(exports, "__esModule", {
     value: true
 });
+exports.concat = undefined;
+
+var _functionalHelpers = require('../functionalHelpers');
+
 function concat(source, enumerable) {
     return function* concatIterator() {
         for (let item of source) {
             if (undefined !== item) yield item;
         }
 
+        enumerable = (0, _functionalHelpers.when)((0, _functionalHelpers.not)(_functionalHelpers.isArray), Array.from, enumerable);
         for (let item of enumerable) {
             if (undefined !== item) yield item;
         }
@@ -71,7 +81,7 @@ function concat(source, enumerable) {
 
 exports.concat = concat;
 
-},{}],4:[function(require,module,exports){
+},{"../functionalHelpers":18}],4:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -110,11 +120,14 @@ exports.groupJoin = undefined;
 
 var _helpers = require('../helpers');
 
+var _functionalHelpers = require('../functionalHelpers');
+
 function groupJoin(outer, inner, outerSelector, innerSelector, projector, comparer) {
     comparer = comparer || _helpers.defaultEqualityComparer;
 
     return function* groupJoinIterator() {
         var innerGroups = [];
+        inner = (0, _functionalHelpers.when)((0, _functionalHelpers.not)(_functionalHelpers.isArray), Array.from, inner);
         for (let innerItem of inner) {
             var innerRes = innerSelector(innerItem);
             var matchingGroup = innerGroups.find(_findInnerGroup);
@@ -141,7 +154,7 @@ function groupJoin(outer, inner, outerSelector, innerSelector, projector, compar
 
 exports.groupJoin = groupJoin;
 
-},{"../helpers":19}],6:[function(require,module,exports){
+},{"../functionalHelpers":18,"../helpers":19}],6:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -157,16 +170,6 @@ function intersect(source, enumerable, comparer) {
     comparer = comparer || _helpers.defaultEqualityComparer;
 
     return function* intersectIterator() {
-        /*var res;
-        for (let item of source) {
-            res = havePreviouslyViewed(item);
-            //TODO: I need to figure out a way to handle generator iterables here in order to ensure that the 'collection' includes
-            //TODO: the item being examined. I also need to make sure I am executing generators consistently across the iterators.
-              //TODO: The logic here needs adjusting.
-            //if (!res && collection.includes(item)) yield item;
-            collection = when(not(isArray), Array.from, collection);
-            if (!res && ~collection.findIndex(function findMatchingItem(it) { return comparer(item, it); })) yield item;
-        }*/
         enumerable = (0, _functionalHelpers.when)((0, _functionalHelpers.not)(_functionalHelpers.isArray), Array.from, enumerable);
         for (let item of source) {
             if (undefined !== item && enumerable.some(function _checkEquivalency(it) {
@@ -194,8 +197,8 @@ var _functionalHelpers = require('../functionalHelpers');
 
 function join(outer, inner, outerSelector, innerSelector, projector, comparer) {
     comparer = comparer || _helpers.defaultEqualityComparer;
-    inner = (0, _functionalHelpers.when)((0, _functionalHelpers.not)(_functionalHelpers.isArray), Array.from, inner);
     return function* joinIterator() {
+        inner = (0, _functionalHelpers.when)((0, _functionalHelpers.not)(_functionalHelpers.isArray), Array.from, inner);
         for (let outerItem of outer) {
             for (let innerItem of inner) {
                 if (comparer(outerSelector(outerItem), innerSelector(innerItem))) {
@@ -219,6 +222,8 @@ exports.union = undefined;
 
 var _helpers = require('../helpers');
 
+var _functionalHelpers = require('../functionalHelpers');
+
 function union(source, enumerable, comparer) {
     comparer = comparer || _helpers.defaultEqualityComparer;
     var havePreviouslyViewed = (0, _helpers.memoizer)(comparer);
@@ -230,6 +235,7 @@ function union(source, enumerable, comparer) {
             if (!res) yield item;
         }
 
+        enumerable = (0, _functionalHelpers.when)((0, _functionalHelpers.not)(_functionalHelpers.isArray), Array.from, enumerable);
         for (let item of enumerable) {
             res = havePreviouslyViewed(item);
             if (!res) yield item;
@@ -239,7 +245,7 @@ function union(source, enumerable, comparer) {
 
 exports.union = union;
 
-},{"../helpers":19}],9:[function(require,module,exports){
+},{"../functionalHelpers":18,"../helpers":19}],9:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -255,13 +261,13 @@ function zip(source, enumerable, selector) {
             idx = 0;
         enumerable = (0, _functionalHelpers.when)((0, _functionalHelpers.not)(_functionalHelpers.isArray), Array.from, enumerable);
 
-        if (enumerable.length < 1) return [];
-
-        for (let item of source) {
-            if (idx > enumerable.length) return;
-            res = selector(item, enumerable[idx]);
-            if (undefined !== res) yield res;
-            ++idx;
+        if (!enumerable.length < 1) {
+            for (let item of source) {
+                if (idx > enumerable.length) return;
+                res = selector(item, enumerable[idx]);
+                if (undefined !== res) yield res;
+                ++idx;
+            }
         }
     };
 }
@@ -607,13 +613,13 @@ exports.generatorProto = generatorProto;
 },{}],20:[function(require,module,exports){
 'use strict';
 
-var _queryObjectCreators = require('./queryObjects/queryObjectCreators');
+var _queryDelegatorCreators = require('./queryObjects/queryDelegatorCreators');
 
 var _queryable = require('./queryObjects/queryable');
 
 window.queryable = _queryable.queryable || {};
 
-},{"./queryObjects/queryObjectCreators":33,"./queryObjects/queryable":34}],21:[function(require,module,exports){
+},{"./queryObjects/queryDelegatorCreators":33,"./queryObjects/queryable":34}],21:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -1028,23 +1034,6 @@ var _queryable = require('./queryable');
 
 var _helpers = require('../helpers');
 
-//TODO: Consider making some sort of abstract object or something that has
-//TODO: the .extend and .from functionality, but the queryable objects do
-//TODO: not delegate to it. The problem here is that consumer-level objects
-//TODO: are "seeing" .from and .extend, and can use them to create/extend
-//TODO: queryables respectively. Those two properties can be set to "undefined"
-//TODO: on the consumer-level objects, but the property names still show,
-//TODO: and it doesn't stop them from using the delegated function as
-//TODO: long as they reference the delegate.
-
-//TODO: It seems like I should probably publicly expose a "queryable" object
-//TODO: that only has .extend and .from functionality. The consumer-level
-//TODO: objects don't delegate to the "queryable" object, but rather to
-//TODO: hidden objects that are not publicly available. The .extend
-//TODO: function would extend the "hidden" objects, not itself, and
-//TODO: .from would return a new consumer-level object that delegates
-//TODO: to one of the "hidden" objects.
-
 function createNewQueryableDelegator(source, iterator) {
     var obj = Object.create(_queryable.internal_queryable);
     obj.dataComputed = false;
@@ -1074,11 +1063,8 @@ function createNewOrderedQueryableDelegator(source, iterator, sortObj) {
 function addGetter(obj) {
     return Object.defineProperty(obj, 'data', {
         get: function _data() {
-            //TODO: not sure if I plan on 'saving' the eval-ed data of a queryable object, and if I do, it'll take a different
-            //TODO: form that what is currently here; for now I am going to leave the check for pre-eval-ed data in place
             if (!this.dataComputed) {
                 var res = Array.from(this);
-                this.dataComputed = true;
                 this.evaluatedData = res;
                 return res;
             }
@@ -1106,14 +1092,11 @@ var _limitationFunctions = require('../limitation/limitationFunctions');
 
 var _projectionFunctions = require('../projection/projectionFunctions');
 
-var _queryObjectCreators = require('./queryObjectCreators');
+var _queryDelegatorCreators = require('./queryDelegatorCreators');
 
 var _helpers = require('../helpers');
 
 var _functionalHelpers = require('../functionalHelpers');
-
-//TODO: need to determine a better way to "hide" queryable delegate prototype functionality. Browser's
-//TODO: are wanting to display both functions on the delegate and on the prototype(s).
 
 /**
  * Object that contains the core functionality; both the queryable and orderedQueryable
@@ -1227,7 +1210,7 @@ var queryable_core = {
      * @returns {*}
      */
     map: function _map(mapFunc) {
-        return (0, _queryObjectCreators.createNewQueryableDelegator)(this, (0, _projectionFunctions.map)(this, mapFunc));
+        return (0, _queryDelegatorCreators.createNewQueryableDelegator)(this, (0, _projectionFunctions.map)(this, mapFunc));
     },
 
     /**
@@ -1238,7 +1221,7 @@ var queryable_core = {
      */
     groupBy: function _groupBy(keySelector, comparer) {
         var groupObj = [{ keySelector: keySelector, comparer: comparer, direction: 'asc' }];
-        return (0, _queryObjectCreators.createNewQueryableDelegator)(this, (0, _projectionFunctions.groupBy)(this, groupObj));
+        return (0, _queryDelegatorCreators.createNewQueryableDelegator)(this, (0, _projectionFunctions.groupBy)(this, groupObj));
     },
 
     /**
@@ -1249,21 +1232,21 @@ var queryable_core = {
      */
     groupByDescending: function _groupByDescending(keySelector, comparer) {
         var groupObj = [{ keySelector: keySelector, comparer: comparer, direction: 'desc' }];
-        return (0, _queryObjectCreators.createNewQueryableDelegator)(this, (0, _projectionFunctions.groupBy)(this, groupObj));
+        return (0, _queryDelegatorCreators.createNewQueryableDelegator)(this, (0, _projectionFunctions.groupBy)(this, groupObj));
     },
 
     /**
      *@type {function}
      */
     flatten: function _flatten() {
-        return (0, _queryObjectCreators.createNewQueryableDelegator)(this, (0, _projectionFunctions.flatten)(this));
+        return (0, _queryDelegatorCreators.createNewQueryableDelegator)(this, (0, _projectionFunctions.flatten)(this));
     },
 
     /**
      *@type {function}
      */
     deepFlatten: function _deepFlatten() {
-        return (0, _queryObjectCreators.createNewQueryableDelegator)(this, (0, _projectionFunctions.deepFlatten)(this));
+        return (0, _queryDelegatorCreators.createNewQueryableDelegator)(this, (0, _projectionFunctions.deepFlatten)(this));
     },
 
     /**
@@ -1272,7 +1255,7 @@ var queryable_core = {
      * @returns {*}
      */
     deepMap: function _deepMap(fn) {
-        return (0, _queryObjectCreators.createNewQueryableDelegator)(this, (0, _projectionFunctions.deepMap)(this, fn));
+        return (0, _queryDelegatorCreators.createNewQueryableDelegator)(this, (0, _projectionFunctions.deepMap)(this, fn));
     },
 
     /**
@@ -1281,30 +1264,46 @@ var queryable_core = {
      * @returns {*}
      */
     addFront: function _addFront(enumerable) {
-        return (0, _queryObjectCreators.createNewQueryableDelegator)(this, (0, _collationFunctions.addFront)(this, enumerable));
+        return (0, _queryDelegatorCreators.createNewQueryableDelegator)(this, (0, _collationFunctions.addFront)(this, enumerable));
     },
 
     /**
-     *
+     * Concatenates two lists by appending the "method's" list argument to the
+     * queryable's source. This function is a deferred execution call that returns
+     * a new queryable object delegator instance that contains all the requisite
+     * information on how to perform the operation.
      * @param enumerable
      * @returns {*}
      */
     concat: function _concat(enumerable) {
-        return (0, _queryObjectCreators.createNewQueryableDelegator)(this, (0, _collationFunctions.concat)(this, enumerable));
+        return (0, _queryDelegatorCreators.createNewQueryableDelegator)(this, (0, _collationFunctions.concat)(this, enumerable));
     },
 
     /**
-     *
-     * @param collection
+     * Produces a list that contains the set difference between the queryable object
+     * and the list that is passed as a function argument. A comparer function may be
+     * provided to the function that determines the equality/inequality of the items in
+     * each list; if left undefined, the function will use a default equality comparer.
+     * This function is a deferred execution call that returns a new queryable
+     * object delegator instance that contains all the requisite information on
+     * how to perform the operation.
+     * equality comparer.
      * @param enumerable
+     * @param comparer
      * @returns {*}
      */
-    except: function _except(collection, enumerable) {
-        return (0, _queryObjectCreators.createNewQueryableDelegator)(this, (0, _collationFunctions.except)(this, collection, enumerable));
+    except: function _except(enumerable, comparer) {
+        return (0, _queryDelegatorCreators.createNewQueryableDelegator)(this, (0, _collationFunctions.except)(this, enumerable, comparer));
     },
 
     /**
-     *
+     * Correlates the items in two lists based on the equality of a key and groups
+     * all items that share the same key. A comparer function may be provided to
+     * the function that determines the equality/inequality of the items in each
+     * list; if left undefined, the function will use a default equality comparer.
+     * This function is a deferred execution call that returns a new queryable
+     * object delegator instance that contains all the requisite information on
+     * how to perform the operation.
      * @param inner
      * @param outerSelector
      * @param innerSelector
@@ -1313,21 +1312,32 @@ var queryable_core = {
      * @returns {*}
      */
     groupJoin: function _groupJoin(inner, outerSelector, innerSelector, projector, comparer) {
-        return (0, _queryObjectCreators.createNewQueryableDelegator)(this, (0, _collationFunctions.groupJoin)(this, inner, outerSelector, innerSelector, projector, comparer));
+        return (0, _queryDelegatorCreators.createNewQueryableDelegator)(this, (0, _collationFunctions.groupJoin)(this, inner, outerSelector, innerSelector, projector, comparer));
     },
 
     /**
-     *
-     * @param collection
+     * Produces the set intersection of the queryable object's source and the list
+     * that is passed as a function argument. A comparer function may be
+     * provided to the function that determines the equality/inequality of the items in
+     * each list; if left undefined, the function will use a default equality comparer.
+     * This function is a deferred execution call that returns a new queryable
+     * object delegator instance that contains all the requisite information on
+     * how to perform the operation.
      * @param enumerable
+     * @param comparer
      * @returns {*}
      */
-    intersect: function _intersect(collection, enumerable) {
-        return (0, _queryObjectCreators.createNewQueryableDelegator)(this, (0, _collationFunctions.intersect)(this, collection, enumerable));
+    intersect: function _intersect(enumerable, comparer) {
+        return (0, _queryDelegatorCreators.createNewQueryableDelegator)(this, (0, _collationFunctions.intersect)(this, enumerable, comparer));
     },
 
     /**
-     *
+     * Correlates the items in two lists based on the equality of items in each
+     * list. A comparer function may be provided to the function that determines
+     * the equality/inequality of the items in each list; if left undefined, the
+     * function will use a default equality comparer. This function is a deferred
+     * execution call that returns a new queryable object delegator instance that
+     * contains all the requisite information on how to perform the operation.
      * @param inner
      * @param outerSelector
      * @param innerSelector
@@ -1336,27 +1346,37 @@ var queryable_core = {
      * @returns {*}
      */
     join: function _join(inner, outerSelector, innerSelector, projector, comparer) {
-        return (0, _queryObjectCreators.createNewQueryableDelegator)(this, (0, _collationFunctions.join)(this, inner, outerSelector, innerSelector, projector, comparer));
+        return (0, _queryDelegatorCreators.createNewQueryableDelegator)(this, (0, _collationFunctions.join)(this, inner, outerSelector, innerSelector, projector, comparer));
     },
 
     /**
-     *
-     * @param collection
+     * Produces the set union of two lists by selecting each unique item in both
+     * lists. A comparer function may be provided to the function that determines
+     * the equality/inequality of the items in each list; if left undefined, the
+     * function will use a default equality comparer. This function is a deferred
+     * execution call that returns a new queryable object delegator instance that
+     * contains all the requisite information on how to perform the operation.
      * @param enumerable
+     * @param comparer
      * @returns {*}
      */
-    union: function _union(collection, enumerable) {
-        return (0, _queryObjectCreators.createNewQueryableDelegator)(this, (0, _collationFunctions.union)(this, collection, enumerable));
+    union: function _union(enumerable, comparer) {
+        return (0, _queryDelegatorCreators.createNewQueryableDelegator)(this, (0, _collationFunctions.union)(this, enumerable, comparer));
     },
 
     /**
-     *
+     * Produces a list of the items in the queryable object and the list passed as
+     * a function argument. A comparer function may be provided to the function that determines
+     * the equality/inequality of the items in each list; if left undefined, the
+     * function will use a default equality comparer. This function is a deferred
+     * execution call that returns a new queryable object delegator instance that
+     * contains all the requisite information on how to perform the operation.
      * @param selector
      * @param enumerable
      * @returns {*}
      */
     zip: function _zip(selector, enumerable) {
-        return (0, _queryObjectCreators.createNewQueryableDelegator)(this, (0, _collationFunctions.zip)(this, selector, enumerable));
+        return (0, _queryDelegatorCreators.createNewQueryableDelegator)(this, (0, _collationFunctions.zip)(this, selector, enumerable));
     },
 
     /**
@@ -1365,7 +1385,7 @@ var queryable_core = {
      * @returns {*}
      */
     where: function _where(predicate) {
-        return (0, _queryObjectCreators.createNewQueryableDelegator)(this, (0, _limitationFunctions.where)(this, predicate));
+        return (0, _queryDelegatorCreators.createNewQueryableDelegator)(this, (0, _limitationFunctions.where)(this, predicate));
     },
 
     /**
@@ -1374,7 +1394,7 @@ var queryable_core = {
      * @returns {*}
      */
     ofType: function _ofType(type) {
-        return (0, _queryObjectCreators.createNewQueryableDelegator)(this, (0, _limitationFunctions.ofType)(this, type));
+        return (0, _queryDelegatorCreators.createNewQueryableDelegator)(this, (0, _limitationFunctions.ofType)(this, type));
     },
 
     /**
@@ -1383,7 +1403,7 @@ var queryable_core = {
      * @returns {*}
      */
     distinct: function _distinct(comparer) {
-        return (0, _queryObjectCreators.createNewQueryableDelegator)(this, (0, _limitationFunctions.distinct)(this, comparer));
+        return (0, _queryDelegatorCreators.createNewQueryableDelegator)(this, (0, _limitationFunctions.distinct)(this, comparer));
     },
 
     /**
@@ -1392,19 +1412,13 @@ var queryable_core = {
      * @returns {Array}
      */
     take: function _take(amt) {
-        //TODO: If I decide to 'save' not just a fully evaluated 'source', but also any data from a partially evaluated
-        //TODO: 'source', then I'll probably have to re-think my strategy of wrapping each 'method's' iterator with
-        //TODO: the standard queryable iterator as it may not work as needed.
-        //TODO:
-        //TODO: I'll also have to change this 'method' as it should take as much of the pre-evaluated data as possible
-        //TODO: before evaluating any remaining data that it needs from the source.
         if (!amt) return [];
         if (!this.dataComputed) {
             var res = [],
                 idx = 0;
 
             for (let item of this) {
-                if (idx < amt) res = res.concat(item);else break;
+                if (idx < amt) res[res.length] = item;else break;
                 ++idx;
             }
             return res;
@@ -1422,15 +1436,19 @@ var queryable_core = {
             source = this.dataComputed ? this.evaluatedData : this;
 
         for (let item of source) {
-            if (predicate(item)) res = res.concat(item);else {
+            if (predicate(item)) res[res.length] = item;else {
                 return res;
             }
         }
     },
 
     /**
-     *
-     * @param amt
+     * Skips over a specified number of items in the source and returns the
+     * remaining items. If no amount is specified, an empty array is returned;
+     * Otherwise, an array containing the items collected from the source is
+     * returned.
+     * @param {number} amt - The number of items in the source to skip before
+     * returning the remainder.
      * @returns {*}
      */
     skip: function _skip(amt) {
@@ -1439,7 +1457,7 @@ var queryable_core = {
             res = [];
 
         for (let item of source) {
-            if (idx >= amt) res = res.concat(item);
+            if (idx >= amt) res[res.length] = item;
             ++idx;
         }
         return res;
@@ -1457,7 +1475,7 @@ var queryable_core = {
 
         for (let item of source) {
             if (!hasFailed && !predicate(item)) hasFailed = true;
-            if (hasFailed) res = res.concat(item);
+            if (hasFailed) res[res.length] = item;
         }
         return res;
     },
@@ -1561,6 +1579,13 @@ var queryable_core = {
     }
 };
 
+/**
+ * A queryable_core delegator object that, in addition to the delegatable functionality
+ * it has from the queryable_core object, also exposes .orderBy and .orderByDescending
+ * functions. These functions allow a consumer to sort a queryable object's data by
+ * a given key.
+ * @type {queryable_core}
+ */
 var internal_queryable = Object.create(queryable_core);
 
 /**
@@ -1571,7 +1596,7 @@ var internal_queryable = Object.create(queryable_core);
  */
 internal_queryable.orderBy = function _orderBy(keySelector, comparer) {
     var sortObj = [{ keySelector: keySelector, comparer: comparer, direction: 'asc' }];
-    return (0, _queryObjectCreators.createNewOrderedQueryableDelegator)(this, (0, _projectionFunctions.orderBy)(this, sortObj), sortObj);
+    return (0, _queryDelegatorCreators.createNewOrderedQueryableDelegator)(this, (0, _projectionFunctions.orderBy)(this, sortObj), sortObj);
 };
 
 /**
@@ -1582,9 +1607,15 @@ internal_queryable.orderBy = function _orderBy(keySelector, comparer) {
  */
 internal_queryable.orderByDescending = function _orderByDescending(keySelector, comparer) {
     var sortObj = [{ keySelector: keySelector, comparer: comparer, direction: 'desc' }];
-    return (0, _queryObjectCreators.createNewOrderedQueryableDelegator)(this, (0, _projectionFunctions.orderBy)(this, sortObj), sortObj);
+    return (0, _queryDelegatorCreators.createNewOrderedQueryableDelegator)(this, (0, _projectionFunctions.orderBy)(this, sortObj), sortObj);
 };
 
+/**
+ * A queryable_core delegator object that, in addition to the delegatable functionality
+ * it has from the queryable_core object, also exposes .thenBy and .thenByDescending
+ * functions. These functions allow a consumer to sort more on than a single column.
+ * @type {queryable_core}
+ */
 var internal_orderedQueryable = Object.create(queryable_core);
 
 internal_orderedQueryable._appliedSort = [];
@@ -1604,7 +1635,7 @@ internal_orderedQueryable._appliedSort = [];
  */
 internal_orderedQueryable.thenBy = function _thenBy(keySelector, comparer) {
     var sortObj = this._appliedSorts.concat({ keySelector: keySelector, comparer: comparer, direction: 'asc' });
-    return (0, _queryObjectCreators.createNewOrderedQueryableDelegator)(this.source, (0, _projectionFunctions.orderBy)(this, sortObj), sortObj);
+    return (0, _queryDelegatorCreators.createNewOrderedQueryableDelegator)(this.source, (0, _projectionFunctions.orderBy)(this, sortObj), sortObj);
 };
 
 /**
@@ -1615,20 +1646,20 @@ internal_orderedQueryable.thenBy = function _thenBy(keySelector, comparer) {
  */
 internal_orderedQueryable.thenByDescending = function thenByDescending(keySelector, comparer) {
     var sortObj = this._appliedSorts.concat({ keySelector: keySelector, comparer: comparer, direction: 'desc' });
-    return (0, _queryObjectCreators.createNewOrderedQueryableDelegator)(this.source, (0, _projectionFunctions.orderBy)(this, sortObj), sortObj);
+    return (0, _queryDelegatorCreators.createNewOrderedQueryableDelegator)(this.source, (0, _projectionFunctions.orderBy)(this, sortObj), sortObj);
 };
 
-//TODO: consider added a function property to this object that can create a new consumer-level
+//TODO: consider adding a function property to this object that can create a new consumer-level
 //TODO: so that the queryable_core object can call that function for each deferred execution
 //TODO: function rather than creating the consumer-level objects itself. This may to resolve
 //TODO: the circular dependency that I am dealing with between queryable_core, queryObjectCreators
 //TODO: function, and the internal_queryable/internal_orderedQueryable objects.
 /**
- *
- * @type {{
- *      extend: queryable._extend,
- *      from: queryable._from
- * }}
+ * Public API for consumers to create new object instance that delegate to a queryable object
+ * for functionality. This object also has a ".extend" function property that can extend the
+ * functionality of all queryable objects by allowing a consumer to define their own function
+ * that will be invokable on all queryable objects.
+ * @type {{extend: queryable._extend, from: queryable._from}}
  */
 var queryable = {
     /**
@@ -1653,7 +1684,7 @@ var queryable = {
     extend: function _extend(propName, fn) {
         if (!queryable_core[propName]) {
             queryable_core[propName] = function (...args) {
-                return (0, _queryObjectCreators.createNewQueryableDelegator)(this, fn(this, ...args));
+                return (0, _queryDelegatorCreators.createNewQueryableDelegator)(this, fn(this, ...args));
             };
         }
     },
@@ -1671,10 +1702,10 @@ var queryable = {
      */
     from: function _from(source = []) {
         //... if the source is a generator, an array, or another queryable, accept it as is...
-        if (_helpers.generatorProto.isPrototypeOf(source) || (0, _functionalHelpers.isArray)(source) || queryable_core.isPrototypeOf(source)) return (0, _queryObjectCreators.createNewQueryableDelegator)(source);
+        if (_helpers.generatorProto.isPrototypeOf(source) || (0, _functionalHelpers.isArray)(source) || queryable_core.isPrototypeOf(source)) return (0, _queryDelegatorCreators.createNewQueryableDelegator)(source);
         //... otherwise, turn the source into an array before creating a new queryable delegator object;
         //if it has an iterator, use Array.from, else wrap the source arg in an array...
-        return (0, _queryObjectCreators.createNewQueryableDelegator)(null !== source && source[Symbol.iterator] ? Array.from(source) : (0, _functionalHelpers.wrap)(source));
+        return (0, _queryDelegatorCreators.createNewQueryableDelegator)(null !== source && source[Symbol.iterator] ? Array.from(source) : (0, _functionalHelpers.wrap)(source));
     }
 };
 
@@ -1683,6 +1714,6 @@ exports.internal_queryable = internal_queryable;
 exports.internal_orderedQueryable = internal_orderedQueryable;
 exports.queryable = queryable;
 
-},{"../collation/collationFunctions":2,"../evaluation/evaluationFunctions":14,"../functionalHelpers":18,"../helpers":19,"../limitation/limitationFunctions":22,"../projection/projectionFunctions":31,"./queryObjectCreators":33}]},{},[20])
+},{"../collation/collationFunctions":2,"../evaluation/evaluationFunctions":14,"../functionalHelpers":18,"../helpers":19,"../limitation/limitationFunctions":22,"../projection/projectionFunctions":31,"./queryDelegatorCreators":33}]},{},[20])
 
 //# sourceMappingURL=index.js.map
