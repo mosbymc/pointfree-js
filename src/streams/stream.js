@@ -10,8 +10,8 @@ var _stream = {
 
 var stream = {
     from: function _from(source) {
-        //... if the source is a generator, an array, or another queryable, accept it as is...
-        if (generatorProto.isPrototypeOf(source) || isArray(source) || queryable_core.isPrototypeOf(source)){
+        //... if the source is a generator, an array, queryable, or an observable accept it as is...
+        if (generatorProto.isPrototypeOf(source) || isArray(source) || queryable_core.isPrototypeOf(source) || observable.isPrototypeOf(source)) {
             var s = Object.create(_stream);
             return s;
         }
