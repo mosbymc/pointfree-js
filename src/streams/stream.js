@@ -18,5 +18,10 @@ var stream = {
         //... otherwise, turn the source into an array before creating a new queryable delegator object;
         //if it has an iterator, use Array.from, else wrap the source arg in an array...
         //return createNewQueryableDelegator(null !== source && source[Symbol.iterator] ? Array.from(source) : wrap(source));
+    },
+    extend: function _extend(propName, fn) {
+        if (!_stream[propName]) {
+            _stream[propName] = fn;
+        }
     }
 };

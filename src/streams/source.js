@@ -10,7 +10,8 @@ var sourceTypes = {
 
 
 var source = {
-    type: null
+    type: null,
+    underlying: null
 };
 
 var finiteSource = Object.create(source),
@@ -18,10 +19,6 @@ var finiteSource = Object.create(source),
 
 finiteSource.type = sourceTypes.finite;
 infiniteSource.type = sourceTypes.infinite;
-
-finiteSource.underlying = null;
-infiniteSource.underlying = null;
-
 infiniteSource.event = null;
 
 function createNewFiniteSource(data) {
