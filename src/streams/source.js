@@ -109,4 +109,60 @@ WebSocket.prototype.observer = function _observer(generator) {
     this.addEventListener("close", close);
 };
 
+function *g(n, e, d) {
+    var max = 10,
+        count = 0,
+        it;
+
+    while (count < max) {
+        it = yield it;
+        it.then(function _resolve(val) {
+                n(val);
+            },
+            function _reject(val) {
+                e(val);
+            });
+        ++count;
+    }
+    d();
+}
+
+function dr(elem, evt, handler, gen, next, error, done) {
+    var ge = gen(next, error, _done);
+    ge.next();
+
+    elem.addEventListener(evt, _handler);
+
+    function _handler(e) {
+        ge.next(handler(e));
+    }
+
+    function _done() {
+        elem.removeEventListener(evt, _handler);
+        done();
+    }
+}
+
+function handler(item) {
+    return new Promise(function _promise(resolve, reject) {
+        if (item.screenX > 500 && item.screenY > 500)
+            resolve({ x: item.screenX, y: item.screenY });
+        else reject("Error: screenX: " + item.screenX + " screenY: " + item.screenY);
+    });
+}
+
+function next(item) {
+    console.log(item);
+}
+
+function error(item) {
+    console.error(item);
+}
+
+function done() {
+    console.log("done");
+}
+
+dr(document, 'click', handler, g, next, error, done);
+
 export { createNewFiniteSource, createNewInfiniteSource, sourceTypes };

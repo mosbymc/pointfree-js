@@ -215,4 +215,8 @@ function attachListener(evt) {
     });
 }
 
+//TODO: Looking at both Rx and Most, neither generators, nor promises are used within the libs. From my own testing,
+//TODO: it doesn't seem like either of those are necessary, and especially not both... it's kinda a one or the other type
+//TODO: of thing; using one, negates the need for the other.
+
 attachListener('click');
