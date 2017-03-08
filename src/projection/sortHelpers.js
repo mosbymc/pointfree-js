@@ -52,4 +52,49 @@ function merge(left, right, keySelector, comparer) {
     return [cloneData(right[0])].concat(merge(left, right.slice(1, right.length), keySelector, comparer));
 }
 
+function quickSortManager(source, keySelector, keyComparer) {
+    var count = source.length,
+        i = 0,
+        cop = [];
+
+    while (i < source.length) {
+        cop[i] = source[i];
+        ++i;
+    }
+    quickSort(cop, 0, count - 1, keySelector, keyComparer);
+    return cop;
+}
+
+function quickSort(data, left, right, keySelector, keyComparer) {
+    do {
+        var i = left,
+            j = right,
+            x = keySelector(data[i + ((j - i) >> 1)]);
+
+        do {
+            while (i < data.length && keyComparer(x, keySelector(data[i])) > 0) ++i;
+            while (j >= 0 && keyComparer(x, keySelector(data[j])) < 0) --j;
+            if (i > j) break;
+            if (i < j) {
+                let tmp = data[i];
+                data[i] = data[j];
+                data[j] = tmp;
+            }
+            ++i;
+            --j;
+        }
+        while (i <= j);
+
+        if (j - left <= right - i) {
+            if (left < j) quickSort(data, left, j, keySelector, keyComparer);
+            left = i;
+        }
+        else {
+            if (i < right) quickSort(data, i, right, keySelector, keyComparer);
+            right = j;
+        }
+    }
+    while (left < right);
+}
+
 export { sortData };
