@@ -52,7 +52,7 @@ function memoizer(comparer) {
     };
 }
 
-function cloneData(data) { //Clones data so pass-by-reference doesn't mess up the values in other grids.
+function cloneData(data) {
     if (data == null || typeof (data) !== 'object')
         return data;
 
