@@ -69,13 +69,14 @@ function quickSort(data, left, right, dir, keySelector, keyComparer) {
     do {
         var i = left,
             j = right,
-            x = keySelector(data[i + ((j - i) >> 1)]);
+            itemIdx = i + ((j - i) >> 1),
+            x = keySelector(data[itemIdx]);
 
         do {
-            while (i < data.length && dir === sortDirection.Ascending ? keyComparer(x, keySelector(data[i])) > 0 :
-                keyComparer(x, keySelector(data[i])) < 0) ++i;
-            while (j >= 0 && dir === sortDirection.Ascending ? keyComparer(x, keySelector(data[j])) < 0 :
-                keyComparer(x, keySelector(data[j])) < 0) --j;
+            while (i < data.length && dir === sortDirection.Ascending ? keyComparer(keySelector, itemIdx, i, x, data) > 0 :
+                keyComparer(keySelector, itemIdx, i, x, data) < 0) ++i;
+            while (j >= 0 && dir === sortDirection.Ascending ? keyComparer(keySelector, itemIdx, j, x, data) < 0 :
+                keyComparer(keySelector, itemIdx, j, x, data) < 0) --j;
             if (i > j) break;
             if (i < j) {
                 let tmp = data[i];
@@ -88,15 +89,15 @@ function quickSort(data, left, right, dir, keySelector, keyComparer) {
         while (i <= j);
 
         if (j - left <= right - i) {
-            if (left < j) quickSort(data, left, j, keySelector, keyComparer);
+            if (left < j) quickSort(data, left, j, dir, keySelector, keyComparer);
             left = i;
         }
         else {
-            if (i < right) quickSort(data, i, right, keySelector, keyComparer);
+            if (i < right) quickSort(data, i, right, dir, keySelector, keyComparer);
             right = j;
         }
     }
     while (left < right);
 }
 
-export { sortData };
+export { sortData, quickSortManager };

@@ -13,10 +13,9 @@ var sortDirection = {
     Descending: 2
 };
 
-function sortComparer(keySelector, idx1, idx2, source) {
-    var val1 = keySelector(source[idx1]),
-        val2 = keySelector(source[idx2]);
-    return val1 > b ? 1 : val1 === val2 ? idx1 - idx2 : -1;
+function sortComparer(keySelector, idx1, idx2, val1, source) {
+    var val2 = keySelector(source[idx2]);
+    return val1 > val2 ? 1 : val1 === val2 ? idx1 - idx2 : -1;
 }
 
 function defaultEqualityComparer(a, b) {
