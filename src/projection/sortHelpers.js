@@ -1,4 +1,4 @@
-import { cloneData, defaultEqualityComparer } from '../helpers';
+import { cloneData, defaultEqualityComparer, sortDirection } from '../helpers';
 import { not } from '../functionalHelpers';
 
 function sortData(data, sortObject) {
@@ -65,15 +65,17 @@ function quickSortManager(source, keySelector, keyComparer) {
     return cop;
 }
 
-function quickSort(data, left, right, keySelector, keyComparer) {
+function quickSort(data, left, right, dir, keySelector, keyComparer) {
     do {
         var i = left,
             j = right,
             x = keySelector(data[i + ((j - i) >> 1)]);
 
         do {
-            while (i < data.length && keyComparer(x, keySelector(data[i])) > 0) ++i;
-            while (j >= 0 && keyComparer(x, keySelector(data[j])) < 0) --j;
+            while (i < data.length && dir === sortDirection.Ascending ? keyComparer(x, keySelector(data[i])) > 0 :
+                keyComparer(x, keySelector(data[i])) < 0) ++i;
+            while (j >= 0 && dir === sortDirection.Ascending ? keyComparer(x, keySelector(data[j])) < 0 :
+                keyComparer(x, keySelector(data[j])) < 0) --j;
             if (i > j) break;
             if (i < j) {
                 let tmp = data[i];

@@ -8,6 +8,11 @@ var javaScriptTypes = {
     'undefined': 'undefined'
 };
 
+var sortDirection = {
+    Ascending: 1,
+    Descending: 2
+};
+
 function sortComparer(keySelector, idx1, idx2, source) {
     var val1 = keySelector(source[idx1]),
         val2 = keySelector(source[idx2]);
@@ -72,5 +77,5 @@ function cloneArray(arr) {
     return newArr;
 }
 
-export { javaScriptTypes, sortComparer, defaultEqualityComparer, defaultGreaterThanComparer, defaultPredicate, memoizer,
+export { javaScriptTypes, sortDirection, sortComparer, defaultEqualityComparer, defaultGreaterThanComparer, defaultPredicate, memoizer,
     cloneData, cloneArray, generatorProto };
