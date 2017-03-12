@@ -1,4 +1,4 @@
-import { cloneData, defaultEqualityComparer, sortDirection } from '../helpers';
+import { cloneData, defaultEqualityComparer, sortComparer, sortDirection } from '../helpers';
 import { not } from '../functionalHelpers';
 
 function sortData(data, sortObject) {
@@ -52,7 +52,7 @@ function merge(left, right, keySelector, comparer) {
     return [cloneData(right[0])].concat(merge(left, right.slice(1, right.length), keySelector, comparer));
 }
 
-function quickSortManager(source, keySelector, keyComparer) {
+function quickSort(source, keySelector, keyComparer) {
     var count = source.length,
         i = 0,
         cop = [];
@@ -61,11 +61,11 @@ function quickSortManager(source, keySelector, keyComparer) {
         cop[i] = source[i];
         ++i;
     }
-    quickSort(cop, 0, count - 1, keySelector, keyComparer);
+    qSort(cop, 0, count - 1, keySelector, keyComparer);
     return cop;
 }
 
-function quickSort(data, left, right, dir, keySelector, keyComparer) {
+function qSort(data, left, right, dir, keySelector, keyComparer) {
     do {
         var i = left,
             j = right,
@@ -89,15 +89,15 @@ function quickSort(data, left, right, dir, keySelector, keyComparer) {
         while (i <= j);
 
         if (j - left <= right - i) {
-            if (left < j) quickSort(data, left, j, dir, keySelector, keyComparer);
+            if (left < j) qSort(data, left, j, dir, keySelector, keyComparer);
             left = i;
         }
         else {
-            if (i < right) quickSort(data, i, right, dir, keySelector, keyComparer);
+            if (i < right) qSort(data, i, right, dir, keySelector, keyComparer);
             right = j;
         }
     }
     while (left < right);
 }
 
-export { sortData, quickSortManager };
+export { sortData, quickSort };
