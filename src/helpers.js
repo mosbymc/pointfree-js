@@ -53,6 +53,19 @@ function memoizer(comparer) {
     };
 }
 
+function newMemoizer(fn, comparer = defaultEqualityComparer) {
+    var items = [];
+
+    return function _memoizedFunc(...args) {
+        if (!args.length || items.some(function _checkEquality(it) {
+            return comparer(it, args);
+            }))
+            return true;
+        items[items.length] = args;
+        return fn(...args);
+    }
+}
+
 function cloneData(data) {
     if (data == null || typeof (data) !== 'object')
         return data;
