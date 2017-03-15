@@ -1,3 +1,5 @@
+function noop() {}
+
 function identity(item) { return item; }
 
 var ifElse = curry(function ifElse(predicate, ifFunc, elseFunc, data) {
@@ -54,4 +56,4 @@ function curryN(length, received, fn) {
     };
 }
 
-export { identity, ifElse, when, wrap, isArray, isObject, isFunction, not, or, and, curry };
+export { noop, identity, ifElse, when, wrap, isArray, isObject, isFunction, not, or, and, curry };

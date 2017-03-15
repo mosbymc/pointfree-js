@@ -1,27 +1,38 @@
+import { noop } from '../functionalHelpers';
+
 var observer = {
-    status: 1,
-    next: function _next(fn) {
-        return function _innerNext(...args) {
-            return fn(...args);
-        };
-    },
-    error: function _error(fn) {
-        return function _innerError(...args) {
-            return fn(...args);
-        };
-    },
-    complete: function _complete(fn) {
-        return function _innerComplete() {
-            return fn();
-        };
-    },
+    status: observerStatus.inactive,
+    next: null,
+    error: null,
+    complete: null,
     unsubscribe: function _unsubscribe() {
-        this.status = 0;
+        if (observerStatus.subscribed === this.status) {
+            this.complete();
+            this.status = observerStatus.unsubscribed;
+        }
     }
 };
 
-function createObserver(next, error, complete) {
+function createObserver(next = noop, error = noop, complete = noop) {
     var o = Object.create(observer);
+    o.next = function _next(item) {
+        return next(item);
+    };
+
+    o.error = function _error(err) {
+        return error(err);
+    };
+
+    o.complete = function _complete() {
+        return complete();
+    };
+    return o;
 }
+
+var observerStatus = {
+    inactive: 0,
+    subscribed: 1,
+    unsubscribed: 2
+};
 
 export { observer };
