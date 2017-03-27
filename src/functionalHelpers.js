@@ -1,3 +1,5 @@
+import { alterFunctionLength } from './helpers';
+
 function noop() {}
 
 function identity(item) { return item; }
@@ -34,24 +36,32 @@ function not(fn) {
     };
 }
 
-function or(a, b, item) {
-    return a(item) || b(item);
+//TODO: need to play around with this a bit more. As it stands, the currying won't
+//TODO: help much as long as the spread operator is being used
+function not2(fn) {
+    return curry(alterFunctionLength(function _not(...rest) {
+        return !fn(...rest);
+    }, fn.length));
 }
 
-function and(a, b, item) {
+var or = curry(function _or(a, b, item) {
+    return a(item) || b(item);
+});
+
+var and = curry(function _and(a, b, item) {
     return a(item) && b(item);
-}
+});
 
 function curry(fn) {
     if (!fn.length || 1 === fn.length) return fn;
-    return curryN(fn.length, [], fn);
+    return _curry(fn.length, [], fn);
 }
 
-function curryN(length, received, fn) {
+function _curry(length, received, fn) {
     return function _c(...rest) {
         var combined = received.concat(rest);
         if (length > combined.length)
-            return curryN(length, combined, fn);
+            return _curry(length, combined, fn);
         return fn.call(this, ...combined);
     };
 }

@@ -67,10 +67,10 @@ function newMemoizer(fn, comparer = defaultEqualityComparer) {
 }
 
 function cloneData(data) {
-    if (data == null || typeof (data) !== 'object')
+    if (null == data || javaScriptTypes.object !== typeof data)
         return data;
 
-    if (Object.prototype.toString.call(data) === '[object Array]')
+    if (Array.isArray(data))
         return cloneArray(data);
 
     var temp = {};
@@ -90,5 +90,14 @@ function cloneArray(arr) {
     return newArr;
 }
 
+function alterFunctionLength(fn, len) {
+    return Object.defineProperty(
+        fn,
+        'length', {
+            value: len
+        }
+    );
+}
+
 export { javaScriptTypes, sortDirection, sortComparer, defaultEqualityComparer, defaultGreaterThanComparer, defaultPredicate, memoizer,
-    cloneData, cloneArray, generatorProto };
+    cloneData, cloneArray, generatorProto, alterFunctionLength };
