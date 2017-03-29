@@ -1,5 +1,183 @@
 function noop() {}
 
+//Observer
+function createObserver(onNext = noop, onError = noop, onComplete = noop) {
+    var o = Object.create(observer2);
+    o.next = function _next(item) {
+        return onNext(item);
+    };
+
+    o.error = function _error(err) {
+        return onError(err);
+    };
+
+    o.complete = function _complete() {
+        return onComplete();
+    }
+}
+
+var observer2 = {
+    unsubscribed: false,
+    unsubscribe: function _unsubscribe() {
+        this.unsubscribed = true;
+    }
+};
+
+var you = {
+    somethingFunny: function _somethingFunny(joke) {
+        var t = document.getElementById('test');
+        document.getElementById('test').innerText += `${joke}, lol\n`;
+    },
+    loseInternetConnection: function _loseInternetConnection() {
+        document.getElementById('test').innerText += `internet down... sad`;
+    }
+};
+
+
+var observer = {
+    next: function _next(value) {
+        if (!this.unsubscribed)
+            document.getElementById('test').innerText += `${value}, lol\n`;
+    },
+    error: function _error(err) {
+        document.getElementById('test').innerText += `somthing bad happened ${err}\n`;
+    },
+    complete: function _complete() {
+        document.getElementById('test').innerText += `done`;
+    },
+    unsubscribed: false,
+    unsubscribe: function _unsubscribe() {
+        this.unsubscribed = true;
+    }
+};
+
+//Observable
+function life(observer) {
+    observer.somethingFunny(`insert a joke`);
+    observer.somethingFunny(`insert a joke`);
+    observer.somethingFunny(`insert a joke`);
+    observer.loseInternetConnection();
+}
+/*
+ var unsubscribe = function stuff(observer) {
+ var id = setInterval(function _genStuff() {
+ observer.next(`insert joke`);
+ }, 1000);
+
+ return function _cancelStuff() {
+ clearInterval(id);
+ observer.complete();
+ };
+ }*/
+
+function funnyThings(observer) {
+    var id = setInterval(function _interval() {
+        observer.next(`insert joke`);
+    }, 1000);
+
+    return function _clear() {
+        clearInterval(id);
+        observer.complete();
+        observer.unsubscribe();
+    }
+}
+
+//... later
+//unsubscribe();
+
+//operator
+function map(callback, observable) {
+    return function _map(observer) {
+        return observable({
+            next: function _next(value) {
+                observer.next(callback(value));
+            },
+            error: function _error(err) {
+                observer.error(err);
+            },
+            complete: function _complete() {
+                observer.complete();
+            },
+            unsubscribe: function _unsubscribe() {
+                observer.unsubscribe();
+            }
+        });
+    };
+}
+
+function delay(ms, observable) {
+    return function _delay() {
+        return observable({
+            next: function _next(value) {
+                setTimeout(function _timeout() {
+                    return observer.next(value);
+                }, ms);
+            },
+            error: function _error(err) {
+                observer.error(err);
+            },
+            complete: function _complete() {
+                observer.complete();
+            },
+            unsubscribe: function _unsubscribe() {
+                observer.unsubscribe();
+            }
+        });
+    }
+}
+
+function map2(callback, observable) {
+    return function _map2(observer) {
+        return observable(createObserver(observer.next, observer.error, observer.complete));
+        return observable({
+            next: function _next(value) {
+                observer.next(callback(value));
+            },
+            error: function _error(err) {
+                observer.error(err);
+            },
+            complete: function _complete() {
+                observer.complete();
+            },
+            unsubscribe: function _unsubscribe() {
+                observer.unsubscribe();
+            }
+        });
+    };
+}
+
+function delay2(ms, observable) {
+    return function _delay2() {
+        return observable({
+            next: function _next(value) {
+                setTimeout(function _timeout() {
+                    return observer.next(value);
+                }, ms);
+            },
+            error: function _error(err) {
+                observer.error(err);
+            },
+            complete: function _complete() {
+                observer.complete();
+            },
+            unsubscribe: function _unsubscribe() {
+                observer.unsubscribe();
+            }
+        });
+    }
+}
+
+
+
+var angryFunnyThings = map(function _map(val) { return `${val}!!!`}, funnyThings),
+    lateAngryFunnyThings = delay(1500, angryFunnyThings),
+    unsubscribe = lateAngryFunnyThings(observer);
+
+//main
+//life(you);
+setTimeout(unsubscribe, 3500);
+
+
 function curry(fn) {
     if (!fn.length || 1 === fn.length) return fn;
     return _curry(fn.length, [], fn);
@@ -64,29 +242,41 @@ var rootObservable = {
 var observer2 = {
     source: null,
     fn: null,
+    //TODO: each observable needs to define its own next, error, complete handlers...
+    //TODO: this means that I can't just have a single observable object that has each
+    //TODO: query-type function hanging directly off of it, but rather need to set this
+    //TODO: stuff up in a similar fashion to Rx. The problem I currently have is clear
+    //TODO: when looking at the .filter functionality. As long as it shares handlers
+    //TODO: with .map, it doesn't matter it the item successfully passed the filter or
+    //TODO: not, the handler will always pass the result through. In addition, .filter
+    //TODO: should not pass the result of its evaluation, but rather, based on its
+    //TODO: evaluation, determine if it should pass the item or not.
     map: function _map(fn) {
         return observer2Creator(this, fn);
     },
-    subscribe: function _subscribe(next, error, complete, subs) {
+    filter: function _filter(pred) {
+        return observer2Creator(this, pred);
+    },
+    subscribe: function _subscribe(next, error, complete) {
         var transform = this.fn;
-        subs = subs || sub2Creator(next, error, complete);
+        //subscriber = subscriber || sub2Creator(next, error, complete);
+        var subscriber = sub2Creator(next, error, complete);
 
         function _next(item) {
             var res = transform(item);
-            return subs.next(res);
+            return subscriber.next(res);
         }
         function _error(err) {
-            return subs.error(error(err));
+            return subscriber.error(err);
         }
         function _complete() {
-            return subs.complete(complete());
+            return subscriber.complete();
         }
 
         return this.source.subscribe(
             _next,
             _error,
-            _complete,
-            sub2Creator(_next, _error, _complete)
+            _complete
         );
     }
 };
@@ -128,7 +318,10 @@ var test = rootObservable.from(document, 'click'),
     test2 = test.map(function _evt(e) {
         return e.pageX + e.pageY;
     }),
-    test3 = test2.subscribe(
+    test3 = test2.filter(function _f(item) {
+        return item > 2000;
+    }),
+    test4 = test3.subscribe(
         function onNext(item) {
             console.log(item);
         },
@@ -321,7 +514,6 @@ io.of = function _of(a) {
     };
     return i;
 };
-
 io.map = function _map(fn) {
     return compose(Object.create(io), f, this._value);
 };
@@ -373,3 +565,30 @@ var join = curry(function _join(ma) {
 var flatMap = curry(function _flatMap(fn, ma) {
     return ma.map(f).join();
 });
+
+
+function alterFunctionLength(fn, len) {
+    return Object.defineProperty(
+        fn,
+        'length', {
+            value: len
+        }
+    );
+}
+
+function not(fn) {
+    return curry(alterFunctionLength(function _not(...rest) {
+        return !fn(...rest);
+    }, fn.length));
+}
+
+function _notTest(arg1, arg2, arg3, arg4) {
+    console.log(arg1, arg2, arg3, arg4);
+    return arg1 + arg2 + arg3 + arg4;
+}
+
+var testNot = not(_notTest);
+var b = testNot(1);
+var c = b(2);
+var p = c(3)(4);
+console.log(p);
