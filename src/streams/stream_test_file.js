@@ -1,460 +1,174 @@
-function noop() {}
-
-//Observer
-function createObserver(onNext = noop, onError = noop, onComplete = noop) {
-    var o = Object.create(observer2);
-    o.next = function _next(item) {
-        return onNext(item);
-    };
-
-    o.error = function _error(err) {
-        return onError(err);
-    };
-
-    o.complete = function _complete() {
-        return onComplete();
-    }
-}
-
-var observer2 = {
-    unsubscribed: false,
-    unsubscribe: function _unsubscribe() {
-        this.unsubscribed = true;
-    }
-};
-
-var you = {
-    somethingFunny: function _somethingFunny(joke) {
-        var t = document.getElementById('test');
-        document.getElementById('test').innerText += `${joke}, lol\n`;
-    },
-    loseInternetConnection: function _loseInternetConnection() {
-        document.getElementById('test').innerText += `internet down... sad`;
-    }
-};
-
-
-var observer = {
-    next: function _next(value) {
-        if (!this.unsubscribed)
-            document.getElementById('test').innerText += `${value}, lol\n`;
-    },
-    error: function _error(err) {
-        document.getElementById('test').innerText += `somthing bad happened ${err}\n`;
-    },
-    complete: function _complete() {
-        document.getElementById('test').innerText += `done`;
-    },
-    unsubscribed: false,
-    unsubscribe: function _unsubscribe() {
-        this.unsubscribed = true;
-    }
-};
-
-//Observable
-function life(observer) {
-    observer.somethingFunny(`insert a joke`);
-    observer.somethingFunny(`insert a joke`);
-    observer.somethingFunny(`insert a joke`);
-    observer.loseInternetConnection();
-}
-/*
- var unsubscribe = function stuff(observer) {
- var id = setInterval(function _genStuff() {
- observer.next(`insert joke`);
- }, 1000);
-
- return function _cancelStuff() {
- clearInterval(id);
- observer.complete();
- };
- }*/
-
-function funnyThings(observer) {
-    var id = setInterval(function _interval() {
-        observer.next(`insert joke`);
-    }, 1000);
-
-    return function _clear() {
-        clearInterval(id);
-        observer.complete();
-        observer.unsubscribe();
-    }
-}
-
-//... later
-//unsubscribe();
-
-//operator
-function map(callback, observable) {
-    return function _map(observer) {
-        return observable({
-            next: function _next(value) {
-                observer.next(callback(value));
-            },
-            error: function _error(err) {
-                observer.error(err);
-            },
-            complete: function _complete() {
-                observer.complete();
-            },
-            unsubscribe: function _unsubscribe() {
-                observer.unsubscribe();
-            }
-        });
-    };
-}
-
-function delay(ms, observable) {
-    return function _delay() {
-        return observable({
-            next: function _next(value) {
-                setTimeout(function _timeout() {
-                    return observer.next(value);
-                }, ms);
-            },
-            error: function _error(err) {
-                observer.error(err);
-            },
-            complete: function _complete() {
-                observer.complete();
-            },
-            unsubscribe: function _unsubscribe() {
-                observer.unsubscribe();
-            }
-        });
-    }
-}
-
-function map2(callback, observable) {
-    return function _map2(observer) {
-        return observable(createObserver(observer.next, observer.error, observer.complete));
-        return observable({
-            next: function _next(value) {
-                observer.next(callback(value));
-            },
-            error: function _error(err) {
-                observer.error(err);
-            },
-            complete: function _complete() {
-                observer.complete();
-            },
-            unsubscribe: function _unsubscribe() {
-                observer.unsubscribe();
-            }
-        });
-    };
-}
-
-function delay2(ms, observable) {
-    return function _delay2() {
-        return observable({
-            next: function _next(value) {
-                setTimeout(function _timeout() {
-                    return observer.next(value);
-                }, ms);
-            },
-            error: function _error(err) {
-                observer.error(err);
-            },
-            complete: function _complete() {
-                observer.complete();
-            },
-            unsubscribe: function _unsubscribe() {
-                observer.unsubscribe();
-            }
-        });
-    }
-}
-
-
-
-var angryFunnyThings = map(function _map(val) { return `${val}!!!`}, funnyThings),
-    lateAngryFunnyThings = delay(1500, angryFunnyThings),
-    unsubscribe = lateAngryFunnyThings(observer);
-
-//main
-//life(you);
-setTimeout(unsubscribe, 3500);
-
-
-function curry(fn) {
-    if (!fn.length || 1 === fn.length) return fn;
-    return _curry(fn.length, [], fn);
-}
-
-function _curry(length, received, fn) {
-    return function _c(...rest) {
-        var combined = received.concat(rest);
-        if (length > combined.length)
-            return _curry(length, combined, fn);
-        return fn.call(this, ...combined);
-    };
-}
-
-
-
-/*
- - JavaScript
- - js
- - Functional
- - Reactive
- - Programming
- - Functional Programming
- - FP
- - Functional Reactive Programming
- - FRP
- - Queryable
- - Observable
-
- QRP - Queryable Reactive Programming - Kerp
- */
-
-
-
-//=====================================================================================//
-//==========================          New Code          ===============================//
-//=====================================================================================//
-var rootObservable = {
+var eventObservable = {
     source: null,
     event: null,
     from: function _from(src, evt) {
-        this.source = src;
-        this.event = evt;
-        //return Object.create(newObservable);
-        return observer2Creator(this, identity);
+        var o = Object.create(observable);
+        o.source = src;
+        o.event = evt;
+        o.subscribe = this.subscribe;
+        return o;
     },
-    subscribe: function _subscribe(next) {
-        function handler(e) {
-            return next(e);
+    subscribe: function _subscribe(subscriber) {
+        var source = this.source,
+            event = this.event;
+
+        function eventHandler(e) {
+            return subscriber.next(e);
         }
 
-        function _unsub() {
-            return this.source.removeEventListener(this.event, handler);
+        function unSub() {
+            return source.removeEventListener(event, eventHandler);
         }
-
-        this.source.addEventListener(this.event, handler);
-        var unSub = functionBinder(this, _unsub);
-        return subscriber2Creator(unSub);
+        source.addEventListener(event, eventHandler);
+        subscriber.unsubscribe = unSub;
+        return subscriber;
     }
 };
 
-var observer2 = {
-    source: null,
-    fn: null,
-    //TODO: each observable needs to define its own next, error, complete handlers...
-    //TODO: this means that I can't just have a single observable object that has each
-    //TODO: query-type function hanging directly off of it, but rather need to set this
-    //TODO: stuff up in a similar fashion to Rx. The problem I currently have is clear
-    //TODO: when looking at the .filter functionality. As long as it shares handlers
-    //TODO: with .map, it doesn't matter it the item successfully passed the filter or
-    //TODO: not, the handler will always pass the result through. In addition, .filter
-    //TODO: should not pass the result of its evaluation, but rather, based on its
-    //TODO: evaluation, determine if it should pass the item or not.
+var observable = {
+    get source() {
+        return this._source;
+    },
+    set source(src) {
+        this._source = src;
+    },
+    get operator() {
+        return this._operator;
+    },
+    set operator(op) {
+        this._operator = op;
+    },
+    get count() {
+        return this._count;
+    },
+    set count(cnt) {
+        this._count = cnt;
+    },
     map: function _map(fn) {
-        return observer2Creator(this, fn);
+        return this.lift(Object.create(mapOperator).init(fn));
     },
     filter: function _filter(pred) {
-        return observer2Creator(this, pred);
+        return this.lift(Object.create(filterOperator).init(pred));
+    },
+    lift: function lift(operator) {
+        var o = Object.create(observable);
+        o.source = this;
+        o.operator = operator;
+        return o;
     },
     subscribe: function _subscribe(next, error, complete) {
-        var transform = this.fn;
-        //subscriber = subscriber || sub2Creator(next, error, complete);
-        var subscriber = sub2Creator(next, error, complete);
-
-        function _next(item) {
-            var res = transform(item);
-            return subscriber.next(res);
-        }
-        function _error(err) {
-            return subscriber.error(err);
-        }
-        function _complete() {
-            return subscriber.complete();
-        }
-
-        return this.source.subscribe(
-            _next,
-            _error,
-            _complete
-        );
-    }
-};
-
-var sub2 = {
-    next: null,
-    error: null,
-    complete: null
-};
-
-var subscriber2 = {
-    status: 0,
-    unsubscribe: null
-};
-
-function observer2Creator(source, fn) {
-    var o = Object.create(observer2);
-    o.source = source;
-    o.fn = fn;
-    return o;
-}
-
-function sub2Creator(onNext, onError, onComplete) {
-    var s = Object.create(sub2);
-    s.next = onNext;
-    s.error = onError;
-    s.complete = onComplete;
-    return s;
-}
-
-function subscriber2Creator(fn) {
-    var s2 = Object.create(subscriber2);
-    s2.status = 1;
-    s2.unsubscribe = fn;
-    return s2;
-}
-
-var test = rootObservable.from(document, 'click'),
-    test2 = test.map(function _evt(e) {
-        return e.pageX + e.pageY;
-    }),
-    test3 = test2.filter(function _f(item) {
-        return item > 2000;
-    }),
-    test4 = test3.subscribe(
-        function onNext(item) {
-            console.log(item);
-        },
-        function onError(err) {
-            console.error(err);
-        },
-        function onComplete() {
-            console.log('complete');
-        }
-    );
-
-function identity(item) { return item; }
-
-var newObservable = {
-    source: null,
-    operator: null,
-    map: function _map(fn) {
-        var o = Object.create(newObservable);
-        o.source = this;
-        o.operator = fn;
-        //What if, rather than define the next, error, and complete function properties up front,
-        //instead, their definition was deferred until a new observer is created from the current
-        //observer? Then, the old observer's next, error, and complete properties would be able
-        //to pass the data along to the newly created observer. The one issue I see with this that
-        //might be a problem is that it would more difficult to have more than one observer created
-        //from an existing observer. This is because, setting a second observer's properties would
-        //effectively overwrite the previous observer's properties. This could be solved with lists,
-        //meaning to pass items through to all subsequent observers, each function in the 'next' list
-        //would have to be called.
-        o.handlers = {
-            complete: function _complete() {
-                //Obviously both here, and in the 'error' function property, I don't want to create an
-                //infinite loop by having these functions just repeatedly call themselves. This is just
-                //temporary code to fill the void until I have the general structure and data flow
-                //figured out. In essence, when the 'complete' function property is invoked, it should
-                //call the underlying observer's 'complete' function property, thus continually forwarding
-                //the operation until the root source is arrived at.
-                return o.complete();
-            },
-            error: function _error(err) {
-                return o.error();
-            },
-            next: function _next(item) {
-                try {
-                    return fn(item);
-                }
-                catch(ex) {
-                    return this.error(ex);
-                }
-            }
-        };
-        return o;
-    },
-    where: function _where(filterFunc) {
-        var o = Object.create(newObservable);
-        o.source = this;
-        o.operator = filterFunc;
-    },
-    concat: function _concat(_observer) {
-        var o = Object.create(newObservable);
-        o.source = this;
-        var h = function _h(n, e, c) {
-            return {
-                complete: function _complete() {
-                    return c();
-                },
-                error: function _error(err) {
-                    return e(err);
-                },
-                next: function _next(item) {
-                    return n(item);
-                }
-            }
-        };
-        o.handlers = {
-            complete: function _complete() {
-                //Obviously both here, and in the 'error' function property, I don't want to create an
-                //infinite loop by having these functions just repeatedly call themselves. This is just
-                //temporary code to fill the void until I have the general structure and data flow
-                //figured out. In essence, when the 'complete' function property is invoked, it should
-                //call the underlying observer's 'complete' function property, thus continually forwarding
-                //the operation until the root source is arrived at.
-                return o.complete();
-            },
-            error: function _error(err) {
-                return o.error();
-            },
-            next: function _next(item) {
-                try {
-                    return fn(item);
-                }
-                catch(ex) {
-                    return this.error(ex);
-                }
-            }
-        };
-        return o;
-    },
-    subscribe: function _subscribe(onNext, onError, onComplete) {
-        var sub;
-        if (rootObservable.isPrototypeOf(this.source)) {
-            sub = this.source.subscribe(this.handlers);
+        var s = Object.create(subscriber).initialize(next, error, complete);
+        if (this.operator) {
+            this.operator.subscribe(s, this.source);
         }
         else {
-            sub = this.source.subscribe({
-                next: this.handlers.next,
-                error: this.handlers.error,
-                complete: this.handlers.complete
-            });
+            this.subscribe(s);
         }
-
-        return Object.create(sub.unsubscribe);
+        return s;
     }
 };
 
-var internalObserver = {
+//TODO: Rx is both lifting the operators into an observable as well as lifting the observable
+//TODO: operators into a subscription. In effect, Rx creates a new observable object, and then sets
+//TODO: the .operator property as the map/filter/group/etc. object as its object.
+//TODO: During subscription, the top level observable will create a new subscriber based on the
+//TODO: next/error/complete functions passed as arguments. It then passes this subscriber to the
+//TODO: operator (as opposed to its source, which is the underlying observable), along with its
+//TODO: source. The operator is lifted into a subscription, and is then passed to the underlying
+//TODO: source object to continue the process.
+var mapOperator = {
+    transform: null,
+    init: function _init(projectionFunc) {
+        this.transform = projectionFunc;
+        return this;
+    },
+    subscribe: function _subscribe(subscriber, source) {
+        return source.subscribe(subscriber, this.transform);
+    }
+};
 
+var filterOperator = {
+    predicate: null,
+    init: function _init(pred) {
+        this.predicate = pred;
+        return this;
+    },
+    subscribe: function _subscribe(subscriber, source) {
+        return source.subscribe(Object.create(filterSubscriber).init(subscriber, this.predicate));
+    }
 };
 
 var subscriber = {
+    dest: null,
     status: 0,
-    unsubscribe: null
+    next: function _next(item) {
+        this.dest.next(item);
+    },
+    error: function _error(err) {
+        this.status = 2;
+        this.dest.error(err);
+    },
+    complete: function _complete() {
+        this.status = 2;
+        this.dest.complete();
+    },
+    unsubscribe: function _unsubscribe() {
+        this.status = 2;
+    },
+    initialize: function _initialize(next, error, complete) {
+        this.status = 1;
+        if (subscriber.isPrototypeOf(next)) {
+            this.dest = next;
+            return this;
+        }
+        this.dest = {
+            next: next,
+            error: error,
+            complete: complete
+        };
+        return this;
+    }
 };
 
-function createSubscriber(unsubscribe) {
-    var s = Object.create(subscriber);
-    this.status = 1;
-    s.unsubscribe = function _unsubscribe() {
-        this.status = 2;
-        unsubscribe();
-    };
-    return s;
-}
+var mapSubscriber = Object.create(subscriber);
+mapSubscriber.transform = null;
+mapSubscriber.count = 0;
+mapSubscriber.next = function _next(item) {
+    var res;
+    try {
+        res = this.transform(item, this.count++);
+    }
+    catch (err) {
+        this.dest.error(err);
+        return;
+    }
+    this.dest.next(res);
+};
+mapSubscriber.init = function _init(subscriber, transform) {
+    this.initialize(subscriber);
+    this.transform = transform;
+    return this;
+};
+
+var filterSubscriber = Object.create(subscriber);
+filterSubscriber.predicate = null;
+filterSubscriber.count = 0;
+filterSubscriber.next = function _next(item) {
+    var res;
+    try {
+        res = this.predicate(item, this.count++);
+    }
+    catch (err) {
+        this.dest.error(err);
+        return;
+    }
+    this.dest.next(res);
+};
+filterSubscriber.init = function _init(subscriber, predicate) {
+    this.initialize(subscriber);
+    this.predicate = predicate;
+    return this;
+};
 
 
 function functionBinder(context, funcs) {
