@@ -83,7 +83,7 @@ var mapOperator = {
         return this;
     },
     subscribe: function _subscribe(subscriber, source) {
-        return source.subscribe(subscriber, this.transform);
+        return source.subscribe(Object.create(mapSubscriber).init(subscriber, this.transform));
     }
 };
 
@@ -154,15 +154,13 @@ var filterSubscriber = Object.create(subscriber);
 filterSubscriber.predicate = null;
 filterSubscriber.count = 0;
 filterSubscriber.next = function _next(item) {
-    var res;
     try {
-        res = this.predicate(item, this.count++);
+        if (this.predicate(item, this.count++))
+            this.dest.next(item);
     }
     catch (err) {
         this.dest.error(err);
-        return;
     }
-    this.dest.next(res);
 };
 filterSubscriber.init = function _init(subscriber, predicate) {
     this.initialize(subscriber);
