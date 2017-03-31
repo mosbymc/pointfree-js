@@ -47,8 +47,14 @@ var observable = {
     map: function _map(fn) {
         return this.lift(Object.create(mapOperator).init(fn));
     },
+    deepMap: function _deepMap(fn) {
+        return this.lift(Object.create(deepMapOperator).init(fn));
+    },
     filter: function _filter(pred) {
         return this.lift(Object.create(filterOperator).init(pred));
+    },
+    merge: function _merge(...observables) {
+        return this.lift(Object.create(mergeOperator).init([this].concat(observables)));
     },
     lift: function lift(operator) {
         var o = Object.create(observable);
@@ -87,6 +93,17 @@ var mapOperator = {
     }
 };
 
+var deepMapOperator = {
+    transform: null,
+    init: function _init(projectionFunc) {
+        this.transform = projectionFunc;
+        return this;
+    },
+    subscribe: function _subscribe(subscriber, source) {
+        return source.subscribe(Object.create(deepMapSubscriber).init(subscriber, this.transform));
+    }
+};
+
 var filterOperator = {
     predicate: null,
     init: function _init(pred) {
@@ -95,6 +112,17 @@ var filterOperator = {
     },
     subscribe: function _subscribe(subscriber, source) {
         return source.subscribe(Object.create(filterSubscriber).init(subscriber, this.predicate));
+    }
+};
+
+var mergeOperator = {
+    observables: [],
+    init: function _init(observables) {
+        this.observables = observables;
+        return this;
+    },
+    subscribe: function _subscribe(subscriber, source) {
+        return source.subscribe(Object.create(mergeSubscriber).init(subscriber, this.observables));
     }
 };
 
@@ -150,6 +178,40 @@ mapSubscriber.init = function _init(subscriber, transform) {
     return this;
 };
 
+//TODO: need to see how to handle a deep map (as well as flatten); should I return entire
+//TODO: collection at once? Or one item at a time? And if the latter, when does each item
+//TODO: get returned?
+var deepMapSubscriber = Object.create(subscriber);
+deepMapSubscriber.transform = null;
+deepMapSubscriber.count = 0;
+deepMapSubscriber.next = function _next(item) {
+    var mappedResult;
+    try {
+        mappedResult = recursiveMap(item);
+    }
+    catch (err) {
+        this.dext.error(err);
+        return;
+    }
+    this.dest.next(mappedResult);
+
+    function recursiveMap(item) {
+        if (isArray(item)) {
+            var res = [];
+            for (let it of item) {
+                res = res.concat(recursiveMap(it));
+            }
+            return res;
+        }
+        res = this.transform(item, this.count++);
+    }
+};
+deepMapSubscriber.init = function _init(subscriber, transform) {
+    this.initialize(subscriber);
+    this.transform = transform;
+    return this;
+};
+
 var filterSubscriber = Object.create(subscriber);
 filterSubscriber.predicate = null;
 filterSubscriber.count = 0;
@@ -165,6 +227,52 @@ filterSubscriber.next = function _next(item) {
 filterSubscriber.init = function _init(subscriber, predicate) {
     this.initialize(subscriber);
     this.predicate = predicate;
+    return this;
+};
+
+var mergeSubscriber = Object.create(subscriber);
+mergeSubscriber.count = 0;
+mergeSubscriber.next = function _next(item) {
+    this.dest.next(item);
+};
+mergeSubscriber.init = function _init(subscriber, observables) {
+    observables.forEach(function _subscribeToEach(o) {
+        this.initialize(subscriber);
+    }, this);
+    return this;
+};
+
+
+
+var mapObject = {
+    mapOperator: {
+        transform: null,
+        init: function _init(projectionFunc) {
+            this.transform = projectionFunc;
+            return this;
+        },
+        subscribe: function _subscribe(subscriber, source) {
+            return source.subscribe(Object.create(this.mapSubscriber).init(subscriber, this.transform));
+        }
+    },
+    mapSubscriber: Object.create(subscriber)
+};
+mapObject.mapSubscriber.transform = null;
+mapObject.mapSubscriber.count = 0;
+mapObject.mapSubscriber.next = function _next(item) {
+    var res;
+    try {
+        res = this.transform(item, this.count++);
+    }
+    catch (err) {
+        this.dest.error(err);
+        return;
+    }
+    this.dest.next(res);
+};
+mapObject.mapSubscriber.init = function _init(subscriber, transform) {
+    this.initialize(subscriber);
+    this.transform = transform;
     return this;
 };
 
