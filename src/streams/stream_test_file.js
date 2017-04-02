@@ -129,10 +129,9 @@ var mergeOperator = {
 };
 
 var subscriber = {
-    dest: null,
-    status: 0,
     next: function _next(item) {
-        this.dest.next(item);
+        Promise.resolve(item)
+            .then(this.then);
     },
     error: function _error(err) {
         this.status = 2;
@@ -146,7 +145,13 @@ var subscriber = {
         this.status = 2;
     },
     initialize: function _initialize(next, error, complete) {
+        function then(val) {
+            this.dest.next(val);
+        }
+
         this.status = 1;
+        this.count = 0;
+        this.then = functionBinder(this, then);
         if (subscriber.isPrototypeOf(next)) {
             this.dest = next;
             return this;
@@ -160,9 +165,21 @@ var subscriber = {
     }
 };
 
+function next1(item) {
+    this.dest.next(item);
+}
+
+function error(err) {
+    this.status = 2;
+    this.dest.error(err);
+}
+
+function complete() {
+    this.status = 2;
+    this.dest.complete();
+}
+
 var mapSubscriber = Object.create(subscriber);
-mapSubscriber.transform = null;
-mapSubscriber.count = 0;
 mapSubscriber.next = function _next(item) {
     var res;
     try {
@@ -172,7 +189,8 @@ mapSubscriber.next = function _next(item) {
         this.dest.error(err);
         return;
     }
-    this.dest.next(res);
+    Promise.resolve(res)
+        .then(this.then);
 };
 mapSubscriber.init = function _init(subscriber, transform) {
     this.initialize(subscriber);
@@ -184,8 +202,6 @@ mapSubscriber.init = function _init(subscriber, transform) {
 //TODO: collection at once? Or one item at a time? And if the latter, when does each item
 //TODO: get returned?
 var deepMapSubscriber = Object.create(subscriber);
-deepMapSubscriber.transform = null;
-deepMapSubscriber.count = 0;
 deepMapSubscriber.next = function _next(item) {
     var mappedResult;
     try {
@@ -195,7 +211,8 @@ deepMapSubscriber.next = function _next(item) {
         this.dest.error(err);
         return;
     }
-    this.dest.next(mappedResult);
+    Promise.resolve(mappedResult)
+        .then(this.then);
 
     function recursiveMap(item) {
         if (isArray(item)) {
@@ -215,12 +232,11 @@ deepMapSubscriber.init = function _init(subscriber, transform) {
 };
 
 var filterSubscriber = Object.create(subscriber);
-filterSubscriber.predicate = null;
-filterSubscriber.count = 0;
 filterSubscriber.next = function _next(item) {
     try {
         if (this.predicate(item, this.count++))
-            this.dest.next(item);
+            Promise.resolve(item)
+                .then(this.then);
     }
     catch (err) {
         this.dest.error(err);
@@ -233,7 +249,6 @@ filterSubscriber.init = function _init(subscriber, predicate) {
 };
 
 var mergeSubscriber = Object.create(subscriber);
-mergeSubscriber.count = 0;
 mergeSubscriber.next = function _next(item) {
     this.dest.next(item);
 };
@@ -259,8 +274,6 @@ var mapObject = {
     },
     mapSubscriber: Object.create(subscriber)
 };
-mapObject.mapSubscriber.transform = null;
-mapObject.mapSubscriber.count = 0;
 mapObject.mapSubscriber.next = function _next(item) {
     var res;
     try {
@@ -277,6 +290,7 @@ mapObject.mapSubscriber.init = function _init(subscriber, transform) {
     this.transform = transform;
     return this;
 };
+
 
 
 function functionBinder(context, funcs) {
