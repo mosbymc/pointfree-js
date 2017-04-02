@@ -1,3 +1,5 @@
+import { curry, isArray } from '../functionalHelpers';
+
 var eventObservable = {
     source: null,
     event: null,
@@ -190,7 +192,7 @@ deepMapSubscriber.next = function _next(item) {
         mappedResult = recursiveMap(item);
     }
     catch (err) {
-        this.dext.error(err);
+        this.dest.error(err);
         return;
     }
     this.dest.next(mappedResult);
@@ -203,7 +205,7 @@ deepMapSubscriber.next = function _next(item) {
             }
             return res;
         }
-        res = this.transform(item, this.count++);
+        return this.transform(item, this.count++);
     }
 };
 deepMapSubscriber.init = function _init(subscriber, transform) {
@@ -236,7 +238,7 @@ mergeSubscriber.next = function _next(item) {
     this.dest.next(item);
 };
 mergeSubscriber.init = function _init(subscriber, observables) {
-    observables.forEach(function _subscribeToEach(o) {
+    observables.forEach(function _subscribeToEach() {
         this.initialize(subscriber);
     }, this);
     return this;
@@ -308,7 +310,7 @@ container.map = function _map(fn) {
 
 var maybe = Object.create(baseFunctor);
 maybe.map = function _map(fn) {
-    return this.isNothing() ? maybe.of(null) : maybe.of(f(this._value));
+    return this.isNothing() ? maybe.of(null) : maybe.of(fn(this._value));
 };
 maybe.isNothing = function _isNothing() {
     return null == this._value;
@@ -335,7 +337,7 @@ io.of = function _of(a) {
     return i;
 };
 io.map = function _map(fn) {
-    return compose(Object.create(io), f, this._value);
+    return compose(Object.create(io), fn, this._value);
 };
 
 var kestrel = curry(function _k(val) {
@@ -362,7 +364,7 @@ var unfold = curry(function _unfold(fn, seed) {
     return res;
 });
 
-//
+
 var unless = curry(function _unless(pred, fn, a) {
     return pred(a) ? a : fn(a);
 });
@@ -383,7 +385,7 @@ var join = curry(function _join(ma) {
 });
 
 var flatMap = curry(function _flatMap(fn, ma) {
-    return ma.map(f).join();
+    return ma.map(fn).join();
 });
 
 
