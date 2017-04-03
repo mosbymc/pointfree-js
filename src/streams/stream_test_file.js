@@ -27,6 +27,23 @@ var eventObservable = {
     }
 };
 
+//TODO: for now, this will just run off setInterval functionality. Eventually, I'll
+//TODO: need to create a 'scheduler' similar to Rx in order to efficiently expand
+//TODO: functionality.
+var intervalObservable = {
+    from: function _from(timeout, source) {
+        this.interval = timeout;
+        this.source = source;
+    },
+    subscribe: function _subscribe(subscriber) {
+
+
+        function unSub() {
+            return source.clearInterval(this.id);
+        }
+    }
+};
+
 var observable = {
     get source() {
         return this._source;
@@ -57,6 +74,12 @@ var observable = {
     },
     merge: function _merge(...observables) {
         return this.lift(Object.create(mergeOperator).init([this].concat(observables)));
+    },
+    itemBuffer: function _itemBuffer(amt) {
+        return this.lift(Object.create(bufferOperator).init(amt));
+    },
+    timeBuffer: function _timeBuffer(amt) {
+        return this.lift(Object.create(bufferOperator).init(amt));
     },
     lift: function lift(operator) {
         var o = Object.create(observable);
@@ -128,6 +151,16 @@ var mergeOperator = {
     }
 };
 
+var bufferOperator = {
+    init: function _init(amt) {
+        this.interval = amt;
+        return this;
+    },
+    subscribe: function _subscribe(subscriber, source) {
+        return source.subscribe(Object.create(bufferSubscriber).init(subscriber, this.interval));
+    }
+};
+
 var subscriber = {
     next: function _next(item) {
         Promise.resolve(item)
@@ -145,13 +178,12 @@ var subscriber = {
         this.status = 2;
     },
     initialize: function _initialize(next, error, complete) {
-        function then(val) {
-            this.dest.next(val);
-        }
-
         this.status = 1;
         this.count = 0;
-        this.then = functionBinder(this, then);
+        this.then = (function _then(val) {
+            return this.dest.next(val);
+        }).bind(this);
+
         if (subscriber.isPrototypeOf(next)) {
             this.dest = next;
             return this;
@@ -164,20 +196,6 @@ var subscriber = {
         return this;
     }
 };
-
-function next1(item) {
-    this.dest.next(item);
-}
-
-function error(err) {
-    this.status = 2;
-    this.dest.error(err);
-}
-
-function complete() {
-    this.status = 2;
-    this.dest.complete();
-}
 
 var mapSubscriber = Object.create(subscriber);
 mapSubscriber.next = function _next(item) {
@@ -259,36 +277,27 @@ mergeSubscriber.init = function _init(subscriber, observables) {
     return this;
 };
 
-
-
-var mapObject = {
-    mapOperator: {
-        transform: null,
-        init: function _init(projectionFunc) {
-            this.transform = projectionFunc;
-            return this;
-        },
-        subscribe: function _subscribe(subscriber, source) {
-            return source.subscribe(Object.create(this.mapSubscriber).init(subscriber, this.transform));
-        }
-    },
-    mapSubscriber: Object.create(subscriber)
+var bufferSubscriber = Object.create(subscriber);
+bufferSubscriber.next = function _next(val) {
+    this.buffer[this.buffer.length] = val;
 };
-mapObject.mapSubscriber.next = function _next(item) {
-    var res;
-    try {
-        res = this.transform(item, this.count++);
-    }
-    catch (err) {
-        this.dest.error(err);
-        return;
-    }
-    this.dest.next(res);
-};
-mapObject.mapSubscriber.init = function _init(subscriber, transform) {
+bufferSubscriber.init = function _init(subscriber, interval) {
     this.initialize(subscriber);
-    this.transform = transform;
+    this.buffer = [];
+    this.now = Date.now;
+
+    function _interval() {
+        if (this.buffer.length) {
+            this.dest.next(this.buffer.map(function _mapBuffer(item) { return item; }));
+            this.buffer.length = 0;
+        }
+    }
+
+    this.id = setInterval((_interval).bind(this), interval);
     return this;
+};
+bufferSubscriber.unsubscribe = function _unsubscribe() {
+    clearInterval(this.id);
 };
 
 
@@ -301,6 +310,49 @@ function functionBinder(context, funcs) {
             return fn.bind(context);
         });
     }
+}
+
+function cloneData(data) {
+    if (null == data || 'object' !== typeof data)
+        return data;
+
+    if (Array.isArray(data))
+        return cloneArray(data);
+
+    var temp = {};
+    /*
+     var fields = Object.keys(data).concat(climbPrototypeChain(obj));
+     Object.keys(data).forEach(function _cloneGridData(field) {
+     temp[field] = cloneData(data[field]);
+     });
+     */
+
+    Object.keys(data)
+        .concat(climbPrototypeChain(data))
+        .forEach(function _cloneGridData(field) {
+            temp[field] = cloneData(data[field]);
+        });
+    return temp;
+}
+
+function cloneArray(arr) {
+    var length = arr.length,
+        newArr = new arr.constructor(length),
+        index = -1;
+    while (++index < length) {
+        newArr[index] = cloneData(arr[index]);
+    }
+    return newArr;
+}
+
+function climbPrototypeChain(obj) {
+    var fields = [];
+    obj = Object.getPrototypeOf(obj);
+    while (obj !== Object.prototype) {
+        fields = fields.concat(Object.keys(obj));
+        obj = Object.getPrototypeOf(obj);
+    }
+    return fields;
 }
 
 
