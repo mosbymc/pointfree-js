@@ -7,23 +7,6 @@ var observableStatus = {
     complete: 3
 };
 
-//TODO: for now, this will just run off setInterval functionality. Eventually, I'll
-//TODO: need to create a 'scheduler' similar to Rx in order to effeciently expand
-//TODO: functionality.
-var intervalObservable = {
-    from: function _from(timeout, source) {
-        this.interval = timeout;
-        this.source = source;
-    },
-    subscribe: function _subscribe(subscriber) {
-
-
-        function unSub() {
-            return source.clearInterval(this.id);
-        }
-    }
-};
-
 var observable = {
     get source() {
         return this._source;
@@ -74,7 +57,7 @@ var observable = {
             }
 
             function unSub() {
-                this.status = observableStatus.complete;
+                subscriber.status = observableStatus.complete;
                 return source.removeEventListener(event, eventHandler);
             }
             source.addEventListener(event, eventHandler);
@@ -93,12 +76,19 @@ var observable = {
             }
 
             var runner = (function _runner() {
-                if (this.status !== observableStatus.paused && this.status !== observableStatus.complete && this.idx <= this.source.length) {
+                if (subscriber.status !== observableStatus.paused && subscriber.status !== observableStatus.complete && this.idx < this.source.length) {
                     Promise.resolve(this.source[this.idx++])
                         .then(function _resolve(val) {
                             subscriber.next(val);
                             runner();
                         });
+                }
+                else {
+                    //var d = subscriber.dest ? subscriber.dest.dest ? subscriber.dest : subscriber : this;
+                    //while (d.dest) d = d.dest;
+                    var d = subscriber;
+                    while (d.dest.dest) d = d.dest;
+                    d.unsubscribe();
                 }
             }).bind(this);
 
@@ -218,12 +208,7 @@ var itemBufferOperator = {
         return this;
     },
     subscribe: function _subscribe(subscriber, source) {
-        var ret = source.subscribe(Object.create(itemBufferSubscriber).init(subscriber, this.count));
-        source.unsubscribe = function _unsubscribe() {
-            this.status = observableStatus.complete;
-            ret.unsubscribe();
-        };
-        return ret;
+        return source.subscribe(Object.create(itemBufferSubscriber).init(subscriber, this.count));
     }
 };
 
@@ -233,7 +218,10 @@ var subscriber = {
         return this._status || observableStatus.inactive;
     },
     set status(status) {
-        this._status = status in observableStatus ? status : observableStatus.inactive;
+        this._status = Object.keys(observableStatus)
+            .map(function _statusValues(status) { return observableStatus[status]; })
+            .includes(status) ?
+            status : observableStatus.inactive;
     },
     get count() {
         return this._count || 0;
@@ -242,8 +230,7 @@ var subscriber = {
         this._count = cnt || 0;
     },
     next: function _next(item) {
-        Promise.resolve(item)
-            .then(this.then);
+        Promise.resolve(item).then(this.then);
     },
     error: function _error(err) {
         this.status = observableStatus.complete;
@@ -283,8 +270,7 @@ mapSubscriber.next = function _next(item) {
         this.dest.error(err);
         return;
     }
-    Promise.resolve(res)
-        .then(this.then);
+    Promise.resolve(res).then(this.then);
 };
 mapSubscriber.init = function _init(subscriber, transform) {
     this.initialize(subscriber);
@@ -305,8 +291,7 @@ deepMapSubscriber.next = function _next(item) {
         this.dest.error(err);
         return;
     }
-    Promise.resolve(mappedResult)
-        .then(this.then);
+    Promise.resolve(mappedResult).then(this.then);
 
     function recursiveMap(item) {
         if (isArray(item)) {
@@ -329,8 +314,7 @@ var filterSubscriber = Object.create(subscriber);
 filterSubscriber.next = function _next(item) {
     try {
         if (this.predicate(item, this.count++))
-            Promise.resolve(item)
-                .then(this.then);
+            Promise.resolve(item).then(this.then);
     }
     catch (err) {
         this.dest.error(err);
@@ -372,6 +356,8 @@ timeBufferSubscriber.init = function _init(subscriber, interval) {
     this.id = setInterval((_interval).bind(this), interval);
     return this;
 };
+//TODO: need to figure out a way to include operator-subscribers in the unsubscribe function pipeline; otherwise,
+//TODO: the functionality for clearing the interval will never be called.
 timeBufferSubscriber.unsubscribe = function _unsubscribe() {
     clearInterval(this.id);
 };
