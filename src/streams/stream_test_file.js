@@ -1,34 +1,14 @@
 import { curry, isArray } from '../functionalHelpers';
 
-var eventObservable = {
-    source: null,
-    event: null,
-    from: function _from(src, evt) {
-        var o = Object.create(observable);
-        o.source = src;
-        o.event = evt;
-        o.subscribe = this.subscribe;
-        return o;
-    },
-    subscribe: function _subscribe(subscriber) {
-        var source = this.source,
-            event = this.event;
-
-        function eventHandler(e) {
-            return subscriber.next(e);
-        }
-
-        function unSub() {
-            return source.removeEventListener(event, eventHandler);
-        }
-        source.addEventListener(event, eventHandler);
-        subscriber.unsubscribe = unSub;
-        return subscriber;
-    }
+var observableStatus = {
+    inactive: 0,
+    active: 1,
+    paused: 2,
+    complete: 3
 };
 
 //TODO: for now, this will just run off setInterval functionality. Eventually, I'll
-//TODO: need to create a 'scheduler' similar to Rx in order to efficiently expand
+//TODO: need to create a 'scheduler' similar to Rx in order to effeciently expand
 //TODO: functionality.
 var intervalObservable = {
     from: function _from(timeout, source) {
@@ -57,12 +37,6 @@ var observable = {
     set operator(op) {
         this._operator = op;
     },
-    get count() {
-        return this._count;
-    },
-    set count(cnt) {
-        this._count = cnt;
-    },
     map: function _map(fn) {
         return this.lift(Object.create(mapOperator).init(fn));
     },
@@ -75,11 +49,11 @@ var observable = {
     merge: function _merge(...observables) {
         return this.lift(Object.create(mergeOperator).init([this].concat(observables)));
     },
-    itemBuffer: function _itemBuffer(amt) {
-        return this.lift(Object.create(bufferOperator).init(amt));
+    itemBuffer: function _itemBuffer(count) {
+        return this.lift(Object.create(itemBufferOperator).init(count));
     },
     timeBuffer: function _timeBuffer(amt) {
-        return this.lift(Object.create(bufferOperator).init(amt));
+        return this.lift(Object.create(timeBufferOperator).init(amt));
     },
     lift: function lift(operator) {
         var o = Object.create(observable);
@@ -87,14 +61,71 @@ var observable = {
         o.operator = operator;
         return o;
     },
+    fromEvent: function _fromEvent(src, evt) {
+        var o = Object.create(observable);
+        o.source = src;
+        o.event = evt;
+        o.subscribe = function _subscribe(subscriber) {
+            var source = this.source,
+                event = this.event;
+
+            function eventHandler(e) {
+                return subscriber.next(e);
+            }
+
+            function unSub() {
+                this.status = observableStatus.complete;
+                return source.removeEventListener(event, eventHandler);
+            }
+            source.addEventListener(event, eventHandler);
+            subscriber.unsubscribe = unSub;
+            return subscriber;
+        };
+        return o;
+    },
+    fromArray: function _fromArray(src, startingIdx = 0) {
+        var o = Object.create(observable);
+        o.source = src;
+        o.idx = startingIdx;
+        o.subscribe = function _subscribe(subscriber) {
+            function unSub() {
+                this.status = observableStatus.complete;
+            }
+
+            var runner = (function _runner() {
+                if (this.status !== observableStatus.paused && this.status !== observableStatus.complete && this.idx <= this.source.length) {
+                    Promise.resolve(this.source[this.idx++])
+                        .then(function _resolve(val) {
+                            subscriber.next(val);
+                            runner();
+                        });
+                }
+            }).bind(this);
+
+            Promise.resolve()
+                .then(function _callRunner() {
+                    runner();
+                });
+
+            subscriber.unsubscribe = unSub;
+            return subscriber;
+        };
+        return o;
+    },
     subscribe: function _subscribe(next, error, complete) {
-        var s = Object.create(subscriber).initialize(next, error, complete);
+        var s = Object.create(subscriber).initialize(next, error, complete),
+            ret;
         if (this.operator) {
-            this.operator.subscribe(s, this.source);
+            ret = this.operator.subscribe(s, this.source);
         }
         else {
-            this.subscribe(s);
+            ret = this.subscribe(s);
         }
+
+        s.unsubscribe = function _unsubscribe() {
+            this.status = observableStatus.complete;
+            ret.unsubscribe();
+        };
         return s;
     }
 };
@@ -108,7 +139,12 @@ var observable = {
 //TODO: source. The operator is lifted into a subscription, and is then passed to the underlying
 //TODO: source object to continue the process.
 var mapOperator = {
-    transform: null,
+    get transform() {
+        return this._transform;
+    },
+    set transform(fn) {
+        this._transform = fn;
+    },
     init: function _init(projectionFunc) {
         this.transform = projectionFunc;
         return this;
@@ -119,7 +155,12 @@ var mapOperator = {
 };
 
 var deepMapOperator = {
-    transform: null,
+    get transform() {
+        return this._transform;
+    },
+    set transform(fn) {
+        this._transform = fn;
+    },
     init: function _init(projectionFunc) {
         this.transform = projectionFunc;
         return this;
@@ -130,7 +171,12 @@ var deepMapOperator = {
 };
 
 var filterOperator = {
-    predicate: null,
+    get predicate() {
+        return this._predicate;
+    },
+    set predicate(fn) {
+        this._predicate = fn;
+    },
     init: function _init(pred) {
         this.predicate = pred;
         return this;
@@ -141,7 +187,12 @@ var filterOperator = {
 };
 
 var mergeOperator = {
-    observables: [],
+    get predicate() {
+        return this._observables || [];
+    },
+    set predicate(arr) {
+        this._observables = arr;
+    },
     init: function _init(observables) {
         this.observables = observables;
         return this;
@@ -151,34 +202,59 @@ var mergeOperator = {
     }
 };
 
-var bufferOperator = {
+var timeBufferOperator = {
     init: function _init(amt) {
         this.interval = amt;
         return this;
     },
     subscribe: function _subscribe(subscriber, source) {
-        return source.subscribe(Object.create(bufferSubscriber).init(subscriber, this.interval));
+        return source.subscribe(Object.create(timeBufferSubscriber).init(subscriber, this.interval));
     }
 };
 
+var itemBufferOperator = {
+    init: function _init(amt) {
+        this.count = amt;
+        return this;
+    },
+    subscribe: function _subscribe(subscriber, source) {
+        var ret = source.subscribe(Object.create(itemBufferSubscriber).init(subscriber, this.count));
+        source.unsubscribe = function _unsubscribe() {
+            this.status = observableStatus.complete;
+            ret.unsubscribe();
+        };
+        return ret;
+    }
+};
+
+
 var subscriber = {
+    get status() {
+        return this._status || observableStatus.inactive;
+    },
+    set status(status) {
+        this._status = status in observableStatus ? status : observableStatus.inactive;
+    },
+    get count() {
+        return this._count || 0;
+    },
+    set count(cnt) {
+        this._count = cnt || 0;
+    },
     next: function _next(item) {
         Promise.resolve(item)
             .then(this.then);
     },
     error: function _error(err) {
-        this.status = 2;
+        this.status = observableStatus.complete;
         this.dest.error(err);
     },
     complete: function _complete() {
-        this.status = 2;
+        this.status = observableStatus.complete;
         this.dest.complete();
     },
-    unsubscribe: function _unsubscribe() {
-        this.status = 2;
-    },
     initialize: function _initialize(next, error, complete) {
-        this.status = 1;
+        this.status = observableStatus.active;
         this.count = 0;
         this.then = (function _then(val) {
             return this.dest.next(val);
@@ -277,11 +353,11 @@ mergeSubscriber.init = function _init(subscriber, observables) {
     return this;
 };
 
-var bufferSubscriber = Object.create(subscriber);
-bufferSubscriber.next = function _next(val) {
+var timeBufferSubscriber = Object.create(subscriber);
+timeBufferSubscriber.next = function _next(val) {
     this.buffer[this.buffer.length] = val;
 };
-bufferSubscriber.init = function _init(subscriber, interval) {
+timeBufferSubscriber.init = function _init(subscriber, interval) {
     this.initialize(subscriber);
     this.buffer = [];
     this.now = Date.now;
@@ -296,8 +372,23 @@ bufferSubscriber.init = function _init(subscriber, interval) {
     this.id = setInterval((_interval).bind(this), interval);
     return this;
 };
-bufferSubscriber.unsubscribe = function _unsubscribe() {
+timeBufferSubscriber.unsubscribe = function _unsubscribe() {
     clearInterval(this.id);
+};
+
+var itemBufferSubscriber = Object.create(subscriber);
+itemBufferSubscriber.next = function _next(val) {
+    this.buffer[this.buffer.length] = val;
+    if (this.buffer.length >= this.count) {
+        this.dest.next(this.buffer.map(function _mapBuffer(item) { return item; }));
+        this.buffer.length = 0;
+    }
+};
+itemBufferSubscriber.init = function _init(subscriber, count) {
+    this.initialize(subscriber);
+    this.buffer = [];
+    this.count = count;
+    return this;
 };
 
 
