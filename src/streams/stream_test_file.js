@@ -30,7 +30,12 @@ var observable = {
         return this.lift(Object.create(filterOperator).init(pred));
     },
     merge: function _merge(...observables) {
-        return this.lift(Object.create(mergeOperator).init([this].concat(observables)));
+        var transform;
+        if ('function' === typeof observables[observables.length - 1]) {
+            transform = observables[observables.length - 1];
+            observables = observables.slice(0, observables.length - 1);
+        }
+        return this.lift(Object.create(mergeOperator).init([this].concat(observables), transform));
     },
     itemBuffer: function _itemBuffer(count) {
         return this.lift(Object.create(itemBufferOperator).init(count));
@@ -84,8 +89,6 @@ var observable = {
                         });
                 }
                 else {
-                    //var d = subscriber.dest ? subscriber.dest.dest ? subscriber.dest : subscriber : this;
-                    //while (d.dest) d = d.dest;
                     var d = subscriber;
                     while (d.dest.dest) d = d.dest;
                     d.unsubscribe();
@@ -113,21 +116,20 @@ var observable = {
         }
 
         s.unsubscribe = function _unsubscribe() {
+            if (observableStatus.complete === this.status) return;
             this.status = observableStatus.complete;
+            var retProto = Object.getPrototypeOf(ret);
+            //TODO: not sure of the order that needs to happen here, or if it even matters
+            //Have to use Function#call property to invoke the prototype's unsubscribe method in case,
+            //as it is with the timeBufferSubscriber, a specific property of the subscriber is needed
+            //in order to perform the unsubscription.
+            if (retProto.unsubscribe) retProto.unsubscribe.call(ret);
             ret.unsubscribe();
         };
         return s;
     }
 };
 
-//TODO: Rx is both lifting the operators into an observable as well as lifting the observable
-//TODO: operators into a subscription. In effect, Rx creates a new observable object, and then sets
-//TODO: the .operator property as the map/filter/group/etc. object as its object.
-//TODO: During subscription, the top level observable will create a new subscriber based on the
-//TODO: next/error/complete functions passed as arguments. It then passes this subscriber to the
-//TODO: operator (as opposed to its source, which is the underlying observable), along with its
-//TODO: source. The operator is lifted into a subscription, and is then passed to the underlying
-//TODO: source object to continue the process.
 var mapOperator = {
     get transform() {
         return this._transform;
@@ -177,18 +179,25 @@ var filterOperator = {
 };
 
 var mergeOperator = {
-    get predicate() {
+    get observables() {
         return this._observables || [];
     },
-    set predicate(arr) {
+    set observables(arr) {
         this._observables = arr;
     },
-    init: function _init(observables) {
+    get transform() {
+        return this._transform;
+    },
+    set transform(fn) {
+        this._transform = fn;
+    },
+    init: function _init(observables, transform) {
         this.observables = observables;
+        this.transform = transform;
         return this;
     },
     subscribe: function _subscribe(subscriber, source) {
-        return source.subscribe(Object.create(mergeSubscriber).init(subscriber, this.observables));
+        return source.subscribe(Object.create(mergeSubscriber).init(subscriber, this.observables, this.transform));
     }
 };
 
@@ -229,6 +238,12 @@ var subscriber = {
     set count(cnt) {
         this._count = cnt || 0;
     },
+    get subscribers() {
+        return this._subscribers || [];
+    },
+    set subscribers(subs) {
+        this._subscribers = (this._subscribers || []).concat(subs);
+    },
     next: function _next(item) {
         Promise.resolve(item).then(this.then);
     },
@@ -249,6 +264,7 @@ var subscriber = {
 
         if (subscriber.isPrototypeOf(next)) {
             this.dest = next;
+            next.subscribers = this;
             return this;
         }
         this.dest = {
@@ -328,16 +344,39 @@ filterSubscriber.init = function _init(subscriber, predicate) {
 
 var mergeSubscriber = Object.create(subscriber);
 mergeSubscriber.next = function _next(item) {
-    this.dest.next(item);
+    if (this.transform) {
+        var res;
+        try {
+            res = this.transform(item, this.count++);
+        }
+        catch (err) {
+            this.dest.error(err);
+            return;
+        }
+        Promise.resolve(res).then(this.then);
+    }
+    else this.dest.next(item);
 };
-mergeSubscriber.init = function _init(subscriber, observables) {
-    observables.forEach(function _subscribeToEach() {
-        this.initialize(subscriber);
+
+mergeSubscriber.init = function _init(subscriber, observables, transform) {
+    this.transform = transform;
+    observables.forEach(function _subscribeToEach(observable) {
+        observable.subscribe(this);
     }, this);
+    this.initialize(subscriber);
     return this;
 };
 
-var timeBufferSubscriber = Object.create(subscriber);
+var timeBufferSubscriber = Object.create(subscriber, {
+    id: {
+        get: function _getId() {
+            return this._id || 0;
+        },
+        set: function _setId(val) {
+            this._id = val;
+        }
+    }
+});
 timeBufferSubscriber.next = function _next(val) {
     this.buffer[this.buffer.length] = val;
 };
@@ -356,8 +395,6 @@ timeBufferSubscriber.init = function _init(subscriber, interval) {
     this.id = setInterval((_interval).bind(this), interval);
     return this;
 };
-//TODO: need to figure out a way to include operator-subscribers in the unsubscribe function pipeline; otherwise,
-//TODO: the functionality for clearing the interval will never be called.
 timeBufferSubscriber.unsubscribe = function _unsubscribe() {
     clearInterval(this.id);
 };
