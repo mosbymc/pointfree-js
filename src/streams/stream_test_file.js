@@ -90,7 +90,7 @@ var observable = {
                 }
                 else {
                     var d = subscriber;
-                    while (d.dest.dest) d = d.dest;
+                    while (d.subscriber.subscriber) d = d.subscriber;
                     d.unsubscribe();
                 }
             }).bind(this);
@@ -106,26 +106,9 @@ var observable = {
         return o;
     },
     subscribe: function _subscribe(next, error, complete) {
-        var s = Object.create(subscriber).initialize(next, error, complete),
-            ret;
-        if (this.operator) {
-            ret = this.operator.subscribe(s, this.source);
-        }
-        else {
-            ret = this.subscribe(s);
-        }
-
-        s.unsubscribe = function _unsubscribe() {
-            if (observableStatus.complete === this.status) return;
-            this.status = observableStatus.complete;
-            var retProto = Object.getPrototypeOf(ret);
-            //TODO: not sure of the order that needs to happen here, or if it even matters
-            //Have to use Function#call property to invoke the prototype's unsubscribe method in case,
-            //as it is with the timeBufferSubscriber, a specific property of the subscriber is needed
-            //in order to perform the unsubscription.
-            if (retProto.unsubscribe) retProto.unsubscribe.call(ret);
-            ret.unsubscribe();
-        };
+        var s = Object.create(subscriber).initialize(next, error, complete);
+        if (this.operator) this.operator.subscribe(s, this.source);
+        else this.subscribe(s);
         return s;
     }
 };
@@ -238,41 +221,72 @@ var subscriber = {
     set count(cnt) {
         this._count = cnt || 0;
     },
-    get subscribers() {
-        return this._subscribers || [];
+    get subscriptions() {
+        return this._subscriptions || [];
     },
-    set subscribers(subs) {
-        this._subscribers = (this._subscribers || []).concat(subs);
+    set subscriptions(subs) {
+        this._subscriptions = (this._subscriptions || []).concat(subs);
+    },
+    removeSubscriber: function _removeSubscriber() {
+        this.subscriber = null;
+    },
+    removeSubscription: function _removeSubscription(subscription) {
+        if (this.subscriptions.length) {
+            this.subscriptions = this.subscriptions.filter(function _findSubscriber(sub) {
+                return sub !== subscription;
+            });
+        }
+    },
+    removeSubscriptions: function _removeSubscriptions() {
+        this.subscriptions.length = 0;
     },
     next: function _next(item) {
-        Promise.resolve(item).then(this.then);
+        this.subscriber.next(item);
+        //Promise.resolve(item).then(this.then);
     },
     error: function _error(err) {
         this.status = observableStatus.complete;
-        this.dest.error(err);
+        this.subscriber.error(err);
     },
     complete: function _complete() {
         this.status = observableStatus.complete;
-        this.dest.complete();
+        if (this.subscriber && observableStatus.complete !== this.subscriber.status) this.subscriber.complete();
     },
     initialize: function _initialize(next, error, complete) {
         this.status = observableStatus.active;
         this.count = 0;
         this.then = (function _then(val) {
-            return this.dest.next(val);
+            return this.subscriber.next(val);
         }).bind(this);
 
         if (subscriber.isPrototypeOf(next)) {
-            this.dest = next;
-            next.subscribers = this;
+            this.subscriber = next;
+            next.subscriptions = this;
             return this;
         }
-        this.dest = {
+        this.subscriber = {
             next: next,
             error: error,
             complete: complete
         };
         return this;
+    },
+    unsubscribe: function _unsubscribe() {
+        if (observableStatus.complete === this.status) return;
+        this.complete();
+        this.status = observableStatus.complete;
+        if (this.subscriber && subscriber.isPrototypeOf(this.subscriber)) {
+            var sub = this.subscriber;
+            this.subscriber = null;
+            sub.unsubscribe();
+        }
+
+        while (this.subscriptions.length) {
+            var subscription = this.subscriptions.shift(),
+                subscriptionProto = Object.getPrototypeOf(subscription);
+            if (subscriptionProto.unsubscribe) subscriptionProto.unsubscribe.call(subscription);
+            subscription.unsubscribe();
+        }
     }
 };
 
@@ -283,10 +297,11 @@ mapSubscriber.next = function _next(item) {
         res = this.transform(item, this.count++);
     }
     catch (err) {
-        this.dest.error(err);
+        this.subscriber.error(err);
         return;
     }
-    Promise.resolve(res).then(this.then);
+    this.subscriber.next(res);
+    //Promise.resolve(res).then(this.then);
 };
 mapSubscriber.init = function _init(subscriber, transform) {
     this.initialize(subscriber);
@@ -304,10 +319,11 @@ deepMapSubscriber.next = function _next(item) {
         mappedResult = recursiveMap(item);
     }
     catch (err) {
-        this.dest.error(err);
+        this.subscriber.error(err);
         return;
     }
-    Promise.resolve(mappedResult).then(this.then);
+    this.subscriber.next(mappedResult);
+    //Promise.resolve(mappedResult).then(this.then);
 
     function recursiveMap(item) {
         if (isArray(item)) {
@@ -330,10 +346,11 @@ var filterSubscriber = Object.create(subscriber);
 filterSubscriber.next = function _next(item) {
     try {
         if (this.predicate(item, this.count++))
-            Promise.resolve(item).then(this.then);
+            this.subscriber.next(item);
+        //Promise.resolve(item).then(this.then);
     }
     catch (err) {
-        this.dest.error(err);
+        this.subscriber.error(err);
     }
 };
 filterSubscriber.init = function _init(subscriber, predicate) {
@@ -350,12 +367,13 @@ mergeSubscriber.next = function _next(item) {
             res = this.transform(item, this.count++);
         }
         catch (err) {
-            this.dest.error(err);
+            this.subscriber.error(err);
             return;
         }
-        Promise.resolve(res).then(this.then);
+        //Promise.resolve(res).then(this.then);
+        this.subscriber.next(res);
     }
-    else this.dest.next(item);
+    else this.subscriber.next(item);
 };
 
 mergeSubscriber.init = function _init(subscriber, observables, transform) {
@@ -387,7 +405,7 @@ timeBufferSubscriber.init = function _init(subscriber, interval) {
 
     function _interval() {
         if (this.buffer.length) {
-            this.dest.next(this.buffer.map(function _mapBuffer(item) { return item; }));
+            this.subscriber.next(this.buffer.map(function _mapBuffer(item) { return item; }));
             this.buffer.length = 0;
         }
     }
@@ -403,7 +421,7 @@ var itemBufferSubscriber = Object.create(subscriber);
 itemBufferSubscriber.next = function _next(val) {
     this.buffer[this.buffer.length] = val;
     if (this.buffer.length >= this.count) {
-        this.dest.next(this.buffer.map(function _mapBuffer(item) { return item; }));
+        this.subscriber.next(this.buffer.map(function _mapBuffer(item) { return item; }));
         this.buffer.length = 0;
     }
 };
