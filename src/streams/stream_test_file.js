@@ -108,7 +108,6 @@ var observable = {
     subscribe: function _subscribe(next, error, complete) {
         var s = Object.create(subscriber).initialize(next, error, complete);
         if (this.operator) this.operator.subscribe(s, this.source);
-        else this.subscribe(s);
         return s;
     }
 };
@@ -221,12 +220,6 @@ var subscriber = {
     set count(cnt) {
         this._count = cnt || 0;
     },
-    get subscriptions() {
-        return this._subscriptions || [];
-    },
-    set subscriptions(subs) {
-        this._subscriptions = (this._subscriptions || []).concat(subs);
-    },
     removeSubscriber: function _removeSubscriber() {
         this.subscriber = null;
     },
@@ -255,13 +248,14 @@ var subscriber = {
     initialize: function _initialize(next, error, complete) {
         this.status = observableStatus.active;
         this.count = 0;
+        this.subscriptions = [];
         this.then = (function _then(val) {
             return this.subscriber.next(val);
         }).bind(this);
 
         if (subscriber.isPrototypeOf(next)) {
             this.subscriber = next;
-            next.subscriptions = this;
+            next.subscriptions = next.subscriptions ? next.subscriptions.concat(this) : [].concat(this);
             return this;
         }
         this.subscriber = {
@@ -274,7 +268,6 @@ var subscriber = {
     unsubscribe: function _unsubscribe() {
         if (observableStatus.complete === this.status) return;
         this.complete();
-        this.status = observableStatus.complete;
         if (this.subscriber && subscriber.isPrototypeOf(this.subscriber)) {
             var sub = this.subscriber;
             this.subscriber = null;
@@ -282,9 +275,8 @@ var subscriber = {
         }
 
         while (this.subscriptions.length) {
-            var subscription = this.subscriptions.shift(),
-                subscriptionProto = Object.getPrototypeOf(subscription);
-            if (subscriptionProto.unsubscribe) subscriptionProto.unsubscribe.call(subscription);
+            var subscription = this.subscriptions.shift();
+            if (subscription.cleanUp) subscription.cleanUp();
             subscription.unsubscribe();
         }
     }
@@ -405,6 +397,9 @@ timeBufferSubscriber.init = function _init(subscriber, interval) {
 
     function _interval() {
         if (this.buffer.length) {
+            //the map is needed here because, due to the asychronous nature of subscribers and the subsequent
+            //clearing of the buffer, the subscriber#next argument would be nullified before it had a chance
+            //to act on it.
             this.subscriber.next(this.buffer.map(function _mapBuffer(item) { return item; }));
             this.buffer.length = 0;
         }
@@ -413,8 +408,9 @@ timeBufferSubscriber.init = function _init(subscriber, interval) {
     this.id = setInterval((_interval).bind(this), interval);
     return this;
 };
-timeBufferSubscriber.unsubscribe = function _unsubscribe() {
+timeBufferSubscriber.cleanUp = function _cleanUp() {
     clearInterval(this.id);
+    this.buffer.length = 0;
 };
 
 var itemBufferSubscriber = Object.create(subscriber);
