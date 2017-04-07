@@ -8,6 +8,13 @@ var javaScriptTypes = {
     'undefined': 'undefined'
 };
 
+var observableStatus = {
+    inactive: 0,
+    active: 1,
+    paused: 2,
+    complete: 3
+};
+
 var sortDirection = {
     Ascending: 1,
     Descending: 2
@@ -99,5 +106,5 @@ function alterFunctionLength(fn, len) {
     );
 }
 
-export { javaScriptTypes, sortDirection, sortComparer, defaultEqualityComparer, defaultGreaterThanComparer, defaultPredicate, memoizer,
+export { javaScriptTypes, sortDirection, observableStatus, sortComparer, defaultEqualityComparer, defaultGreaterThanComparer, defaultPredicate, memoizer,
     cloneData, cloneArray, generatorProto, alterFunctionLength };
