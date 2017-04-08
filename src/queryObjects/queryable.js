@@ -176,15 +176,15 @@ var queryable_core = {
     },
 
     /**
-     * Concatenates two lists by appending the "method's" list argument to the
+     * Concatenates two or more lists by appending the "method's" list argument(s) to the
      * queryable's source. This function is a deferred execution call that returns
      * a new queryable object delegator instance that contains all the requisite
      * information on how to perform the operation.
-     * @param enumerable
+     * @param {Array | *} enumerables
      * @returns {*}
      */
-    concat: function _concat(enumerable) {
-        return createNewQueryableDelegator(this, concat(this, enumerable));
+    concat: function _concat(...enumerables) {
+        return createNewQueryableDelegator(this, concat(this, enumerables, arguments.length));
     },
 
     /**
