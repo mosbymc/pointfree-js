@@ -1,4 +1,4 @@
-import { alterFunctionLength } from './helpers';
+import { alterFunctionLength, javaScriptTypes } from './helpers';
 
 /**
  * No-op function; used as default function in some cases when argument is optional
@@ -40,14 +40,23 @@ var ifElse = curry(function ifElse(predicate, ifFunc, elseFunc, data) {
  * Similar to ifElse, but no 'elseFunc' argument. Instead, if the application
  * of the predicate to the data returns truthy, the transform is applied to
  * the data. Otherwise, the data is returned without invoking the transform.
- *
  * @predicate {function}
  * @transform {function}
  * @data {*}
  * @returns {*}
  */
 var when = curry(function _when(predicate, transform, data) {
-    return ifElse(predicate, transform, identity, data);
+    if (predicate(data)) return transform(data);
+    return data;
+});
+
+/**
+ *
+ * @type {*}
+ */
+var whenNot = curry(function _whenNot(predicate, transform, data) {
+    if (!predicate(data)) return transform(data);
+    return data;
 });
 
 /**
@@ -79,7 +88,7 @@ function isArray(data) {
  * @returns {boolean}
  */
 function isObject(item) {
-    return typeof item === 'object' && null !== item;
+    return javaScriptTypes.object === typeof item && null !==  item;
 }
 
 /**
@@ -89,7 +98,7 @@ function isObject(item) {
  * @returns {boolean}
  */
 function isFunction(fn) {
-    return typeof fn === 'function';
+    return javaScriptTypes.function === typeof fn;
 }
 
 /**
@@ -142,4 +151,4 @@ function _curry(length, received, fn) {
     };
 }
 
-export { noop, identity, ifElse, when, wrap, isArray, isObject, isFunction, not, or, and, curry };
+export { noop, identity, ifElse, when, whenNot, wrap, isArray, isObject, isFunction, not, or, and, curry };

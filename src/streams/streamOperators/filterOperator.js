@@ -7,8 +7,8 @@ var filterOperator = {
     set predicate(fn) {
         this._predicate = fn;
     },
-    init: function _init(pred) {
-        this.predicate = pred;
+    init: function _init(predicate) {
+        this.predicate = predicate;
         return this;
     },
     subscribe: function _subscribe(subscriber, source) {

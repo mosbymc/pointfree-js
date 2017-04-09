@@ -1,4 +1,5 @@
 import { when, not, isArray } from '../functionalHelpers';
+import { javaScriptTypes } from '../helpers';
 
 function zip(source, enumerable, selector) {
     return function *zipIterator() {
@@ -10,7 +11,7 @@ function zip(source, enumerable, selector) {
             for (let item of source) {
                 if (idx > enumerable.length) return;
                 res = selector(item, enumerable[idx]);
-                if (undefined !== res) yield res;
+                if (javaScriptTypes.undefined !== res) yield res;
                 ++idx;
             }
         }

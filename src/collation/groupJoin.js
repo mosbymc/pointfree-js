@@ -1,4 +1,4 @@
-import { defaultEqualityComparer } from '../helpers';
+import { defaultEqualityComparer, javaScriptTypes } from '../helpers';
 import { when, not, isArray } from '../functionalHelpers';
 
 function groupJoin(outer, inner, outerSelector, innerSelector, projector, comparer) {
@@ -18,7 +18,7 @@ function groupJoin(outer, inner, outerSelector, innerSelector, projector, compar
         for (var outerItem of outer) {
             var innerMatch =  innerGroups.find(_compareByKeys);
             let res = projector(outerItem, undefined === innerMatch ? [] : innerMatch.items );
-            if (undefined !== res) yield res;
+            if (javaScriptTypes.undefined !== res) yield res;
         }
 
         function _findInnerGroup(grp) {

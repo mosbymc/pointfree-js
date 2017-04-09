@@ -1,4 +1,4 @@
-import { defaultEqualityComparer } from '../helpers';
+import { defaultEqualityComparer, javaScriptTypes } from '../helpers';
 import { when, not, isArray } from '../functionalHelpers';
 
 function join(outer, inner, outerSelector, innerSelector, projector, comparer) {
@@ -9,7 +9,7 @@ function join(outer, inner, outerSelector, innerSelector, projector, comparer) {
             for (let innerItem of inner) {
                 if (comparer(outerSelector(outerItem), innerSelector(innerItem))) {
                     let res = projector(outerItem, innerItem);
-                    if (undefined !== res) yield res;
+                    if (javaScriptTypes.undefined !== res) yield res;
                 }
 
             }
