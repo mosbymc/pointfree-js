@@ -1,28 +1,37 @@
 import { subscriber } from './subscriber';
 import { sortData } from '../../projection/sortHelpers';
 
-var groupBySubscriber = Object.create(subscriber);
-groupBySubscriber.next = function _next(item) {
-    if (this.buffer.length + 1 >= this.bufferAmount) {
-        try {
-            var res = groupData(this.buffer, [ { keySelector: this.keySelector, comparer: this.comparer, direction: 'desc' } ]);
-            this.subscriber.next(res);
-            this.buffer.length = 0;
-        }
-        catch (ex) {
-            this.subscriber.error(ex);
-        }
+var groupBySubscriber = Object.create(subscriber, {
+    next: {
+        value: function _next(item) {
+            if (this.buffer.length + 1 >= this.bufferAmount) {
+                try {
+                    var res = groupData(this.buffer, [ { keySelector: this.keySelector, comparer: this.comparer, direction: 'desc' } ]);
+                    this.subscriber.next(res);
+                    this.buffer.length = 0;
+                }
+                catch (ex) {
+                    this.subscriber.error(ex);
+                }
+            }
+            else this.buffer[this.buffer.length] = item;
+        },
+        writable: false,
+        configurable: false
+    },
+    init: {
+        value: function _init(subscriber, keySelector, comparer, bufferAmount) {
+            this.initialize(subscriber);
+            this.keySelector = keySelector;
+            this.comparer = comparer;
+            this.bufferAmount = bufferAmount;
+            this.buffer = [];
+            return this;
+        },
+        writable: false,
+        configurable: false
     }
-    else this.buffer[this.buffer.length] = item;
-};
-groupBySubscriber.init = function _init(subscriber, keySelector, comparer, bufferAmount) {
-    this.initialize(subscriber);
-    this.keySelector = keySelector;
-    this.comparer = comparer;
-    this.bufferAmount = bufferAmount;
-    this.buffer = [];
-    return this;
-};
+});
 
 function groupData(data, groupObject) {
     var sortedData = sortData(data, groupObject),

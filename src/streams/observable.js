@@ -57,12 +57,8 @@ var observable = {
      * @returns {observable}
      */
     merge: function _merge(...observables) {
-        var transform;
-        if ('function' === typeof observables[observables.length - 1]) {
-            transform = observables[observables.length - 1];
-            observables = observables.slice(0, observables.length - 1);
-        }
-        return this.lift(Object.create(mergeOperator).init([this].concat(observables), transform));
+        observables = mergeOperator.isPrototypeOf(this.operator) ? [this].concat(observables, this.operator.observables) : [this].concat(observables);
+        return this.lift(Object.create(mergeOperator).init([this].concat(observables)));
     },
     /**
      *
