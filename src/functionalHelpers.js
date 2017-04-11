@@ -16,6 +16,33 @@ function noop() {}
 function identity(item) { return item; }
 
 /**
+ * compose :: [a] -> (b) -> c
+ * @param funcs
+ * @returns {function}
+ */
+function compose(...funcs) {
+    funcs = funcs.reverse();
+    return function _compose(item) {
+        return funcs.reduce(function _reduce(val, fn) {
+            return fn(val);
+        }, item);
+    };
+}
+
+/**
+ * pipe :: [a] -> (b) -> c
+ * @param funcs
+ * @returns {_pipe}
+ */
+function pipe(...funcs) {
+    return function _pipe(item) {
+        return funcs.reduce(function _reduce(val, fn) {
+            return fn(val);
+        }, item);
+    };
+}
+
+/**
  * ifElse :: Function -> ( Function -> ( Function -> (a -> b) ) )
  * Takes a predicate function that is applied to the data; If a truthy value
  * is returned from the application, the provided ifFunc argument will be
@@ -151,4 +178,4 @@ function _curry(length, received, fn) {
     };
 }
 
-export { noop, identity, ifElse, when, whenNot, wrap, isArray, isObject, isFunction, not, or, and, curry };
+export { noop, identity, compose, pipe, ifElse, when, whenNot, wrap, isArray, isObject, isFunction, not, or, and, curry };

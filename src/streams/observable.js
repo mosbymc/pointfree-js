@@ -2,7 +2,7 @@ import { observableStatus } from '../helpers';
 import { subscriber } from './subscribers/subscriber';
 import { deepMapOperator, filterOperator, groupByOperator, itemBufferOperator, mapOperator, mergeOperator, timeBufferOperator } from './streamOperators/operators';
 import { generatorProto } from '../helpers';
-import { wrap } from '../functionalHelpers';
+import { compose, and, wrap } from '../functionalHelpers';
 
 var observable = {
     get source() {
@@ -23,6 +23,8 @@ var observable = {
      * @returns {observable}
      */
     map: function _map(fn) {
+        if (mapOperator.isPrototypeOf(this.operator))
+            return this.lift.call(this.source, Object.create(mapOperator).init(compose(fn, this.operator.transform)));
         return this.lift(Object.create(mapOperator).init(fn));
     },
     /**
@@ -39,6 +41,7 @@ var observable = {
      * @returns {observable}
      */
     filter: function _filter(predicate) {
+        if (filterOperator.isPrototypeOf(this.operator)) return this.lift.call(this.source, Object.create(filterOperator).init(and(predicate, this.operator.predicate)));
         return this.lift(Object.create(filterOperator).init(predicate));
     },
     /**
@@ -57,7 +60,7 @@ var observable = {
      * @returns {observable}
      */
     merge: function _merge(...observables) {
-        observables = mergeOperator.isPrototypeOf(this.operator) ? [this].concat(observables, this.operator.observables) : [this].concat(observables);
+        if (mergeOperator.isPrototypeOf(this.operator)) return this.lift.call(this.source, Object.create(mergeOperator).init([this].concat(observables, this.operator.observables)));
         return this.lift(Object.create(mergeOperator).init([this].concat(observables)));
     },
     /**
