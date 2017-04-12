@@ -61,6 +61,14 @@ var subscriber = {
         };
         return this;
     },
+    onError: function _onError(error) {
+        this.subscriber.error = error;
+        return this;
+    },
+    onComplete: function _onComplete(complete) {
+        this.subscriber.complete = complete;
+        return this;
+    },
     unsubscribe: function _unsubscribe() {
         if (observableStatus.complete === this.status) return;
         this.complete();

@@ -2,7 +2,7 @@ import { observableStatus } from '../helpers';
 import { subscriber } from './subscribers/subscriber';
 import { deepMapOperator, filterOperator, groupByOperator, itemBufferOperator, mapOperator, mergeOperator, timeBufferOperator } from './streamOperators/operators';
 import { generatorProto } from '../helpers';
-import { compose, and, wrap } from '../functionalHelpers';
+import { compose, and, wrap, noop } from '../functionalHelpers';
 
 var observable = {
     get source() {
@@ -212,6 +212,16 @@ var observable = {
     subscribe: function _subscribe(next, error, complete) {
         var s = Object.create(subscriber).initialize(next, error, complete);
         if (this.operator) this.operator.subscribe(s, this.source);
+        return s;
+    },
+    /**
+     *
+     * @param next
+     * @returns {*}
+     */
+    onValue: function _onValue(next) {
+        var s = Object.create(subscriber).initialize(next, noop, noop);
+        if (this.operator) this.operator.subscriber(s, this.source);
         return s;
     }
 };
