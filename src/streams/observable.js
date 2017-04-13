@@ -133,6 +133,7 @@ var observable = {
                 this.status = observableStatus.complete;
             }
 
+            /*
             var runner = (function _runner() {
                 if (subscriber.status !== observableStatus.paused && subscriber.status !== observableStatus.complete && this.idx < this.source.length) {
                     for (let item of source) {
@@ -156,6 +157,29 @@ var observable = {
                 .then(function _callRunner() {
                     runner();
                 });
+               */
+
+            Promise.resolve()
+                .then(function _callRunner() {
+                    ((function _runner() {
+                        if (subscriber.status !== observableStatus.paused && subscriber.status !== observableStatus.complete && this.idx < this.source.length) {
+                            for (let item of source) {
+                                Promise.resolve(item)
+                                    .then(function _resolve(val) {
+                                        subscriber.next(val);
+                                        _runner();
+                                    });
+                            }
+                        }
+                        else {
+                            //TODO: don't think I need to do this 'recursive' unsubscribe here since the
+                            //TODO: unsubscribe function is itself recursive
+                            var d = subscriber;
+                            while (d.subscriber.subscriber) d = d.subscriber;
+                            d.unsubscribe();
+                        }
+                    }).bind(this))();
+                });
 
             subscriber.unsubscribe = unSub;
             return subscriber;
@@ -163,29 +187,31 @@ var observable = {
         return o;
     },
     /**
-     *
+     * Creates a new observable from a generator function
      * @param src
      * @returns {observable}
      */
     fromGenerator: function _fromGenerator(src) {
         var o = Object.create(observable);
         o.source = src;
-        o.subscribe = function _subscribe(subscriber) {
+        o.subscribe = function _subscribe(subscriber_next, error, complete) {
             var it = this.source();
-            var runner = (function _runner() {
-                if (subscriber.status !== observableStatus.paused && subscriber.status !== observableStatus.complete) {
+            ((function _runner() {
+                if ('object' !== typeof subscriber_next || (subscriber_next.status !== observableStatus.paused && subscriber_next.status !== observableStatus.complete)) {
                     Promise.resolve(it.next())
                         .then(function _then(val) {
-                            if (!it.done) {
-                                subscriber.next(val);
-                                runner();
+                            if (!val.done) {
+                                if ('function' === typeof subscriber_next) subscriber_next(val.value);
+                                else subscriber_next.next(val.value);
+                                _runner();
                             }
                         });
                 }
-                else {
+                else if ('function' !== typeof subscriber_next) {
                     this.unsubscribe();
                 }
-            }).bind(this);
+                else complete();
+            }).bind(this))();
         };
         return o;
     },

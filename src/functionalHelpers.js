@@ -131,6 +131,11 @@ function isFunction(fn) {
 /**
  * not :: () -> !()
  *
+ * @description - Returns a function, that, when invoked, will return the
+ * result of the inversion of the invocation of the function argument. The
+ * returned function is curried to the same arity as the function argument,
+ * so it can be partially applied even after being 'wrapped' inside the
+ * not function.
  * @param fn
  * @returns {*}
  */
