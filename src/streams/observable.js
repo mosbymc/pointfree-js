@@ -1,9 +1,14 @@
 import { observableStatus } from '../helpers';
 import { subscriber } from './subscribers/subscriber';
-import { deepMapOperator, filterOperator, groupByOperator, itemBufferOperator, mapOperator, mergeOperator, timeBufferOperator } from './streamOperators/operators';
+import { debounceOperator, deepMapOperator, filterOperator, groupByOperator, itemBufferOperator, mapOperator, mergeOperator, timeBufferOperator } from './streamOperators/operators';
 import { generatorProto } from '../helpers';
 import { compose, and, wrap, noop } from '../functionalHelpers';
 
+//TODO: I thinking about implementing an 'observable watcher' functionality. the concept would be
+//TODO: that you have an observable that is registered to watch one or more other observables. When
+//TODO: the complete or error, the watcher will be notified in its .next handler. To do this, I'd
+//TODO: need to assign each observable a unique id, and allow an observable watching to register a
+//TODO: unique handler per watched observable if so desired.
 var observable = {
     get source() {
         return this._source;
@@ -78,6 +83,14 @@ var observable = {
      */
     timeBuffer: function _timeBuffer(amt) {
         return this.lift(Object.create(timeBufferOperator).init(amt));
+    },
+    /**
+     *
+     * @param amt
+     * @returns {*|observable}
+     */
+    debounce: function _debounce(amt) {
+        return this.lift(Object.create(debounceOperator).init(amt));
     },
     /**
      *

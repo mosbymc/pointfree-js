@@ -16,7 +16,29 @@ function noop() {}
 function identity(item) { return item; }
 
 /**
- * compose :: [a] -> (b) -> c
+ * constant :: a -> () -> a
+ * @param {*} item
+ * @returns {function} - Returns a function, that when invoked, will
+ * return the item passed to the constant function as an argument.
+ */
+function constant(item) {
+    return function _constant() {
+        return item;
+    };
+}
+
+/**
+ * kestrel :: a -> () -> a
+ * @refer - constant
+ * @type {constant}
+ * @param {*} item
+ * @returns {function} - Returns a function, that when invoked, will
+ * return the item passed to the constant function as an argument.
+ */
+var kestrel = constant;
+
+/**
+ * compose :: [a] -> (b -> c)
  * @param funcs
  * @returns {function}
  */
@@ -30,16 +52,25 @@ function compose(...funcs) {
 }
 
 /**
- * pipe :: [a] -> (b) -> c
- * @param funcs
- * @returns {_pipe}
+ * pipe :: [a] -> (b -> c)
+ * @description -  Takes a list of functions as arguments and returns
+ * a function waiting to be invoked with a single item. Once the returned
+ * function is invoked, it will reduce the list of functions over the item,
+ * starting with the first function in the list and working through
+ * sequentially. Performs a similar functionality to compose, but applies
+ * the functions in reverse order to that of compose.
+ * @refer {compose}
+ * @param {Array} funcs - An array of function to be reduced over an item
+ * @returns {function} - Returns a function waiting for the item over which
+ * to reduce the functions.
  */
 function pipe(...funcs) {
-    return function _pipe(item) {
+    return compose(funcs.reverse());
+    /*return function _pipe(item) {
         return funcs.reduce(function _reduce(val, fn) {
             return fn(val);
         }, item);
-    };
+    };*/
 }
 
 /**
@@ -183,4 +214,4 @@ function _curry(length, received, fn) {
     };
 }
 
-export { noop, identity, compose, pipe, ifElse, when, whenNot, wrap, isArray, isObject, isFunction, not, or, and, curry };
+export { noop, identity, constant, kestrel, compose, pipe, ifElse, when, whenNot, wrap, isArray, isObject, isFunction, not, or, and, curry };

@@ -1,3 +1,4 @@
+import { debounceSubscriber } from './debounceSubscriber';
 import { deepMapSubscriber } from './deepMapSubscriber';
 import { filterSubscriber } from './filterSubscriber';
 import { groupBySubscriber } from './groupBySubscriber';
@@ -8,4 +9,4 @@ import { timeBufferSubscriber } from './timeBufferSubscriber';
 
 import { subscriber } from './subscriber';
 
-export { deepMapSubscriber, filterSubscriber, groupBySubscriber, itemBufferSubscriber, mapSubscriber, mergeSubscriber, timeBufferSubscriber, subscriber };
+export { debounceSubscriber, deepMapSubscriber, filterSubscriber, groupBySubscriber, itemBufferSubscriber, mapSubscriber, mergeSubscriber, timeBufferSubscriber, subscriber };
