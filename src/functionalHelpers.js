@@ -38,6 +38,22 @@ function constant(item) {
 var kestrel = constant;
 
 /**
+ *
+ * @type {*}
+ */
+var get = curry(function _get(prop, obj) {
+    return obj[prop];
+});
+
+/**
+ *
+ * @type {*}
+ */
+var set = curry(function _set(prop, val, obj) {
+    obj[prop] = val;
+});
+
+/**
  * compose :: [a] -> (b -> c)
  * @param funcs
  * @returns {function}
@@ -214,4 +230,4 @@ function _curry(length, received, fn) {
     };
 }
 
-export { noop, identity, constant, kestrel, compose, pipe, ifElse, when, whenNot, wrap, isArray, isObject, isFunction, not, or, and, curry };
+export { noop, identity, constant, kestrel, get, set, compose, pipe, ifElse, when, whenNot, wrap, isArray, isObject, isFunction, not, or, and, curry };
