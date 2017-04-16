@@ -49,8 +49,9 @@ var get = curry(function _get(prop, obj) {
  *
  * @type {*}
  */
-var set = curry(function _set(prop, val, obj) {
+var set = curry(function _set(val, prop, obj) {
     obj[prop] = val;
+    return val;
 });
 
 /**
@@ -61,10 +62,10 @@ var set = curry(function _set(prop, val, obj) {
 function compose(...funcs) {
     funcs = funcs.reverse();
     return function _compose(item) {
-        return funcs.reduce(function _reduce(val, fn) {
+        return get('reduce', funcs)(function _reduce(val, fn) {
             return fn(val);
         }, item);
-    };
+    }
 }
 
 /**
@@ -189,7 +190,7 @@ function isFunction(fn) {
 function not(fn) {
     return curry(alterFunctionLength(function _not(...rest) {
         return !fn(...rest);
-    }, fn.length));
+    }, get('length', fn)));
 }
 
 /**

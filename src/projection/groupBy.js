@@ -1,4 +1,4 @@
-import { when, isArray, not } from '../functionalHelpers';
+import { when, isArray, not, get, set } from '../functionalHelpers';
 import { sortData } from  './sortHelpers';
 
 function groupBy(source, groupObject) {
@@ -27,7 +27,7 @@ function groupData(data, groupObject) {
 function findGroup(arr, field) {
     var grp;
     if (arr.some(function _findGroup(group) {
-            if (group.key === field) {
+            if (get('key', group) === field) {
                 grp = group;
                 return true;
             }
@@ -35,7 +35,7 @@ function findGroup(arr, field) {
         return grp;
     else {
         grp = [];
-        grp.key = field;
+        set(field, 'key', grp);
         arr.push(grp);
         return grp;
     }
