@@ -87,6 +87,15 @@
 //TODO:    otherwise, should be accepted. An object without an iterator, although enumerable, should not be accepted as a valid parameter. In light of this,
 //TODO:    I should probably change the 'collection' parameter in all collation 'methods' to 'enumerable' or something similar.
 
+//TODO: Ok. I think I finally get it. Took me ~9 months, but containers are starting to make sense. Linq is a functor, and, were it not for a couple
+//TODO: of methods that it is "missing", it would be a monad; same goes for Rx. I had no idea that containers and linq/Rx were one in the same thing.
+//TODO: Granted, linq is not just a generic monad, it's a monad<list>. So if you wanted a maybe, or a future, or an IO, you'd still need to implement
+//TODO: those data structures in C#. Essentially, if C# had given us IFunctor instead of IEnumerable, we could have created any tricked out functor
+//TODO: implementation by overriding some base methods, like a maybe's null check before apply a fn to it's underlying. In other words, Rx and Linq
+//TODO: screwed us! Not really, but that's kinda my feeling. Granted, if it hand't taken me so long to understand "why containers", then maybe I
+//TODO: wouldn't be as critical, but still, I could have an interface for a tricked out monad(functor), but instead I get a single implementation
+//TODO: of a monad and have to create all other versions myself since both Rx and linq basically "expect" to be sitting on top of a list.
+
 
  function union(previousFunc, collection, comparer) {
      comparer = comparer || defaultEqualityComparer;
