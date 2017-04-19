@@ -56,17 +56,13 @@ var set = curry(function _set(val, prop, obj) {
 
 /**
  * compose :: [a] -> (b -> c)
- * @param funcs
- * @returns {function}
+ * @type {*}
  */
-function compose(...funcs) {
-    funcs = funcs.reverse();
-    return function _compose(item) {
-        return get('reduce', funcs)(function _reduce(val, fn) {
-            return fn(val);
-        }, item);
-    }
-}
+var compose = curry(function _compose(funcs, item) {
+    funcs.reverse().reduce(function _reduce(val, fn) {
+        return fn(val);
+    }, item);
+});
 
 /**
  * pipe :: [a] -> (b -> c)
@@ -81,14 +77,9 @@ function compose(...funcs) {
  * @returns {function} - Returns a function waiting for the item over which
  * to reduce the functions.
  */
-function pipe(...funcs) {
-    return compose(funcs.reverse());
-    /*return function _pipe(item) {
-        return funcs.reduce(function _reduce(val, fn) {
-            return fn(val);
-        }, item);
-    };*/
-}
+var pipe = curry(function _pipe(funcs, item) {
+    return compose(funcs.reverse(), item);
+});
 
 /**
  * ifElse :: Function -> ( Function -> ( Function -> (a -> b) ) )
