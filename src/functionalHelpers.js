@@ -59,9 +59,7 @@ var set = curry(function _set(val, prop, obj) {
  * @type {*}
  */
 var compose = curry(function _compose(funcs, item) {
-    funcs.reverse().reduce(function _reduce(val, fn) {
-        return fn(val);
-    }, item);
+    return pipe(funcs.reverse(), item);
 });
 
 /**
@@ -78,7 +76,9 @@ var compose = curry(function _compose(funcs, item) {
  * to reduce the functions.
  */
 var pipe = curry(function _pipe(funcs, item) {
-    return compose(funcs.reverse(), item);
+    funcs.reduce(function _reduce(val, fn) {
+        return fn(val);
+    }, item);
 });
 
 /**

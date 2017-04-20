@@ -1,11 +1,12 @@
 import { when, isArray, not, get, set } from '../functionalHelpers';
 import { sortData } from  './sortHelpers';
+import { createNewQueryableDelegator } from '../queryObjects/queryDelegatorCreators';
 
 function groupBy(source, groupObject) {
     return function *groupByIterator() {
         //gather all data from the source before grouping
         var groupedData = groupData(when(not(isArray), Array.from, source), groupObject);
-        for (let item of groupedData) yield item;
+        for (let item of groupedData) yield createNewQueryableDelegator(item);
     };
 }
 

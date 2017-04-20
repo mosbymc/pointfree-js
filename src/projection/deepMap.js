@@ -33,4 +33,26 @@ function deepMap(source, fn) {
     };
 }
 
+function flatMap(source, fn) {
+    return function *flatMapIterator() {
+        var results = [];
+        for (let item of source) {
+            var res = fn(item);
+            if (res.length) {
+                results = results.concat(res);
+                yield results.shift();
+            }
+            else if (undefined !== res) {
+                if (isArray(res)) {
+                    yield res.shift();
+                    results = results.concat(res);
+                }
+            }
+            else yield res;
+        }
+
+        while (results.length) yield results.shift();
+    }
+}
+
 export { deepMap };
