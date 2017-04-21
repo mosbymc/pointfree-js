@@ -37,6 +37,24 @@ function constant(item) {
  */
 var kestrel = constant;
 
+var tap = curry(function _tap(a, f) {
+    return f(a), a;
+});
+
+function sequence(fns) {
+    return function _sequence(...args) {
+        fns.forEach(function fSequence(fn) {
+            fn(...args);
+        });
+    };
+}
+
+var fork = curry(function _fork(join, fn1, fn2) {
+    return function _fork_(...args) {
+        return join(fn1(...args), fn2(...args));
+    };
+});
+
 /**
  *
  * @type {*}
@@ -71,15 +89,20 @@ var compose = curry(function _compose(funcs, item) {
  * sequentially. Performs a similar functionality to compose, but applies
  * the functions in reverse order to that of compose.
  * @refer {compose}
- * @param {Array} funcs - An array of function to be reduced over an item
+ * @param {function} fn - The function to run initially; may be any arity.
+ * @param {Array} fns - The remaining functions in the pipeline. Each receives
+ * its input from the output of the previous function. Therefore each of these
+ * functions must be unary.
  * @returns {function} - Returns a function waiting for the item over which
  * to reduce the functions.
  */
-var pipe = curry(function _pipe(funcs, item) {
-    funcs.reduce(function _reduce(val, fn) {
-        return fn(val);
-    }, item);
-});
+function pipe(fn, ...fns) {
+    return function _pipe(...args) {
+        return fns.reduce(function pipeReduce(item, f) {
+            return f(item);
+        }, fn(...args));
+    };
+}
 
 /**
  * ifElse :: Function -> ( Function -> ( Function -> (a -> b) ) )
