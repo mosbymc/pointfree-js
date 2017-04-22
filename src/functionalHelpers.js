@@ -1,4 +1,5 @@
-import { alterFunctionLength, javaScriptTypes } from './helpers';
+import { alterFunctionLength, javaScriptTypes, cloneArray } from './helpers';
+import { identity } from './identity_monad/identity';
 
 /**
  * No-op function; used as default function in some cases when argument is optional
@@ -148,6 +149,11 @@ var whenNot = curry(function _whenNot(predicate, transform, data) {
     return data;
 });
 
+var nth = curry(function nth(offset, list) {
+    var idx = offset < 0 ? list.length + offset : offset;
+    return 'string' === typeof list ? list.charAt(idx) : list[idx];
+});
+
 /**
  * wrap :: a -> [a]
  * Takes any value of any type and returns an array containing
@@ -158,6 +164,15 @@ var whenNot = curry(function _whenNot(predicate, transform, data) {
  */
 function wrap(data) {
     return [data];
+}
+
+/**
+ *
+ * @param a
+ * @returns {string}
+ */
+function type(a) {
+    return typeof a;
 }
 
 /**
@@ -177,7 +192,7 @@ function isArray(data) {
  * @returns {boolean}
  */
 function isObject(item) {
-    return javaScriptTypes.object === typeof item && null !==  item;
+    return javaScriptTypes.object === type(item) && null !==  item;
 }
 
 /**
@@ -187,7 +202,61 @@ function isObject(item) {
  * @returns {boolean}
  */
 function isFunction(fn) {
-    return javaScriptTypes.function === typeof fn;
+    return javaScriptTypes.function === type(fn);
+}
+
+/**
+ *
+ * @param num
+ * @returns {boolean}
+ */
+function isNumber(num) {
+    return javaScriptTypes.number === type(num);
+}
+
+/**
+ *
+ * @param str
+ * @returns {boolean}
+ */
+function isString(str) {
+    return javaScriptTypes.string === type(str);
+}
+
+/**
+ *
+ * @param bool
+ * @returns {boolean}
+ */
+function isBoolean(bool) {
+    return javaScriptTypes.boolean === type(bool);
+}
+
+/**
+ *
+ * @param sym
+ * @returns {boolean}
+ */
+function isSymbol(sym) {
+    return javaScriptTypes.symbol === type(sym);
+}
+
+/**
+ *
+ * @param n
+ * @returns {string|boolean}
+ */
+function isNull(n) {
+    return type(n) && null === n;
+}
+
+/**
+ *
+ * @param u
+ * @returns {boolean}
+ */
+function isUndefined(u) {
+    return javaScriptTypes.undefined === type(u);
 }
 
 /**
@@ -225,6 +294,74 @@ var and = curry(function _and(a, b, item) {
     return a(item) && b(item);
 });
 
+var arrayLens = curry(function _arrayLens(idx, f, xs) {
+    return map(function (val) {
+        return update(idx, val, xs)
+    }, f(xs[idx]));
+});
+
+var objectLens = curry(function _objectLens(prop, f, xs) {
+    return map(function _map(rep) {
+        return assoc(prop, rep, xs);
+    }, f(xs[prop]));
+});
+
+var view = curry(function _view(lens, target) {
+    return lens(kestrel)(target).value;
+});
+
+var over = curry(function _over(lens, mapFn, target) {
+    return lens(function _lens(y) {
+        return identity(mapFn(y));
+    })(target).value;
+});
+
+var put = curry(function _put(lens, val, target) {
+    return over(lens, kestrel(val), target);
+});
+
+function makeLenses(...paths) {
+    return paths.reduce(function _pathReduce(cur, next) {
+        var ol = objectLens(next);
+        return put(ol, ol, cur);
+    }, { num: arrayLens });
+}
+
+function lensPath(...path) {
+    return compose(...path.map(function _pathMap(p) {
+        return 'string' === typeof p ? objectLens(p) : arrayLens(p);
+    }));
+}
+
+var mapped = curry(function _mapped(f, x) {
+    return identity(map(compose(function _mCompose(x) {
+        return x.value;
+    }, f), x));
+});
+
+var assoc = curry(function _assoc(prop, val, obj) {
+    var result = {};
+    for (var p in obj) {
+        result[p] = obj[p];
+    }
+    result[prop] = val;
+    return result;
+});
+
+var update = curry(function _update(idx, x, list) {
+    return adjust(kestrel(x), idx, list);
+});
+
+var adjust = curry(function _adjust(fn, idx, list) {
+    if (idx >= list.length || idx < -list.length) {
+        return list;
+    }
+    var _idx = idx < 0 ? list.length + idx : idx,
+        _list = cloneArray(list);
+    _list[_idx] = fn(list[_idx]);
+    return _list;
+});
+
 /**
  * curry :: (* -> a) -> (* -> a)
  *
@@ -233,16 +370,28 @@ var and = curry(function _and(a, b, item) {
  */
 function curry(fn) {
     if (!fn.length || 1 === fn.length) return fn;
-    return _curry(fn.length, [], fn);
+    return curryN(fn.length, [], fn);
 }
 
-function _curry(length, received, fn) {
-    return function _c(...rest) {
+/**
+ * Curries a function to a specified arity
+ * @param {number} arity - The number of arguments to curry the function for
+ * @param {Array} received - An array of the arguments to be applied to the function
+ * @param {function} fn - The function to be curried
+ * @returns {function | *} - Returns either a function waiting for more arguments to
+ * be applied before invocation, or will return the result of the function invocation
+ * if the specified number of arguments have been received
+ */
+function curryN(arity, received, fn) {
+    return function _curryN(...rest) {
         var combined = received.concat(rest);
-        if (length > combined.length)
-            return _curry(length, combined, fn);
+        if (arity > combined.length)
+            return curryN(arity, combined, fn);
         return fn.call(this, ...combined);
     };
 }
 
-export { noop, identity, constant, kestrel, get, set, compose, pipe, ifElse, when, whenNot, wrap, isArray, isObject, isFunction, not, or, and, curry };
+export { noop, identity, constant, kestrel, get, set, nth, compose, pipe, ifElse, when, whenNot,
+        wrap, type, isArray, isObject, isFunction, isNumber, isString, isBoolean, isSymbol, isNull,
+        isUndefined, not, or, and, arrayLens, objectLens, view, over, put, makeLenses, lensPath,
+        mapped, assoc, update, adjust, curry, curryN };
