@@ -49,6 +49,18 @@ var tap = curry(function _tap(a, f) {
 
 /**
  *
+ * @param fn
+ * @returns {function}
+ */
+function once(fn) {
+    var invoked = false;
+    return function _once(...args) {
+        return invoked ? undefined : fn(...args);
+    };
+}
+
+/**
+ *
  * @param fns
  * @returns {function}
  */
@@ -469,7 +481,7 @@ function curryN(arity, received, fn) {
     };
 }
 
-export { noop, identity, constant, kestrel, get, objectSet, arraySet, nth, compose, pipe, ifElse, when,
+export { noop, identity, constant, once, kestrel, get, objectSet, arraySet, nth, compose, pipe, ifElse, when,
         whenNot, wrap, type, isArray, isObject, isFunction, isNumber, isString, isBoolean, isSymbol, isNull,
         isUndefined, not, or, and, arrayLens, objectLens, view, over, put, makeLenses, lensPath,
         mapped, adjust, curry, curryN, tap, fork, sequence };

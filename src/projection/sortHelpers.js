@@ -73,9 +73,9 @@ function qSort(data, left, right, dir, keySelector, keyComparer) {
             x = keySelector(data[itemIdx]);
 
         do {
-            while (i < data.length && dir === sortDirection.Ascending ? keyComparer(keySelector, itemIdx, i, x, data) > 0 :
+            while (i < data.length && dir === sortDirection.ascending ? keyComparer(keySelector, itemIdx, i, x, data) > 0 :
                 keyComparer(keySelector, itemIdx, i, x, data) < 0) ++i;
-            while (j >= 0 && dir === sortDirection.Ascending ? keyComparer(keySelector, itemIdx, j, x, data) < 0 :
+            while (j >= 0 && dir === sortDirection.ascending ? keyComparer(keySelector, itemIdx, j, x, data) < 0 :
                 keyComparer(keySelector, itemIdx, j, x, data) < 0) --j;
             if (i > j) break;
             if (i < j) {
