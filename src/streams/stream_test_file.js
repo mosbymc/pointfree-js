@@ -451,7 +451,7 @@ function cloneData(data) {
     /*
      var fields = Object.keys(data).concat(climbPrototypeChain(obj));
      Object.keys(data).forEach(function _cloneGridData(field) {
-     temp[field] = cloneData(data[field]);
+     temp[field] = deepClone(data[field]);
      });
      */
 

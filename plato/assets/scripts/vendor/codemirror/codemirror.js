@@ -125,7 +125,7 @@ window.CodeMirror = (function() {
     if (!webkit) d.scroller.draggable = true;
     // Needed to handle Tab key in KHTML
     if (khtml) { d.inputDiv.style.height = "1px"; d.inputDiv.style.position = "absolute"; }
-    // Need to set a minimum width to see the scrollbar on IE7 (but must not set it on IE8).
+    // Need to objectSet a minimum width to see the scrollbar on IE7 (but must not objectSet it on IE8).
     else if (ie_lt8) d.scrollbarH.style.minWidth = d.scrollbarV.style.minWidth = "18px";
 
     // Current visible range (may be bigger than the view window).
@@ -391,7 +391,7 @@ window.CodeMirror = (function() {
     return updated;
   }
 
-  // Uses a set of changes plus the current scroll position to
+  // Uses a objectSet of changes plus the current scroll position to
   // determine which DOM updates have to be made, and makes the
   // updates.
   function updateDisplayInner(cm, changes, viewPort) {
@@ -1845,7 +1845,7 @@ window.CodeMirror = (function() {
   // UPDATING
 
   // Replace the range from from to to by the strings in newText.
-  // Afterwards, set the selection to selFrom, selTo.
+  // Afterwards, objectSet the selection to selFrom, selTo.
   function updateDoc(cm, from, to, newText, selUpdate, origin) {
     // Possibly split or suppress the update based on the presence
     // of read-only spans in its range.
@@ -2040,7 +2040,7 @@ window.CodeMirror = (function() {
   function isLine(doc, l) {return l >= 0 && l < doc.size;}
 
   // If shift is held, this will move the selection anchor. Otherwise,
-  // it'll set the whole selection.
+  // it'll objectSet the whole selection.
   function extendSelection(cm, pos, other, bias) {
     var sel = cm.view.sel;
     if (sel.shift || sel.extend) {
@@ -3683,7 +3683,7 @@ window.CodeMirror = (function() {
     var pos = 0, i = 0, text = "", style;
     var nextChange = 0, spanStyle, spanEndStyle, spanStartStyle, collapsed;
     for (;;) {
-      if (nextChange == pos) { // Update current marker set
+      if (nextChange == pos) { // Update current marker objectSet
         spanStyle = spanEndStyle = spanStartStyle = "";
         collapsed = null; nextChange = Infinity;
         var foundBookmark = null;
@@ -4207,7 +4207,7 @@ window.CodeMirror = (function() {
   // word wrapping between certain characters *only* if a new inline
   // element is started between them. This makes it hard to reliably
   // measure the position of things, since that requires inserting an
-  // extra span. This terribly fragile set of regexps matches the
+  // extra span. This terribly fragile objectSet of regexps matches the
   // character combinations that suffer from this phenomenon on the
   // various browsers.
   var spanAffectsWrapping = /^$/; // Won't match any two-character string

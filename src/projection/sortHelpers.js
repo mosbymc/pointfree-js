@@ -1,4 +1,4 @@
-import { cloneData, defaultEqualityComparer, sortComparer, sortDirection } from '../helpers';
+import { deepClone, defaultEqualityComparer, sortComparer, sortDirection } from '../helpers';
 import { not } from '../functionalHelpers';
 
 function sortData(data, sortObject) {
@@ -48,8 +48,8 @@ function merge(left, right, keySelector, comparer) {
     if (!right.length) return left;
 
     if (comparer(keySelector(left[0]), keySelector(right[0])))
-        return [cloneData(left[0])].concat(merge(left.slice(1, left.length), right, keySelector, comparer));
-    return [cloneData(right[0])].concat(merge(left, right.slice(1, right.length), keySelector, comparer));
+        return [deepClone(left[0])].concat(merge(left.slice(1, left.length), right, keySelector, comparer));
+    return [deepClone(right[0])].concat(merge(left, right.slice(1, right.length), keySelector, comparer));
 }
 
 function quickSort(source, keySelector, keyComparer) {

@@ -18,7 +18,9 @@ var _just = {
     get value() {
         return this._value;
     },
-    map: kestrel(this),
+    map: function _map() {
+        return this;
+    },
     apply: function _apply(ma) {
         return ma.map(this.value);
     },

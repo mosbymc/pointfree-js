@@ -12,7 +12,7 @@
 
       var tempToken = editor.getTokenAt(editor.getCursor());
 
-      // Don't show completions if token has changed and the option is set.
+      // Don't show completions if token has changed and the option is objectSet.
       if (options.closeOnTokenChange && previousToken != null &&
           (tempToken.start != previousToken.start || tempToken.type != previousToken.type)) {
         return;
@@ -78,7 +78,7 @@
           close(); editor.focus();
           // Pass the event to the CodeMirror instance so that it can handle things like backspace properly.
           editor.triggerOnKeyDown(event);
-          // Don't show completions if the code is backspace and the option is set.
+          // Don't show completions if the code is backspace and the option is objectSet.
           if (!options.closeOnBackspace || code != 8) {
             setTimeout(function(){collectHints(tempToken);}, 50);
           }

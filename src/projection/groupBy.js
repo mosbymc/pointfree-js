@@ -1,4 +1,4 @@
-import { when, isArray, not, get, set } from '../functionalHelpers';
+import { when, isArray, not, get, objectSet } from '../functionalHelpers';
 import { sortData } from  './sortHelpers';
 import { createNewQueryableDelegator } from '../queryObjects/queryDelegatorCreators';
 
@@ -36,7 +36,7 @@ function findGroup(arr, field) {
         return grp;
     else {
         grp = [];
-        set(field, 'key', grp);
+        objectSet(field, 'key', grp);
         arr.push(grp);
         return grp;
     }

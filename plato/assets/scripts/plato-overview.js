@@ -123,7 +123,7 @@ $(function(){
     });
 
     function onGraphClick(i){
-      // If the i is not set, we jump to the last file in the list. This
+      // If the i is not objectSet, we jump to the last file in the list. This
       // preserves a behavior from Morris v1. I expect Plato V1 to be deprecated
       // and this hack is mearly to preserve the casper tests.
       if (i == null || isNaN(i)) { i = __report.reports.length - 1; }

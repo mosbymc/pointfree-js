@@ -1,4 +1,4 @@
-import { defaultEqualityComparer, defaultGreaterThanComparer, defaultPredicate, memoizer, cloneData, cloneArray } from '../../src/helpers';
+import { defaultEqualityComparer, defaultGreaterThanComparer, defaultPredicate, memoizer, deepClone, deepCopy } from '../../src/helpers';
 import { testData } from '../testData';
 
 function checkClonedDataProps(orig, clone) {
@@ -19,16 +19,16 @@ function checkClonedArrayIndices(orig, clone) {
     });
 }
 
-describe('cloneData', function testCloneData() {
+describe('deepClone', function testCloneData() {
     it('should clone data', function testCloneData() {
-        var clonedData = cloneData(testData);
+        var clonedData = deepClone(testData);
         expect(checkClonedDataProps(testData, clonedData)).to.be.true;
     });
 });
 
-describe('cloneArray', function testCloneArray() {
+describe('deepCopy', function testCloneArray() {
     it('should clone arrays', function testCloneArray() {
-        var clonedArr = cloneArray(testData.dataSource.data);
+        var clonedArr = deepCopy(testData.dataSource.data);
         expect(checkClonedArrayIndices(testData.dataSource.data, clonedArr)).to.be.true;
     });
 });

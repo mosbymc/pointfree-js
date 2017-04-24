@@ -30,7 +30,7 @@
         $this.css('font-size', Math.max(Math.min($this.width() / (compressor*10), parseFloat(settings.maxFontSize)), parseFloat(settings.minFontSize)));
       };
 
-      // Call once to set.
+      // Call once to objectSet.
       resizer();
 
       // Call on resize. Opera debounces their resize by default.

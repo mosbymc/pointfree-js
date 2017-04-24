@@ -5,7 +5,7 @@ function createNewQueryableDelegator(source, iterator) {
     var obj = Object.create(internal_queryable);
     obj.dataComputed = false;
     obj.source = source;
-    //if the iterator param has been passed and is a generator, set it as the object's
+    //if the iterator param has been passed and is a generator, objectSet it as the object's
     //iterator; other wise let the object delegate to the queryable's iterator
     if (iterator && generatorProto.isPrototypeOf(iterator))
         obj[Symbol.iterator] = iterator;
@@ -21,7 +21,7 @@ function createNewOrderedQueryableDelegator(source, iterator, sortObj) {
     //the underlying sorting function will only be called a single time for
     //all sorts.
     obj._appliedSorts = sortObj;
-    //if the iterator param has been passed and is a generator, set it as the object's
+    //if the iterator param has been passed and is a generator, objectSet it as the object's
     //iterator; other wise let the object delegate to the queryable's iterator
     if (iterator && generatorProto.isPrototypeOf(iterator))
         obj[Symbol.iterator] = iterator;

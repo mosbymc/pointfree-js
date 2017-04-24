@@ -24,7 +24,7 @@ gulp.task('build-dev', ['clean-dev'], function _testTmp() {
         uglify = require('gulp-uglify'),
         sourceMaps = require('gulp-sourcemaps');
 
-    // set up the browserify instance on a task basis
+    // objectSet up the browserify instance on a task basis
     var b = browserify({
         entries: './src/index.js',
         debug: true,

@@ -18,7 +18,7 @@ module.exports = function _wallaby(wallaby) {
         /*
          files: the files that should be included in the phantomjs sandbox
          - load: Indicates to wallaby if it or something else will load the files into sandbox; those that are
-         set to false are being loaded by browserify after transpilation
+         objectSet to false are being loaded by browserify after transpilation
          - instrument: Indicates to wallaby if coverage reporting (in the IDE and application) should be checked against the matched files
          */
         files: [
@@ -31,9 +31,9 @@ module.exports = function _wallaby(wallaby) {
         ],
 
         /*
-         tests: the tests to be run, load is set to false because they will be required through browserify after transpilation
+         tests: the tests to be run, load is objectSet to false because they will be required through browserify after transpilation
          - load: Indicates to wallaby if it or something else will load the files into sandbox; those that are
-         set to false are being loaded by browserify after transpilation
+         objectSet to false are being loaded by browserify after transpilation
          */
         tests: [
             { pattern: 'test/**/*.spec.js', load: false }
@@ -127,7 +127,7 @@ module.exports = function _wallaby(wallaby) {
         /*
          files: the files that should be included in the phantomjs sandbox
          - load: Indicates to wallaby if it or something else will load the files into sandbox; those that are
-         set to false are being loaded by browserify after transpilation
+         objectSet to false are being loaded by browserify after transpilation
          - instrument: Indicates to wallaby if coverage reporting (in the IDE and application) should be checked against the matched files
          */
         files: [
@@ -140,9 +140,9 @@ module.exports = function _wallaby(wallaby) {
         ],
 
         /*
-         tests: the tests to be run, load is set to false because they will be required through browserify after transpilation
+         tests: the tests to be run, load is objectSet to false because they will be required through browserify after transpilation
          - load: Indicates to wallaby if it or something else will load the files into sandbox; those that are
-         set to false are being loaded by browserify after transpilation
+         objectSet to false are being loaded by browserify after transpilation
          */
         tests: [
             { pattern: 'test/**/*.spec.js', load: false }

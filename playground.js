@@ -14,7 +14,7 @@
 //TODO:
 //TODO:    Each 'method' that can be called on the queryable object and which results in deferred execution, should have its own iterator defined,
 //TODO:    so that, in effect, each 'method' knows how to iterate and evaluate itself. When creating the new queryable object to return from a 'method'
-//TODO:    call, that 'method' should return its iterator to be set as the new queryable object's iterator; thus, every time a deferred execution 'method'
+//TODO:    call, that 'method' should return its iterator to be objectSet as the new queryable object's iterator; thus, every time a deferred execution 'method'
 //TODO:    is chained off a queryable, it results in a new queryable object that has a different iterator than the one that proceeded it and is unique
 //TODO:    to the 'method' that was called.
 //TODO:
@@ -67,7 +67,7 @@
 //TODO:           object's state to see if it has already been evaluated before actually performing the evaluation. This would allow users of the library
 //TODO:           to focus more on the evaluation logic of their function via the iterator without having to worry about checking if the queryable has
 //TODO:           already been evaluated, while at the same time, providing a clean and consistent 'interface' for a queryable's [Symbol.iterator] property.
-//TODO:           In addition, the iterator wrapper could always set the queryable's evaluated state after the function iterator has completed execution as
+//TODO:           In addition, the iterator wrapper could always objectSet the queryable's evaluated state after the function iterator has completed execution as
 //TODO:           well. This way, not only does a function's iterator not need to check if the queryable object it is iterating has already been evaluated,
 //TODO:           but it also won't need to bother setting that state once it completes the evaluation as it will be performed in the iterator wrapper. Now,
 //TODO:           each function's iterator is free to concern itself solely with its own evaluation and doesn't need to bother with the checking or setting
@@ -606,7 +606,7 @@ attachListener('click');
             while (_parent) {
                 _parent.remove(this);
                 // if this._parents is null or index >= len,
-                // then _parent is set to null, and the loop exits
+                // then _parent is objectSet to null, and the loop exits
                 _parent = ++index < len && _parents[index] || null;
             }
             if (isFunction(_unsubscribe)) {
@@ -712,7 +712,7 @@ attachListener('click');
             var _a = this, _parent = _a._parent, _parents = _a._parents;
             if (!_parent || _parent === parent) {
                 // If we don't have a parent, or the new parent is the same as the
-                // current parent, then set this._parent to the new parent.
+                // current parent, then objectSet this._parent to the new parent.
                 this._parent = parent;
             }
             else if (!_parents) {
@@ -1030,7 +1030,7 @@ attachListener('click');
     var $$observable = getSymbolObservable(root);
 
     /**
-     * A representation of any set of values over any amount of time. This the most basic building block
+     * A representation of any objectSet of values over any amount of time. This the most basic building block
      * of RxJS.
      *
      * @class Observable<T>
@@ -1482,10 +1482,10 @@ attachListener('click');
          * listen for multiple calls, you probably want to use {@link fromEvent} or
          * {@link fromEventPattern} instead.
          *
-         * If `func` depends on some context (`this` property), that context will be set
+         * If `func` depends on some context (`this` property), that context will be objectSet
          * to the same context that output function has at call time. In particular, if `func`
          * is called as method of some object, in order to preserve proper behaviour,
-         * it is recommended to set context of output function to that object as well,
+         * it is recommended to objectSet context of output function to that object as well,
          * provided `func` is not already bound.
          *
          * If input function calls its callback in "node style" (i.e. first argument to callback is
@@ -1725,7 +1725,7 @@ attachListener('click');
          * To find out more, check out documentation for {@link bindCallback}, where
          * Scheduler works exactly the same.
          *
-         * As in {@link bindCallback}, context (`this` property) of input function will be set to context
+         * As in {@link bindCallback}, context (`this` property) of input function will be objectSet to context
          * of returned function, when it is called.
          *
          * After Observable emits value, it will complete immediately. This means
@@ -2772,7 +2772,7 @@ attachListener('click');
      * `concat` will complete as well. At any given moment only one Observable passed to operator
      * emits values. If you would like to emit values from passed Observables concurrently, check out
      * {@link merge} instead, especially with optional `concurrent` parameter. As a matter of fact,
-     * `concat` is an equivalent of `merge` operator with `concurrent` parameter set to `1`.
+     * `concat` is an equivalent of `merge` operator with `concurrent` parameter objectSet to `1`.
      *
      * Note that if some input Observable never completes, `concat` will also never complete
      * and Observables following the one that did not complete will never be subscribed. On the other
@@ -5777,7 +5777,7 @@ attachListener('click');
             if (!request.crossDomain && !headers['X-Requested-With']) {
                 headers['X-Requested-With'] = 'XMLHttpRequest';
             }
-            // ensure content type is set
+            // ensure content type is objectSet
             if (!('Content-Type' in headers) && !(root.FormData && request.body instanceof root.FormData) && typeof request.body !== 'undefined') {
                 headers['Content-Type'] = 'application/x-www-form-urlencoded; charset=UTF-8';
             }
@@ -5800,7 +5800,7 @@ attachListener('click');
             }
             else {
                 this.xhr = xhr;
-                // set up the events before open XHR
+                // objectSet up the events before open XHR
                 // https://developer.mozilla.org/en/docs/Web/API/XMLHttpRequest/Using_XMLHttpRequest
                 // You need to add the event listeners before calling open() on the request.
                 // Otherwise the progress events will not fire.
@@ -5817,13 +5817,13 @@ attachListener('click');
                     this.error(errorObject.e);
                     return null;
                 }
-                // timeout, responseType and withCredentials can be set once the XHR is open
+                // timeout, responseType and withCredentials can be objectSet once the XHR is open
                 xhr.timeout = request.timeout;
                 xhr.responseType = request.responseType;
                 if ('withCredentials' in xhr) {
                     xhr.withCredentials = !!request.withCredentials;
                 }
-                // set headers
+                // objectSet headers
                 this.setHeaders(xhr, headers);
                 // finally send the request
                 result = body ? tryCatch(xhr.send).call(xhr, body) : tryCatch(xhr.send).call(xhr);
@@ -7273,7 +7273,7 @@ attachListener('click');
      * the source emits, you can run into memory issues as the incoming Observables
      * collect in an unbounded buffer.
      *
-     * Note: `concatAll` is equivalent to `mergeAll` with concurrency parameter set
+     * Note: `concatAll` is equivalent to `mergeAll` with concurrency parameter objectSet
      * to `1`.
      *
      * @example <caption>For each click event, tick every second from 0 to 3, with no concurrency</caption>
@@ -7489,7 +7489,7 @@ attachListener('click');
      * as inner Observables amass in an unbounded buffer waiting for their turn to
      * be subscribed to.
      *
-     * Note: `concatMap` is equivalent to `mergeMap` with concurrency parameter set
+     * Note: `concatMap` is equivalent to `mergeMap` with concurrency parameter objectSet
      * to `1`.
      *
      * @example <caption>For each click event, tick every second from 0 to 3, with no concurrency</caption>
@@ -7703,7 +7703,7 @@ attachListener('click');
      * be subscribed to.
      *
      * Note: `concatMapTo` is equivalent to `mergeMapTo` with concurrency parameter
-     * set to `1`.
+     * objectSet to `1`.
      *
      * @example <caption>For each click event, tick every second from 0 to 3, with no concurrency</caption>
      * var clicks = Rx.Observable.fromEvent(document, 'click');
@@ -12875,7 +12875,7 @@ attachListener('click');
                 return _super.prototype.recycleAsyncId.call(this, scheduler, id, delay);
             }
             // If the scheduler queue is empty, cancel the requested microtask and
-            // set the scheduled flag to undefined so the next AsapAction will schedule
+            // objectSet the scheduled flag to undefined so the next AsapAction will schedule
             // its own.
             if (scheduler.actions.length === 0) {
                 Immediate.clearImmediate(id);
@@ -12923,7 +12923,7 @@ attachListener('click');
      * <span class="informal">Perform task as fast as it can be performed asynchronously</span>
      *
      * `asap` scheduler behaves the same as {@link async} scheduler when you use it to delay task
-     * in time. If however you set delay to `0`, `asap` will wait for current synchronously executing
+     * in time. If however you objectSet delay to `0`, `asap` will wait for current synchronously executing
      * code to end and then it will try to execute given task as fast as possible.
      *
      * `asap` scheduler will do its best to minimize time between end of currently executing code
@@ -15591,7 +15591,7 @@ attachListener('click');
                 return _super.prototype.recycleAsyncId.call(this, scheduler, id, delay);
             }
             // If the scheduler queue is empty, cancel the requested animation frame and
-            // set the scheduled flag to undefined so the next AnimationFrameAction will
+            // objectSet the scheduled flag to undefined so the next AnimationFrameAction will
             // request its own.
             if (scheduler.actions.length === 0) {
                 AnimationFrame.cancelAnimationFrame(id);

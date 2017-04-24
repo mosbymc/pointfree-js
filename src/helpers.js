@@ -73,28 +73,36 @@ function newMemoizer(fn, comparer = defaultEqualityComparer) {
     }
 }
 
-function cloneData(data) {
-    if (null == data || javaScriptTypes.object !== typeof data)
-        return data;
+function deepClone(obj) {
+    if (null == obj || javaScriptTypes.object !== typeof obj)
+        return obj;
 
-    if (Array.isArray(data))
-        return cloneArray(data);
+    if (Array.isArray(obj))
+        return deepCopy(obj);
 
     var temp = {};
-    Object.keys(data).forEach(function _cloneGridData(field) {
-        temp[field] = cloneData(data[field]);
+    Object.keys(obj).forEach(function _cloneGridData(field) {
+        temp[field] = deepClone(obj[field]);
     });
     return temp;
 }
 
-function cloneArray(arr) {
+function deepCopy(arr) {
     var length = arr.length,
         newArr = new arr.constructor(length),
         index = -1;
     while (++index < length) {
-        newArr[index] = cloneData(arr[index]);
+        newArr[index] = deepClone(arr[index]);
     }
     return newArr;
+}
+
+function shallowClone(obj) {
+    var clone = {};
+    for (var p in obj) {
+        clone[p] = obj[p];
+    }
+    return clone;
 }
 
 function alterFunctionLength(fn, len) {
@@ -107,4 +115,4 @@ function alterFunctionLength(fn, len) {
 }
 
 export { javaScriptTypes, sortDirection, observableStatus, sortComparer, defaultEqualityComparer, defaultGreaterThanComparer, defaultPredicate, memoizer,
-    cloneData, cloneArray, generatorProto, alterFunctionLength };
+    deepClone, deepCopy, shallowClone, generatorProto, alterFunctionLength };

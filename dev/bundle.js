@@ -1038,7 +1038,7 @@ function createNewQueryableDelegator(source, iterator) {
     var obj = Object.create(_queryable.internal_queryable);
     obj.dataComputed = false;
     obj.source = source;
-    //if the iterator param has been passed and is a generator, set it as the object's
+    //if the iterator param has been passed and is a generator, objectSet it as the object's
     //iterator; other wise let the object delegate to the queryable's iterator
     if (iterator && _helpers.generatorProto.isPrototypeOf(iterator)) obj[Symbol.iterator] = iterator;
 
@@ -1053,7 +1053,7 @@ function createNewOrderedQueryableDelegator(source, iterator, sortObj) {
     //the underlying sorting function will only be called a single time for
     //all sorts.
     obj._appliedSorts = sortObj;
-    //if the iterator param has been passed and is a generator, set it as the object's
+    //if the iterator param has been passed and is a generator, objectSet it as the object's
     //iterator; other wise let the object delegate to the queryable's iterator
     if (iterator && _helpers.generatorProto.isPrototypeOf(iterator)) obj[Symbol.iterator] = iterator;
 
@@ -1280,7 +1280,7 @@ var queryable_core = {
     },
 
     /**
-     * Produces a list that contains the set difference between the queryable object
+     * Produces a list that contains the objectSet difference between the queryable object
      * and the list that is passed as a function argument. A comparer function may be
      * provided to the function that determines the equality/inequality of the items in
      * each list; if left undefined, the function will use a default equality comparer.
@@ -1316,7 +1316,7 @@ var queryable_core = {
     },
 
     /**
-     * Produces the set intersection of the queryable object's source and the list
+     * Produces the objectSet intersection of the queryable object's source and the list
      * that is passed as a function argument. A comparer function may be
      * provided to the function that determines the equality/inequality of the items in
      * each list; if left undefined, the function will use a default equality comparer.
@@ -1350,7 +1350,7 @@ var queryable_core = {
     },
 
     /**
-     * Produces the set union of two lists by selecting each unique item in both
+     * Produces the objectSet union of two lists by selecting each unique item in both
      * lists. A comparer function may be provided to the function that determines
      * the equality/inequality of the items in each list; if left undefined, the
      * function will use a default equality comparer. This function is a deferred
@@ -1571,7 +1571,7 @@ var queryable_core = {
     /**
      * Base iterator to which all queryable_core delegator objects
      * delegate to for iteration if for some reason an iterator wasn't
-     * set on the delegator at the time of creation.
+     * objectSet on the delegator at the time of creation.
      */
     [Symbol.iterator]: function* _iterator() {
         var data = Array.from(this.source);
@@ -1674,7 +1674,7 @@ var queryable = {
      * and yield out each item one at a time. The first argument must be the 'source'
      * argument of the function which will be what the returned generator must iterate
      * in order to retrieve the items it work work on. The function may work on all
-     * the data as a single set, or it can iterate it's queryable source and apply the
+     * the data as a single objectSet, or it can iterate it's queryable source and apply the
      * functionality to a single item before yielding that item and calling for the next.
      * The source argument may be any iterable object, generally an array or another
      * queryable; the returned generator needs either turn the iterable into an array
@@ -1697,7 +1697,7 @@ var queryable = {
      * argument has a [Symbol.iterator] definition, it will call Array.from on the source
      * before creating a new delegator, otherwise it will wrap the source argument in
      * as array.
-     * @returns { Object } Returns a new queryable delegator object with its source set
+     * @returns { Object } Returns a new queryable delegator object with its source objectSet
      * to the value of the provided source argument
      */
     from: function _from(source = []) {

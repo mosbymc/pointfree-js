@@ -1,4 +1,4 @@
-import { alterFunctionLength, javaScriptTypes, cloneArray } from './helpers';
+import { alterFunctionLength, javaScriptTypes, shallowClone } from './helpers';
 import { identity } from './identity_monad/identity';
 
 /**
@@ -7,6 +7,7 @@ import { identity } from './identity_monad/identity';
  */
 function noop() {}
 
+//TODO: I need to either rename this function or the identity monad creator func
 /**
  * identity :: a -> a
  * Identity function; takes any item and returns same item when invoked
@@ -38,10 +39,19 @@ function constant(item) {
  */
 var kestrel = constant;
 
+/**
+ *
+ * @type {function}
+ */
 var tap = curry(function _tap(a, f) {
     return f(a), a;
 });
 
+/**
+ *
+ * @param fns
+ * @returns {function}
+ */
 function sequence(fns) {
     return function _sequence(...args) {
         fns.forEach(function fSequence(fn) {
@@ -50,6 +60,11 @@ function sequence(fns) {
     };
 }
 
+/**
+ *
+ * @type {function}
+ *
+ */
 var fork = curry(function _fork(join, fn1, fn2) {
     return function _fork_(...args) {
         return join(fn1(...args), fn2(...args));
@@ -58,7 +73,10 @@ var fork = curry(function _fork(join, fn1, fn2) {
 
 /**
  *
- * @type {*}
+ * @type {function}
+ * @param {string} prop
+ * @param {object} obj
+ * @returns {*}
  */
 var get = curry(function _get(prop, obj) {
     return obj[prop];
@@ -66,11 +84,28 @@ var get = curry(function _get(prop, obj) {
 
 /**
  *
- * @type {*}
+ * @type {function}
+ * @param {string} prop
+ * @param {*} val
+ * @param {object} obj
+ * @returns {object}
  */
-var set = curry(function _set(val, prop, obj) {
-    obj[prop] = val;
-    return val;
+var objectSet = curry(function _objectSet(prop, val, obj) {
+    var result = shallowClone(obj);
+    result[prop] = val;
+    return result;
+});
+
+/**
+ *
+ * @type {function}
+ * @param {number} idx
+ * @param {*} x
+ * @param {Array} list
+ * @returns {Array}
+ */
+var arraySet = curry(function _arraySet(idx, x, list) {
+    return adjust(kestrel(x), idx, list);
 });
 
 /**
@@ -142,13 +177,24 @@ var when = curry(function _when(predicate, transform, data) {
 
 /**
  *
- * @type {*}
+ * @type {function}
+ * @param {function} predicate
+ * @param {function} transform
+ * @param {*} data
+ * @returns {*}
  */
 var whenNot = curry(function _whenNot(predicate, transform, data) {
     if (!predicate(data)) return transform(data);
     return data;
 });
 
+/**
+ *
+ * @type {function}
+ * @param {number} offset
+ * @param {Array} list
+ * @returns {*}
+ */
 var nth = curry(function nth(offset, list) {
     var idx = offset < 0 ? list.length + offset : offset;
     return 'string' === typeof list ? list.charAt(idx) : list[idx];
@@ -294,32 +340,57 @@ var and = curry(function _and(a, b, item) {
     return a(item) && b(item);
 });
 
+/**
+ *
+ * @type {*}
+ */
 var arrayLens = curry(function _arrayLens(idx, f, xs) {
     return map(function (val) {
         return update(idx, val, xs)
     }, f(xs[idx]));
 });
 
+/**
+ *
+ * @type {*}
+ */
 var objectLens = curry(function _objectLens(prop, f, xs) {
     return map(function _map(rep) {
-        return assoc(prop, rep, xs);
+        return objectSet(prop, rep, xs);
     }, f(xs[prop]));
 });
 
+/**
+ *
+ * @type {*}
+ */
 var view = curry(function _view(lens, target) {
     return lens(kestrel)(target).value;
 });
 
+/**
+ *
+ * @type {*}
+ */
 var over = curry(function _over(lens, mapFn, target) {
     return lens(function _lens(y) {
         return identity(mapFn(y));
     })(target).value;
 });
 
+/**
+ *
+ * @type {*}
+ */
 var put = curry(function _put(lens, val, target) {
     return over(lens, kestrel(val), target);
 });
 
+/**
+ *
+ * @param paths
+ * @returns {*}
+ */
 function makeLenses(...paths) {
     return paths.reduce(function _pathReduce(cur, next) {
         var ol = objectLens(next);
@@ -327,37 +398,44 @@ function makeLenses(...paths) {
     }, { num: arrayLens });
 }
 
+/**
+ *
+ * @param path
+ * @returns {*}
+ */
 function lensPath(...path) {
     return compose(...path.map(function _pathMap(p) {
         return 'string' === typeof p ? objectLens(p) : arrayLens(p);
     }));
 }
 
+/**
+ *
+ * @type {function}
+ * @param {function} f
+ * @param {object} x
+ * @returns {identity<T>}
+ */
 var mapped = curry(function _mapped(f, x) {
     return identity(map(compose(function _mCompose(x) {
         return x.value;
     }, f), x));
 });
 
-var assoc = curry(function _assoc(prop, val, obj) {
-    var result = {};
-    for (var p in obj) {
-        result[p] = obj[p];
-    }
-    result[prop] = val;
-    return result;
-});
-
-var update = curry(function _update(idx, x, list) {
-    return adjust(kestrel(x), idx, list);
-});
-
+/**
+ *
+ * @type {function}
+ * @param {function} fn
+ * @param {number} idx
+ * @param {Array} list
+ * @returns {Array}
+ */
 var adjust = curry(function _adjust(fn, idx, list) {
     if (idx >= list.length || idx < -list.length) {
         return list;
     }
     var _idx = idx < 0 ? list.length + idx : idx,
-        _list = cloneArray(list);
+        _list = list.map(identity);
     _list[_idx] = fn(list[_idx]);
     return _list;
 });
@@ -391,7 +469,7 @@ function curryN(arity, received, fn) {
     };
 }
 
-export { noop, identity, constant, kestrel, get, set, nth, compose, pipe, ifElse, when, whenNot,
-        wrap, type, isArray, isObject, isFunction, isNumber, isString, isBoolean, isSymbol, isNull,
+export { noop, identity, constant, kestrel, get, objectSet, arraySet, nth, compose, pipe, ifElse, when,
+        whenNot, wrap, type, isArray, isObject, isFunction, isNumber, isString, isBoolean, isSymbol, isNull,
         isUndefined, not, or, and, arrayLens, objectLens, view, over, put, makeLenses, lensPath,
-        mapped, assoc, update, adjust, curry, curryN };
+        mapped, adjust, curry, curryN, tap, fork, sequence };
