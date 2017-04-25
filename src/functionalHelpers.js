@@ -4,6 +4,7 @@ import { identity } from './identity_monad/identity';
 /**
  * No-op function; used as default function in some cases when argument is optional
  * and consumer does not provide.
+ * @returns {undefined}
  */
 function noop() {}
 
@@ -12,7 +13,7 @@ function noop() {}
  * identity :: a -> a
  * Identity function; takes any item and returns same item when invoked
  *
- * @param item - Any value of any type
+ * @param {*} item - Any value of any type
  * @returns {*} - returns item
  */
 function identity(item) { return item; }
@@ -31,8 +32,8 @@ function constant(item) {
 
 /**
  * kestrel :: a -> () -> a
- * @refer - constant
- * @type {constant}
+ * @note @see {@link constant}
+ * @type {function}
  * @param {*} item
  * @returns {function} - Returns a function, that when invoked, will
  * return the item passed to the constant function as an argument.
@@ -40,17 +41,21 @@ function constant(item) {
 var kestrel = constant;
 
 /**
- *
- * @type {function}
+ * @description:
+ * @type: {function}
+ * @param: {*} a
+ * @param: {function} f
+ * @returns {a}
  */
 var tap = curry(function _tap(a, f) {
-    return f(a), a;
+    f(a);
+    return a;
 });
 
 /**
- *
- * @param fn
- * @returns {function}
+ * @description:
+ * @param: {function} fn
+ * @returns: {function}
  */
 function once(fn) {
     var invoked = false;
@@ -60,9 +65,9 @@ function once(fn) {
 }
 
 /**
- *
- * @param fns
- * @returns {function}
+ * @description:
+ * @param: {Array} fns
+ * @returns: {function}
  */
 function sequence(fns) {
     return function _sequence(...args) {
@@ -73,9 +78,12 @@ function sequence(fns) {
 }
 
 /**
- *
- * @type {function}
- *
+ * @description:
+ * @type: {function}
+ * @param: {function} join
+ * @param: {function} fn1
+ * @param: {function} fn2
+ * @returns: {function}
  */
 var fork = curry(function _fork(join, fn1, fn2) {
     return function _fork_(...args) {
@@ -84,23 +92,23 @@ var fork = curry(function _fork(join, fn1, fn2) {
 });
 
 /**
- *
- * @type {function}
- * @param {string} prop
- * @param {object} obj
- * @returns {*}
+ * @description:
+ * @type: {function}
+ * @param: {string} prop
+ * @param: {object} obj
+ * @returns: {*}
  */
 var get = curry(function _get(prop, obj) {
     return obj[prop];
 });
 
 /**
- *
- * @type {function}
- * @param {string} prop
- * @param {*} val
- * @param {object} obj
- * @returns {object}
+ * @description:
+ * @type: {function}
+ * @param: {string} prop
+ * @param: {*} val
+ * @param: {object} obj
+ * @returns: {object}
  */
 var objectSet = curry(function _objectSet(prop, val, obj) {
     var result = shallowClone(obj);
@@ -109,12 +117,15 @@ var objectSet = curry(function _objectSet(prop, val, obj) {
 });
 
 /**
- *
- * @type {function}
- * @param {number} idx
- * @param {*} x
- * @param {Array} list
- * @returns {Array}
+ * @description: Updates the value at a specified index of an array by first creating a shallow copy
+ * of the array and then updating its value at the specified index.
+ * @type: {function}
+ * @note: @see {@link adjust}
+ * @param: {number} idx - The index of the array to which the alternate value will be set.
+ * @param: {*} x - The value to be used to update the array at the index specified.
+ * @param: {Array} list - The list on which to perform the update.
+ * @returns: {Array} - Returns a new array with the value at the specified index being
+ * set to the value of the 'x' argument.
  */
 var arraySet = curry(function _arraySet(idx, x, list) {
     return adjust(kestrel(x), idx, list);
@@ -122,7 +133,12 @@ var arraySet = curry(function _arraySet(idx, x, list) {
 
 /**
  * compose :: [a] -> (b -> c)
- * @type {*}
+ * @description:
+ * @type: {function}
+ * @note: @see {@link pipe}
+ * @param: {Array} funcs
+ * @param: {*} item
+ * @returns: {*}
  */
 var compose = curry(function _compose(funcs, item) {
     return pipe(funcs.reverse(), item);
@@ -130,18 +146,19 @@ var compose = curry(function _compose(funcs, item) {
 
 /**
  * pipe :: [a] -> (b -> c)
- * @description -  Takes a list of functions as arguments and returns
+ * @description: -  Takes a list of functions as arguments and returns
  * a function waiting to be invoked with a single item. Once the returned
  * function is invoked, it will reduce the list of functions over the item,
  * starting with the first function in the list and working through
  * sequentially. Performs a similar functionality to compose, but applies
  * the functions in reverse order to that of compose.
- * @refer {compose}
- * @param {function} fn - The function to run initially; may be any arity.
- * @param {Array} fns - The remaining functions in the pipeline. Each receives
+ * @refer: {compose}
+ * @note: @see {@link compose}
+ * @param: {function} fn - The function to run initially; may be any arity.
+ * @param: {Array} fns - The remaining functions in the pipeline. Each receives
  * its input from the output of the previous function. Therefore each of these
  * functions must be unary.
- * @returns {function} - Returns a function waiting for the item over which
+ * @returns: {function} - Returns a function waiting for the item over which
  * to reduce the functions.
  */
 function pipe(fn, ...fns) {
@@ -154,11 +171,11 @@ function pipe(fn, ...fns) {
 
 /**
  * ifElse :: Function -> ( Function -> ( Function -> (a -> b) ) )
- * Takes a predicate function that is applied to the data; If a truthy value
+ * @description: Takes a predicate function that is applied to the data; If a truthy value
  * is returned from the application, the provided ifFunc argument will be
  * invoked, passing the data as an argument, otherwise the elseFunc is
  * invoked with the data as an argument.
- *
+ * @type: {function}
  * @predicate {function}
  * @ifFunc {function}
  * @elseFunc {function}
@@ -358,7 +375,7 @@ var and = curry(function _and(a, b, item) {
  */
 var arrayLens = curry(function _arrayLens(idx, f, xs) {
     return map(function (val) {
-        return update(idx, val, xs)
+        return arraySet(idx, val, xs)
     }, f(xs[idx]));
 });
 
@@ -435,12 +452,20 @@ var mapped = curry(function _mapped(f, x) {
 });
 
 /**
- *
+ * @description: Updates the value stored in a single specified index of an array. The function
+ * argument should be some form of a unary projector. The 'projector' function will receive
+ * the value stored in the existing array at the specified 'idx' argument location. A new array
+ * is returned and the original array remains unchanged.
  * @type {function}
- * @param {function} fn
- * @param {number} idx
- * @param {Array} list
- * @returns {Array}
+ * @param {function} fn - A function that can operate on a single point of data from the array
+ * and a value to be used as an update for the same index in the new array.
+ * @param {number} idx - A number representing the zero-based offset of the array; idx determines
+ * what value will be passed as the unary argument to the operator function and what index in the
+ * newly created array will be altered. If the value is less than zero, the function will use the
+ * 'idx' argument value as an offset from the last element in the array.
+ * @param {Array} list - The list to update.
+ * @returns {Array} - Returns a new array identical to the original array except where the new,
+ * computed value is inserted
  */
 var adjust = curry(function _adjust(fn, idx, list) {
     if (idx >= list.length || idx < -list.length) {
