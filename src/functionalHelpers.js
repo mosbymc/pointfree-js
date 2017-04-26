@@ -103,6 +103,15 @@ var get = curry(function _get(prop, obj) {
 });
 
 /**
+ *
+ * @type {*}
+ */
+var set = curry(function _set(prop, val, obj) {
+    obj[prop] = val;
+    return obj;
+});
+
+/**
  * @description:
  * @type: {function}
  * @param: {string} prop
@@ -183,10 +192,24 @@ function pipe(fn, ...fns) {
  * @returns {*} - returns the result of invoking the ifFunc or elseFunc
  * on the data
  */
-var ifElse = curry(function ifElse(predicate, ifFunc, elseFunc, data) {
+var ifElse = curry(function _ifElse(predicate, ifFunc, elseFunc, data) {
     if (predicate(data))
         return ifFunc(data);
     return elseFunc(data);
+});
+
+/**
+ *
+ * @type {function}
+ * @param {function} predicate
+ * @param {function} ifFunc
+ * @param {*} ifArg
+ * @param {*} thatArg
+ */
+var ifThisThenThat = curry(function _ifThisThenThat(predicate, ifFunc, ifArg, thatArg) {
+    if (predicate(ifArg))
+        return ifFunc(thatArg);
+    return thatArg;
 });
 
 /**
@@ -371,6 +394,197 @@ var and = curry(function _and(a, b, item) {
 
 /**
  *
+ * @param {*} x
+ * @returns {boolean}
+ */
+function flip(x) {
+    return !x;
+}
+
+/**
+ *
+ * @param {*} x
+ * @returns {boolean}
+ */
+function truthy(x) {
+    return !!x;
+}
+
+/**
+ * @type {flip}
+ * @see flip
+ * @param {*} x
+ * @returns {boolean}
+ */
+var falsey = flip;
+
+/**
+ *
+ * @type {function}
+ * @param {number} x
+ * @param {number} y
+ * @returns {number}
+ */
+var add = curry(function _add(x, y) {
+    return x + y;
+});
+
+/**
+ *
+ * @type {function}
+ * @param {number} x
+ * @param {number} y
+ * @returns {number}
+ */
+var subtract = curry(function _subtract(x, y) {
+    return x - y;
+});
+
+/**
+ *
+ * @type {function}
+ * @param {number} x
+ * @param {number} y
+ * @returns {number}
+ */
+var divide = curry(function _divide(x, y) {
+    return x / y;
+});
+
+/**
+ *
+ * @type {function}
+ * @param {number} x
+ * @param {number} y
+ * @returns {number}
+ */
+var multiple = curry(function _multiple(x, y) {
+    return x * y;
+});
+
+/**
+ *
+ * @type {function}
+ * @param {number} x
+ * @param {number} y
+ * @returns {number}
+ */
+var modulus = curry(function _modulus(x, y) {
+    return x % y;
+});
+
+/**
+ *
+ * @param {Array} first
+ * @param {Array} rest
+ * @returns {string | Array}
+ */
+function concat(first, ...rest) {
+    if (null == rest || !rest.length) return first;
+    return rest.reduce(function _concatStrings(cur, next) {
+        return cur.concat(next);
+    }, first);
+}
+
+/**
+ *
+ * @param {number} x
+ * @returns {number}
+ */
+function negate(x) {
+    return -x;
+}
+
+/**
+ *
+ * @type {function}
+ * @param {*} x
+ * @param {*} y
+ * @returns {boolean}
+ */
+var equal = curry(function _curry(x, y) {
+    return x == y;
+});
+
+/**
+ *
+ * @type {function}
+ * @param {*} x
+ * @param {*} y
+ * @returns {boolean}
+ */
+var strictEqual = curry(function _strictEqual(x, y) {
+    return x === y;
+});
+
+/**
+ *
+ * @type {function}
+ * @param {*}
+ * @param {*}
+ * @returns {boolean}
+ */
+var notEqual = curry(function _notEqual(x, y) {
+    return x != y;
+});
+
+/**
+ *
+ * @type {function}
+ * @param {*} x
+ * @param {*} y
+ * @returns {boolean}
+ */
+var strictNotEqual = curry(function _strictNotEqual(x, y) {
+    return x !== y;
+});
+
+/**
+ *
+ * @type {function}
+ * @param {number | string} x
+ * @param {number | string} y
+ * @returns {boolean}
+ */
+var greaterThan = curry(function _greaterThan(x, y) {
+    return x > y;
+});
+
+/**
+ *
+ * @type {function}
+ * @param {string | number} x
+ * @param {string | number} y
+ * @returns {boolean}
+ */
+var greaterThanOrEqual = curry(function _greaterThanOrEqual(x, y) {
+    return x >= y;
+});
+
+/**
+ *
+ * @type {function}
+ * @param {string | number} x
+ * @param {string | number} y
+ * @returns {boolean}
+ */
+var lessThan = curry(function _lessThan(x, y) {
+    return x < y;
+});
+
+/**
+ *
+ * @type {function}
+ * @param {string | number} x
+ * @param {string | number} y
+ * @returns {boolean}
+ */
+var lessThanOrEqual = curry(function _lessThanOrEqual(x, y) {
+    return x <= y;
+});
+
+/**
+ *
  * @type {*}
  */
 var arrayLens = curry(function _arrayLens(idx, f, xs) {
@@ -506,7 +720,8 @@ function curryN(arity, received, fn) {
     };
 }
 
-export { noop, identity, constant, once, kestrel, get, objectSet, arraySet, nth, compose, pipe, ifElse, when,
-        whenNot, wrap, type, isArray, isObject, isFunction, isNumber, isString, isBoolean, isSymbol, isNull,
-        isUndefined, not, or, and, arrayLens, objectLens, view, over, put, makeLenses, lensPath,
-        mapped, adjust, curry, curryN, tap, fork, sequence };
+export { noop, identity, constant, once, kestrel, get, set, objectSet, arraySet, nth, compose, pipe, ifElse, ifThisThenThat,
+        when, whenNot, wrap, type, isArray, isObject, isFunction, isNumber, isString, isBoolean, isSymbol, isNull,
+        isUndefined, not, or, and, flip, truthy, falsey, add, subtract, divide, multiple, modulus, concat, negate,
+        equal, strictEqual, notEqual, strictNotEqual, greaterThan, greaterThanOrEqual, lessThan, lessThanOrEqual,
+        arrayLens, objectLens, view, over, put, makeLenses, lensPath, mapped, adjust, curry, curryN, tap, fork, sequence };

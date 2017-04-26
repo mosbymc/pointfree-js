@@ -1,7 +1,14 @@
 import { internal_queryable, internal_orderedQueryable } from './queryable';
 import { generatorProto } from '../helpers';
+import { set, ifThisThenThat, pipe } from '../functionalHelpers';
 
 function createNewQueryableDelegator(source, iterator) {
+    var setIterator = ifThisThenThat(isIterator, set(Symbol.iterator, iterator), iterator);
+    var constructQueryable = pipe(addGetter, setIterator, set('source', source), set('dataComputed', false));
+    return constructQueryable(Object.create(internal_queryable));
+
+
+    /*
     var obj = Object.create(internal_queryable);
     obj.dataComputed = false;
     obj.source = source;
@@ -11,6 +18,7 @@ function createNewQueryableDelegator(source, iterator) {
         obj[Symbol.iterator] = iterator;
 
     return addGetter(obj);
+    */
 }
 
 function createNewOrderedQueryableDelegator(source, iterator, sortObj) {
@@ -27,6 +35,12 @@ function createNewOrderedQueryableDelegator(source, iterator, sortObj) {
         obj[Symbol.iterator] = iterator;
 
     return addGetter(obj);
+}
+
+//var queryableConstructor = pipe(setIt)
+
+function isIterator(iterator) {
+    return iterator && generatorProto.isPrototypeOf(iterator);
 }
 
 
