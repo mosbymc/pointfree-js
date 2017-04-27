@@ -1,10 +1,18 @@
 import { internal_queryable, internal_orderedQueryable } from './queryable';
 import { generatorProto } from '../helpers';
-import { set, ifThisThenThat, pipe } from '../functionalHelpers';
+import { set, when, ifThisThenThat, pipe, isNothing, not } from '../functionalHelpers';
+
+var setIterator = ifThisThenThat(isIterator, set(Symbol.iterator)),
+    constructQueryable = pipe(addGetter, setIterator(iterator), set('source', source), set('dataComputed', false)),
+    applySorts = when(not(isNothing), set('_appliedSorts'));
+
+function constructQueryableDelegator(source, iterator, sortObj) {
+
+}
+
 
 function createNewQueryableDelegator(source, iterator) {
-    var setIterator = ifThisThenThat(isIterator, set(Symbol.iterator, iterator), iterator);
-    var constructQueryable = pipe(addGetter, setIterator, set('source', source), set('dataComputed', false));
+    var constructQueryable = pipe(addGetter, setIterator(iterator), set('source', source), set('dataComputed', false));
     return constructQueryable(Object.create(internal_queryable));
 
 

@@ -358,6 +358,15 @@ function isUndefined(u) {
 }
 
 /**
+ *
+ * @param x
+ * @returns {boolean}
+ */
+function isNothing(x) {
+    return null == x;
+}
+
+/**
  * not :: () -> !()
  *
  * @description - Returns a function, that, when invoked, will return the
@@ -722,6 +731,6 @@ function curryN(arity, received, fn) {
 
 export { noop, identity, constant, once, kestrel, get, set, objectSet, arraySet, nth, compose, pipe, ifElse, ifThisThenThat,
         when, whenNot, wrap, type, isArray, isObject, isFunction, isNumber, isString, isBoolean, isSymbol, isNull,
-        isUndefined, not, or, and, flip, truthy, falsey, add, subtract, divide, multiple, modulus, concat, negate,
+        isUndefined, isNothing, not, or, and, flip, truthy, falsey, add, subtract, divide, multiple, modulus, concat, negate,
         equal, strictEqual, notEqual, strictNotEqual, greaterThan, greaterThanOrEqual, lessThan, lessThanOrEqual,
         arrayLens, objectLens, view, over, put, makeLenses, lensPath, mapped, adjust, curry, curryN, tap, fork, sequence };
