@@ -27,9 +27,6 @@ beforeEach(function setSource() {
 
 describe('Test queryable', function testQueryable() {
     it('should create a new queryable delegate', function testObjectDelegation() {
-        expect(internal_queryable.dataComputed).to.be.undefined;
-        expect(internal_queryable.evaluatedData).to.be.undefined;
-
         var queryableAddFront = internal_queryable.addFront([1, 2, 3, 4, 5]),
             concatQueryable = internal_queryable.concat(testData.dataSource.data),
             exceptQueryable = internal_queryable.except(testData.dataSource.data),
@@ -64,45 +61,25 @@ describe('Test queryable', function testQueryable() {
         //queryable object functions that return a new queryable object delegator; check to make sure the
         //returned object delegates to the queryable object.
         expect(internal_queryable.isPrototypeOf(queryableAddFront)).to.be.true;
-        queryableAddFront.dataComputed.should.be.false;
         expect(internal_queryable.isPrototypeOf(concatQueryable)).to.be.true;
-        concatQueryable.dataComputed.should.be.false;
         expect(internal_queryable.isPrototypeOf(exceptQueryable)).to.be.true;
-        exceptQueryable.dataComputed.should.be.false;
         expect(internal_queryable.isPrototypeOf(groupJoinQueryable)).to.be.true;
-        groupJoinQueryable.dataComputed.should.be.false;
         expect(internal_queryable.isPrototypeOf(queryableIntersect)).to.be.true;
-        queryableIntersect.dataComputed.should.be.false;
         expect(internal_queryable.isPrototypeOf(queryableGroupJoin)).to.be.true;
-        queryableGroupJoin.dataComputed.should.be.false;
         expect(internal_queryable.isPrototypeOf(queryableJoin)).to.be.true;
-        queryableJoin.dataComputed.should.be.false;
         expect(internal_queryable.isPrototypeOf(queryableUnion)).to.be.true;
-        queryableUnion.dataComputed.should.be.false;
         expect(internal_queryable.isPrototypeOf(queryableZip)).to.be.true;
-        queryableZip.dataComputed.should.be.false;
         expect(internal_queryable.isPrototypeOf(queryableWhere)).to.be.true;
-        queryableWhere.dataComputed.should.be.false;
         expect(internal_queryable.isPrototypeOf(queryableOfType)).to.be.true;
-        queryableOfType.dataComputed.should.be.false;
         expect(internal_queryable.isPrototypeOf(queryableDistinct)).to.be.true;
-        queryableDistinct.dataComputed.should.be.false;
         expect(internal_queryable.isPrototypeOf(queryableDeepMap)).to.be.true;
-        queryableDeepMap.dataComputed.should.be.false;
         expect(internal_queryable.isPrototypeOf(queryableMap)).to.be.true;
-        queryableMap.dataComputed.should.be.false;
         expect(internal_queryable.isPrototypeOf(queryableGroupBy)).to.be.true;
-        queryableGroupBy.dataComputed.should.be.false;
-        expect(internal_queryable.isPrototypeOf(queryableGroupByDescending)).to.be.true;
-        queryableGroupByDescending.dataComputed.should.be.false;
+        expect(internal_queryable.isPrototypeOf(queryableGroupByDescending)).to.be.true
         expect(internal_queryable.isPrototypeOf(queryableOrderBy)).to.be.false;
-        queryableOrderBy.dataComputed.should.be.false;
         expect(internal_queryable.isPrototypeOf(queryableOrderByDescending)).to.be.false;
-        queryableOrderByDescending.dataComputed.should.be.false;
         expect(internal_queryable.isPrototypeOf(queryableFlatten)).to.be.true;
-        queryableFlatten.dataComputed.should.be.false;
         expect(internal_queryable.isPrototypeOf(queryableDeepFlatten)).to.be.true;
-        queryableDeepFlatten.dataComputed.should.be.false;
 
         queryableAll.should.be.true;
         queryableAny.should.be.true;
@@ -162,9 +139,6 @@ describe('Test queryable', function testQueryable() {
     });
 
     it('should take the shortcut if the queryable\'s has been evaluated', function testShortCut() {
-        internal_queryable.dataComputed = true;
-        internal_queryable.evaluatedData = testData.dataSource.data;
-
         var take = internal_queryable.take(5),
             takeWhile = internal_queryable.takeWhile(function _takeWhile(item) {
                 return item.FirstName !== 'Mark';
@@ -179,7 +153,6 @@ describe('Test queryable', function testQueryable() {
     });
 
     it('should have a functioning skip', function testSkip() {
-        internal_queryable.dataComputed = false;
         var allItems = internal_queryable.skip(0),
             lessOne = internal_queryable.skip(1),
             lessFive = internal_queryable.skip(5),
@@ -195,7 +168,6 @@ describe('Test queryable', function testQueryable() {
     });
 
     it('should have a functioning skip while', function testQueryableSkipWhile() {
-        internal_queryable.dataComputed = false;
         function predicate1() { return false; }
         function predicate2() { return true; }
         function predicate3(item) { return item.State === 'NY' || item.State === 'NJ'; }
@@ -212,9 +184,6 @@ describe('Test queryable', function testQueryable() {
     });
 
     it('should take the shortcut if the queryable\'s has been evaluated on skip and skipWhile', function testShortCut() {
-        internal_queryable.dataComputed = true;
-        internal_queryable.evaluatedData = testData.dataSource.data;
-
         var skip = internal_queryable.skip(10),
             skipWhile = internal_queryable.skipWhile(function _pred() { return false; });
 

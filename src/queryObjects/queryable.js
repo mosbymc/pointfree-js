@@ -15,10 +15,6 @@ import { isArray, wrap } from '../functionalHelpers';
  * @type {{
  * source,
  * source,
- * evaluatedData: *,
- * evaluatedData: *,
- * dataComputed: *,
- * dataComputed: *,
  * map: queryable_core._map,
  * groupBy: queryable_core._groupBy,
  * groupByDescending: queryable_core._groupByDescending,
@@ -72,44 +68,6 @@ var queryable_core = {
      */
     set source(val) {
         this._source = val;
-    },
-
-    /**
-     * Getter for underlying _evaluatedData field; Holds an array of data
-     * after enumerating the queryable delegator instance's source
-     * @returns {*}
-     */
-    get evaluatedData() {
-        return this._evaluatedData;
-    },
-
-    /**
-     * Setter for underlying _evaluatedData field; returns either an
-     * array if the queryable delegator instance's source has been
-     * enumerated, or undefined
-     * @param val
-     */
-    set evaluatedData(val) {
-        this._dataComputed = true;
-        this._evaluatedData = val;
-    },
-
-    /**
-     * Getter for underlying _dataComputed field; returns true if
-     * the queryable delegator instance's source has been enumerated
-     * and false if not
-     * @returns {*}
-     */
-    get dataComputed() {
-        return this._dataComputed;
-    },
-
-    /**
-     * Setter for underlying _dataComputed field
-     * @param val
-     */
-    set dataComputed(val) {
-        this._dataComputed = val;
     },
 
     /**
@@ -184,7 +142,7 @@ var queryable_core = {
      * @returns {*}
      */
     concat: function _concat(...enumerables) {
-        return createNewQueryableDelegator(this, concat(this, enumerables, arguments.length));
+        return createNewQueryableDelegator(this, concat(this, enumerables, enumerables.length));
     },
 
     /**
@@ -321,20 +279,15 @@ var queryable_core = {
      */
     take: function _take(amt) {
         if (!amt) return [];
-        if (!this.dataComputed) {
-            var res = [],
-                idx = 0;
+        var res = [],
+            idx = 0;
 
-            for (let item of this) {
-                if (idx < amt)
-                    res[res.length] = item;
-                else
-                    break;
-                ++idx;
-            }
-            return res;
+        for (let item of this) {
+            if (idx < amt) res[res.length] = item;
+            else break;
+            ++idx;
         }
-        return this.evaluatedData.slice(0, amt);
+        return res;
     },
 
     /**
@@ -343,10 +296,9 @@ var queryable_core = {
      * @returns {Array}
      */
     takeWhile: function _takeWhile(predicate = defaultPredicate) {
-        var res = [],
-            source = this.dataComputed ? this.evaluatedData : this;
+        var res = [];
 
-        for (let item of source) {
+        for (let item of this.source) {
             if (predicate(item))
                 res[res.length] = item;
             else  {
@@ -365,11 +317,10 @@ var queryable_core = {
      * @returns {*}
      */
     skip: function _skip(amt) {
-        var source = this.dataComputed ? this.evaluatedData : this.source,
-            idx = 0,
+        var idx = 0,
             res = [];
 
-        for (let item of source) {
+        for (let item of this.source) {
             if (idx >= amt)
                 res[res.length] = item;
             ++idx;
@@ -383,11 +334,11 @@ var queryable_core = {
      * @returns {Array}
      */
     skipWhile: function _skipWhile(predicate = defaultPredicate) {
-        var source = this.dataComputed ? this.evaluatedData : this.source,
-            hasFailed = false,
+        var hasFailed = false,
             res = [];
 
-        for (let item of source) {
+        //TODO: check this logic out; seems incorrect
+        for (let item of this.source) {
             if (!hasFailed && !predicate(item))
                 hasFailed = true;
             if (hasFailed)
@@ -479,6 +430,14 @@ var queryable_core = {
      */
     toSet: function _toSet() {
         return new Set(this);
+    },
+
+    /**
+     *
+     * @returns {*}
+     */
+    toEvaluatedQueryable: function _toEvaluatedQueryable() {
+        return queryable.from(this.data);
     },
 
     /**

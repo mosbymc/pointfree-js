@@ -40,16 +40,22 @@ function constant(item) {
  */
 var kestrel = constant;
 
+function apply(fn) {
+    return function _apply(...args) {
+        return fn(...args);
+    };
+}
+
 /**
  * @description:
  * @type: {function}
- * @param: {*} a
- * @param: {function} f
- * @returns {a}
+ * @param: {*} arg
+ * @param: {function} fn
+ * @returns {arg}
  */
-var tap = curry(function _tap(a, f) {
-    f(a);
-    return a;
+var tap = curry(function _tap(fn, arg) {
+    fn(arg);
+    return arg;
 });
 
 /**
@@ -146,12 +152,11 @@ var arraySet = curry(function _arraySet(idx, x, list) {
  * @type: {function}
  * @note: @see {@link pipe}
  * @param: {Array} funcs
- * @param: {*} item
  * @returns: {*}
  */
-var compose = curry(function _compose(funcs, item) {
-    return pipe(funcs.reverse(), item);
-});
+function compose(...funcs) {
+    return pipe(funcs.reverse());
+}
 
 /**
  * pipe :: [a] -> (b -> c)
@@ -364,6 +369,15 @@ function isUndefined(u) {
  */
 function isNothing(x) {
     return null == x;
+}
+
+/**
+ *
+ * @param x
+ * @returns {boolean}
+ */
+function isSomething(x) {
+    return null != x;
 }
 
 /**
@@ -729,8 +743,8 @@ function curryN(arity, received, fn) {
     };
 }
 
-export { noop, identity, constant, once, kestrel, get, set, objectSet, arraySet, nth, compose, pipe, ifElse, ifThisThenThat,
+export { noop, identity, constant, apply, once, kestrel, get, set, objectSet, arraySet, nth, compose, pipe, ifElse, ifThisThenThat,
         when, whenNot, wrap, type, isArray, isObject, isFunction, isNumber, isString, isBoolean, isSymbol, isNull,
-        isUndefined, isNothing, not, or, and, flip, truthy, falsey, add, subtract, divide, multiple, modulus, concat, negate,
+        isUndefined, isNothing, isSomething, not, or, and, flip, truthy, falsey, add, subtract, divide, multiple, modulus, concat, negate,
         equal, strictEqual, notEqual, strictNotEqual, greaterThan, greaterThanOrEqual, lessThan, lessThanOrEqual,
         arrayLens, objectLens, view, over, put, makeLenses, lensPath, mapped, adjust, curry, curryN, tap, fork, sequence };
