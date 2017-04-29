@@ -2,7 +2,7 @@ import { addFront, concat, except, groupJoin, intersect, join, union, zip } from
 import { all, any, contains, first, fold, last, count } from '../evaluation/evaluationFunctions';
 import { distinct, ofType, where } from '../limitation/limitationFunctions';
 import { deepFlatten, deepMap, flatten, groupBy, orderBy, map } from '../projection/projectionFunctions';
-import { createNewQueryableDelegator, createNewOrderedQueryableDelegator } from './queryDelegatorCreators';
+import { createNewQueryableDelegator, createNewOrderedQueryableDelegator, constructQueryableDelegator } from './queryDelegatorCreators';
 import { generatorProto, defaultPredicate } from '../helpers';
 import { isArray, wrap } from '../functionalHelpers';
 
@@ -529,6 +529,86 @@ internal_orderedQueryable.thenByDescending = function thenByDescending(keySelect
     var sortObj = this._appliedSorts.concat({ keySelector: keySelector, comparer: comparer, direction: 'desc' });
     return createNewOrderedQueryableDelegator(this.source, orderBy(this, sortObj), sortObj);
 };
+
+//TODO: functional
+//TODO: functional programming
+//TODO: FP
+//TODO: monad
+//TODO: functor
+//TODO: container
+//TODO: JavaScript
+//TODO: JS
+//TODO: JunctionalS
+//TODO: JunctorS
+//TODO: lanoitcunf
+//TODO: rotcnuf
+//TODO: danom
+//TODO: tpircSavaJ
+//TODO: Junctional FavaScript
+
+/**
+ * @description: Creator function for a new mlist object. Takes any value/type as a parameter
+ * and, if it has an iterator defined, with set it as the underlying source of the mlist as is,
+ * or, wrap the item in an array if there is no defined iterator.
+ * @param {*} source - Any type, any value; used as the underlying source of the mlist
+ * @returns {internal_queryable} - A new mlist instance with the value provided as the underlying source.
+ */
+function mlist(source) {
+    //TODO: should I exclude strings from being used as a source directly, or allow it because
+    //TODO: they have an iterator?
+    return constructQueryableDelegator(source && source[Symbol.iterator] ? source : wrap(source));
+}
+
+/**
+ * @description: Convenience function for create a new mlist instance; internally calls mlist.
+ * @see mlist
+ * @param {*} source - Any type, any value; used as the underlying source of the mlist
+ * @returns {internal_queryable} - A new mlist instance with the value provided as the underlying source.
+ */
+mlist.from = function _from(source) {
+    return mlist(source);
+};
+
+/**
+ * Extension function that allows new functionality to be applied to
+ * the queryable object
+ * @param {string} propName - The name of the new queryable property; must be unique
+ * @param {function} fn - A function that defines the new queryable functionality and
+ * will be called when this new queryable property is invoked.
+ *
+ * NOTE: The fn parameter must be a non-generator function that takes one or more
+ * arguments. If this new queryable function should be an immediately evaluated
+ * function (like: take, any, reverse, etc.), it merely needs the accept a single
+ * argument and know how to iterate it. In the case of an immediately evaluated
+ * function, the return type can be any javascript type, and the only input will
+ * be the previous instance of the queryable.
+ *
+ * If the function's evaluation should be deferred it needs to work a bit differently.
+ * In this case, the function should accept one or more arguments, the first and only
+ * required argument being the underlying source of the queryable object. This underlying
+ * source can be anything with an iterator (generator, array, map, set, another queryable).
+ * Any additional arguments that the function needs should be specified in the signature.
+ * The return value of the function should be a generator that knows how to iterate the
+ * underlying source. If the generator should operate like most queryable functions, i.e.
+ * take a single item, process it, and then yield it out before asking for the next, a
+ * for-of loop is the preferred method for employment. However, if the generator needs
+ * all of the underlying data upfront (like orderBy and groupBy), Array.from is the
+ * preferred method. Array.from will 'force' all the underlying queryable instances
+ * to evaluate their data before it is handed over in full to the generator. The generator
+ * can then act with full knowledge of the data and perform whatever operation is needed
+ * before ultimately yielding out a single item at a time. If your extension function
+ * needs to yield out all items at once, then that function is not a lazy evaluation
+ * function and should be constructed like the immediately evaluated functions described
+ * above.
+ */
+mlist.extend = function _extend(propName, fn) {
+    if (!queryable_core[propName]) {
+        queryable_core[propName] = function(...args) {
+            return createNewQueryableDelegator(this, fn(this, ...args));
+        };
+    }
+};
+
 
 //TODO: consider adding a function property to this object that can create a new consumer-level
 //TODO: so that the queryable_core object can call that function for each deferred execution

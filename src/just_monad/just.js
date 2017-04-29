@@ -1,5 +1,3 @@
-import { kestrel } from '../functionalHelpers';
-
 function just(item) {
     return Object.create(_just, {
         _value: {

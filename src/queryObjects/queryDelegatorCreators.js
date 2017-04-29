@@ -12,8 +12,8 @@ var setSource = set('source'),
     queryable = ifElse(isSomething, createQueryable, createOrderedQueryable);
 
 function constructQueryableDelegator(source, iterator, sortObj) {
-    var b = when(constant(isIterator(iterator)), set(Symbol.iterator, iterator)),
-        f = tap(isIterator, iterator); //=> true
+    //var b = when(constant(isIterator(iterator)), set(Symbol.iterator, iterator)),
+        //f = tap(isIterator, iterator); //=> true
         //f => iterator
     //TODO: I might be able to work out a composition of 'isIterator' and 'setIterator' via 'tap'. I would still
     //TODO: need the 'when' function, but if 'tap' internally runs 'isIterator', then it would return the iterator
@@ -32,11 +32,6 @@ function createOrderedQueryable(sorts) {
 
 
 function createNewQueryableDelegator(source, iterator) {
-    var constructQueryable = compose(addGetter, setIterator(iterator), set('source', source), set('dataComputed', false));
-    return constructQueryable(Object.create(internal_queryable));
-
-
-    /*
     var obj = Object.create(internal_queryable);
     obj.source = source;
     //if the iterator param has been passed and is a generator, objectSet it as the object's
@@ -45,7 +40,6 @@ function createNewQueryableDelegator(source, iterator) {
         obj[Symbol.iterator] = iterator;
 
     return addGetter(obj);
-    */
 }
 
 function createNewOrderedQueryableDelegator(source, iterator, sortObj) {
@@ -74,4 +68,4 @@ function addGetter(obj) {
     );
 }
 
-export { createNewQueryableDelegator, createNewOrderedQueryableDelegator };
+export { createNewQueryableDelegator, createNewOrderedQueryableDelegator, constructQueryableDelegator };
