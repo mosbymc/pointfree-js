@@ -19,31 +19,42 @@ function constructQueryableDelegator(source, iterator, sortObj) {
     //TODO: need the 'when' function, but if 'tap' internally runs 'isIterator', then it would return the iterator
     //TODO: object which would then be passed to the setIterator function, which would then be waiting for the
     //TODO: object argument to be passed to it.
-    return compose(addGetter, when(isIterator(iterator), setIterator(iterator)), setSource)(source, queryable(sortObj));
+    return compose(when(isIterator(iterator), setIterator(iterator)), setSource)(source, queryable(sortObj));
 }
 
 function createQueryable() {
-    return Object.create(internal_queryable);
+    return Object.create(internal_queryable, {
+        data: {
+            get: function _getData() {
+                return Array.from(this);
+            }
+        }
+    });
 }
 
 function createOrderedQueryable(sorts) {
-    return set('_appliedSorts', sorts, Object.create(internal_orderedQueryable));
+    return set('_appliedSorts', sorts, Object.create(internal_orderedQueryable, {
+        data: {
+            get: function _getData() {
+                return Array.from(this);
+            }
+        }
+    }));
 }
 
-
 function createNewQueryableDelegator(source, iterator) {
-    var obj = Object.create(internal_queryable);
+    var obj = createQueryable();
     obj.source = source;
     //if the iterator param has been passed and is a generator, objectSet it as the object's
     //iterator; other wise let the object delegate to the queryable's iterator
     if (iterator && generatorProto.isPrototypeOf(iterator))
         obj[Symbol.iterator] = iterator;
 
-    return addGetter(obj);
+    return obj;
 }
 
 function createNewOrderedQueryableDelegator(source, iterator, sortObj) {
-    var obj = Object.create(internal_orderedQueryable);
+    var obj = createOrderedQueryable(sortObj);
     obj.source = source;
     //Need to maintain a list of all the sorts that have been applied; effectively,
     //the underlying sorting function will only be called a single time for
@@ -54,18 +65,7 @@ function createNewOrderedQueryableDelegator(source, iterator, sortObj) {
     if (iterator && generatorProto.isPrototypeOf(iterator))
         obj[Symbol.iterator] = iterator;
 
-    return addGetter(obj);
-}
-
-function addGetter(obj) {
-    return Object.defineProperty(
-        obj,
-        'data', {
-            get: function _data() {
-                return Array.from(this);
-            }
-        }
-    );
+    return obj;
 }
 
 export { createNewQueryableDelegator, createNewOrderedQueryableDelegator, constructQueryableDelegator };
