@@ -602,7 +602,7 @@ mlist.from = function _from(source) {
  * above.
  */
 mlist.extend = function _extend(propName, fn) {
-    if (!queryable_core[propName]) {
+    if (!propName in queryable_core) {
         queryable_core[propName] = function(...args) {
             return createNewQueryableDelegator(this, fn(this, ...args));
         };

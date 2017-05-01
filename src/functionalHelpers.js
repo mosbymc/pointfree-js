@@ -42,7 +42,9 @@ var kestrel = constant;
 
 function apply(fn) {
     return function _apply(...args) {
-        return fn(...args);
+        return function _apply_() {
+            return fn(...args);
+        }
     };
 }
 
@@ -607,6 +609,28 @@ var lessThanOrEqual = curry(function _lessThanOrEqual(x, y) {
 });
 
 /**
+ * @description:
+ * @type: {function}
+ * @param: {object} delegator
+ * @param: {object} delegate
+ * @returns: {boolean}
+ */
+var delegatesTo = curry(function _delegatesTo(delegator, delegate) {
+    return delegate.isPrototypeOf(delegator);
+});
+
+/**
+ * @description:
+ * @type: {function}
+ * @param: {object} delegate
+ * @param: {object} delegator
+ * @returns: {boolean}
+ */
+var delegatesFrom = curry(function _delegatesFrom(delegate, delegator) {
+    return delegate.isPrototypeOf(delegator);
+});
+
+/**
  *
  * @type {*}
  */
@@ -746,5 +770,5 @@ function curryN(arity, received, fn) {
 export { noop, identity, constant, apply, once, kestrel, get, set, objectSet, arraySet, nth, compose, pipe, ifElse, ifThisThenThat,
         when, whenNot, wrap, type, isArray, isObject, isFunction, isNumber, isString, isBoolean, isSymbol, isNull,
         isUndefined, isNothing, isSomething, not, or, and, flip, truthy, falsey, add, subtract, divide, multiple, modulus, concat, negate,
-        equal, strictEqual, notEqual, strictNotEqual, greaterThan, greaterThanOrEqual, lessThan, lessThanOrEqual,
+        equal, strictEqual, notEqual, strictNotEqual, greaterThan, greaterThanOrEqual, lessThan, lessThanOrEqual, delegatesTo, delegatesFrom,
         arrayLens, objectLens, view, over, put, makeLenses, lensPath, mapped, adjust, curry, curryN, tap, fork, sequence };

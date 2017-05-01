@@ -9,7 +9,7 @@ import { set, when, compose, isSomething, constant, apply, tap, ifElse } from '.
 var setSource = set('source'),
     setIterator = set(Symbol.iterator),
     isIterator = apply(generatorProto.isPrototypeOf),
-    queryable = ifElse(isSomething, createQueryable, createOrderedQueryable);
+    queryable = ifElse(isSomething, createOrderedQueryable, createQueryable);
 
 function constructQueryableDelegator(source, iterator, sortObj) {
     //var b = when(constant(isIterator(iterator)), set(Symbol.iterator, iterator)),
@@ -47,7 +47,7 @@ function createNewQueryableDelegator(source, iterator) {
     obj.source = source;
     //if the iterator param has been passed and is a generator, objectSet it as the object's
     //iterator; other wise let the object delegate to the queryable's iterator
-    if (iterator && generatorProto.isPrototypeOf(iterator))
+    if (generatorProto.isPrototypeOf(iterator))
         obj[Symbol.iterator] = iterator;
 
     return obj;
@@ -62,7 +62,7 @@ function createNewOrderedQueryableDelegator(source, iterator, sortObj) {
     obj._appliedSorts = sortObj;
     //if the iterator param has been passed and is a generator, objectSet it as the object's
     //iterator; other wise let the object delegate to the queryable's iterator
-    if (iterator && generatorProto.isPrototypeOf(iterator))
+    if (generatorProto.isPrototypeOf(iterator))
         obj[Symbol.iterator] = iterator;
 
     return obj;
