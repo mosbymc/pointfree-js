@@ -396,11 +396,6 @@ var queryable_core = {
 
     /**
      *
-     */
-    reduce: this.fold,
-
-    /**
-     *
      * @param predicate
      * @returns {*}
      */

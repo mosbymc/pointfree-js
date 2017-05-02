@@ -17,7 +17,7 @@ describe('Test map...', function testMap() {
         });
     });
 
-    it('should function return unmolested test data when identity is passed as function arg', function testMapWithIdentity() {
+    it('should function return unmolested test data when Identity is passed as function arg', function testMapWithIdentity() {
         var mapIterable = map(testData.dataSource.data, _identity),
             mapRes = Array.from(mapIterable());
 

@@ -1,4 +1,4 @@
-import { identity, ifElse, wrap, isArray, isObject, isFunction, not, or, and, curry } from '../../src/functionalHelpers';
+import { Identity, ifElse, wrap, isArray, isObject, isFunction, not, or, and, curry } from '../../src/functionalHelpers';
 import { testData } from '../testData';
 
 var testDataFirstNames = testData.dataSource.data.map(function _retrieveFirstNames(item) {
@@ -15,7 +15,7 @@ afterEach(function _resetData() {
 describe('identity', function testIdentity() {
     it('should return an empty array when passed an empty array', function testIdentityWithEmptyArray() {
         var emptyArr = [],
-            identityResult = identity(emptyArr);
+            identityResult = Identity(emptyArr);
 
         identityResult.should.be.an('array');
         identityResult.should.have.lengthOf(0);
@@ -24,8 +24,8 @@ describe('identity', function testIdentity() {
 
     it('should return distinct values when called twice with different values', function testIdentityWithTwoValues() {
         var simpleObj = { a: 1, b: 2 },
-            simpleObjResult = identity(simpleObj),
-            testDataResult = identity(testData.dataSource.data);
+            simpleObjResult = Identity(simpleObj),
+            testDataResult = Identity(testData.dataSource.data);
 
         simpleObjResult.should.eql(simpleObj);
         testDataResult.should.eql(testData.dataSource.data);
@@ -36,9 +36,9 @@ describe('identity', function testIdentity() {
             primString = 'Hello World',
             primBoolean = false;
 
-        var numberResult = identity(primNumber),
-            stringResult = identity(primString),
-            booleanResult = identity(primBoolean);
+        var numberResult = Identity(primNumber),
+            stringResult = Identity(primString),
+            booleanResult = Identity(primBoolean);
 
         numberResult.should.eql(primNumber);
         stringResult.should.eql(primString);

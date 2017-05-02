@@ -1,12 +1,12 @@
-function identity(item) {
+function Identity(item) {
     return Object.create(_identity, {
         _value: {
             value: item
         }
     });
 }
-identity.of = function _of(item) {
-    return identity(item);
+Identity.of = function _of(item) {
+    return Identity(item);
 };
 
 var _identity = {
@@ -14,7 +14,7 @@ var _identity = {
         return this._value;
     },
     map: function _map(fn) {
-        return identity(fn(this.value));
+        return Identity(fn(this.value));
     },
     apply: function _apply(ma) {
         return this.map(ma.value);
@@ -26,11 +26,11 @@ var _identity = {
         return this.value;
     },
     of: function _of(item) {
-        return identity.of(item);
+        return Identity.of(item);
     },
     toString: function _toString() {
         return `Identity(${this.value})`;
     }
 };
 
-export { identity, _identity };
+export { Identity, _identity };

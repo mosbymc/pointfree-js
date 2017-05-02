@@ -19,7 +19,7 @@ describe('Test deep map', function testDeepMap() {
         });
     });
 
-    it('should return test data when identity is passed as an argument', function testDeepMapWithIdentity() {
+    it('should return test data when Identity is passed as an argument', function testDeepMapWithIdentity() {
         var deepMapIterable = deepMap(testData.dataSource.data, identity),
             deepMapRes = Array.from(deepMapIterable());
 
@@ -28,7 +28,7 @@ describe('Test deep map', function testDeepMap() {
         });
     });
 
-    it('should return flattened data when identity is pass as an argument to grouped data', function testDeepMapWithIdentityOnGroupedData() {
+    it('should return flattened data when Identity is pass as an argument to grouped data', function testDeepMapWithIdentityOnGroupedData() {
         var data = [
             [
                 [1, 2, 3],

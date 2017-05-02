@@ -1,4 +1,4 @@
-import { deepClone, defaultEqualityComparer, sortComparer, sortDirection } from '../helpers';
+import { deepClone, defaultEqualityComparer, sortDirection } from '../helpers';
 import { not } from '../functionalHelpers';
 
 function sortData(data, sortObject) {

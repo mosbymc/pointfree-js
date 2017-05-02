@@ -35,15 +35,15 @@ var sortDirection = {
 };
 
 /**
- * @description -
- * @type {function}
- * @param {function} keySelector
- * @param {number} idx1
- * @param {number} idx2
- * @param {*} val1
- * @param {Array} list
- * @param {string} dir
- * @returns {number}
+ * @description:
+ * @type: {function}
+ * @param: {function} keySelector
+ * @param: {number} idx1
+ * @param: {number} idx2
+ * @param: {*} val1
+ * @param: {Array} list
+ * @param: {string} dir
+ * @returns: {number}
  */
 var sortComparer = curry(function _sortComparer(keySelector, idx1, idx2, val1, source, dir) {
     var val2 = keySelector(source[idx2]);

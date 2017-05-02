@@ -48,7 +48,8 @@ module.exports = function _wallaby(wallaby) {
             { pattern : 'src/**/*.js', load: false },
             { pattern: 'test/testData.js', load: false },
             '!test/**/*.spec.js',
-            '!src/index.js'
+            '!src/index.js',
+            '!playground.js'
         ],
 
         /*

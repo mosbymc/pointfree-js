@@ -35,7 +35,7 @@ var multi_nested_data = [
 ];
 
 describe('Test deepFlatten', function testDeepFlatten() {
-    it('should act as identity for already flat data', function testDeepFlattenWithFlatData() {
+    it('should act as Identity for already flat data', function testDeepFlattenWithFlatData() {
         var deepFlattenIterable = deepFlatten(testData.dataSource.data),
             deepFlattenRes = Array.from(deepFlattenIterable());
 

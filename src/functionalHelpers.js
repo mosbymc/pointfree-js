@@ -1,5 +1,4 @@
 import { alterFunctionLength, javaScriptTypes, shallowClone } from './helpers';
-import { identity } from './identity_monad/identity';
 
 /**
  * No-op function; used as default function in some cases when argument is optional
@@ -8,9 +7,8 @@ import { identity } from './identity_monad/identity';
  */
 function noop() {}
 
-//TODO: I need to either rename this function or the identity monad creator func
 /**
- * identity :: a -> a
+ * Identity :: a -> a
  * Identity function; takes any item and returns same item when invoked
  *
  * @param {*} item - Any value of any type

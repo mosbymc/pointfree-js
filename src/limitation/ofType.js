@@ -1,36 +1,36 @@
 import { javaScriptTypes } from '../helpers';
 
-function ofType(source, type) {
+function ofType(source, dataType) {
     return function *ofTypeIterator() {
         function _checkTypeKeys(key) {
             return key in objItem;
         }
         function _checkItemKeys(key) {
-            return key in type;
+            return key in dataType;
         }
 
-        if (type in javaScriptTypes) {
+        if (dataType in javaScriptTypes) {
             for (let item of source) {
-                if (javaScriptTypes[type] === typeof item) yield item;
+                if (javaScriptTypes[dataType] === typeof item) yield item;
             }
         }
         else {
-            if (typeof type === javaScriptTypes.function) {
+            if (typeof dataType === javaScriptTypes.function) {
                 for (let item of source) {
-                    if (item === type) yield item;
+                    if (item === dataType) yield item;
                 }
             }
-            else if (null === type) {
+            else if (null === dataType) {
                 for (let item of source) {
-                    if (type === item) yield item;
+                    if (dataType === item) yield item;
                 }
             }
             else {
                 for (var objItem of source) {
-                    if (type.isPrototypeOf(objItem))
+                    if (dataType.isPrototypeOf(objItem))
                         yield objItem;
                     else if (javaScriptTypes.object === typeof objItem && null !== objItem &&
-                        Object.keys(type).every(_checkTypeKeys) && Object.keys(objItem).every(_checkItemKeys)) {
+                        Object.keys(dataType).every(_checkTypeKeys) && Object.keys(objItem).every(_checkItemKeys)) {
                         yield objItem;
                     }
                 }

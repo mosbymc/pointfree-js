@@ -12,8 +12,8 @@ import { set, when, compose, isSomething, apply, ifElse, wrap, delegatesFrom } f
  * at the consumer-object level, as well as to provide default values for a consumer-level
  * object at creation if not specified.
  * @type {{
- * source,
- * source,
+ * value,
+ * value,
  * map: list_core._map,
  * groupBy: list_core._groupBy,
  * groupByDescending: list_core._groupByDescending,
@@ -57,16 +57,16 @@ var list_core = {
      * @description: Getter for the underlying source object of the list
      * @returns: {*}
      */
-    get source() {
-        return this._source;
+    get value() {
+        return this._value;
     },
 
     /**
      * @description: Setter for the underlying source object of the list
      * @param: val
      */
-    set source(val) {
-        this._source = val;
+    set value(val) {
+        this._value = val;
     },
 
     /**
@@ -136,7 +136,7 @@ var list_core = {
 
     /**
      * @description: Concatenates two or more lists by appending the "method's" list argument(s) to the
-     * queryable's source. This function is a deferred execution call that returns
+     * list's value. This function is a deferred execution call that returns
      * a new queryable object delegator instance that contains all the requisite
      * information on how to perform the operation.
      * @param: {Array | *} enumerables
@@ -183,7 +183,7 @@ var list_core = {
     },
 
     /**
-     * @description: Produces the objectSet intersection of the queryable object's source and the list
+     * @description: Produces the objectSet intersection of the list object's value and the list
      * that is passed as a function argument. A comparer function may be
      * provided to the function that determines the equality/inequality of the items in
      * each list; if left undefined, the function will use a default equality comparer.
@@ -299,7 +299,7 @@ var list_core = {
     takeWhile: function _takeWhile(predicate = defaultPredicate) {
         var res = [];
 
-        for (let item of this.source) {
+        for (let item of this.value) {
             if (predicate(item))
                 res[res.length] = item;
             else  {
@@ -321,7 +321,7 @@ var list_core = {
         var idx = 0,
             res = [];
 
-        for (let item of this.source) {
+        for (let item of this.value) {
             if (idx >= amt)
                 res[res.length] = item;
             ++idx;
@@ -338,12 +338,14 @@ var list_core = {
         var hasFailed = false,
             res = [];
 
-        //TODO: check this logic out; seems incorrect
-        for (let item of this.source) {
-            if (!hasFailed && !predicate(item))
-                hasFailed = true;
-            if (hasFailed)
-                res[res.length] = item;
+        for (let item of this.value) {
+            if (!hasFailed) {
+                if (!predicate(item)) {
+                    hasFailed = true;
+                    res[res.length] = item;
+                }
+            }
+            else res[res.length] = item;
         }
         return res;
     },
@@ -402,7 +404,9 @@ var list_core = {
      * @param: initial
      * @returns:
      */
-    reduce: this.fold,
+    reduce: function _reduce(fn, initial) {
+        return fold(this, fn, initial);
+    },
 
     /**
      * @description:
@@ -458,7 +462,7 @@ var list_core = {
      * @returns: {m_list}
      */
     toEvaluatedList: function _toEvaluatedList() {
-        return list.from(this.data);
+        return list.from(this.data /* the .data property is a getter function that forces evaluation */);
     },
 
     /**
@@ -475,7 +479,7 @@ var list_core = {
      * objectSet on the delegator at the time of creation.
      */
     [Symbol.iterator]: function *_iterator() {
-        for (let item of this.source)
+        for (let item of this.value)
             yield item;
     }
 };
@@ -524,9 +528,9 @@ var ordered_m_list = Object.create(list_core, {
     _appliedSorts: {
         value: []
     },
-    //In these two functions, feeding the call to "orderBy" with the .source property of the list delegate
+    //In these two functions, feeding the call to "orderBy" with the .value property of the list delegate
     //rather than the delegate itself, effectively excludes the previous call to the orderBy/orderByDescending
-    //since the iterator exists on the delegate, not on its source. Each subsequent call to thenBy/thenByDescending
+    //since the iterator exists on the delegate, not on its value. Each subsequent call to thenBy/thenByDescending
     //will continue to exclude the previous call's iterator... effectively what we're doing is ignoring all the
     //prior calls made to orderBy/orderByDescending/thenBy/thenByDescending and calling it once but with an array
     //of the the requested sorts.
@@ -539,7 +543,7 @@ var ordered_m_list = Object.create(list_core, {
     thenBy: {
         value: function _thenBy(keySelector, comparer) {
             var sortObj = this._appliedSorts.concat({ keySelector: keySelector, comparer: comparer, direction: 'asc' });
-            return createListDelegator(this.source, orderBy(this, sortObj), sortObj);
+            return createListDelegator(this.value, orderBy(this, sortObj), sortObj);
         }
     },
     /**
@@ -551,7 +555,7 @@ var ordered_m_list = Object.create(list_core, {
     thenByDescending: {
         value: function thenByDescending(keySelector, comparer) {
             var sortObj = this._appliedSorts.concat({ keySelector: keySelector, comparer: comparer, direction: 'desc' });
-            return createListDelegator(this.source, orderBy(this, sortObj), sortObj);
+            return createListDelegator(this.value, orderBy(this, sortObj), sortObj);
         }
     }
 });
@@ -572,7 +576,7 @@ var ordered_m_list = Object.create(list_core, {
 //TODO: tpircSavaJ
 //TODO: Junctional FavaScript
 
-var setSource = set('source'),
+var setValue = set('value'),
     setIterator = set(Symbol.iterator),
     isIterator = apply(delegatesFrom(generatorProto)),
     create = ifElse(isSomething, createOrderedList, createList);
@@ -597,8 +601,8 @@ function createOrderedList(sorts) {
     }));
 }
 
-function createListDelegator(source, iterator, sortObj) {
-    return compose(when(isIterator(iterator), setIterator(iterator)), setSource)(source, create(sortObj));
+function createListDelegator(value, iterator, sortObj) {
+    return compose(when(isIterator(iterator), setIterator(iterator)), setValue)(value, create(sortObj));
 }
 
 /**

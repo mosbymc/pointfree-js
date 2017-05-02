@@ -2,7 +2,7 @@ import { flatten } from '../../../src/projection/flatten';
 import { testData } from '../../testData';
 
 describe('Test flatten', function testFlatten() {
-    it('should act as identity with already flat data', function testFlattenWithFlatData() {
+    it('should act as Identity with already flat data', function testFlattenWithFlatData() {
         var flattenIterable = flatten(testData.dataSource.data),
             flattenRes = Array.from(flattenIterable());
 
