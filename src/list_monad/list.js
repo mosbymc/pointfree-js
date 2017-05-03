@@ -1,9 +1,9 @@
 import { addFront, concat, except, groupJoin, intersect, join, union, zip } from '../collation/collationFunctions';
 import { all, any, contains, first, fold, last, count } from '../evaluation/evaluationFunctions';
 import { distinct, ofType, where } from '../limitation/limitationFunctions';
-import { deepFlatten, deepMap, flatten, groupBy, orderBy, map } from '../projection/projectionFunctions';
+import { deepFlatten, deepMap, flatMap, flatten, groupBy, orderBy, map } from '../projection/projectionFunctions';
 import { generatorProto, defaultPredicate } from '../helpers';
-import { set, when, compose, isSomething, apply, ifElse, wrap, delegatesFrom } from '../functionalHelpers';
+import { set, when, isSomething, apply, ifElse, wrap, delegatesFrom } from '../functionalHelpers';
 
 /**
  * @description: Object that contains the core functionality of a list; both the m_list and ordered_m_list
@@ -70,12 +70,32 @@ var list_core = {
     },
 
     /**
+     * @description: Applies a function contained in another functor to the source
+     * of this list object instance's underlying source. A new list object instance
+     * is returned.
+     * @param: ma
+     * @return: {*}
+     */
+    apply: function _apply(ma) {
+        return this.map(ma.value);
+    },
+
+    /**
      * @description:
      * @param: {function} mapFunc
      * @returns: {*}
      */
     map: function _map(mapFunc) {
         return createListDelegator(this, map(this, mapFunc));
+    },
+
+    /**
+     * @description:
+     * @param: {function} fn
+     * @return: {*}
+     */
+    flatMap: function _flatMap(fn) {
+        return createListDelegator(this, flatMap(this, fn));
     },
 
     /**
@@ -198,6 +218,9 @@ var list_core = {
         return createListDelegator(this, intersect(this, enumerable, comparer));
     },
 
+    //TODO: need to think of a different name for the .join function property as that is needed
+    //TODO: for monadic functionality. This will also force a renaming of the .groupJoin function
+    //TODO: property.
     /**
      * @description: Correlates the items in two lists based on the equality of items in each
      * list. A comparer function may be provided to the function that determines
@@ -481,6 +504,17 @@ var list_core = {
     [Symbol.iterator]: function *_iterator() {
         for (let item of this.value)
             yield item;
+    },
+
+    /**
+     * @description: Returns a string representation of an instance of a list
+     * delegator object. This function does not cause evaluation of the source,
+     * but this also means the returned value only reflects the underlying
+     * data, not the evaluated data.
+     * @return: {string}
+     */
+    toString: function _toString() {
+        return `List(${this.value})`;
     }
 };
 
@@ -601,8 +635,19 @@ function createOrderedList(sorts) {
     }));
 }
 
+/**
+ * @description: Creator function for list delegate object instances. Creates a m_list delegator
+ * if no sort object is passed, otherwise, it will create an ordered_m_list delegator. If no
+ * iterator is passed, the delegator will fall back on the delegate's iterator.
+ * @param: {*} value - Any value that should be used as the underlying source of the list. It the
+ * value has an iterator it will be accepted as is, if not, it will be wrapped in an array.
+ * @param: {generator} iterator - A generator function that should be used as the iterator for
+ * the new list delegator instance.
+ * @param: {m_list|ordered_m_list} sortObj - A 'sort object' that the ordered_m_list knows how
+ * to utilize when sorting or grouping a list.
+ */
 function createListDelegator(value, iterator, sortObj) {
-    return compose(when(isIterator(iterator), setIterator(iterator)), setValue)(value, create(sortObj));
+    return when(isIterator(iterator), setIterator(iterator), setValue(value, create(sortObj)));
 }
 
 /**

@@ -45,6 +45,7 @@ var sortDirection = {
  * @param: {string} dir
  * @returns: {number}
  */
+
 var sortComparer = curry(function _sortComparer(keySelector, idx1, idx2, val1, source, dir) {
     var val2 = keySelector(source[idx2]);
     var c = val1 > val2 ? 1 : val1 === val2 ? idx1 - idx2 : -1;

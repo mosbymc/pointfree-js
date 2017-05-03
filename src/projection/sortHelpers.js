@@ -5,7 +5,7 @@ function sortData(data, sortObject) {
     var sortedData = data;
     sortObject.forEach(function _sortItems(sort, index) {
         let comparer = sort.direction === 'asc' ? sort.comparer : not(sort.comparer);
-        if (index === 0) sortedData = mergeSort(data, sort.keySelector, comparer);
+        if (index === 0) sortedData = quickSort(data, sort.keySelector, comparer);
         else {
             let sortedSubData = [],
                 itemsToSort = [],
@@ -22,13 +22,13 @@ function sortData(data, sortObject) {
                             sortedSubData.concat(itemsToSort) : sortedSubData.concat(itemsToSort.reverse());
                     }
                     else {
-                        sortedSubData = sortedSubData.concat(mergeSort(itemsToSort, sort.keySelector, comparer));
+                        sortedSubData = sortedSubData.concat(quickSort(itemsToSort, sort.keySelector, comparer));
                     }
                     itemsToSort.length = 0;
                     itemsToSort.push(item);
                 }
                 if (idx === sortedData.length - 1) {
-                    sortedSubData = sortedSubData.concat(mergeSort(itemsToSort, sort.keySelector, comparer));
+                    sortedSubData = sortedSubData.concat(quickSort(itemsToSort, sort.keySelector, comparer));
                 }
             });
             sortedData = sortedSubData;

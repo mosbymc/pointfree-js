@@ -34,8 +34,8 @@ function deepMap(source, fn) {
     };
 }
 
-function flatMap(source, fn) {
-    return function *flatMapIterator() {
+function flatMap1(source, fn) {
+    return function *flatMap1Iterator() {
         var results = [];
         for (let item of source) {
             var res = fn(item);
@@ -56,8 +56,14 @@ function flatMap(source, fn) {
     };
 }
 
-function flatMap2(source, fn) {
-    return function *flatMap2Iterator() {
+/**
+ * @description:
+ * @param: {*} source
+ * @param: {function} fn
+ * @return: {flatMapIterator}
+ */
+function flatMap(source, fn) {
+    return function *flatMapIterator() {
         for (let item of source) {
             if (null != item && item.map && 'function' === typeof item.map) {
                 var res;
@@ -71,4 +77,4 @@ function flatMap2(source, fn) {
     };
 }
 
-export { deepMap };
+export { deepMap, flatMap };

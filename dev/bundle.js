@@ -8,22 +8,24 @@ exports.addFront = undefined;
 
 var _functionalHelpers = require('../functionalHelpers');
 
+var _helpers = require('../helpers');
+
 function addFront(source, enumerable) {
     return function* addFront() {
         enumerable = (0, _functionalHelpers.when)((0, _functionalHelpers.not)(_functionalHelpers.isArray), Array.from, enumerable);
         for (let item of enumerable) {
-            if (undefined !== item) yield item;
+            if (_helpers.javaScriptTypes.undefined !== item) yield item;
         }
 
         for (let item of source) {
-            if (undefined !== item) yield item;
+            if (_helpers.javaScriptTypes.undefined !== item) yield item;
         }
     };
 }
 
 exports.addFront = addFront;
 
-},{"../functionalHelpers":18}],2:[function(require,module,exports){
+},{"../functionalHelpers":18,"../helpers":19}],2:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -66,22 +68,34 @@ exports.concat = undefined;
 
 var _functionalHelpers = require('../functionalHelpers');
 
-function concat(source, enumerable) {
+var _helpers = require('../helpers');
+
+function concat(source, enumerables, argsCount) {
     return function* concatIterator() {
         for (let item of source) {
-            if (undefined !== item) yield item;
+            if (_helpers.javaScriptTypes.undefined !== item) yield item;
         }
 
-        enumerable = (0, _functionalHelpers.when)((0, _functionalHelpers.not)(_functionalHelpers.isArray), Array.from, enumerable);
-        for (let item of enumerable) {
-            if (undefined !== item) yield item;
+        var enumerable;
+        if (1 === argsCount) {
+            enumerable = (0, _functionalHelpers.when)((0, _functionalHelpers.not)(_functionalHelpers.isArray), Array.from, enumerables);
+            for (let item of enumerable) {
+                if (_helpers.javaScriptTypes.undefined !== item) yield item;
+            }
+        } else {
+            for (let list of enumerables) {
+                enumerable = (0, _functionalHelpers.when)((0, _functionalHelpers.not)(_functionalHelpers.isArray), Array.from, list);
+                for (let item of enumerable) {
+                    if (_helpers.javaScriptTypes.undefined !== item) yield item;
+                }
+            }
         }
     };
 }
 
 exports.concat = concat;
 
-},{"../functionalHelpers":18}],4:[function(require,module,exports){
+},{"../functionalHelpers":18,"../helpers":19}],4:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -139,7 +153,7 @@ function groupJoin(outer, inner, outerSelector, innerSelector, projector, compar
         for (var outerItem of outer) {
             var innerMatch = innerGroups.find(_compareByKeys);
             let res = projector(outerItem, undefined === innerMatch ? [] : innerMatch.items);
-            if (undefined !== res) yield res;
+            if (_helpers.javaScriptTypes.undefined !== res) yield res;
         }
 
         function _findInnerGroup(grp) {
@@ -172,7 +186,7 @@ function intersect(source, enumerable, comparer) {
     return function* intersectIterator() {
         enumerable = (0, _functionalHelpers.when)((0, _functionalHelpers.not)(_functionalHelpers.isArray), Array.from, enumerable);
         for (let item of source) {
-            if (undefined !== item && enumerable.some(function _checkEquivalency(it) {
+            if (_helpers.javaScriptTypes.undefined !== item && enumerable.some(function _checkEquivalency(it) {
                 return comparer(item, it);
             })) {
                 yield item;
@@ -203,7 +217,7 @@ function join(outer, inner, outerSelector, innerSelector, projector, comparer) {
             for (let innerItem of inner) {
                 if (comparer(outerSelector(outerItem), innerSelector(innerItem))) {
                     let res = projector(outerItem, innerItem);
-                    if (undefined !== res) yield res;
+                    if (_helpers.javaScriptTypes.undefined !== res) yield res;
                 }
             }
         }
@@ -255,6 +269,8 @@ exports.zip = undefined;
 
 var _functionalHelpers = require('../functionalHelpers');
 
+var _helpers = require('../helpers');
+
 function zip(source, enumerable, selector) {
     return function* zipIterator() {
         var res,
@@ -265,7 +281,7 @@ function zip(source, enumerable, selector) {
             for (let item of source) {
                 if (idx > enumerable.length) return;
                 res = selector(item, enumerable[idx]);
-                if (undefined !== res) yield res;
+                if (_helpers.javaScriptTypes.undefined !== res) yield res;
                 ++idx;
             }
         }
@@ -274,7 +290,7 @@ function zip(source, enumerable, selector) {
 
 exports.zip = zip;
 
-},{"../functionalHelpers":18}],10:[function(require,module,exports){
+},{"../functionalHelpers":18,"../helpers":19}],10:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -318,24 +334,32 @@ exports.contains = undefined;
 
 var _functionalHelpers = require('../functionalHelpers');
 
+var _helpers = require('../helpers');
+
+//TODO: see if there is any real performance increase by just using .includes when a comparer hasn't been passed
+//import { defaultEqualityComparer } from '../helpers';
 function contains(source, val, comparer) {
     source = (0, _functionalHelpers.when)((0, _functionalHelpers.not)(_functionalHelpers.isArray), Array.from, source);
-    if (undefined === comparer) return source.includes(val);
+    if (_helpers.javaScriptTypes.undefined === comparer) return source.includes(val);
     return source.some(function _checkEquality(item) {
         return comparer(item, val);
     });
-} //TODO: see if there is any real performance increase by just using .includes when a comparer hasn't been passed
-//import { defaultEqualityComparer } from '../helpers';
+}
+
 exports.contains = contains;
 
-},{"../functionalHelpers":18}],13:[function(require,module,exports){
-"use strict";
+},{"../functionalHelpers":18,"../helpers":19}],13:[function(require,module,exports){
+'use strict';
 
 Object.defineProperty(exports, "__esModule", {
     value: true
 });
+exports.count = undefined;
+
+var _helpers = require('../helpers');
+
 function count(source, predicate) {
-    if (undefined === predicate) return Array.from(source).length;
+    if (_helpers.javaScriptTypes.undefined === predicate) return Array.from(source).length;
     return Array.from(source).filter(function filterItems(item) {
         return predicate(item);
     }).length;
@@ -343,7 +367,7 @@ function count(source, predicate) {
 
 exports.count = count;
 
-},{}],14:[function(require,module,exports){
+},{"../helpers":19}],14:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -391,19 +415,22 @@ function first(source, predicate) {
 exports.first = first;
 
 },{"../helpers":19}],16:[function(require,module,exports){
-"use strict";
+'use strict';
 
 Object.defineProperty(exports, "__esModule", {
     value: true
 });
+exports.fold = undefined;
+
+var _functionalHelpers = require('../functionalHelpers');
+
 function fold(source, fn, initial = 0) {
-    var data = Array.from(source);
-    return data.reduce(fn, initial);
+    return (0, _functionalHelpers.when)((0, _functionalHelpers.not)(_functionalHelpers.isArray), Array.from, source).reduce(fn, initial);
 }
 
 exports.fold = fold;
 
-},{}],17:[function(require,module,exports){
+},{"../functionalHelpers":18}],17:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -427,80 +454,856 @@ exports.last = last;
 Object.defineProperty(exports, "__esModule", {
     value: true
 });
+exports.sequence = exports.fork = exports.tap = exports.curryN = exports.curry = exports.adjust = exports.mapped = exports.lensPath = exports.makeLenses = exports.put = exports.over = exports.view = exports.objectLens = exports.arrayLens = exports.delegatesFrom = exports.delegatesTo = exports.lessThanOrEqual = exports.lessThan = exports.greaterThanOrEqual = exports.greaterThan = exports.strictNotEqual = exports.notEqual = exports.strictEqual = exports.equal = exports.negate = exports.concat = exports.modulus = exports.multiple = exports.divide = exports.subtract = exports.add = exports.falsey = exports.truthy = exports.flip = exports.and = exports.or = exports.not = exports.isSomething = exports.isNothing = exports.isUndefined = exports.isNull = exports.isSymbol = exports.isBoolean = exports.isString = exports.isNumber = exports.isFunction = exports.isObject = exports.isArray = exports.type = exports.wrap = exports.whenNot = exports.when = exports.ifThisThenThat = exports.ifElse = exports.pipe = exports.compose = exports.nth = exports.arraySet = exports.objectSet = exports.set = exports.get = exports.kestrel = exports.once = exports.apply = exports.constant = exports.identity = exports.noop = undefined;
+
+var _helpers = require('./helpers');
+
+/**
+ * No-op function; used as default function in some cases when argument is optional
+ * and consumer does not provide.
+ * @returns {undefined}
+ */
+function noop() {}
+
+/**
+ * Identity :: a -> a
+ * Identity function; takes any item and returns same item when invoked
+ *
+ * @param {*} item - Any value of any type
+ * @returns {*} - returns item
+ */
 function identity(item) {
     return item;
 }
 
-var ifElse = curry(function ifElse(predicate, ifFunc, elseFunc, data) {
+/**
+ * constant :: a -> () -> a
+ * @param {*} item
+ * @returns {function} - Returns a function, that when invoked, will
+ * return the item passed to the constant function as an argument.
+ */
+function constant(item) {
+    return function _constant() {
+        return item;
+    };
+}
+
+/**
+ * kestrel :: a -> () -> a
+ * @note @see {@link constant}
+ * @type {function}
+ * @param {*} item
+ * @returns {function} - Returns a function, that when invoked, will
+ * return the item passed to the constant function as an argument.
+ */
+var kestrel = constant;
+
+function apply(fn) {
+    return function _apply(...args) {
+        return function _apply_() {
+            return fn(...args);
+        };
+    };
+}
+
+/**
+ * @description:
+ * @type: {function}
+ * @param: {*} arg
+ * @param: {function} fn
+ * @returns {arg}
+ */
+var tap = curry(function _tap(fn, arg) {
+    fn(arg);
+    return arg;
+});
+
+/**
+ * @description:
+ * @param: {function} fn
+ * @returns: {function}
+ */
+function once(fn) {
+    var invoked = false;
+    return function _once(...args) {
+        return invoked ? undefined : fn(...args);
+    };
+}
+
+/**
+ * @description:
+ * @param: {Array} fns
+ * @returns: {function}
+ */
+function sequence(fns) {
+    return function _sequence(...args) {
+        fns.forEach(function fSequence(fn) {
+            fn(...args);
+        });
+    };
+}
+
+/**
+ * @description:
+ * @type: {function}
+ * @param: {function} join
+ * @param: {function} fn1
+ * @param: {function} fn2
+ * @returns: {function}
+ */
+var fork = curry(function _fork(join, fn1, fn2) {
+    return function _fork_(...args) {
+        return join(fn1(...args), fn2(...args));
+    };
+});
+
+/**
+ * @description:
+ * @type: {function}
+ * @param: {string} prop
+ * @param: {object} obj
+ * @returns: {*}
+ */
+var get = curry(function _get(prop, obj) {
+    return obj[prop];
+});
+
+/**
+ *
+ * @type {*}
+ */
+var set = curry(function _set(prop, val, obj) {
+    obj[prop] = val;
+    return obj;
+});
+
+/**
+ * @description:
+ * @type: {function}
+ * @param: {string} prop
+ * @param: {*} val
+ * @param: {object} obj
+ * @returns: {object}
+ */
+var objectSet = curry(function _objectSet(prop, val, obj) {
+    var result = (0, _helpers.shallowClone)(obj);
+    result[prop] = val;
+    return result;
+});
+
+/**
+ * @description: Updates the value at a specified index of an array by first creating a shallow copy
+ * of the array and then updating its value at the specified index.
+ * @type: {function}
+ * @note: @see {@link adjust}
+ * @param: {number} idx - The index of the array to which the alternate value will be set.
+ * @param: {*} x - The value to be used to update the array at the index specified.
+ * @param: {Array} list - The list on which to perform the update.
+ * @returns: {Array} - Returns a new array with the value at the specified index being
+ * set to the value of the 'x' argument.
+ */
+var arraySet = curry(function _arraySet(idx, x, list) {
+    return adjust(kestrel(x), idx, list);
+});
+
+/**
+ * compose :: [a] -> (b -> c)
+ * @description:
+ * @type: {function}
+ * @note: @see {@link pipe}
+ * @param: {Array} funcs
+ * @returns: {*}
+ */
+function compose(...funcs) {
+    return pipe(funcs.reverse());
+}
+
+/**
+ * pipe :: [a] -> (b -> c)
+ * @description: -  Takes a list of functions as arguments and returns
+ * a function waiting to be invoked with a single item. Once the returned
+ * function is invoked, it will reduce the list of functions over the item,
+ * starting with the first function in the list and working through
+ * sequentially. Performs a similar functionality to compose, but applies
+ * the functions in reverse order to that of compose.
+ * @refer: {compose}
+ * @note: @see {@link compose}
+ * @param: {function} fn - The function to run initially; may be any arity.
+ * @param: {Array} fns - The remaining functions in the pipeline. Each receives
+ * its input from the output of the previous function. Therefore each of these
+ * functions must be unary.
+ * @returns: {function} - Returns a function waiting for the item over which
+ * to reduce the functions.
+ */
+function pipe(fn, ...fns) {
+    return function _pipe(...args) {
+        return fns.reduce(function pipeReduce(item, f) {
+            return f(item);
+        }, fn(...args));
+    };
+}
+
+/**
+ * ifElse :: Function -> ( Function -> ( Function -> (a -> b) ) )
+ * @description: Takes a predicate function that is applied to the data; If a truthy value
+ * is returned from the application, the provided ifFunc argument will be
+ * invoked, passing the data as an argument, otherwise the elseFunc is
+ * invoked with the data as an argument.
+ * @type: {function}
+ * @predicate {function}
+ * @ifFunc {function}
+ * @elseFunc {function}
+ * @data {*}
+ * @returns {*} - returns the result of invoking the ifFunc or elseFunc
+ * on the data
+ */
+var ifElse = curry(function _ifElse(predicate, ifFunc, elseFunc, data) {
     if (predicate(data)) return ifFunc(data);
     return elseFunc(data);
 });
 
-var when = curry(function _when(predicate, transform, data) {
-    return ifElse(predicate, transform, identity, data);
+/**
+ *
+ * @type {function}
+ * @param {function} predicate
+ * @param {function} ifFunc
+ * @param {*} ifArg
+ * @param {*} thatArg
+ */
+var ifThisThenThat = curry(function _ifThisThenThat(predicate, ifFunc, ifArg, thatArg) {
+    if (predicate(ifArg)) return ifFunc(thatArg);
+    return thatArg;
 });
 
+/**
+ * when :: Function -> (Function -> (a -> b))
+ * Similar to ifElse, but no 'elseFunc' argument. Instead, if the application
+ * of the predicate to the data returns truthy, the transform is applied to
+ * the data. Otherwise, the data is returned without invoking the transform.
+ * @predicate {function}
+ * @transform {function}
+ * @data {*}
+ * @returns {*}
+ */
+var when = curry(function _when(predicate, transform, data) {
+    if (predicate(data)) return transform(data);
+    return data;
+});
+
+/**
+ *
+ * @type {function}
+ * @param {function} predicate
+ * @param {function} transform
+ * @param {*} data
+ * @returns {*}
+ */
+var whenNot = curry(function _whenNot(predicate, transform, data) {
+    if (!predicate(data)) return transform(data);
+    return data;
+});
+
+/**
+ *
+ * @type {function}
+ * @param {number} offset
+ * @param {Array} list
+ * @returns {*}
+ */
+var nth = curry(function nth(offset, list) {
+    var idx = offset < 0 ? list.length + offset : offset;
+    return 'string' === typeof list ? list.charAt(idx) : list[idx];
+});
+
+/**
+ * wrap :: a -> [a]
+ * Takes any value of any type and returns an array containing
+ * the value passed as its only item
+ *
+ * @param {*} data - Any value, any type
+ * @returns {[*]} - Returns an array of any value, any type
+ */
 function wrap(data) {
     return [data];
 }
 
+/**
+ *
+ * @param a
+ * @returns {string}
+ */
+function type(a) {
+    return typeof a;
+}
+
+/**
+ * isArray :: a -> Boolean
+ *
+ * @param data
+ * @returns {boolean}
+ */
 function isArray(data) {
     return Array.isArray(data);
 }
 
+/**
+ * isObject :: a -> Boolean
+ *
+ * @param item
+ * @returns {boolean}
+ */
 function isObject(item) {
-    return typeof item === 'object' && null !== item;
+    return _helpers.javaScriptTypes.object === type(item) && null !== item;
 }
 
+/**
+ * isFunction :: a -> Boolean
+ *
+ * @param fn
+ * @returns {boolean}
+ */
 function isFunction(fn) {
-    return typeof fn === 'function';
+    return _helpers.javaScriptTypes.function === type(fn);
 }
 
+/**
+ *
+ * @param num
+ * @returns {boolean}
+ */
+function isNumber(num) {
+    return _helpers.javaScriptTypes.number === type(num);
+}
+
+/**
+ *
+ * @param str
+ * @returns {boolean}
+ */
+function isString(str) {
+    return _helpers.javaScriptTypes.string === type(str);
+}
+
+/**
+ *
+ * @param bool
+ * @returns {boolean}
+ */
+function isBoolean(bool) {
+    return _helpers.javaScriptTypes.boolean === type(bool);
+}
+
+/**
+ *
+ * @param sym
+ * @returns {boolean}
+ */
+function isSymbol(sym) {
+    return _helpers.javaScriptTypes.symbol === type(sym);
+}
+
+/**
+ *
+ * @param n
+ * @returns {string|boolean}
+ */
+function isNull(n) {
+    return type(n) && null === n;
+}
+
+/**
+ *
+ * @param u
+ * @returns {boolean}
+ */
+function isUndefined(u) {
+    return _helpers.javaScriptTypes.undefined === type(u);
+}
+
+/**
+ *
+ * @param x
+ * @returns {boolean}
+ */
+function isNothing(x) {
+    return null == x;
+}
+
+/**
+ *
+ * @param x
+ * @returns {boolean}
+ */
+function isSomething(x) {
+    return null != x;
+}
+
+/**
+ * not :: () -> !()
+ *
+ * @description - Returns a function, that, when invoked, will return the
+ * result of the inversion of the invocation of the function argument. The
+ * returned function is curried to the same arity as the function argument,
+ * so it can be partially applied even after being 'wrapped' inside the
+ * not function.
+ * @param fn
+ * @returns {*}
+ */
 function not(fn) {
-    return function _not(...rest) {
+    return curry((0, _helpers.alterFunctionLength)(function _not(...rest) {
         return !fn(...rest);
-    };
+    }, get('length', fn)));
 }
 
-function or(a, b, item) {
+/**
+ * or :: (*... -> Boolean) -> ((*... -> Boolean) -> ((*... -> Boolean)))
+ *
+ * @type {*}
+ */
+var or = curry(function _or(a, b, item) {
     return a(item) || b(item);
-}
+});
 
-function and(a, b, item) {
+/**
+ * and :: (*... -> Boolean) -> ((*... -> Boolean) -> ((*... -> Boolean)))
+ *
+ * @type {*}
+ */
+var and = curry(function _and(a, b, item) {
     return a(item) && b(item);
+});
+
+/**
+ *
+ * @param {*} x
+ * @returns {boolean}
+ */
+function flip(x) {
+    return !x;
 }
 
+/**
+ *
+ * @param {*} x
+ * @returns {boolean}
+ */
+function truthy(x) {
+    return !!x;
+}
+
+/**
+ * @type {flip}
+ * @see flip
+ * @param {*} x
+ * @returns {boolean}
+ */
+var falsey = flip;
+
+/**
+ *
+ * @type {function}
+ * @param {number} x
+ * @param {number} y
+ * @returns {number}
+ */
+var add = curry(function _add(x, y) {
+    return x + y;
+});
+
+/**
+ *
+ * @type {function}
+ * @param {number} x
+ * @param {number} y
+ * @returns {number}
+ */
+var subtract = curry(function _subtract(x, y) {
+    return x - y;
+});
+
+/**
+ *
+ * @type {function}
+ * @param {number} x
+ * @param {number} y
+ * @returns {number}
+ */
+var divide = curry(function _divide(x, y) {
+    return x / y;
+});
+
+/**
+ *
+ * @type {function}
+ * @param {number} x
+ * @param {number} y
+ * @returns {number}
+ */
+var multiple = curry(function _multiple(x, y) {
+    return x * y;
+});
+
+/**
+ *
+ * @type {function}
+ * @param {number} x
+ * @param {number} y
+ * @returns {number}
+ */
+var modulus = curry(function _modulus(x, y) {
+    return x % y;
+});
+
+/**
+ *
+ * @param {Array} first
+ * @param {Array} rest
+ * @returns {string | Array}
+ */
+function concat(first, ...rest) {
+    if (null == rest || !rest.length) return first;
+    return rest.reduce(function _concatStrings(cur, next) {
+        return cur.concat(next);
+    }, first);
+}
+
+/**
+ *
+ * @param {number} x
+ * @returns {number}
+ */
+function negate(x) {
+    return -x;
+}
+
+/**
+ *
+ * @type {function}
+ * @param {*} x
+ * @param {*} y
+ * @returns {boolean}
+ */
+var equal = curry(function _curry(x, y) {
+    return x == y;
+});
+
+/**
+ *
+ * @type {function}
+ * @param {*} x
+ * @param {*} y
+ * @returns {boolean}
+ */
+var strictEqual = curry(function _strictEqual(x, y) {
+    return x === y;
+});
+
+/**
+ *
+ * @type {function}
+ * @param {*}
+ * @param {*}
+ * @returns {boolean}
+ */
+var notEqual = curry(function _notEqual(x, y) {
+    return x != y;
+});
+
+/**
+ *
+ * @type {function}
+ * @param {*} x
+ * @param {*} y
+ * @returns {boolean}
+ */
+var strictNotEqual = curry(function _strictNotEqual(x, y) {
+    return x !== y;
+});
+
+/**
+ *
+ * @type {function}
+ * @param {number | string} x
+ * @param {number | string} y
+ * @returns {boolean}
+ */
+var greaterThan = curry(function _greaterThan(x, y) {
+    return x > y;
+});
+
+/**
+ *
+ * @type {function}
+ * @param {string | number} x
+ * @param {string | number} y
+ * @returns {boolean}
+ */
+var greaterThanOrEqual = curry(function _greaterThanOrEqual(x, y) {
+    return x >= y;
+});
+
+/**
+ *
+ * @type {function}
+ * @param {string | number} x
+ * @param {string | number} y
+ * @returns {boolean}
+ */
+var lessThan = curry(function _lessThan(x, y) {
+    return x < y;
+});
+
+/**
+ *
+ * @type {function}
+ * @param {string | number} x
+ * @param {string | number} y
+ * @returns {boolean}
+ */
+var lessThanOrEqual = curry(function _lessThanOrEqual(x, y) {
+    return x <= y;
+});
+
+/**
+ * @description:
+ * @type: {function}
+ * @param: {object} delegator
+ * @param: {object} delegate
+ * @returns: {boolean}
+ */
+var delegatesTo = curry(function _delegatesTo(delegator, delegate) {
+    return delegate.isPrototypeOf(delegator);
+});
+
+/**
+ * @description:
+ * @type: {function}
+ * @param: {object} delegate
+ * @param: {object} delegator
+ * @returns: {boolean}
+ */
+var delegatesFrom = curry(function _delegatesFrom(delegate, delegator) {
+    return delegate.isPrototypeOf(delegator);
+});
+
+/**
+ *
+ * @type {*}
+ */
+var arrayLens = curry(function _arrayLens(idx, f, xs) {
+    return map(function (val) {
+        return arraySet(idx, val, xs);
+    }, f(xs[idx]));
+});
+
+/**
+ *
+ * @type {*}
+ */
+var objectLens = curry(function _objectLens(prop, f, xs) {
+    return map(function _map(rep) {
+        return objectSet(prop, rep, xs);
+    }, f(xs[prop]));
+});
+
+/**
+ *
+ * @type {*}
+ */
+var view = curry(function _view(lens, target) {
+    return lens(kestrel)(target).value;
+});
+
+/**
+ *
+ * @type {*}
+ */
+var over = curry(function _over(lens, mapFn, target) {
+    return lens(function _lens(y) {
+        return identity(mapFn(y));
+    })(target).value;
+});
+
+/**
+ *
+ * @type {*}
+ */
+var put = curry(function _put(lens, val, target) {
+    return over(lens, kestrel(val), target);
+});
+
+/**
+ *
+ * @param paths
+ * @returns {*}
+ */
+function makeLenses(...paths) {
+    return paths.reduce(function _pathReduce(cur, next) {
+        var ol = objectLens(next);
+        return put(ol, ol, cur);
+    }, { num: arrayLens });
+}
+
+/**
+ *
+ * @param path
+ * @returns {*}
+ */
+function lensPath(...path) {
+    return compose(...path.map(function _pathMap(p) {
+        return 'string' === typeof p ? objectLens(p) : arrayLens(p);
+    }));
+}
+
+/**
+ *
+ * @type {function}
+ * @param {function} f
+ * @param {object} x
+ * @returns {identity<T>}
+ */
+var mapped = curry(function _mapped(f, x) {
+    return identity(map(compose(function _mCompose(x) {
+        return x.value;
+    }, f), x));
+});
+
+/**
+ * @description: Updates the value stored in a single specified index of an array. The function
+ * argument should be some form of a unary projector. The 'projector' function will receive
+ * the value stored in the existing array at the specified 'idx' argument location. A new array
+ * is returned and the original array remains unchanged.
+ * @type {function}
+ * @param {function} fn - A function that can operate on a single point of data from the array
+ * and a value to be used as an update for the same index in the new array.
+ * @param {number} idx - A number representing the zero-based offset of the array; idx determines
+ * what value will be passed as the unary argument to the operator function and what index in the
+ * newly created array will be altered. If the value is less than zero, the function will use the
+ * 'idx' argument value as an offset from the last element in the array.
+ * @param {Array} list - The list to update.
+ * @returns {Array} - Returns a new array identical to the original array except where the new,
+ * computed value is inserted
+ */
+var adjust = curry(function _adjust(fn, idx, list) {
+    if (idx >= list.length || idx < -list.length) {
+        return list;
+    }
+    var _idx = idx < 0 ? list.length + idx : idx,
+        _list = list.map(identity);
+    _list[_idx] = fn(list[_idx]);
+    return _list;
+});
+
+/**
+ * curry :: (* -> a) -> (* -> a)
+ *
+ * @param fn
+ * @returns {*}
+ */
 function curry(fn) {
     if (!fn.length || 1 === fn.length) return fn;
     return curryN(fn.length, [], fn);
 }
 
-function curryN(length, received, fn) {
-    return function _c(...rest) {
+/**
+ * Curries a function to a specified arity
+ * @param {number} arity - The number of arguments to curry the function for
+ * @param {Array} received - An array of the arguments to be applied to the function
+ * @param {function} fn - The function to be curried
+ * @returns {function | *} - Returns either a function waiting for more arguments to
+ * be applied before invocation, or will return the result of the function invocation
+ * if the specified number of arguments have been received
+ */
+function curryN(arity, received, fn) {
+    return function _curryN(...rest) {
         var combined = received.concat(rest);
-        if (length > combined.length) return curryN(length, combined, fn);
+        if (arity > combined.length) return curryN(arity, combined, fn);
         return fn.call(this, ...combined);
     };
 }
 
+exports.noop = noop;
 exports.identity = identity;
+exports.constant = constant;
+exports.apply = apply;
+exports.once = once;
+exports.kestrel = kestrel;
+exports.get = get;
+exports.set = set;
+exports.objectSet = objectSet;
+exports.arraySet = arraySet;
+exports.nth = nth;
+exports.compose = compose;
+exports.pipe = pipe;
 exports.ifElse = ifElse;
+exports.ifThisThenThat = ifThisThenThat;
 exports.when = when;
+exports.whenNot = whenNot;
 exports.wrap = wrap;
+exports.type = type;
 exports.isArray = isArray;
 exports.isObject = isObject;
 exports.isFunction = isFunction;
+exports.isNumber = isNumber;
+exports.isString = isString;
+exports.isBoolean = isBoolean;
+exports.isSymbol = isSymbol;
+exports.isNull = isNull;
+exports.isUndefined = isUndefined;
+exports.isNothing = isNothing;
+exports.isSomething = isSomething;
 exports.not = not;
 exports.or = or;
 exports.and = and;
+exports.flip = flip;
+exports.truthy = truthy;
+exports.falsey = falsey;
+exports.add = add;
+exports.subtract = subtract;
+exports.divide = divide;
+exports.multiple = multiple;
+exports.modulus = modulus;
+exports.concat = concat;
+exports.negate = negate;
+exports.equal = equal;
+exports.strictEqual = strictEqual;
+exports.notEqual = notEqual;
+exports.strictNotEqual = strictNotEqual;
+exports.greaterThan = greaterThan;
+exports.greaterThanOrEqual = greaterThanOrEqual;
+exports.lessThan = lessThan;
+exports.lessThanOrEqual = lessThanOrEqual;
+exports.delegatesTo = delegatesTo;
+exports.delegatesFrom = delegatesFrom;
+exports.arrayLens = arrayLens;
+exports.objectLens = objectLens;
+exports.view = view;
+exports.over = over;
+exports.put = put;
+exports.makeLenses = makeLenses;
+exports.lensPath = lensPath;
+exports.mapped = mapped;
+exports.adjust = adjust;
 exports.curry = curry;
+exports.curryN = curryN;
+exports.tap = tap;
+exports.fork = fork;
+exports.sequence = sequence;
 
-},{}],19:[function(require,module,exports){
+},{"./helpers":19}],19:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
     value: true
 });
+exports.alterFunctionLength = exports.generatorProto = exports.shallowClone = exports.deepCopy = exports.deepClone = exports.memoizer = exports.defaultPredicate = exports.defaultGreaterThanComparer = exports.defaultEqualityComparer = exports.sortComparer = exports.observableStatus = exports.sortDirection = exports.javaScriptTypes = undefined;
+
+var _functionalHelpers = require('./functionalHelpers');
+
+/**
+ *
+ * @type {{function: string, object: string, boolean: string, number: string, symbol: string, string: string, undefined: string}}
+ */
 var javaScriptTypes = {
     'function': 'function',
     'object': 'object',
@@ -511,47 +1314,77 @@ var javaScriptTypes = {
     'undefined': 'undefined'
 };
 
-var comparisons = {
-    strictEquality: 'eq',
-    looseEquality: '==',
-    strictInequality: 'neq',
-    looseInequality: '!=',
-    greaterThanOrEqual: 'gte',
-    greaterThan: 'gt',
-    lessThanOrEqual: 'lte',
-    lessThan: 'lt',
-    falsey: 'falsey',
-    truthy: 'truthy',
-    contains: 'ct',
-    doesNotContain: 'nct',
-    startsWith: 'startsWith',
-    endsWith: 'endsWith'
+/**
+ *
+ * @type {{inactive: number, active: number, paused: number, complete: number}}
+ */
+var observableStatus = {
+    inactive: 0,
+    active: 1,
+    paused: 2,
+    complete: 3
 };
 
-var dataTypes = {
-    number: '^-?(?:[1-9]{1}[0-9]{0,2}(?:,[0-9]{3})*(?:\\.[0-9]+)?|[1-9]{1}[0-9]{0,}(?:\\.[0-9]+)?|0(?:\\.[0-9]+)?|(?:\\.[0-9]+)?)$',
-    numberChar: '[\\d,\\.-]',
-    integer: '^\\-?\\d+$',
-    time: '^(0?[1-9]|1[012])(?:(?:(:|\\.)([0-5]\\d))(?:\\2([0-5]\\d))?)?(?:(\\ [AP]M))$|^([01]?\\d|2[0-3])(?:(?:(:|\\.)([0-5]\\d))(?:\\7([0-5]\\d))?)$',
-    timeChar: '[\\d\\.:\\ AMP]',
-    date: '^(?:(?:(?:(?:(?:(?:(?:(0?[13578]|1[02])(\\/|-|\\.)(31))\\2|(?:(0?[1,3-9]|1[0-2])(\\/|-|\\.)(29|30)\\5))|(?:(?:(?:(?:(31)(\\/|-|\\.)(0?[13578]|1[02])\\8)|(?:(29|30)(\\/|-|\\.)' + '(0?[1,3-9]|1[0-2])\\11)))))((?:1[6-9]|[2-9]\\d)?\\d{2})|(?:(?:(?:(0?2)(\\/|-|\\.)(29)\\15)|(?:(29)(\\/|-|\\.)(0?2))\\18)((?:(?:1[6-9]|[2-9]\\d)?(?:0[48]|[2468][048]|[13579][26])' + '|(?:(?:16|[2468][048]|[3579][26])00))))|(?:(?:((?:0?[1-9])|(?:1[0-2]))(\\/|-|\\.)(0?[1-9]|1\\d|2[0-8]))\\22|(0?[1-9]|1\\d|2[0-8])(\\/|-|\\.)((?:0?[1-9])|(?:1[0-2]))\\25)((?:1[6-9]|[2-9]\\d)?\\d{2}))))' + '|(?:(?:((?:1[6-9]|[2-9]\\d)?(?:0[48]|[2468][048]|[13579][26])|(?:(?:16|[2468][048]|[3579][26])00)))(\\/|-|\\.)(?:(?:(?:(0?2)(?:\\29)(29))))|((?:1[6-9]|[2-9]\\d)?\\d{2})(\\/|-|\\.)' + '(?:(?:(?:(0?[13578]|1[02])\\33(31))|(?:(0?[1,3-9]|1[0-2])\\33(29|30)))|((?:0?[1-9])|(?:1[0-2]))\\33(0?[1-9]|1\\d|2[0-8]))))$',
-    datetime: '^(((?:(?:(?:(?:(?:(?:(?:(0?[13578]|1[02])(\\/|-|\\.)(31))\\4|(?:(0?[1,3-9]|1[0-2])(\\/|-|\\.)(29|30)\\7))|(?:(?:(?:(?:(31)(\\/|-|\\.)(0?[13578]|1[02])\\10)|(?:(29|30)(\\/|-|\\.)' + '(0?[1,3-9]|1[0-2])\\13)))))((?:1[6-9]|[2-9]\\d)?\\d{2})|(?:(?:(?:(0?2)(\\/|-|\\.)(29)\\17)|(?:(29)(\\/|-|\\.)(0?2))\\20)((?:(?:1[6-9]|[2-9]\\d)?(?:0[48]|[2468][048]|[13579][26])' + '|(?:(?:16|[2468][048]|[3579][26])00))))|(?:(?:((?:0?[1-9])|(?:1[0-2]))(\\/|-|\\.)(0?[1-9]|1\\d|2[0-8]))\\24|(0?[1-9]|1\\d|2[0-8])(\\/|-|\\.)((?:0?[1-9])|(?:1[0-2]))\\27)' + '((?:1[6-9]|[2-9]\\d)?\\d{2}))))|(?:(?:((?:1[6-9]|[2-9]\\d)?(?:0[48]|[2468][048]|[13579][26])|(?:(?:16|[2468][048]|[3579][26])00)))(\\/|-|\\.)(?:(?:(?:(0?2)(?:\\31)(29))))' + '|((?:1[6-9]|[2-9]\\d)?\\d{2})(\\/|-|\\.)(?:(?:(?:(0?[13578]|1[02])\\35(31))|(?:(0?[1,3-9]|1[0-2])\\35(29|30)))|((?:0?[1-9])|(?:1[0-2]))\\35(0?[1-9]|1\\d|2[0-8])))))' + '(?: |T)((0?[1-9]|1[012])(?:(?:(:|\\.)([0-5]\\d))(?:\\44([0-5]\\d))?)?(?:(\\ [AP]M))$|([01]?\\d|2[0-3])(?:(?:(:|\\.)([0-5]\\d))(?:\\49([0-5]\\d))?)$))',
-    dateChar: '\\d|\\-|\\/|\\.',
-    dateTimeChar: '[\\d\\.:\\sAMP\\-\\/]'
+/**
+ *
+ * @type {{ascending: number, descending: number}}
+ */
+var sortDirection = {
+    ascending: 1,
+    descending: 2
 };
 
-function defaultEqualityComparer(a, b) {
+/**
+ * @description:
+ * @type: {function}
+ * @param: {function} keySelector
+ * @param: {number} idx1
+ * @param: {number} idx2
+ * @param: {*} val1
+ * @param: {Array} list
+ * @param: {string} dir
+ * @returns: {number}
+ */
+
+var sortComparer = (0, _functionalHelpers.curry)(function _sortComparer(keySelector, idx1, idx2, val1, source, dir) {
+    var val2 = keySelector(source[idx2]);
+    var c = val1 > val2 ? 1 : val1 === val2 ? idx1 - idx2 : -1;
+    return dir === sortDirection.ascending ? c : -c;
+});
+
+/**
+ *
+ * @type {function}
+ * @param {*} a
+ * @param {*} b
+ * @returns {boolean}
+ */
+var defaultEqualityComparer = (0, _functionalHelpers.curry)(function _defaultEqualityComparer(a, b) {
     return a === b;
-}
+});
 
-function defaultGreaterThanComparer(a, b) {
+/**
+ *
+ * @type {function}
+ * @param {*} a
+ * @param {*} b
+ * @returns {boolean}
+ */
+var defaultGreaterThanComparer = (0, _functionalHelpers.curry)(function defaultGreaterThanComparer(a, b) {
     return a > b;
-}
+});
 
-function defaultPredicate() {
-    return true;
-}
+/**
+ * @type {function}
+ * @returns {boolean}
+ */
+var defaultPredicate = (0, _functionalHelpers.kestrel)(true);
 
+/**
+ * @description - Prototype of a generator; used to detect if a function
+ * argument is a generator or a regular function.
+ * @type {Object}
+ */
 var generatorProto = Object.getPrototypeOf(function* _generator() {});
 
 //TODO: this will have to be changed as the false value could be a legit value for a collection...
@@ -576,50 +1409,112 @@ function memoizer(comparer) {
     };
 }
 
-function cloneData(data) {
-    //Clones data so pass-by-reference doesn't mess up the values in other grids.
-    if (data == null || typeof data !== 'object') return data;
+function newMemoizer(fn, comparer = defaultEqualityComparer) {
+    var items = [];
 
-    if (Object.prototype.toString.call(data) === '[object Array]') return cloneArray(data);
+    return function _memoizedFunc(...args) {
+        if (!args.length || items.some(function _checkEquality(it) {
+            return comparer(it, args);
+        })) return true;
+        items[items.length] = args;
+        return fn(...args);
+    };
+}
+
+function memoized(fn, keyMaker) {
+    var lookup = new Map();
+    return function _memoized(...args) {
+        var key = javaScriptTypes.function === typeof keyMaker ? keyMaker(...args) : args;
+        return lookup[key] || (lookup[key] = fn(...args));
+    };
+}
+
+/**
+ *
+ * @param {*} obj
+ * @returns {object}
+ */
+function deepClone(obj) {
+    if (null == obj || javaScriptTypes.object !== typeof obj) return obj;
+
+    if (Array.isArray(obj)) return deepCopy(obj);
 
     var temp = {};
-    Object.keys(data).forEach(function _cloneGridData(field) {
-        temp[field] = cloneData(data[field]);
+    Object.keys(obj).forEach(function _cloneGridData(field) {
+        temp[field] = deepClone(obj[field]);
     });
     return temp;
 }
 
-function cloneArray(arr) {
+/**
+ *
+ * @param {Array} arr
+ * @returns {Array}
+ */
+function deepCopy(arr) {
     var length = arr.length,
         newArr = new arr.constructor(length),
         index = -1;
     while (++index < length) {
-        newArr[index] = cloneData(arr[index]);
+        newArr[index] = deepClone(arr[index]);
     }
     return newArr;
 }
 
+/**
+ *
+ * @param {object} obj
+ * @returns {object}
+ */
+function shallowClone(obj) {
+    var clone = {};
+    for (var p in obj) {
+        clone[p] = obj[p];
+    }
+    return clone;
+}
+
+/**
+ *
+ * @type {function}
+ * @param {number} len
+ * @param {function} fn
+ * @returns {function}
+ */
+var alterFunctionLength = (0, _functionalHelpers.curry)(function _alterFunctionLength(len, fn) {
+    return Object.defineProperty(fn, 'length', {
+        value: len
+    });
+});
+
 exports.javaScriptTypes = javaScriptTypes;
-exports.comparisons = comparisons;
-exports.dataTypes = dataTypes;
+exports.sortDirection = sortDirection;
+exports.observableStatus = observableStatus;
+exports.sortComparer = sortComparer;
 exports.defaultEqualityComparer = defaultEqualityComparer;
 exports.defaultGreaterThanComparer = defaultGreaterThanComparer;
 exports.defaultPredicate = defaultPredicate;
 exports.memoizer = memoizer;
-exports.cloneData = cloneData;
-exports.cloneArray = cloneArray;
+exports.deepClone = deepClone;
+exports.deepCopy = deepCopy;
+exports.shallowClone = shallowClone;
 exports.generatorProto = generatorProto;
+exports.alterFunctionLength = alterFunctionLength;
 
-},{}],20:[function(require,module,exports){
+},{"./functionalHelpers":18}],20:[function(require,module,exports){
 'use strict';
-
-var _queryDelegatorCreators = require('./queryObjects/queryDelegatorCreators');
 
 var _queryable = require('./queryObjects/queryable');
 
-window.queryable = _queryable.queryable || {};
+var _list = require('./list_monad/list');
 
-},{"./queryObjects/queryDelegatorCreators":33,"./queryObjects/queryable":34}],21:[function(require,module,exports){
+var _observable = require('./streams/observable');
+
+window.queryable = _queryable.queryable || {};
+window.list = _list.list || {};
+window.observable = _observable.observable || {};
+
+},{"./list_monad/list":25,"./queryObjects/queryable":35,"./streams/observable":36}],21:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -669,31 +1564,31 @@ exports.ofType = undefined;
 
 var _helpers = require('../helpers');
 
-function ofType(source, type) {
+function ofType(source, dataType) {
     return function* ofTypeIterator() {
         function _checkTypeKeys(key) {
             return key in objItem;
         }
         function _checkItemKeys(key) {
-            return key in type;
+            return key in dataType;
         }
 
-        if (type in _helpers.javaScriptTypes) {
+        if (dataType in _helpers.javaScriptTypes) {
             for (let item of source) {
-                if (_helpers.javaScriptTypes[type] === typeof item) yield item;
+                if (_helpers.javaScriptTypes[dataType] === typeof item) yield item;
             }
         } else {
-            if (typeof type === _helpers.javaScriptTypes.function) {
+            if (typeof dataType === _helpers.javaScriptTypes.function) {
                 for (let item of source) {
-                    if (item === type) yield item;
+                    if (item === dataType) yield item;
                 }
-            } else if (null === type) {
+            } else if (null === dataType) {
                 for (let item of source) {
-                    if (type === item) yield item;
+                    if (dataType === item) yield item;
                 }
             } else {
                 for (var objItem of source) {
-                    if (type.isPrototypeOf(objItem)) yield objItem;else if (_helpers.javaScriptTypes.object === typeof objItem && null !== objItem && Object.keys(type).every(_checkTypeKeys) && Object.keys(objItem).every(_checkItemKeys)) {
+                    if (dataType.isPrototypeOf(objItem)) yield objItem;else if (_helpers.javaScriptTypes.object === typeof objItem && null !== objItem && Object.keys(dataType).every(_checkTypeKeys) && Object.keys(objItem).every(_checkItemKeys)) {
                         yield objItem;
                     }
                 }
@@ -713,7 +1608,7 @@ Object.defineProperty(exports, "__esModule", {
 function where(source, predicate) {
     return function* whereIterator() {
         for (let item of source) {
-            if (predicate(item)) yield item;
+            if (false !== predicate(item)) yield item;
         }
     };
 }
@@ -721,6 +1616,696 @@ function where(source, predicate) {
 exports.where = where;
 
 },{}],25:[function(require,module,exports){
+'use strict';
+
+Object.defineProperty(exports, "__esModule", {
+    value: true
+});
+exports.list_core = exports.list = undefined;
+
+var _collationFunctions = require('../collation/collationFunctions');
+
+var _evaluationFunctions = require('../evaluation/evaluationFunctions');
+
+var _limitationFunctions = require('../limitation/limitationFunctions');
+
+var _projectionFunctions = require('../projection/projectionFunctions');
+
+var _helpers = require('../helpers');
+
+var _functionalHelpers = require('../functionalHelpers');
+
+/**
+ * @description: Object that contains the core functionality of a list; both the m_list and ordered_m_list
+ * objects delegate to this object for all functionality besides orderBy/orderByDescending
+ * and thenBy/thenByDescending respectively. Getter/setters are present for state-manipulation
+ * at the consumer-object level, as well as to provide default values for a consumer-level
+ * object at creation if not specified.
+ * @type {{
+ * value,
+ * value,
+ * map: list_core._map,
+ * groupBy: list_core._groupBy,
+ * groupByDescending: list_core._groupByDescending,
+ * flatten: list_core._flatten,
+ * deepFlatten: list_core._deepFlatten,
+ * deepMap: list_core._deepMap,
+ * addFront: list_core._addFront,
+ * concat: list_core._concat,
+ * except: list_core._except,
+ * groupJoin: list_core._groupJoin,
+ * intersect: list_core._intersect,
+ * join: list_core._join,
+ * union: list_core._union,
+ * zip: list_core._zip,
+ * where: list_core._where,
+ * ofType: list_core._ofType,
+ * distinct: list_core._distinct,
+ * take: list_core._take,
+ * takeWhile: list_core._takeWhile,
+ * skip: list_core._skip,
+ * skipWhile: list_core._skipWhile,
+ * any: list_core._any,
+ * all: list_core._all,
+ * contains: list_core._contains,
+ * first: list_core._first,
+ * fold: list_core._fold,
+ * last: list_core._last,
+ * count: list_core._count,
+ * toArray: list_core._toArray,
+ * toSet: list_core._toSet,
+ * reverse: list_core._reverse,
+ * [Symbol.iterator]: list_core._iterator
+ * }}
+ */
+var list_core = {
+    //Using getters for these properties because there's a chance the setting and/or getting
+    //functionality could change; this will allow for a consistent interface while the
+    //logic beneath changes
+
+    /**
+     * @description: Getter for the underlying source object of the list
+     * @returns: {*}
+     */
+    get value() {
+        return this._value;
+    },
+
+    /**
+     * @description: Setter for the underlying source object of the list
+     * @param: val
+     */
+    set value(val) {
+        this._value = val;
+    },
+
+    /**
+     * @description:
+     * @param: {function} mapFunc
+     * @returns: {*}
+     */
+    map: function _map(mapFunc) {
+        return createListDelegator(this, (0, _projectionFunctions.map)(this, mapFunc));
+    },
+
+    /**
+     * @description:
+     * @param: {function} keySelector
+     * @param: {function} comparer
+     * @returns: {m_list}
+     */
+    groupBy: function _groupBy(keySelector, comparer) {
+        var groupObj = [{ keySelector: keySelector, comparer: comparer, direction: 'asc' }];
+        return createListDelegator(this, (0, _projectionFunctions.groupBy)(this, groupObj));
+    },
+
+    /**
+     * @description:
+     * @param: {function} keySelector
+     * @param: {function} comparer
+     * @returns: {*}
+     */
+    groupByDescending: function _groupByDescending(keySelector, comparer) {
+        var groupObj = [{ keySelector: keySelector, comparer: comparer, direction: 'desc' }];
+        return createListDelegator(this, (0, _projectionFunctions.groupBy)(this, groupObj));
+    },
+
+    /**
+     * @description:
+     * @returns:
+     */
+    flatten: function _flatten() {
+        return createListDelegator(this, (0, _projectionFunctions.flatten)(this));
+    },
+
+    /**
+     * @description:
+     * @returns:
+     */
+    deepFlatten: function _deepFlatten() {
+        return createListDelegator(this, (0, _projectionFunctions.deepFlatten)(this));
+    },
+
+    /**
+     * @description:
+     * @param: {function} fn
+     * @returns: {*}
+     */
+    deepMap: function _deepMap(fn) {
+        return createListDelegator(this, (0, _projectionFunctions.deepMap)(this, fn));
+    },
+
+    /**
+     * @description:
+     * @param: enumerable
+     * @returns: {*}
+     */
+    addFront: function _addFront(enumerable) {
+        return createListDelegator(this, (0, _collationFunctions.addFront)(this, enumerable));
+    },
+
+    /**
+     * @description: Concatenates two or more lists by appending the "method's" list argument(s) to the
+     * list's value. This function is a deferred execution call that returns
+     * a new queryable object delegator instance that contains all the requisite
+     * information on how to perform the operation.
+     * @param: {Array | *} enumerables
+     * @returns: {*}
+     */
+    concat: function _concat(...enumerables) {
+        return createListDelegator(this, (0, _collationFunctions.concat)(this, enumerables, enumerables.length));
+    },
+
+    /**
+     * @description: Produces a list that contains the objectSet difference between the queryable object
+     * and the list that is passed as a function argument. A comparer function may be
+     * provided to the function that determines the equality/inequality of the items in
+     * each list; if left undefined, the function will use a default equality comparer.
+     * This function is a deferred execution call that returns a new queryable
+     * object delegator instance that contains all the requisite information on
+     * how to perform the operation.
+     * equality comparer.
+     * @param: enumerable
+     * @param: {function} comparer
+     * @returns: {*}
+     */
+    except: function _except(enumerable, comparer) {
+        return createListDelegator(this, (0, _collationFunctions.except)(this, enumerable, comparer));
+    },
+
+    /**
+     * @description: Correlates the items in two lists based on the equality of a key and groups
+     * all items that share the same key. A comparer function may be provided to
+     * the function that determines the equality/inequality of the items in each
+     * list; if left undefined, the function will use a default equality comparer.
+     * This function is a deferred execution call that returns a new queryable
+     * object delegator instance that contains all the requisite information on
+     * how to perform the operation.
+     * @param: {Array|list} inner
+     * @param: {function} outerSelector
+     * @param: {function} innerSelector
+     * @param: {function} projector
+     * @param: {function} comparer
+     * @returns: {*}
+     */
+    groupJoin: function _groupJoin(inner, outerSelector, innerSelector, projector, comparer) {
+        return createListDelegator(this, (0, _collationFunctions.groupJoin)(this, inner, outerSelector, innerSelector, projector, comparer));
+    },
+
+    /**
+     * @description: Produces the objectSet intersection of the list object's value and the list
+     * that is passed as a function argument. A comparer function may be
+     * provided to the function that determines the equality/inequality of the items in
+     * each list; if left undefined, the function will use a default equality comparer.
+     * This function is a deferred execution call that returns a new queryable
+     * object delegator instance that contains all the requisite information on
+     * how to perform the operation.
+     * @param: enumerable
+     * @param: {function} comparer
+     * @returns: {*}
+     */
+    intersect: function _intersect(enumerable, comparer) {
+        return createListDelegator(this, (0, _collationFunctions.intersect)(this, enumerable, comparer));
+    },
+
+    /**
+     * @description: Correlates the items in two lists based on the equality of items in each
+     * list. A comparer function may be provided to the function that determines
+     * the equality/inequality of the items in each list; if left undefined, the
+     * function will use a default equality comparer. This function is a deferred
+     * execution call that returns a new queryable object delegator instance that
+     * contains all the requisite information on how to perform the operation.
+     * @param: {Array|list} inner
+     * @param: {function} outerSelector
+     * @param: {function} innerSelector
+     * @param: {function} projector
+     * @param: {function} comparer
+     * @returns: {*}
+     */
+    join: function _join(inner, outerSelector, innerSelector, projector, comparer) {
+        return createListDelegator(this, (0, _collationFunctions.join)(this, inner, outerSelector, innerSelector, projector, comparer));
+    },
+
+    /**
+     * @description: Produces the objectSet union of two lists by selecting each unique item in both
+     * lists. A comparer function may be provided to the function that determines
+     * the equality/inequality of the items in each list; if left undefined, the
+     * function will use a default equality comparer. This function is a deferred
+     * execution call that returns a new queryable object delegator instance that
+     * contains all the requisite information on how to perform the operation.
+     * @param: enumerable
+     * @param: {function} comparer
+     * @returns: {*}
+     */
+    union: function _union(enumerable, comparer) {
+        return createListDelegator(this, (0, _collationFunctions.union)(this, enumerable, comparer));
+    },
+
+    /**
+     * @description: Produces a list of the items in the queryable object and the list passed as
+     * a function argument. A comparer function may be provided to the function that determines
+     * the equality/inequality of the items in each list; if left undefined, the
+     * function will use a default equality comparer. This function is a deferred
+     * execution call that returns a new queryable object delegator instance that
+     * contains all the requisite information on how to perform the operation.
+     * @param: {function} selector
+     * @param: enumerable
+     * @returns {*}
+     */
+    zip: function _zip(selector, enumerable) {
+        return createListDelegator(this, (0, _collationFunctions.zip)(this, selector, enumerable));
+    },
+
+    /**
+     * @description:
+     * @param: {function} predicate
+     * @returns: {*}
+     */
+    where: function _where(predicate) {
+        return createListDelegator(this, (0, _limitationFunctions.where)(this, predicate));
+    },
+
+    /**
+     * @description:
+     * @param: type
+     * @returns: {*}
+     */
+    ofType: function _ofType(type) {
+        return createListDelegator(this, (0, _limitationFunctions.ofType)(this, type));
+    },
+
+    /**
+     * @description:
+     * @param: {function} comparer
+     * @returns: {*}
+     */
+    distinct: function _distinct(comparer) {
+        return createListDelegator(this, (0, _limitationFunctions.distinct)(this, comparer));
+    },
+
+    /**
+     * @description:
+     * @param: {number} amt
+     * @returns: {Array}
+     */
+    take: function _take(amt) {
+        if (!amt) return [];
+        var res = [],
+            idx = 0;
+
+        for (let item of this) {
+            if (idx < amt) res[res.length] = item;else break;
+            ++idx;
+        }
+        return res;
+    },
+
+    /**
+     * @description:
+     * @param: {function} predicate
+     * @returns: {Array}
+     */
+    takeWhile: function _takeWhile(predicate = _helpers.defaultPredicate) {
+        var res = [];
+
+        for (let item of this.value) {
+            if (predicate(item)) res[res.length] = item;else {
+                return res;
+            }
+        }
+    },
+
+    /**
+     * @description: Skips over a specified number of items in the source and returns the
+     * remaining items. If no amount is specified, an empty array is returned;
+     * Otherwise, an array containing the items collected from the source is
+     * returned.
+     * @param: {number} amt - The number of items in the source to skip before
+     * returning the remainder.
+     * @returns: {*}
+     */
+    skip: function _skip(amt) {
+        var idx = 0,
+            res = [];
+
+        for (let item of this.value) {
+            if (idx >= amt) res[res.length] = item;
+            ++idx;
+        }
+        return res;
+    },
+
+    /**
+     * @description:
+     * @param: {function} predicate
+     * @returns: {Array}
+     */
+    skipWhile: function _skipWhile(predicate = _helpers.defaultPredicate) {
+        var hasFailed = false,
+            res = [];
+
+        for (let item of this.value) {
+            if (!hasFailed) {
+                if (!predicate(item)) {
+                    hasFailed = true;
+                    res[res.length] = item;
+                }
+            } else res[res.length] = item;
+        }
+        return res;
+    },
+
+    /**
+     * @description:
+     * @param: {function} predicate
+     * @returns: {*}
+     */
+    any: function _any(predicate = _helpers.defaultPredicate) {
+        return (0, _evaluationFunctions.any)(this, predicate);
+    },
+
+    /**
+     * @description:
+     * @param: {function} predicate
+     * @returns: {*}
+     */
+    all: function _all(predicate = _helpers.defaultPredicate) {
+        return (0, _evaluationFunctions.all)(this, predicate);
+    },
+
+    /**
+     * @description:
+     * @param: val
+     * @param: {function} comparer
+     * @returns: {*}
+     */
+    contains: function _contains(val, comparer) {
+        return (0, _evaluationFunctions.contains)(this, val, comparer);
+    },
+
+    /**
+     * @description:
+     * @param: {function} predicate
+     * @returns: {*}
+     */
+    first: function _first(predicate = _helpers.defaultPredicate) {
+        return (0, _evaluationFunctions.first)(this, predicate);
+    },
+
+    /**
+     * @description:
+     * @param: {function} fn
+     * @param: initial
+     * @returns: {*}
+     */
+    fold: function _fold(fn, initial) {
+        return (0, _evaluationFunctions.fold)(this, fn, initial);
+    },
+
+    /**
+     * @description:
+     * @see: list_core.fold
+     * @param: fn
+     * @param: initial
+     * @returns:
+     */
+    reduce: function _reduce(fn, initial) {
+        return (0, _evaluationFunctions.fold)(this, fn, initial);
+    },
+
+    /**
+     * @description:
+     * @param: {function} predicate
+     * @returns: {*}
+     */
+    last: function _last(predicate = _helpers.defaultPredicate) {
+        return (0, _evaluationFunctions.last)(this, predicate);
+    },
+
+    /**
+     * @description:
+     * @returns: {*}
+     */
+    count: function _count() {
+        return (0, _evaluationFunctions.count)(this);
+    },
+
+    /**
+     * @description:
+     * @returns: {Array}
+     */
+    toArray: function _toArray() {
+        return Array.from(this);
+    },
+
+    /**
+     * @description:
+     * @returns: {Set}
+     */
+    toSet: function _toSet() {
+        return new Set(this);
+    },
+
+    /**
+     * @description:
+     * @param: {*} item
+     * @returns: {m_list}
+     */
+    of: function _of(item) {
+        return list(item);
+    },
+
+    /**
+     * @description: Evaluates the current list instance and returns a new list
+     * instance with the evaluated data as its source. This is used when the
+     * initial list's data must be iterated more than once as it will cause
+     * the evaluation to happen each item it is iterated. Rather the pulling the
+     * initial data through the list's 'pipeline' every time, this property will
+     * allow you to evaluate the list's data and store it in a new list that can
+     * be iterated many times without needing to re-evaluate. It is effectively
+     * a syntactical shortcut for: list.from(listInstance.data);
+     * @returns: {m_list}
+     */
+    toEvaluatedList: function _toEvaluatedList() {
+        return list.from(this.data /* the .data property is a getter function that forces evaluation */);
+    },
+
+    /**
+     * @description:
+     * @returns: {Array<*>}
+     */
+    reverse: function _reverse() {
+        return Array.from(this).reverse();
+    },
+
+    /**
+     * @description: Base iterator to which all queryable_core delegator objects
+     * delegate to for iteration if for some reason an iterator wasn't
+     * objectSet on the delegator at the time of creation.
+     */
+    [Symbol.iterator]: function* _iterator() {
+        for (let item of this.value) yield item;
+    }
+};
+
+/**
+ * @description: A list_core delegator object that, in addition to the delegatable functionality
+ * it has from the list_core object, also exposes .orderBy and .orderByDescending
+ * functions. These functions allow a consumer to sort a list's data by
+ * a given key.
+ * @type: {list_core}
+ */
+var m_list = Object.create(list_core, {
+    /**
+     * @description:
+     * @param: keySelector
+     * @param: comparer
+     * @returns: {*}
+     */
+    orderBy: {
+        value: function _orderBy(keySelector, comparer) {
+            var sortObj = [{ keySelector: keySelector, comparer: comparer, direction: 'asc' }];
+            return createListDelegator(this, (0, _projectionFunctions.orderBy)(this, sortObj), sortObj);
+        }
+    },
+    /**
+     * @description:
+     * @param: keySelector
+     * @param: comparer
+     * @returns: {*}
+     */
+    orderByDescending: {
+        value: function _orderByDescending(keySelector, comparer) {
+            var sortObj = [{ keySelector: keySelector, comparer: comparer, direction: 'desc' }];
+            return createListDelegator(this, (0, _projectionFunctions.orderBy)(this, sortObj), sortObj);
+        }
+    }
+});
+
+/**
+ * @description: A list_core delegator object that, in addition to the delegatable functionality
+ * it has from the queryable_core object, also exposes .thenBy and .thenByDescending
+ * functions. These functions allow a consumer to sort more on than a single column.
+ * @type: {list_core}
+ */
+var ordered_m_list = Object.create(list_core, {
+    _appliedSorts: {
+        value: []
+    },
+    //In these two functions, feeding the call to "orderBy" with the .value property of the list delegate
+    //rather than the delegate itself, effectively excludes the previous call to the orderBy/orderByDescending
+    //since the iterator exists on the delegate, not on its value. Each subsequent call to thenBy/thenByDescending
+    //will continue to exclude the previous call's iterator... effectively what we're doing is ignoring all the
+    //prior calls made to orderBy/orderByDescending/thenBy/thenByDescending and calling it once but with an array
+    //of the the requested sorts.
+    /**
+     * @description:
+     * @param: keySelector
+     * @param: comparer
+     * @returns: {*}
+     */
+    thenBy: {
+        value: function _thenBy(keySelector, comparer) {
+            var sortObj = this._appliedSorts.concat({ keySelector: keySelector, comparer: comparer, direction: 'asc' });
+            return createListDelegator(this.value, (0, _projectionFunctions.orderBy)(this, sortObj), sortObj);
+        }
+    },
+    /**
+     * @description:
+     * @param: keySelector
+     * @param: comparer
+     * @returns: {*}
+     */
+    thenByDescending: {
+        value: function thenByDescending(keySelector, comparer) {
+            var sortObj = this._appliedSorts.concat({ keySelector: keySelector, comparer: comparer, direction: 'desc' });
+            return createListDelegator(this.value, (0, _projectionFunctions.orderBy)(this, sortObj), sortObj);
+        }
+    }
+});
+
+//TODO: functional
+//TODO: functional programming
+//TODO: FP
+//TODO: monad
+//TODO: functor
+//TODO: container
+//TODO: JavaScript
+//TODO: JS
+//TODO: JunctionalS
+//TODO: JunctorS
+//TODO: lanoitcunf
+//TODO: rotcnuf
+//TODO: danom
+//TODO: tpircSavaJ
+//TODO: Junctional FavaScript
+
+var setValue = (0, _functionalHelpers.set)('value'),
+    setIterator = (0, _functionalHelpers.set)(Symbol.iterator),
+    isIterator = (0, _functionalHelpers.apply)((0, _functionalHelpers.delegatesFrom)(_helpers.generatorProto)),
+    create = (0, _functionalHelpers.ifElse)(_functionalHelpers.isSomething, createOrderedList, createList);
+
+function createList() {
+    return Object.create(m_list, {
+        data: {
+            get: function _getData() {
+                return Array.from(this);
+            }
+        }
+    });
+}
+
+function createOrderedList(sorts) {
+    return (0, _functionalHelpers.set)('_appliedSorts', sorts, Object.create(ordered_m_list, {
+        data: {
+            get: function _getData() {
+                return Array.from(this);
+            }
+        }
+    }));
+}
+
+function createListDelegator(value, iterator, sortObj) {
+    return (0, _functionalHelpers.compose)((0, _functionalHelpers.when)(isIterator(iterator), setIterator(iterator)), setValue)(value, create(sortObj));
+}
+
+/**
+ * @description: Creator function for a new list object. Takes any value/type as a parameter
+ * and, if it has an iterator defined, with set it as the underlying source of the list as is,
+ * or, wrap the item in an array if there is no defined iterator.
+ * @param: {*} source - Any type, any value; used as the underlying source of the list
+ * @returns: {m_list} - A new list instance with the value provided as the underlying source.
+ */
+function list(source) {
+    //TODO: should I exclude strings from being used as a source directly, or allow it because
+    //TODO: they have an iterator?
+    return createListDelegator(source && source[Symbol.iterator] ? source : (0, _functionalHelpers.wrap)(source));
+}
+
+/**
+ * @description: Convenience function for create a new list instance; internally calls list.
+ * @see: list
+ * @param: {*} source - Any type, any value; used as the underlying source of the list
+ * @returns: {m_list} - A new list instance with the value provided as the underlying source.
+ */
+list.from = function _from(source) {
+    return list(source);
+};
+
+/**
+ * @description: Alias for list.from
+ * @see: list.from
+ * @type: {function}
+ * @param: {*}
+ * @returns: {m_list}
+ */
+list.of = list.from;
+
+/**
+ * @description: Extension function that allows new functionality to be applied to
+ * the queryable object
+ * @param: {string} propName - The name of the new property that should exist on the list; must be unique
+ * @param: {function} fn - A function that defines the new list functionality and
+ * will be called when this new list property is invoked.
+ *
+ * NOTE: The fn parameter must be a non-generator function that takes one or more
+ * arguments. If this new list function should be an immediately evaluated
+ * function (like: take, any, reverse, etc.), it merely needs the accept one or more
+ * arguments and know how to iterate the source. In the case of an immediately evaluated
+ * function, the return type can be any javascript type. The first argument is always the
+ * previous list instance that must be iterated. Additional arguments may be specified
+ * if desired.
+ *
+ * If the function's evaluation should be deferred it needs to work a bit differently.
+ * In this case, the function should accept one or more arguments, the first and only
+ * required argument being the underlying source of the list object. This underlying
+ * source can be anything with an iterator (generator, array, map, set, another queryable).
+ * Any additional arguments that the function needs should be specified in the signature.
+ * The return value of the function should be a generator that knows how to iterate the
+ * underlying source. If the generator should operate like most list functions, i.e.
+ * take a single item, process it, and then yield it out before asking for the next, a
+ * for-of loop is the preferred method for employment. However, if the generator needs
+ * all of the underlying data upfront (like orderBy and groupBy), Array.from is the
+ * preferred method. Array.from will 'force' all the underlying list instances
+ * to evaluate their data before it is handed over in full to the generator. The generator
+ * can then act with full knowledge of the data and perform whatever operation is needed
+ * before ultimately yielding out a single item at a time. If your extension function
+ * needs to yield out all items at once, then that function is not a lazy evaluation
+ * function and should be constructed like the immediately evaluated functions described
+ * above.
+ */
+list.extend = function _extend(propName, fn) {
+    if (!(propName in m_list) && !(propName in ordered_m_list)) {
+        list_core[propName] = function (...args) {
+            return createListDelegator(this, fn(this, ...args));
+        };
+    }
+};
+
+exports.list = list;
+exports.list_core = list_core;
+
+},{"../collation/collationFunctions":2,"../evaluation/evaluationFunctions":14,"../functionalHelpers":18,"../helpers":19,"../limitation/limitationFunctions":22,"../projection/projectionFunctions":32}],26:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -769,7 +2354,7 @@ function objectContainsOnlyArrays(data) {
 
 exports.deepFlatten = deepFlatten;
 
-},{"../functionalHelpers":18}],26:[function(require,module,exports){
+},{"../functionalHelpers":18}],27:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -778,6 +2363,8 @@ Object.defineProperty(exports, "__esModule", {
 exports.deepMap = undefined;
 
 var _functionalHelpers = require('../functionalHelpers');
+
+var _list = require('../list_monad/list');
 
 function deepMap(source, fn) {
     return function* deepMapIterator() {
@@ -810,9 +2397,42 @@ function deepMap(source, fn) {
     };
 }
 
+function flatMap(source, fn) {
+    return function* flatMapIterator() {
+        var results = [];
+        for (let item of source) {
+            var res = fn(item);
+            if (res.length) {
+                results = results.concat(res);
+                yield results.shift();
+            } else if (undefined !== res) {
+                if ((0, _functionalHelpers.isArray)(res)) {
+                    yield res.shift();
+                    results = results.concat(res);
+                }
+            } else yield res;
+        }
+
+        while (results.length) yield results.shift();
+    };
+}
+
+function flatMap2(source, fn) {
+    return function* flatMap2Iterator() {
+        for (let item of source) {
+            if (null != item && item.map && 'function' === typeof item.map) {
+                var res;
+                if (_list.list_core.isPrototypeOf(item)) res = item.map(fn).data;else res = item.map(fn);
+
+                yield res;
+            } else yield fn(item);
+        }
+    };
+}
+
 exports.deepMap = deepMap;
 
-},{"../functionalHelpers":18}],27:[function(require,module,exports){
+},{"../functionalHelpers":18,"../list_monad/list":25}],28:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -837,7 +2457,7 @@ function flatten(source) {
 
 exports.flatten = flatten;
 
-},{"../functionalHelpers":18}],28:[function(require,module,exports){
+},{"../functionalHelpers":18}],29:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -849,11 +2469,13 @@ var _functionalHelpers = require('../functionalHelpers');
 
 var _sortHelpers = require('./sortHelpers');
 
+var _queryDelegatorCreators = require('../queryObjects/queryDelegatorCreators');
+
 function groupBy(source, groupObject) {
     return function* groupByIterator() {
         //gather all data from the source before grouping
         var groupedData = groupData((0, _functionalHelpers.when)((0, _functionalHelpers.not)(_functionalHelpers.isArray), Array.from, source), groupObject);
-        for (let item of groupedData) yield item;
+        for (let item of groupedData) yield (0, _queryDelegatorCreators.createNewQueryableDelegator)(item);
     };
 }
 
@@ -875,13 +2497,13 @@ function groupData(data, groupObject) {
 function findGroup(arr, field) {
     var grp;
     if (arr.some(function _findGroup(group) {
-        if (group.key === field) {
+        if ((0, _functionalHelpers.get)('key', group) === field) {
             grp = group;
             return true;
         }
     })) return grp;else {
         grp = [];
-        grp.key = field;
+        (0, _functionalHelpers.objectSet)(field, 'key', grp);
         arr.push(grp);
         return grp;
     }
@@ -889,24 +2511,28 @@ function findGroup(arr, field) {
 
 exports.groupBy = groupBy;
 
-},{"../functionalHelpers":18,"./sortHelpers":32}],29:[function(require,module,exports){
-"use strict";
+},{"../functionalHelpers":18,"../queryObjects/queryDelegatorCreators":34,"./sortHelpers":33}],30:[function(require,module,exports){
+'use strict';
 
 Object.defineProperty(exports, "__esModule", {
     value: true
 });
+exports.map = undefined;
+
+var _helpers = require('../helpers');
+
 function map(source, fn) {
     return function* mapIterator() {
         for (let item of source) {
             let res = fn(item);
-            if (undefined !== res) yield res;
+            if (_helpers.javaScriptTypes.undefined !== res) yield res;
         }
     };
 }
 
 exports.map = map;
 
-},{}],30:[function(require,module,exports){
+},{"../helpers":19}],31:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -917,6 +2543,8 @@ exports.orderBy = undefined;
 var _functionalHelpers = require('../functionalHelpers');
 
 var _sortHelpers = require('./sortHelpers');
+
+var _helpers = require('../helpers');
 
 //TODO: I should probably make this take either a "fields" object, or a selector function
 //TODO: It also seems an insertion sort would work better in terms of lazy evaluation... of course, if
@@ -930,14 +2558,14 @@ function orderBy(source, orderObject) {
         //gather all data from the source before sorting
         var orderedData = (0, _sortHelpers.sortData)((0, _functionalHelpers.when)((0, _functionalHelpers.not)(_functionalHelpers.isArray), Array.from, source), orderObject);
         for (let item of orderedData) {
-            if (undefined !== item) yield item;
+            if (_helpers.javaScriptTypes.undefined !== item) yield item;
         }
     };
 }
 
 exports.orderBy = orderBy;
 
-},{"../functionalHelpers":18,"./sortHelpers":32}],31:[function(require,module,exports){
+},{"../functionalHelpers":18,"../helpers":19,"./sortHelpers":33}],32:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -964,13 +2592,13 @@ exports.groupBy = _groupBy.groupBy;
 exports.map = _map.map;
 exports.orderBy = _orderBy.orderBy;
 
-},{"./deepFlatten":25,"./deepMap":26,"./flatten":27,"./groupBy":28,"./map":29,"./orderBy":30}],32:[function(require,module,exports){
+},{"./deepFlatten":26,"./deepMap":27,"./flatten":28,"./groupBy":29,"./map":30,"./orderBy":31}],33:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
     value: true
 });
-exports.sortData = undefined;
+exports.quickSort = exports.sortData = undefined;
 
 var _helpers = require('../helpers');
 
@@ -1016,67 +2644,138 @@ function merge(left, right, keySelector, comparer) {
     if (!left.length) return right;
     if (!right.length) return left;
 
-    if (comparer(keySelector(left[0]), keySelector(right[0]))) return [(0, _helpers.cloneData)(left[0])].concat(merge(left.slice(1, left.length), right, keySelector, comparer));
-    return [(0, _helpers.cloneData)(right[0])].concat(merge(left, right.slice(1, right.length), keySelector, comparer));
+    if (comparer(keySelector(left[0]), keySelector(right[0]))) return [(0, _helpers.deepClone)(left[0])].concat(merge(left.slice(1, left.length), right, keySelector, comparer));
+    return [(0, _helpers.deepClone)(right[0])].concat(merge(left, right.slice(1, right.length), keySelector, comparer));
+}
+
+function quickSort(source, keySelector, keyComparer) {
+    var count = source.length,
+        i = 0,
+        cop = [];
+
+    while (i < source.length) {
+        cop[i] = source[i];
+        ++i;
+    }
+    qSort(cop, 0, count - 1, keySelector, keyComparer);
+    return cop;
+}
+
+function qSort(data, left, right, dir, keySelector, keyComparer) {
+    do {
+        var i = left,
+            j = right,
+            itemIdx = i + (j - i >> 1),
+            x = keySelector(data[itemIdx]);
+
+        do {
+            while (i < data.length && dir === _helpers.sortDirection.ascending ? keyComparer(keySelector, itemIdx, i, x, data) > 0 : keyComparer(keySelector, itemIdx, i, x, data) < 0) ++i;
+            while (j >= 0 && dir === _helpers.sortDirection.ascending ? keyComparer(keySelector, itemIdx, j, x, data) < 0 : keyComparer(keySelector, itemIdx, j, x, data) < 0) --j;
+            if (i > j) break;
+            if (i < j) {
+                let tmp = data[i];
+                data[i] = data[j];
+                data[j] = tmp;
+            }
+            ++i;
+            --j;
+        } while (i <= j);
+
+        if (j - left <= right - i) {
+            if (left < j) qSort(data, left, j, dir, keySelector, keyComparer);
+            left = i;
+        } else {
+            if (i < right) qSort(data, i, right, dir, keySelector, keyComparer);
+            right = j;
+        }
+    } while (left < right);
 }
 
 exports.sortData = sortData;
+exports.quickSort = quickSort;
 
-},{"../functionalHelpers":18,"../helpers":19}],33:[function(require,module,exports){
+},{"../functionalHelpers":18,"../helpers":19}],34:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
     value: true
 });
-exports.createNewOrderedQueryableDelegator = exports.createNewQueryableDelegator = undefined;
+exports.constructQueryableDelegator = exports.createNewOrderedQueryableDelegator = exports.createNewQueryableDelegator = undefined;
 
 var _queryable = require('./queryable');
 
 var _helpers = require('../helpers');
 
+var _functionalHelpers = require('../functionalHelpers');
+
+//=========================================================================================//
+//===============================          Helpers         ================================//
+//=========================================================================================//
+var setSource = (0, _functionalHelpers.set)('source'),
+    setIterator = (0, _functionalHelpers.set)(Symbol.iterator),
+    isIterator = (0, _functionalHelpers.apply)(_helpers.generatorProto.isPrototypeOf),
+    queryable = (0, _functionalHelpers.ifElse)(_functionalHelpers.isSomething, createOrderedQueryable, createQueryable);
+
+function constructQueryableDelegator(source, iterator, sortObj) {
+    //var b = when(constant(isIterator(iterator)), set(Symbol.iterator, iterator)),
+    //f = tap(isIterator, iterator); //=> true
+    //f => iterator
+    //TODO: I might be able to work out a composition of 'isIterator' and 'setIterator' via 'tap'. I would still
+    //TODO: need the 'when' function, but if 'tap' internally runs 'isIterator', then it would return the iterator
+    //TODO: object which would then be passed to the setIterator function, which would then be waiting for the
+    //TODO: object argument to be passed to it.
+    return (0, _functionalHelpers.compose)((0, _functionalHelpers.when)(isIterator(iterator), setIterator(iterator)), setSource)(source, queryable(sortObj));
+}
+
+function createQueryable() {
+    return Object.create(_queryable.internal_queryable, {
+        data: {
+            get: function _getData() {
+                return Array.from(this);
+            }
+        }
+    });
+}
+
+function createOrderedQueryable(sorts) {
+    return (0, _functionalHelpers.set)('_appliedSorts', sorts, Object.create(_queryable.internal_orderedQueryable, {
+        data: {
+            get: function _getData() {
+                return Array.from(this);
+            }
+        }
+    }));
+}
+
 function createNewQueryableDelegator(source, iterator) {
-    var obj = Object.create(_queryable.internal_queryable);
-    obj.dataComputed = false;
+    var obj = createQueryable();
     obj.source = source;
     //if the iterator param has been passed and is a generator, objectSet it as the object's
     //iterator; other wise let the object delegate to the queryable's iterator
-    if (iterator && _helpers.generatorProto.isPrototypeOf(iterator)) obj[Symbol.iterator] = iterator;
+    if (_helpers.generatorProto.isPrototypeOf(iterator)) obj[Symbol.iterator] = iterator;
 
-    return addGetter(obj);
+    return obj;
 }
 
 function createNewOrderedQueryableDelegator(source, iterator, sortObj) {
-    var obj = Object.create(_queryable.internal_orderedQueryable);
+    var obj = createOrderedQueryable(sortObj);
     obj.source = source;
-    obj.dataComputed = false;
     //Need to maintain a list of all the sorts that have been applied; effectively,
     //the underlying sorting function will only be called a single time for
     //all sorts.
     obj._appliedSorts = sortObj;
     //if the iterator param has been passed and is a generator, objectSet it as the object's
     //iterator; other wise let the object delegate to the queryable's iterator
-    if (iterator && _helpers.generatorProto.isPrototypeOf(iterator)) obj[Symbol.iterator] = iterator;
+    if (_helpers.generatorProto.isPrototypeOf(iterator)) obj[Symbol.iterator] = iterator;
 
-    return addGetter(obj);
-}
-
-function addGetter(obj) {
-    return Object.defineProperty(obj, 'data', {
-        get: function _data() {
-            if (!this.dataComputed) {
-                var res = Array.from(this);
-                this.evaluatedData = res;
-                return res;
-            }
-            return this.evaluatedData;
-        }
-    });
+    return obj;
 }
 
 exports.createNewQueryableDelegator = createNewQueryableDelegator;
 exports.createNewOrderedQueryableDelegator = createNewOrderedQueryableDelegator;
+exports.constructQueryableDelegator = constructQueryableDelegator;
 
-},{"../helpers":19,"./queryable":34}],34:[function(require,module,exports){
+},{"../functionalHelpers":18,"../helpers":19,"./queryable":35}],35:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -1107,10 +2806,6 @@ var _functionalHelpers = require('../functionalHelpers');
  * @type {{
  * source,
  * source,
- * evaluatedData: *,
- * evaluatedData: *,
- * dataComputed: *,
- * dataComputed: *,
  * map: queryable_core._map,
  * groupBy: queryable_core._groupBy,
  * groupByDescending: queryable_core._groupByDescending,
@@ -1164,44 +2859,6 @@ var queryable_core = {
      */
     set source(val) {
         this._source = val;
-    },
-
-    /**
-     * Getter for underlying _evaluatedData field; Holds an array of data
-     * after enumerating the queryable delegator instance's source
-     * @returns {*}
-     */
-    get evaluatedData() {
-        return this._evaluatedData;
-    },
-
-    /**
-     * Setter for underlying _evaluatedData field; returns either an
-     * array if the queryable delegator instance's source has been
-     * enumerated, or undefined
-     * @param val
-     */
-    set evaluatedData(val) {
-        this._dataComputed = true;
-        this._evaluatedData = val;
-    },
-
-    /**
-     * Getter for underlying _dataComputed field; returns true if
-     * the queryable delegator instance's source has been enumerated
-     * and false if not
-     * @returns {*}
-     */
-    get dataComputed() {
-        return this._dataComputed;
-    },
-
-    /**
-     * Setter for underlying _dataComputed field
-     * @param val
-     */
-    set dataComputed(val) {
-        this._dataComputed = val;
     },
 
     /**
@@ -1268,15 +2925,15 @@ var queryable_core = {
     },
 
     /**
-     * Concatenates two lists by appending the "method's" list argument to the
+     * Concatenates two or more lists by appending the "method's" list argument(s) to the
      * queryable's source. This function is a deferred execution call that returns
      * a new queryable object delegator instance that contains all the requisite
      * information on how to perform the operation.
-     * @param enumerable
+     * @param {Array | *} enumerables
      * @returns {*}
      */
-    concat: function _concat(enumerable) {
-        return (0, _queryDelegatorCreators.createNewQueryableDelegator)(this, (0, _collationFunctions.concat)(this, enumerable));
+    concat: function _concat(...enumerables) {
+        return (0, _queryDelegatorCreators.createNewQueryableDelegator)(this, (0, _collationFunctions.concat)(this, enumerables, enumerables.length));
     },
 
     /**
@@ -1413,17 +3070,14 @@ var queryable_core = {
      */
     take: function _take(amt) {
         if (!amt) return [];
-        if (!this.dataComputed) {
-            var res = [],
-                idx = 0;
+        var res = [],
+            idx = 0;
 
-            for (let item of this) {
-                if (idx < amt) res[res.length] = item;else break;
-                ++idx;
-            }
-            return res;
+        for (let item of this) {
+            if (idx < amt) res[res.length] = item;else break;
+            ++idx;
         }
-        return this.evaluatedData.slice(0, amt);
+        return res;
     },
 
     /**
@@ -1432,10 +3086,9 @@ var queryable_core = {
      * @returns {Array}
      */
     takeWhile: function _takeWhile(predicate = _helpers.defaultPredicate) {
-        var res = [],
-            source = this.dataComputed ? this.evaluatedData : this;
+        var res = [];
 
-        for (let item of source) {
+        for (let item of this.source) {
             if (predicate(item)) res[res.length] = item;else {
                 return res;
             }
@@ -1452,11 +3105,10 @@ var queryable_core = {
      * @returns {*}
      */
     skip: function _skip(amt) {
-        var source = this.dataComputed ? this.evaluatedData : this.source,
-            idx = 0,
+        var idx = 0,
             res = [];
 
-        for (let item of source) {
+        for (let item of this.source) {
             if (idx >= amt) res[res.length] = item;
             ++idx;
         }
@@ -1469,11 +3121,11 @@ var queryable_core = {
      * @returns {Array}
      */
     skipWhile: function _skipWhile(predicate = _helpers.defaultPredicate) {
-        var source = this.dataComputed ? this.evaluatedData : this.source,
-            hasFailed = false,
+        var hasFailed = false,
             res = [];
 
-        for (let item of source) {
+        //TODO: check this logic out; seems incorrect
+        for (let item of this.source) {
             if (!hasFailed && !predicate(item)) hasFailed = true;
             if (hasFailed) res[res.length] = item;
         }
@@ -1558,6 +3210,14 @@ var queryable_core = {
      */
     toSet: function _toSet() {
         return new Set(this);
+    },
+
+    /**
+     *
+     * @returns {*}
+     */
+    toEvaluatedQueryable: function _toEvaluatedQueryable() {
+        return queryable.from(this.data);
     },
 
     /**
@@ -1649,6 +3309,85 @@ internal_orderedQueryable.thenByDescending = function thenByDescending(keySelect
     return (0, _queryDelegatorCreators.createNewOrderedQueryableDelegator)(this.source, (0, _projectionFunctions.orderBy)(this, sortObj), sortObj);
 };
 
+//TODO: functional
+//TODO: functional programming
+//TODO: FP
+//TODO: monad
+//TODO: functor
+//TODO: container
+//TODO: JavaScript
+//TODO: JS
+//TODO: JunctionalS
+//TODO: JunctorS
+//TODO: lanoitcunf
+//TODO: rotcnuf
+//TODO: danom
+//TODO: tpircSavaJ
+//TODO: Junctional FavaScript
+
+/**
+ * @description: Creator function for a new mlist object. Takes any value/type as a parameter
+ * and, if it has an iterator defined, with set it as the underlying source of the mlist as is,
+ * or, wrap the item in an array if there is no defined iterator.
+ * @param {*} source - Any type, any value; used as the underlying source of the mlist
+ * @returns {internal_queryable} - A new mlist instance with the value provided as the underlying source.
+ */
+function mlist(source) {
+    //TODO: should I exclude strings from being used as a source directly, or allow it because
+    //TODO: they have an iterator?
+    return (0, _queryDelegatorCreators.constructQueryableDelegator)(source && source[Symbol.iterator] ? source : (0, _functionalHelpers.wrap)(source));
+}
+
+/**
+ * @description: Convenience function for create a new mlist instance; internally calls mlist.
+ * @see mlist
+ * @param {*} source - Any type, any value; used as the underlying source of the mlist
+ * @returns {internal_queryable} - A new mlist instance with the value provided as the underlying source.
+ */
+mlist.from = function _from(source) {
+    return mlist(source);
+};
+
+/**
+ * Extension function that allows new functionality to be applied to
+ * the queryable object
+ * @param {string} propName - The name of the new queryable property; must be unique
+ * @param {function} fn - A function that defines the new queryable functionality and
+ * will be called when this new queryable property is invoked.
+ *
+ * NOTE: The fn parameter must be a non-generator function that takes one or more
+ * arguments. If this new queryable function should be an immediately evaluated
+ * function (like: take, any, reverse, etc.), it merely needs the accept a single
+ * argument and know how to iterate it. In the case of an immediately evaluated
+ * function, the return type can be any javascript type, and the only input will
+ * be the previous instance of the queryable.
+ *
+ * If the function's evaluation should be deferred it needs to work a bit differently.
+ * In this case, the function should accept one or more arguments, the first and only
+ * required argument being the underlying source of the queryable object. This underlying
+ * source can be anything with an iterator (generator, array, map, set, another queryable).
+ * Any additional arguments that the function needs should be specified in the signature.
+ * The return value of the function should be a generator that knows how to iterate the
+ * underlying source. If the generator should operate like most queryable functions, i.e.
+ * take a single item, process it, and then yield it out before asking for the next, a
+ * for-of loop is the preferred method for employment. However, if the generator needs
+ * all of the underlying data upfront (like orderBy and groupBy), Array.from is the
+ * preferred method. Array.from will 'force' all the underlying queryable instances
+ * to evaluate their data before it is handed over in full to the generator. The generator
+ * can then act with full knowledge of the data and perform whatever operation is needed
+ * before ultimately yielding out a single item at a time. If your extension function
+ * needs to yield out all items at once, then that function is not a lazy evaluation
+ * function and should be constructed like the immediately evaluated functions described
+ * above.
+ */
+mlist.extend = function _extend(propName, fn) {
+    if (!propName in queryable_core) {
+        queryable_core[propName] = function (...args) {
+            return (0, _queryDelegatorCreators.createNewQueryableDelegator)(this, fn(this, ...args));
+        };
+    }
+};
+
 //TODO: consider adding a function property to this object that can create a new consumer-level
 //TODO: so that the queryable_core object can call that function for each deferred execution
 //TODO: function rather than creating the consumer-level objects itself. This may to resolve
@@ -1714,6 +3453,1034 @@ exports.internal_queryable = internal_queryable;
 exports.internal_orderedQueryable = internal_orderedQueryable;
 exports.queryable = queryable;
 
-},{"../collation/collationFunctions":2,"../evaluation/evaluationFunctions":14,"../functionalHelpers":18,"../helpers":19,"../limitation/limitationFunctions":22,"../projection/projectionFunctions":31,"./queryDelegatorCreators":33}]},{},[20])
+},{"../collation/collationFunctions":2,"../evaluation/evaluationFunctions":14,"../functionalHelpers":18,"../helpers":19,"../limitation/limitationFunctions":22,"../projection/projectionFunctions":32,"./queryDelegatorCreators":34}],36:[function(require,module,exports){
+'use strict';
+
+Object.defineProperty(exports, "__esModule", {
+    value: true
+});
+exports.observable = undefined;
+
+var _helpers = require('../helpers');
+
+var _subscriber = require('./subscribers/subscriber');
+
+var _operators = require('./streamOperators/operators');
+
+var _functionalHelpers = require('../functionalHelpers');
+
+//TODO: I thinking about implementing an 'observable watcher' functionality. the concept would be
+//TODO: that you have an observable that is registered to watch one or more other observables. When
+//TODO: the complete or error, the watcher will be notified in its .next handler. To do this, I'd
+//TODO: need to assign each observable a unique id, and allow an observable watching to register a
+//TODO: unique handler per watched observable if so desired.
+var observable = {
+    get source() {
+        return this._source;
+    },
+    set source(src) {
+        this._source = src;
+    },
+    get operator() {
+        return this._operator;
+    },
+    set operator(op) {
+        this._operator = op;
+    },
+    /**
+     *
+     * @param fn
+     * @returns {observable}
+     */
+    map: function _map(fn) {
+        if (_operators.mapOperator.isPrototypeOf(this.operator)) return this.lift.call(this.source, Object.create(_operators.mapOperator).init((0, _functionalHelpers.compose)(fn, this.operator.transform)));
+        return this.lift(Object.create(_operators.mapOperator).init(fn));
+    },
+    /**
+     *
+     * @param fn
+     * @returns {observable}
+     */
+    deepMap: function _deepMap(fn) {
+        return this.lift(Object.create(_operators.deepMapOperator).init(fn));
+    },
+    /**
+     *
+     * @param predicate
+     * @returns {observable}
+     */
+    filter: function _filter(predicate) {
+        if (_operators.filterOperator.isPrototypeOf(this.operator)) return this.lift.call(this.source, Object.create(_operators.filterOperator).init((0, _functionalHelpers.and)(predicate, this.operator.predicate)));
+        return this.lift(Object.create(_operators.filterOperator).init(predicate));
+    },
+    /**
+     *
+     * @param keySelector
+     * @param comparer
+     * @param bufferAmt
+     * @returns {observable}
+     */
+    groupBy: function _groupBy(keySelector, comparer, bufferAmt = 0) {
+        return this.lift(Object.create(_operators.groupByOperator).init(keySelector, comparer, bufferAmt));
+    },
+    /**
+     *
+     * @param observables
+     * @returns {observable}
+     */
+    merge: function _merge(...observables) {
+        if (_operators.mergeOperator.isPrototypeOf(this.operator)) return this.lift.call(this.source, Object.create(_operators.mergeOperator).init([this].concat(observables, this.operator.observables)));
+        return this.lift(Object.create(_operators.mergeOperator).init([this].concat(observables)));
+    },
+    /**
+     *
+     * @param count
+     * @returns {observable}
+     */
+    itemBuffer: function _itemBuffer(count) {
+        return this.lift(Object.create(_operators.itemBufferOperator).init(count));
+    },
+    /**
+     *
+     * @param amt
+     * @returns {observable}
+     */
+    timeBuffer: function _timeBuffer(amt) {
+        return this.lift(Object.create(_operators.timeBufferOperator).init(amt));
+    },
+    /**
+     *
+     * @param amt
+     * @returns {*|observable}
+     */
+    debounce: function _debounce(amt) {
+        return this.lift(Object.create(_operators.debounceOperator).init(amt));
+    },
+    /**
+     *
+     * @param operator
+     * @returns {observable}
+     */
+    lift: function lift(operator) {
+        var o = Object.create(observable);
+        o.source = this;
+        o.operator = operator;
+        return o;
+    },
+    /**
+     *
+     * @param src
+     * @param evt
+     * @returns {observable}
+     */
+    fromEvent: function _fromEvent(src, evt) {
+        var o = Object.create(observable);
+        o.source = src;
+        o.event = evt;
+        o.subscribe = function _subscribe(subscriber) {
+            var source = this.source,
+                event = this.event;
+
+            function eventHandler(e) {
+                return subscriber.next(e);
+            }
+
+            function unSub() {
+                subscriber.status = _helpers.observableStatus.complete;
+                return source.removeEventListener(event, eventHandler);
+            }
+            source.addEventListener(event, eventHandler);
+            subscriber.unsubscribe = unSub;
+            return subscriber;
+        };
+        return o;
+    },
+    /**
+     *
+     * @param src
+     * @param startingIdx
+     * @returns {observable}
+     */
+    fromList: function _fromList(src, startingIdx = 0) {
+        var o = Object.create(observable);
+        o.source = src;
+        o.idx = startingIdx;
+        o.subscribe = function _subscribe(subscriber) {
+            function unSub() {
+                this.status = _helpers.observableStatus.complete;
+            }
+
+            /*
+            var runner = (function _runner() {
+                if (subscriber.status !== observableStatus.paused && subscriber.status !== observableStatus.complete && this.idx < this.source.length) {
+                    for (let item of source) {
+                        Promise.resolve(item)
+                            .then(function _resolve(val) {
+                                subscriber.next(val);
+                                runner();
+                            });
+                    }
+                }
+                else {
+                    //TODO: don't think I need to do this 'recursive' unsubscribe here since the
+                    //TODO: unsubscribe function is itself recursive
+                    var d = subscriber;
+                    while (d.subscriber.subscriber) d = d.subscriber;
+                    d.unsubscribe();
+                }
+            }).bind(this);
+              Promise.resolve()
+                .then(function _callRunner() {
+                    runner();
+                });
+               */
+
+            Promise.resolve().then(function _callRunner() {
+                (function _runner() {
+                    if (subscriber.status !== _helpers.observableStatus.paused && subscriber.status !== _helpers.observableStatus.complete && this.idx < this.source.length) {
+                        for (let item of source) {
+                            Promise.resolve(item).then(function _resolve(val) {
+                                subscriber.next(val);
+                                _runner();
+                            });
+                        }
+                    } else {
+                        //TODO: don't think I need to do this 'recursive' unsubscribe here since the
+                        //TODO: unsubscribe function is itself recursive
+                        var d = subscriber;
+                        while (d.subscriber.subscriber) d = d.subscriber;
+                        d.unsubscribe();
+                    }
+                }).bind(this)();
+            });
+
+            subscriber.unsubscribe = unSub;
+            return subscriber;
+        };
+        return o;
+    },
+    /**
+     * Creates a new observable from a generator function
+     * @param src
+     * @returns {observable}
+     */
+    fromGenerator: function _fromGenerator(src) {
+        var o = Object.create(observable);
+        o.source = src;
+        o.subscribe = function _subscribe(subscriber_next, error, complete) {
+            var it = this.source();
+            (function _runner() {
+                if ('object' !== typeof subscriber_next || subscriber_next.status !== _helpers.observableStatus.paused && subscriber_next.status !== _helpers.observableStatus.complete) {
+                    Promise.resolve(it.next()).then(function _then(val) {
+                        if (!val.done) {
+                            if ('function' === typeof subscriber_next) subscriber_next(val.value);else subscriber_next.next(val.value);
+                            _runner();
+                        }
+                    });
+                } else if ('function' !== typeof subscriber_next) {
+                    this.unsubscribe();
+                } else complete();
+            }).bind(this)();
+        };
+        return o;
+    },
+    /**
+     *
+     * @param src
+     * @returns {observable} - Returns a new observable
+     */
+    from: function _from(src) {
+        if (_helpers.generatorProto.isPrototypeOf(src)) return this.fromGenerator(src);
+        return this.fromList(src[Symbol.iterator] ? src : (0, _functionalHelpers.wrap)(src));
+    },
+    /**
+     * Creates a new subscriber for this observable. Takes three function handlers;
+     * a 'next' handler that receives each item after having passed through the lower
+     * level subscribers, an 'error' handler that is called if an exception is thrown
+     * while the stream is active, and a complete handler that is called whenever the
+     * stream is done.
+     * @param {function} next - A function handler
+     * @param {function} error - A function handler
+     * @param {function} complete - A function handler
+     * @returns {subscriber}
+     */
+    subscribe: function _subscribe(next, error, complete) {
+        var s = Object.create(_subscriber.subscriber).initialize(next, error, complete);
+        if (this.operator) this.operator.subscribe(s, this.source);
+        return s;
+    },
+    /**
+     *
+     * @param next
+     * @returns {*}
+     */
+    onValue: function _onValue(next) {
+        var s = Object.create(_subscriber.subscriber).initialize(next, _functionalHelpers.noop, _functionalHelpers.noop);
+        if (this.operator) this.operator.subscriber(s, this.source);
+        return s;
+    }
+};
+
+exports.observable = observable;
+
+},{"../functionalHelpers":18,"../helpers":19,"./streamOperators/operators":44,"./subscribers/subscriber":53}],37:[function(require,module,exports){
+'use strict';
+
+Object.defineProperty(exports, "__esModule", {
+    value: true
+});
+exports.debounceOperator = undefined;
+
+var _debounceSubscriber = require('../subscribers/debounceSubscriber');
+
+var debounceOperator = {
+    init: function _init(amt) {
+        this.interval = amt;
+        return this;
+    },
+    subscribe: function _subscribe(subscriber, source) {
+        return source.subscribe(Object.create(_debounceSubscriber.debounceSubscriber).init(subscriber, this.interval));
+    }
+};
+
+exports.debounceOperator = debounceOperator;
+
+},{"../subscribers/debounceSubscriber":46}],38:[function(require,module,exports){
+'use strict';
+
+Object.defineProperty(exports, "__esModule", {
+    value: true
+});
+exports.deepMapOperator = undefined;
+
+var _deepMapSubscriber = require('../subscribers/deepMapSubscriber');
+
+var deepMapOperator = {
+    get transform() {
+        return this._transform;
+    },
+    set transform(fn) {
+        this._transform = fn;
+    },
+    init: function _init(projectionFunc) {
+        this.transform = projectionFunc;
+        return this;
+    },
+    subscribe: function _subscribe(subscriber, source) {
+        return source.subscribe(Object.create(_deepMapSubscriber.deepMapSubscriber).init(subscriber, this.transform));
+    }
+};
+
+exports.deepMapOperator = deepMapOperator;
+
+},{"../subscribers/deepMapSubscriber":47}],39:[function(require,module,exports){
+'use strict';
+
+Object.defineProperty(exports, "__esModule", {
+    value: true
+});
+exports.filterOperator = undefined;
+
+var _filterSubscriber = require('../subscribers/filterSubscriber');
+
+var filterOperator = {
+    get predicate() {
+        return this._predicate;
+    },
+    set predicate(fn) {
+        this._predicate = fn;
+    },
+    init: function _init(predicate) {
+        this.predicate = predicate;
+        return this;
+    },
+    subscribe: function _subscribe(subscriber, source) {
+        return source.subscribe(Object.create(_filterSubscriber.filterSubscriber).init(subscriber, this.predicate));
+    }
+};
+
+exports.filterOperator = filterOperator;
+
+},{"../subscribers/filterSubscriber":48}],40:[function(require,module,exports){
+'use strict';
+
+Object.defineProperty(exports, "__esModule", {
+    value: true
+});
+exports.groupByOperator = undefined;
+
+var _groupBySubscriber = require('../subscribers/groupBySubscriber');
+
+var groupByOperator = {
+    get keySelector() {
+        return this._keySelector;
+    },
+    set keySelector(ks) {
+        this._keySelector = ks;
+    },
+    get comparer() {
+        return this._comparer;
+    },
+    set comparer(c) {
+        this._comparer = c;
+    },
+    get bufferAmount() {
+        return this._bufferAmount || 0;
+    },
+    set bufferAmount(amt) {
+        this._bufferAmount = amt;
+    },
+    init: function _init(keySelector, comparer, bufferAmount) {
+        this.keySelector = keySelector;
+        this.comparer = comparer;
+        this.bufferAmount = bufferAmount;
+        return this;
+    },
+    subscribe: function _subscribe(subscriber, source) {
+        return source.subscribe(Object.create(_groupBySubscriber.groupBySubscriber).init(subscriber, this.keySelector, this.comparer, this.bufferAmount));
+    }
+};
+
+exports.groupByOperator = groupByOperator;
+
+},{"../subscribers/groupBySubscriber":49}],41:[function(require,module,exports){
+'use strict';
+
+Object.defineProperty(exports, "__esModule", {
+    value: true
+});
+exports.itemBufferOperator = undefined;
+
+var _itemBufferSubscriber = require('../subscribers/itemBufferSubscriber');
+
+var itemBufferOperator = {
+    init: function _init(amt) {
+        this.count = amt;
+        return this;
+    },
+    subscribe: function _subscribe(subscriber, source) {
+        return source.subscribe(Object.create(_itemBufferSubscriber.itemBufferSubscriber).init(subscriber, this.count));
+    }
+};
+
+exports.itemBufferOperator = itemBufferOperator;
+
+},{"../subscribers/itemBufferSubscriber":50}],42:[function(require,module,exports){
+'use strict';
+
+Object.defineProperty(exports, "__esModule", {
+    value: true
+});
+exports.mapOperator = undefined;
+
+var _mapSubscriber = require('../subscribers/mapSubscriber');
+
+var mapOperator = {
+    get transform() {
+        return this._transform;
+    },
+    set transform(fn) {
+        this._transform = fn;
+    },
+    init: function _init(projectionFunc) {
+        this.transform = projectionFunc;
+        return this;
+    },
+    subscribe: function _subscribe(subscriber, source) {
+        return source.subscribe(Object.create(_mapSubscriber.mapSubscriber).init(subscriber, this.transform));
+    }
+};
+
+exports.mapOperator = mapOperator;
+
+},{"../subscribers/mapSubscriber":51}],43:[function(require,module,exports){
+'use strict';
+
+Object.defineProperty(exports, "__esModule", {
+    value: true
+});
+exports.mergeOperator = undefined;
+
+var _mergeSubscriber = require('../subscribers/mergeSubscriber');
+
+var mergeOperator = {
+    get observables() {
+        return this._observables || [];
+    },
+    set observables(arr) {
+        this._observables = arr;
+    },
+    init: function _init(observables) {
+        this.observables = observables;
+        return this;
+    },
+    subscribe: function _subscribe(subscriber, source) {
+        return source.subscribe(Object.create(_mergeSubscriber.mergeSubscriber).init(subscriber, this.observables));
+    }
+};
+
+exports.mergeOperator = mergeOperator;
+
+},{"../subscribers/mergeSubscriber":52}],44:[function(require,module,exports){
+'use strict';
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.timeBufferOperator = exports.mergeOperator = exports.mapOperator = exports.itemBufferOperator = exports.groupByOperator = exports.filterOperator = exports.deepMapOperator = exports.debounceOperator = undefined;
+
+var _debounceOperator = require('./debounceOperator');
+
+var _deepMapOperator = require('./deepMapOperator');
+
+var _filterOperator = require('./filterOperator');
+
+var _groupByOperator = require('./groupByOperator');
+
+var _itemBufferOperator = require('./itemBufferOperator');
+
+var _mapOperator = require('./mapOperator');
+
+var _mergeOperator = require('./mergeOperator');
+
+var _timeBufferOperator = require('./timeBufferOperator');
+
+exports.debounceOperator = _debounceOperator.debounceOperator;
+exports.deepMapOperator = _deepMapOperator.deepMapOperator;
+exports.filterOperator = _filterOperator.filterOperator;
+exports.groupByOperator = _groupByOperator.groupByOperator;
+exports.itemBufferOperator = _itemBufferOperator.itemBufferOperator;
+exports.mapOperator = _mapOperator.mapOperator;
+exports.mergeOperator = _mergeOperator.mergeOperator;
+exports.timeBufferOperator = _timeBufferOperator.timeBufferOperator;
+
+},{"./debounceOperator":37,"./deepMapOperator":38,"./filterOperator":39,"./groupByOperator":40,"./itemBufferOperator":41,"./mapOperator":42,"./mergeOperator":43,"./timeBufferOperator":45}],45:[function(require,module,exports){
+'use strict';
+
+Object.defineProperty(exports, "__esModule", {
+    value: true
+});
+exports.timeBufferOperator = undefined;
+
+var _timeBufferSubscriber = require('../subscribers/timeBufferSubscriber');
+
+var timeBufferOperator = {
+    init: function _init(amt) {
+        this.interval = amt;
+        return this;
+    },
+    subscribe: function _subscribe(subscriber, source) {
+        return source.subscribe(Object.create(_timeBufferSubscriber.timeBufferSubscriber).init(subscriber, this.interval));
+    }
+};
+
+exports.timeBufferOperator = timeBufferOperator;
+
+},{"../subscribers/timeBufferSubscriber":54}],46:[function(require,module,exports){
+'use strict';
+
+Object.defineProperty(exports, "__esModule", {
+    value: true
+});
+exports.debounceSubscriber = undefined;
+
+var _subscriber = require('./subscriber');
+
+var _helpers = require('../../helpers');
+
+var debounceSubscriber = Object.create(_subscriber.subscriber, {
+    next: {
+        value: function _next(item) {
+            if (null != this.id) this.tearDownTimeout();
+            this.lastItem = item;
+            this.lastTick = Date.now();
+            this.id = setTimeout(this.getTimeoutFunc.bind(this), this.interval, item);
+        }
+    },
+    init: {
+        value: function _init(subscriber, interval) {
+            this.initialize(subscriber);
+            this.lastTick = null;
+            this.lastItem = undefined;
+            this.interval = interval;
+            this.id = null;
+            return this;
+        }
+    },
+    getTimeoutFunc: {
+        get: function _getTimeoutFunc() {
+            return function timeoutFunc(item) {
+                var thisTick = Date.now();
+                if (this.lastTick <= thisTick - this.interval) {
+                    var tmp = this.lastItem;
+                    this.lastItem = undefined;
+                    this.lastTick = thisTick;
+                    this.subscriber.next(tmp);
+                } else {
+                    this.lastTick = thisTick;
+                    this.lastItem = item;
+                }
+            };
+        }
+    },
+    cleanUp: {
+        value: function _cleanUp() {
+            this.tearDownTimeout();
+            this.lastTick = undefined;
+            this.lastItem = undefined;
+        }
+    },
+    tearDownTimeout: {
+        value: function _tearDownTimeout() {
+            if (this.id && _helpers.javaScriptTypes.number === typeof this.id) {
+                clearTimeout(this.id);
+                this.id = null;
+            }
+        }
+    }
+});
+
+exports.debounceSubscriber = debounceSubscriber;
+
+},{"../../helpers":19,"./subscriber":53}],47:[function(require,module,exports){
+'use strict';
+
+Object.defineProperty(exports, "__esModule", {
+    value: true
+});
+exports.deepMapSubscriber = undefined;
+
+var _subscriber = require('./subscriber');
+
+var deepMapSubscriber = Object.create(_subscriber.subscriber, {
+    next: {
+        value: function _next(item) {
+            var mappedResult;
+            try {
+                mappedResult = recursiveMap(item);
+            } catch (err) {
+                this.subscriber.error(err);
+                return;
+            }
+            this.subscriber.next(mappedResult);
+            //Promise.resolve(mappedResult).then(this.then);
+
+            function recursiveMap(item) {
+                if (isArray(item)) {
+                    var res = [];
+                    for (let it of item) {
+                        res = res.concat(recursiveMap(it));
+                    }
+                    return res;
+                }
+                return this.transform(item, this.count++);
+            }
+        },
+        writable: false,
+        configurable: false
+    },
+    init: {
+        value: function _init(subscriber, transform) {
+            this.initialize(subscriber);
+            this.transform = transform;
+            return this;
+        },
+        writable: false,
+        configurable: false
+    }
+});
+
+exports.deepMapSubscriber = deepMapSubscriber;
+
+},{"./subscriber":53}],48:[function(require,module,exports){
+'use strict';
+
+Object.defineProperty(exports, "__esModule", {
+    value: true
+});
+exports.filterSubscriber = undefined;
+
+var _subscriber = require('./subscriber');
+
+var filterSubscriber = Object.create(_subscriber.subscriber, {
+    next: {
+        value: function _next(item) {
+            try {
+                if (this.predicate(item, this.count++)) this.subscriber.next(item);
+                //Promise.resolve(item).then(this.then);
+            } catch (err) {
+                this.subscriber.error(err);
+            }
+        },
+        writable: false,
+        configurable: false
+    },
+    init: {
+        value: function _init(subscriber, predicate) {
+            this.initialize(subscriber);
+            this.predicate = predicate;
+            return this;
+        },
+        writable: false,
+        configurable: false
+    }
+});
+
+exports.filterSubscriber = filterSubscriber;
+
+},{"./subscriber":53}],49:[function(require,module,exports){
+'use strict';
+
+Object.defineProperty(exports, "__esModule", {
+    value: true
+});
+exports.groupBySubscriber = undefined;
+
+var _subscriber = require('./subscriber');
+
+var _sortHelpers = require('../../projection/sortHelpers');
+
+var groupBySubscriber = Object.create(_subscriber.subscriber, {
+    next: {
+        value: function _next(item) {
+            if (this.buffer.length + 1 >= this.bufferAmount) {
+                try {
+                    var res = groupData(this.buffer, [{ keySelector: this.keySelector, comparer: this.comparer, direction: 'desc' }]);
+                    this.subscriber.next(res);
+                    this.buffer.length = 0;
+                } catch (ex) {
+                    this.subscriber.error(ex);
+                }
+            } else this.buffer[this.buffer.length] = item;
+        },
+        writable: false,
+        configurable: false
+    },
+    init: {
+        value: function _init(subscriber, keySelector, comparer, bufferAmount) {
+            this.initialize(subscriber);
+            this.keySelector = keySelector;
+            this.comparer = comparer;
+            this.bufferAmount = bufferAmount;
+            this.buffer = [];
+            return this;
+        },
+        writable: false,
+        configurable: false
+    }
+});
+
+function groupData(data, groupObject) {
+    var sortedData = (0, _sortHelpers.sortData)(data, groupObject),
+        retData = [];
+
+    sortedData.forEach(function _groupSortedData(item) {
+        let grp = retData;
+        groupObject.forEach(function _createGroupsByFields(group) {
+            grp = findGroup(grp, group.keySelector(item));
+        });
+        grp[grp.length] = item;
+    });
+
+    return retData;
+}
+
+function findGroup(arr, field) {
+    var grp;
+    if (arr.some(function _findGroup(group) {
+        if (group.key === field) {
+            grp = group;
+            return true;
+        }
+    })) return grp;else {
+        grp = [];
+        grp.key = field;
+        arr.push(grp);
+        return grp;
+    }
+}
+
+exports.groupBySubscriber = groupBySubscriber;
+
+},{"../../projection/sortHelpers":33,"./subscriber":53}],50:[function(require,module,exports){
+'use strict';
+
+Object.defineProperty(exports, "__esModule", {
+    value: true
+});
+exports.itemBufferSubscriber = undefined;
+
+var _subscriber = require('./subscriber');
+
+var itemBufferSubscriber = Object.create(_subscriber.subscriber, {
+    next: {
+        value: function _next(val) {
+            this.buffer[this.buffer.length] = val;
+            if (this.buffer.length >= this.count) {
+                this.subscriber.next(this.buffer.map(function _mapBuffer(item) {
+                    return item;
+                }));
+                this.buffer.length = 0;
+            }
+        },
+        writable: false,
+        configurable: false
+    },
+    init: {
+        value: function _init(subscriber, count) {
+            this.initialize(subscriber);
+            this.buffer = [];
+            this.count = count;
+            return this;
+        },
+        writable: false,
+        configurable: false
+    }
+});
+
+exports.itemBufferSubscriber = itemBufferSubscriber;
+
+},{"./subscriber":53}],51:[function(require,module,exports){
+'use strict';
+
+Object.defineProperty(exports, "__esModule", {
+    value: true
+});
+exports.mapSubscriber = undefined;
+
+var _subscriber = require('./subscriber');
+
+var mapSubscriber = Object.create(_subscriber.subscriber, {
+    next: {
+        value: function _next(item) {
+            var res;
+            try {
+                res = this.transform(item, this.count++);
+            } catch (err) {
+                this.subscriber.error(err);
+                return;
+            }
+            this.subscriber.next(res);
+        },
+        writable: false,
+        configurable: false
+    },
+    init: {
+        value: function _init(subscriber, transform) {
+            this.initialize(subscriber);
+            this.transform = transform;
+            return this;
+        },
+        writable: false,
+        configurable: false
+    }
+});
+
+exports.mapSubscriber = mapSubscriber;
+
+},{"./subscriber":53}],52:[function(require,module,exports){
+'use strict';
+
+Object.defineProperty(exports, "__esModule", {
+    value: true
+});
+exports.mergeSubscriber = undefined;
+
+var _subscriber = require('./subscriber');
+
+var mergeSubscriber = Object.create(_subscriber.subscriber, {
+    next: {
+        value: function _next(item) {
+            if (this.transform) {
+                var res;
+                try {
+                    res = this.transform(item, this.count++);
+                } catch (err) {
+                    this.subscriber.error(err);
+                    return;
+                }
+                //Promise.resolve(res).then(this.then);
+                this.subscriber.next(res);
+            } else this.subscriber.next(item);
+        },
+        writable: false,
+        configurable: false
+    },
+    init: {
+        value: function _init(subscriber, observables, transform) {
+            this.transform = transform;
+            observables.forEach(function _subscribeToEach(observable) {
+                observable.subscribe(this);
+            }, this);
+            this.initialize(subscriber);
+            return this;
+        },
+        writable: false,
+        configurable: false
+    }
+});
+
+exports.mergeSubscriber = mergeSubscriber;
+
+},{"./subscriber":53}],53:[function(require,module,exports){
+'use strict';
+
+Object.defineProperty(exports, "__esModule", {
+    value: true
+});
+exports.subscriber = undefined;
+
+var _helpers = require('../../helpers');
+
+var subscriber = {
+    get status() {
+        return this._status || _helpers.observableStatus.inactive;
+    },
+    set status(status) {
+        this._status = Object.keys(_helpers.observableStatus).map(function _statusValues(status) {
+            return _helpers.observableStatus[status];
+        }).includes(status) ? status : _helpers.observableStatus.inactive;
+    },
+    get count() {
+        return this._count || 0;
+    },
+    set count(cnt) {
+        this._count = cnt || 0;
+    },
+    removeSubscriber: function _removeSubscriber() {
+        this.subscriber = null;
+    },
+    removeSubscription: function _removeSubscription(subscription) {
+        if (this.subscriptions.length) {
+            this.subscriptions = this.subscriptions.filter(function _findSubscriber(sub) {
+                return sub !== subscription;
+            });
+        }
+    },
+    removeSubscriptions: function _removeSubscriptions() {
+        this.subscriptions.length = 0;
+    },
+    next: function _next(item) {
+        this.subscriber.next(item);
+        //Promise.resolve(item).then(this.then);
+    },
+    error: function _error(err) {
+        this.status = _helpers.observableStatus.complete;
+        this.subscriber.error(err);
+    },
+    complete: function _complete() {
+        this.status = _helpers.observableStatus.complete;
+        if (this.subscriber && _helpers.observableStatus.complete !== this.subscriber.status) this.subscriber.complete();
+    },
+    initialize: function _initialize(next, error, complete) {
+        this.status = _helpers.observableStatus.active;
+        this.count = 0;
+        this.subscriptions = [];
+        this.then = function _then(val) {
+            return this.subscriber.next(val);
+        }.bind(this);
+
+        if (subscriber.isPrototypeOf(next)) {
+            this.subscriber = next;
+            next.subscriptions = next.subscriptions ? next.subscriptions.concat(this) : [].concat(this);
+            return this;
+        }
+        this.subscriber = {
+            next: next,
+            error: error,
+            complete: complete
+        };
+        return this;
+    },
+    onError: function _onError(error) {
+        this.subscriber.error = error;
+        return this;
+    },
+    onComplete: function _onComplete(complete) {
+        this.subscriber.complete = complete;
+        return this;
+    },
+    unsubscribe: function _unsubscribe() {
+        if (_helpers.observableStatus.complete === this.status) return;
+        this.complete();
+        if (this.subscriber && subscriber.isPrototypeOf(this.subscriber)) {
+            var sub = this.subscriber;
+            this.subscriber = null;
+            sub.unsubscribe();
+        }
+
+        while (this.subscriptions.length) {
+            var subscription = this.subscriptions.shift();
+            if (subscription.cleanUp) subscription.cleanUp();
+            subscription.unsubscribe();
+        }
+    }
+};
+
+exports.subscriber = subscriber;
+
+},{"../../helpers":19}],54:[function(require,module,exports){
+'use strict';
+
+Object.defineProperty(exports, "__esModule", {
+    value: true
+});
+exports.timeBufferSubscriber = undefined;
+
+var _subscriber = require('./subscriber');
+
+var timeBufferSubscriber = Object.create(_subscriber.subscriber, {
+    id: {
+        get: function _getId() {
+            return this._id || 0;
+        },
+        set: function _setId(val) {
+            this._id = val;
+        }
+    },
+    next: {
+        value: function _next(val) {
+            this.buffer[this.buffer.length] = val;
+        },
+        writable: false,
+        configurable: false
+    },
+    init: {
+        value: function _init(subscriber, interval) {
+            this.initialize(subscriber);
+            this.buffer = [];
+            this.now = Date.now;
+
+            function _interval() {
+                if (this.buffer.length) {
+                    //the map is needed here because, due to the asychronous nature of subscribers and the subsequent
+                    //clearing of the buffer, the subscriber#next argument would be nullified before it had a chance
+                    //to act on it.
+                    this.subscriber.next(this.buffer.map(function _mapBuffer(item) {
+                        return item;
+                    }));
+                    this.buffer.length = 0;
+                }
+            }
+
+            this.id = setInterval(_interval.bind(this), interval);
+            return this;
+        },
+        writable: false,
+        configurable: false
+    },
+    cleanUp: {
+        value: function _cleanUp() {
+            clearInterval(this.id);
+            this.buffer.length = 0;
+        },
+        writable: false,
+        configurable: false
+    }
+});
+
+exports.timeBufferSubscriber = timeBufferSubscriber;
+
+},{"./subscriber":53}]},{},[20])
 
 //# sourceMappingURL=index.js.map
