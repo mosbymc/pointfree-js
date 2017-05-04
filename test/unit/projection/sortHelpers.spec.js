@@ -128,7 +128,7 @@ describe('sort data 2', function test() {
 
     it('should do stuff multiple times', function testStuffMoreThanOnce() {
         previousFieldsValues.length = 0;
-        function keySelector(item) {
+        function nameSelector(item) {
             return item.FirstName;
         }
 
@@ -141,8 +141,8 @@ describe('sort data 2', function test() {
         }
 
         var sortObj = [
-            { keySelector: stateSelector, comparer: comparer, direction: 'asc' },
-            { keySelector: keySelector, comparer: comparer, direction: 'desc' }
+            { keySelector: stateSelector, direction: 'asc' },
+            { keySelector: nameSelector, direction: 'desc' }
         ];
 
         var sss = sortData(testData.dataSource.data, sortObj);

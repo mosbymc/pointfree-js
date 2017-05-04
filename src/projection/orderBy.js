@@ -9,10 +9,10 @@ import { javaScriptTypes } from '../helpers';
 
 //TODO: Since group by functionality will work the same way, it's probably best to think this through
 //TODO: first before committing to a mode of functionality  now.
-function orderBy(source, orderObject) {
+function orderBy(source, orderObject, comparer) {
     return function *orderByIterator() {
         //gather all data from the source before sorting
-        var orderedData = sortData(when(not(isArray), Array.from, source), orderObject);
+        var orderedData = sortData(when(not(isArray), Array.from, source), orderObject, comparer);
         for (let item of orderedData) {
             if (javaScriptTypes.undefined !== item) yield item;
         }

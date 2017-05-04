@@ -392,9 +392,9 @@ function isSomething(x) {
  * @returns {*}
  */
 function not(fn) {
-    return curry(alterFunctionLength(function _not(...rest) {
-        return !fn(...rest);
-    }, get('length', fn)));
+    return function _not(...args) {
+        return !fn(...args);
+    };
 }
 
 /**

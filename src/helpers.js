@@ -40,15 +40,14 @@ var sortDirection = {
  * @param: {function} keySelector
  * @param: {number} idx1
  * @param: {number} idx2
- * @param: {*} val1
  * @param: {Array} list
  * @param: {string} dir
  * @returns: {number}
  */
-
-var sortComparer = curry(function _sortComparer(keySelector, idx1, idx2, val1, source, dir) {
-    var val2 = keySelector(source[idx2]);
-    var c = val1 > val2 ? 1 : val1 === val2 ? idx1 - idx2 : -1;
+var sortComparer = curry(function _sortComparer(keySelector, idx1, idx2, source, dir) {
+    var val1 = keySelector(source[idx1]),
+        val2 = keySelector(source[idx2]),
+        c = val1 > val2 ? 1 : val1 < val2 ? -1 : idx1 - idx2;
     return dir === sortDirection.ascending ? c : -c;
 });
 

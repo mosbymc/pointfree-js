@@ -1,9 +1,8 @@
 {
   "env": {
     "test": {
-      "presets": ["es2015"],
       "sourceMaps": true,
-      "plugins": ["transform-es2015-modules-commonjs", "babel-plugin-transform-runtime"]
+      "plugins": ["transform-es2015-modules-commonjs"]
     },
     "dev": {
       "presets": ["es2015"],
@@ -24,6 +23,7 @@
       "plugins": ["transform-es2015-modules-commonjs", "babel-plugin-transform-runtime"]
     },
     "build": {
+      "sourceMaps": true,
       "plugins": ["transform-es2015-modules-commonjs"]
     }
   }

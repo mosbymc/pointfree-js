@@ -1,4 +1,25 @@
-var wallabify = require('wallabify');
+var wallabify = require('wallabify'),
+    proxyquireify = require('proxyquireify'),
+    // proxyquireify patch
+    proxyquireifyPrelude = require('fs').readFileSync(require('path').join(__dirname, 'node_modules/proxyquireify/lib/prelude.js')).toString();
+
+/*require('proxyquireify/lib/find-dependencies');
+ require.cache[require.resolve('proxyquireify/lib/find-dependencies')].exports = function _cache(src) {
+ if (!/require\(.+proxyquireify.+\)/.test(src)) return [];
+ // IMPORTANT: list all variables that you assign like var proxyquire = require('proxyquireify')(require);
+ var hash = ['proxyquire']
+ .map(function _map(name) {
+ return require('proxyquireify/node_modules/detective')(src, {word: name});
+ })
+ .reduce(function _reduce(acc, arr) {
+ arr.forEach(function _forEach(x) {
+ acc[x] = true;
+ });
+ return acc;
+ }, {});
+
+ return Object.keys(hash);
+ };*/
 
 process.env.BABEL_ENV = 'test';
 
@@ -22,9 +43,10 @@ module.exports = function _wallaby(wallaby) {
          - instrument: Indicates to wallaby if coverage reporting (in the IDE and application) should be checked against the matched files
          */
         files: [
-            { pattern: 'node_modules/chai/chai.js', instrument: true },
-            { pattern : 'src/**/*.js', load: true },
-            { pattern: 'test/testData.js', load: true },
+            { pattern: 'node_modules/chai/chai.js', instrument: false },
+            { pattern: 'node_modules/babel-polyfill/dist/polyfill.js', instrument: false },
+            { pattern : 'src/**/*.js', load: false },
+            { pattern: 'test/testData.js', load: false },
             '!test/**/*.spec.js',
             '!src/index.js',
             '!playground.js'
@@ -36,7 +58,7 @@ module.exports = function _wallaby(wallaby) {
          objectSet to false are being loaded by browserify after transpilation
          */
         tests: [
-            { pattern: 'test/**/*.spec.js', load: true }
+            { pattern: 'test/**/*.spec.js', load: false }
         ],
 
         /*
@@ -55,18 +77,25 @@ module.exports = function _wallaby(wallaby) {
             'test/**/*.js': wallaby.compilers.babel()
         },
 
-        env: {
-            type: 'node',
-            runner: 'node'
-        },
+        /*
+         postprocessor: uses the wallabify postprocessor to 'require' files matched by the glob patterns
+         into the sandbox
+         */
+        postprocessor: wallabify({
+            entryPatterns: [
+                'src/**/*.js',
+                'test/**/*.js'
+            ]
+        }),
 
         /*
          setup: wallaby will run this function one it launches the phantomjs sandbox; this will setup
          the global variables being used in the tests and utilize browserify to load the files
          */
         setup: function _setup() {
-            global.should = chai.should();
-            global.expect = chai.expect;
+            window.should = chai.should();
+            window.expect = chai.expect;
+            window.__moduleBundler.loadTests();
         }
     };
 };

@@ -43,7 +43,7 @@ describe('defaultEqualityComparer', function testDefaultEqualityComparer() {
             dec5 = defaultEqualityComparer(testData.dataSource.data, testData.dataSource.data),
             dec6 = defaultEqualityComparer(false, false),
             dec7 = defaultEqualityComparer(null, null),
-            dec8 = defaultEqualityComparer(undefined);
+            dec8 = defaultEqualityComparer(undefined, undefined);
 
         dec1.should.be.true;
         dec2.should.be.true;

@@ -5,7 +5,7 @@ import { javaScriptTypes } from '../helpers';
 
 function contains(source, val, comparer) {
     source = when(not(isArray), Array.from, source);
-    if (javaScriptTypes.undefined === comparer)
+    if (javaScriptTypes.undefined === typeof comparer)
         return source.includes(val);
     return source.some(function _checkEquality(item) {
         return comparer(item, val);

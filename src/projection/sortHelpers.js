@@ -1,11 +1,17 @@
-import { deepClone, defaultEqualityComparer, sortDirection } from '../helpers';
-import { not } from '../functionalHelpers';
+import { deepClone, defaultEqualityComparer, sortComparer, sortDirection } from '../helpers';
 
-function sortData(data, sortObject) {
+/**
+ * @description:
+ * @param: {Array} data
+ * @param: {Object} sortObject
+ * @param: {function} comparer
+ * @return {Array} - Returns an array sorted on 'n' fields in either ascending or descending
+ * order for each field as specified in the 'sortObject' parameter
+ */
+function sortData(data, sortObject, comparer = sortComparer) {
     var sortedData = data;
     sortObject.forEach(function _sortItems(sort, index) {
-        let comparer = sort.direction === 'asc' ? sort.comparer : not(sort.comparer);
-        if (index === 0) sortedData = quickSort(data, sort.keySelector, comparer);
+        if (index === 0) sortedData = quickSort(data, sort.direction, sort.keySelector, comparer);
         else {
             let sortedSubData = [],
                 itemsToSort = [],
@@ -18,17 +24,17 @@ function sortData(data, sortObject) {
                     //TODO: see if there's a realistic way that length === 1 || 2 could be combined into one statement
                     if (itemsToSort.length === 1) sortedSubData = sortedSubData.concat(itemsToSort);
                     else if (itemsToSort.length === 2) {
-                        sortedSubData = comparer(sort.keySelector(itemsToSort[0]), sort.keySelector(itemsToSort[1])) ?
+                        sortedSubData = 0 <= comparer(sort.keySelector, 0, 1, itemsToSort, sort.direction) ?
                             sortedSubData.concat(itemsToSort) : sortedSubData.concat(itemsToSort.reverse());
                     }
                     else {
-                        sortedSubData = sortedSubData.concat(quickSort(itemsToSort, sort.keySelector, comparer));
+                        sortedSubData = sortedSubData.concat(quickSort(itemsToSort, sort.direction, sort.keySelector, comparer));
                     }
                     itemsToSort.length = 0;
                     itemsToSort.push(item);
                 }
                 if (idx === sortedData.length - 1) {
-                    sortedSubData = sortedSubData.concat(quickSort(itemsToSort, sort.keySelector, comparer));
+                    sortedSubData = sortedSubData.concat(quickSort(itemsToSort, sort.direction, sort.keySelector, comparer));
                 }
             });
             sortedData = sortedSubData;
@@ -52,7 +58,15 @@ function merge(left, right, keySelector, comparer) {
     return [deepClone(right[0])].concat(merge(left, right.slice(1, right.length), keySelector, comparer));
 }
 
-function quickSort(source, keySelector, keyComparer) {
+/**
+ * @description:
+ * @param: {Array} source
+ * @param: {string} dir
+ * @param: {function} keySelector
+ * @param: {function} keyComparer
+ * @return: {Array} - Returns a sort array
+ */
+function quickSort(source, dir, keySelector, keyComparer) {
     var count = source.length,
         i = 0,
         cop = [];
@@ -61,22 +75,30 @@ function quickSort(source, keySelector, keyComparer) {
         cop[i] = source[i];
         ++i;
     }
-    qSort(cop, 0, count - 1, keySelector, keyComparer);
+    qSort(cop, 0, count - 1, dir, keySelector, keyComparer);
     return cop;
 }
 
+/**
+ * @description:
+ * @param: {Array} data
+ * @param: {number} left
+ * @param: {number} right
+ * @param: {string} dir
+ * @param: {function} keySelector
+ * @param: {function} keyComparer
+ */
 function qSort(data, left, right, dir, keySelector, keyComparer) {
     do {
         var i = left,
             j = right,
-            itemIdx = i + ((j - i) >> 1),
-            x = keySelector(data[itemIdx]);
+            itemIdx = i + ((j - i) >> 1);
 
         do {
-            while (i < data.length && dir === sortDirection.ascending ? keyComparer(keySelector, itemIdx, i, x, data) > 0 :
-                keyComparer(keySelector, itemIdx, i, x, data) < 0) ++i;
-            while (j >= 0 && dir === sortDirection.ascending ? keyComparer(keySelector, itemIdx, j, x, data) < 0 :
-                keyComparer(keySelector, itemIdx, j, x, data) < 0) --j;
+            while (i < data.length && dir === sortDirection.ascending ? keyComparer(keySelector, itemIdx, i, data, dir) > 0 :
+                keyComparer(keySelector, itemIdx, i, data, dir) < 0) ++i;
+            while (j >= 0 && dir === sortDirection.ascending ? keyComparer(keySelector, itemIdx, j, data, dir) < 0 :
+                keyComparer(keySelector, itemIdx, j, data, dir) < 0) --j;
             if (i > j) break;
             if (i < j) {
                 let tmp = data[i];
