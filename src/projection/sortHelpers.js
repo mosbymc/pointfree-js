@@ -67,16 +67,15 @@ function merge(left, right, keySelector, comparer) {
  * @return: {Array} - Returns a sort array
  */
 function quickSort(source, dir, keySelector, keyComparer) {
-    var count = source.length,
-        i = 0,
-        cop = [];
+    var i = 0,
+        copy = [];
 
     while (i < source.length) {
-        cop[i] = source[i];
+        copy[i] = source[i];
         ++i;
     }
-    qSort(cop, 0, count - 1, dir, keySelector, keyComparer);
-    return cop;
+    qSort(copy, 0, source.length - 1, dir, keySelector, keyComparer);
+    return copy;
 }
 
 /**
@@ -95,10 +94,8 @@ function qSort(data, left, right, dir, keySelector, keyComparer) {
             itemIdx = i + ((j - i) >> 1);
 
         do {
-            while (i < data.length && dir === sortDirection.ascending ? keyComparer(keySelector, itemIdx, i, data, dir) > 0 :
-                keyComparer(keySelector, itemIdx, i, data, dir) < 0) ++i;
-            while (j >= 0 && dir === sortDirection.ascending ? keyComparer(keySelector, itemIdx, j, data, dir) < 0 :
-                keyComparer(keySelector, itemIdx, j, data, dir) < 0) --j;
+            while (i < data.length && keyComparer(keySelector, itemIdx, i, data, dir) > 0) ++i;
+            while (j >= 0 && keyComparer(keySelector, itemIdx, j, data, dir) < 0) --j;
             if (i > j) break;
             if (i < j) {
                 let tmp = data[i];

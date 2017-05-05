@@ -48,7 +48,7 @@ var sortComparer = curry(function _sortComparer(keySelector, idx1, idx2, source,
     var val1 = keySelector(source[idx1]),
         val2 = keySelector(source[idx2]),
         c = val1 > val2 ? 1 : val1 < val2 ? -1 : idx1 - idx2;
-    return dir === sortDirection.ascending ? c : -c;
+    return dir === sortDirection.descending ? c : -c;
 });
 
 /**

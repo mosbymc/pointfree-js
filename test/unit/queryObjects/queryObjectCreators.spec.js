@@ -21,7 +21,7 @@ function comparer(a, b) {
 
 function keySelector(item) { return item.State; }
 function lessThanComparer(a, b) { return a < b; }
-var sortObj = [{ keySelector: keySelector, comparer: lessThanComparer, direction: 'asc' }];
+var sortObj = [{ keySelector: keySelector, direction: 'asc' }];
 
 describe('createNewQueryableDelegator', function testQueryableDelegatorObjectCreation() {
     it('should create a new queryable object delegator with actual pipeline array', function testSuccessfulCreation() {

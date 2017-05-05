@@ -89,6 +89,7 @@ describe('sort data 2', function test() {
         var sss = sortData(testData.dataSource.data, sortObj);
         sss.should.be.an('array');
         sss.should.have.lengthOf(testData.dataSource.data.length);
+        console.log(sss);
         sss.forEach(function validateResults(item) {
             if (!previousFieldsValues.length)
                 previousFieldsValues.push(item.FirstName);
@@ -129,11 +130,10 @@ describe('sort data 2', function test() {
     it('should do stuff multiple times', function testStuffMoreThanOnce() {
         previousFieldsValues.length = 0;
         function nameSelector(item) {
+            if (!item || !item.FirstName) {
+                console.log(item);
+            }
             return item.FirstName;
-        }
-
-        function comparer(a, b) {
-            return a < b;
         }
 
         function stateSelector(item) {

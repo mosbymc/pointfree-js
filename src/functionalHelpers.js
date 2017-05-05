@@ -1,4 +1,4 @@
-import { alterFunctionLength, javaScriptTypes, shallowClone } from './helpers';
+import { javaScriptTypes, shallowClone } from './helpers';
 
 /**
  * No-op function; used as default function in some cases when argument is optional

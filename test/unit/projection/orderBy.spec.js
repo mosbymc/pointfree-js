@@ -1,4 +1,5 @@
 import { orderBy } from '../../../src/projection/orderBy';
+import { sortDirection } from '../../../src/helpers';
 import { testData } from '../../testData';
 
 var previousFieldsValues = [];
@@ -19,19 +20,16 @@ function lastNameSelector(item) {
     return item.LastName;
 }
 
-function comparer(a, b) {
-    return a <= b;
-}
-
 describe('Test orderBy...', function testOrderBy() {
     describe('...using arrays', function testOrderByUsingArrays() {
         it('should return test data ordered by FirstName ascending', function testOrderByOnFirstNameAscending() {
-            var orderObj = [{ keySelector: firstNameSelector, comparer: comparer, direction: 'asc' }];
+            var orderObj = [{ keySelector: firstNameSelector, direction: sortDirection.ascending }];
             var orderByIterable = orderBy(testData.dataSource.data, orderObj),
                 orderByRes = Array.from(orderByIterable());
 
             orderByRes.should.have.lengthOf(testData.dataSource.data.length);
             orderByRes.forEach(function validateResults(item) {
+                console.log(item);
                 if (!previousFieldsValues.length)
                     previousFieldsValues[0] = item.FirstName;
                 else {
@@ -43,7 +41,7 @@ describe('Test orderBy...', function testOrderBy() {
         });
 
         it('should return test data ordered by FirstName descending', function testOrderByOnFirstNameDescending() {
-            var orderObj = [{ keySelector: firstNameSelector, comparer: comparer, direction: 'desc' }],
+            var orderObj = [{ keySelector: firstNameSelector, direction: sortDirection.descending }],
                 orderByIterable = orderBy(testData.dataSource.data, orderObj),
                 orderByRes = Array.from(orderByIterable());
 
@@ -61,9 +59,9 @@ describe('Test orderBy...', function testOrderBy() {
 
         it('should be able of sorting on more than one column', function testOrderByOnMultipleColumns() {
             var orderObj = [
-                { keySelector: stateSelector, comparer: comparer, direction: 'desc' },
-                { keySelector: lastNameSelector, comparer: comparer, direction: 'asc' },
-                { keySelector: firstNameSelector, comparer: comparer, direction: 'asc' }
+                { keySelector: stateSelector, direction: sortDirection.descending },
+                { keySelector: lastNameSelector, direction: sortDirection.ascending },
+                { keySelector: firstNameSelector, direction: sortDirection.ascending }
                 ],
                 orderByIterable = orderBy(testData.dataSource.data, orderObj),
                 orderByRes = Array.from(orderByIterable());
