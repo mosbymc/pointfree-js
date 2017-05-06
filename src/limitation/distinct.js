@@ -1,11 +1,11 @@
-import { defaultEqualityComparer, memoizer } from '../helpers';
+import { defaultEqualityComparer, cacher } from '../helpers';
 
 function distinct(source, comparer = defaultEqualityComparer) {
-    var havePreviouslyViewed = memoizer(comparer);
+    var isInCache = cacher(comparer);
 
     return function *distinctIterator() {
         for (let item of source) {
-            if (!havePreviouslyViewed(item)) yield item;
+            if (!isInCache(item)) yield item;
         }
     };
 }

@@ -1,4 +1,4 @@
-import { defaultEqualityComparer, defaultGreaterThanComparer, defaultPredicate, memoizer, deepClone, deepCopy } from '../../src/helpers';
+import { defaultEqualityComparer, defaultGreaterThanComparer, defaultPredicate, cacher, deepClone, deepCopy } from '../../src/helpers';
 import { testData } from '../testData';
 
 function checkClonedDataProps(orig, clone) {
@@ -124,11 +124,11 @@ describe('defaultPredicate', function testDefaultPredicate() {
     });
 });
 
-describe('memoizer', function testMemoizer() {
+describe('cacher', function testMemoizer() {
     it('should remember unique values for each instance', function testMemoizer() {
-        var mem1 = memoizer(),
-            mem2 = memoizer(),
-            mem3 = memoizer();
+        var mem1 = cacher(),
+            mem2 = cacher(),
+            mem3 = cacher();
 
         testData.dataSource.data.forEach(function findUniques(item) {
             mem1(item).should.not.be.true;

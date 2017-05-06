@@ -1,10 +1,10 @@
 import { intersect } from '../../../src/collation/intersect';
-import { memoizer } from '../../../src/helpers';
+import { cacher } from '../../../src/helpers';
 import { testData } from '../../testData';
 
 function comparer(a, b) { return a.FirstName === b.FirstName; }
 
-var havePreviouslyViewed = memoizer(comparer),
+var havePreviouslyViewed = cacher(comparer),
     uniqueFirstNames = testData.dataSource.data.filter(function findUniqueNames(item) {
         return !havePreviouslyViewed(item);
     });
@@ -13,17 +13,17 @@ var firstHalf = testData.dataSource.data.slice(0, testData.dataSource.data.lengt
     evenIdxs = testData.dataSource.data.filter(function _getEvenIndexedItems(item, idx) { return idx % 2; }),
     oddIdxs = testData.dataSource.data.filter(function _getOddIndexedItems(item, idx) { return !(idx % 2); });
 
-havePreviouslyViewed = memoizer(comparer);
+havePreviouslyViewed = cacher(comparer);
 var firstHalfAndUniqueNames = firstHalf.filter(function _findUniqueNames(item) {
     return !(havePreviouslyViewed(item));
 });
 
-havePreviouslyViewed = memoizer(comparer);
+havePreviouslyViewed = cacher(comparer);
 var evensAndUniqueNames = evenIdxs.filter(function _findUniqueNames(item) {
     return !(havePreviouslyViewed(item));
 });
 
-havePreviouslyViewed = memoizer(comparer);
+havePreviouslyViewed = cacher(comparer);
 var oddsAndUniqueNames = oddIdxs.filter(function _findUniqueNames(item) {
     return !(havePreviouslyViewed(item));
 });

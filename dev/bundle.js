@@ -1393,9 +1393,9 @@ var generatorProto = Object.getPrototypeOf(function* _generator() {});
 function memoizer(comparer) {
     comparer = comparer || defaultEqualityComparer;
     //TODO: need to make another change here... ideally, no queryable function should ever pass an undefined value to
-    //TODO: the memoizer, but I don't want to depend on that. The problem here is that, if the defaultEqualityComparer is
+    //TODO: the cacher, but I don't want to depend on that. The problem here is that, if the defaultEqualityComparer is
     //TODO: not used, then an exception could well be thrown if the comparer tries to access a property on or invoke the
-    //TODO: undefined value that the memoizer's array is initialized with. Likely the best approach is to examine the item
+    //TODO: undefined value that the cacher's array is initialized with. Likely the best approach is to examine the item
     //TODO to be memoized, and if it is undefined, then just return true
     var items = []; //initialize the array with an undefined value as we don't accept that as a legit value for the comparator
     return function _memoizeThis(item) {

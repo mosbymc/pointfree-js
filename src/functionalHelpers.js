@@ -1,25 +1,26 @@
 import { javaScriptTypes, shallowClone } from './helpers';
 
 /**
- * No-op function; used as default function in some cases when argument is optional
+ * @description: No-op function; used as default function in some cases when argument is optional
  * and consumer does not provide.
- * @returns {undefined}
+ * @returns: {undefined}
  */
 function noop() {}
 
 /**
  * Identity :: a -> a
- * Identity function; takes any item and returns same item when invoked
+ * @description: Identity function; takes any item and returns same item when invoked
  *
- * @param {*} item - Any value of any type
- * @returns {*} - returns item
+ * @param: {*} item - Any value of any type
+ * @returns: {*} - returns item
  */
 function identity(item) { return item; }
 
 /**
  * constant :: a -> () -> a
- * @param {*} item
- * @returns {function} - Returns a function, that when invoked, will
+ * @description:
+ * @param: {*} item
+ * @returns: {function} - Returns a function, that when invoked, will
  * return the item passed to the constant function as an argument.
  */
 function constant(item) {
@@ -30,14 +31,20 @@ function constant(item) {
 
 /**
  * kestrel :: a -> () -> a
- * @note @see {@link constant}
- * @type {function}
- * @param {*} item
- * @returns {function} - Returns a function, that when invoked, will
+ * @description:
+ * @note: @see {@link constant}
+ * @type: {function}
+ * @param: {*} item
+ * @returns: {function} - Returns a function, that when invoked, will
  * return the item passed to the constant function as an argument.
  */
 var kestrel = constant;
 
+/**
+ * @description:
+ * @param: {function} fn
+ * @return: {function}
+ */
 function apply(fn) {
     return function _apply(...args) {
         return function _apply_() {
@@ -109,8 +116,12 @@ var get = curry(function _get(prop, obj) {
 });
 
 /**
- *
- * @type {*}
+ * @description:
+ * @type: {function}
+ * @param: {string} prop
+ * @param: {*} val
+ * @param: {object} obj
+ * @return: {object}
  */
 var set = curry(function _set(prop, val, obj) {
     obj[prop] = val;
@@ -190,11 +201,11 @@ function pipe(fn, ...fns) {
  * invoked, passing the data as an argument, otherwise the elseFunc is
  * invoked with the data as an argument.
  * @type: {function}
- * @predicate {function}
- * @ifFunc {function}
- * @elseFunc {function}
- * @data {*}
- * @returns {*} - returns the result of invoking the ifFunc or elseFunc
+ * @param: {function} predicate
+ * @param: {function} ifFunc
+ * @param: {function} elseFunc
+ * @param: {*} data
+ * @return: {*} - returns the result of invoking the ifFunc or elseFunc
  * on the data
  */
 var ifElse = curry(function _ifElse(predicate, ifFunc, elseFunc, data) {
@@ -204,12 +215,13 @@ var ifElse = curry(function _ifElse(predicate, ifFunc, elseFunc, data) {
 });
 
 /**
- *
- * @type {function}
- * @param {function} predicate
- * @param {function} ifFunc
- * @param {*} ifArg
- * @param {*} thatArg
+ * @description:
+ * @type: {function}
+ * @param: {function} predicate
+ * @param: {function} ifFunc
+ * @param: {*} ifArg
+ * @param: {*} thatArg
+ * @return: {*}
  */
 var ifThisThenThat = curry(function _ifThisThenThat(predicate, ifFunc, ifArg, thatArg) {
     if (predicate(ifArg))
@@ -219,13 +231,13 @@ var ifThisThenThat = curry(function _ifThisThenThat(predicate, ifFunc, ifArg, th
 
 /**
  * when :: Function -> (Function -> (a -> b))
- * Similar to ifElse, but no 'elseFunc' argument. Instead, if the application
+ * @description: Similar to ifElse, but no 'elseFunc' argument. Instead, if the application
  * of the predicate to the data returns truthy, the transform is applied to
  * the data. Otherwise, the data is returned without invoking the transform.
- * @predicate {function}
- * @transform {function}
- * @data {*}
- * @returns {*}
+ * @param: {function} predicate
+ * @param: {function} transform
+ * @param: {*} data
+ * @return: {*}
  */
 var when = curry(function _when(predicate, transform, data) {
     if (predicate(data)) return transform(data);
@@ -233,12 +245,12 @@ var when = curry(function _when(predicate, transform, data) {
 });
 
 /**
- *
- * @type {function}
- * @param {function} predicate
- * @param {function} transform
- * @param {*} data
- * @returns {*}
+ * @description:
+ * @type: {function}
+ * @param: {function} predicate
+ * @param: {function} transform
+ * @param: {*} data
+ * @return: {*}
  */
 var whenNot = curry(function _whenNot(predicate, transform, data) {
     if (!predicate(data)) return transform(data);
@@ -246,11 +258,11 @@ var whenNot = curry(function _whenNot(predicate, transform, data) {
 });
 
 /**
- *
- * @type {function}
- * @param {number} offset
- * @param {Array} list
- * @returns {*}
+ * @description:
+ * @type: {function}
+ * @param: {number} offset
+ * @param: {Array} list
+ * @return: {*}
  */
 var nth = curry(function nth(offset, list) {
     var idx = offset < 0 ? list.length + offset : offset;
@@ -259,20 +271,20 @@ var nth = curry(function nth(offset, list) {
 
 /**
  * wrap :: a -> [a]
- * Takes any value of any type and returns an array containing
+ * @description: Takes any value of any type and returns an array containing
  * the value passed as its only item
  *
- * @param {*} data - Any value, any type
- * @returns {[*]} - Returns an array of any value, any type
+ * @param: {*} data - Any value, any type
+ * @return: {[*]} - Returns an array of any value, any type
  */
 function wrap(data) {
     return [data];
 }
 
 /**
- *
- * @param a
- * @returns {string}
+ * @description:
+ * @param: {*} a
+ * @return: {string}
  */
 function type(a) {
     return typeof a;
@@ -280,9 +292,9 @@ function type(a) {
 
 /**
  * isArray :: a -> Boolean
- *
- * @param data
- * @returns {boolean}
+ * @description:
+ * @param: data
+ * @return: {boolean}
  */
 function isArray(data) {
     return Array.isArray(data);
@@ -290,9 +302,9 @@ function isArray(data) {
 
 /**
  * isObject :: a -> Boolean
- *
- * @param item
- * @returns {boolean}
+ * @description:
+ * @param: item
+ * @return: {boolean}
  */
 function isObject(item) {
     return javaScriptTypes.object === type(item) && null !==  item;
@@ -300,81 +312,81 @@ function isObject(item) {
 
 /**
  * isFunction :: a -> Boolean
- *
- * @param fn
- * @returns {boolean}
+ * @description:
+ * @param: {function} fn
+ * @return: {boolean}
  */
 function isFunction(fn) {
     return javaScriptTypes.function === type(fn);
 }
 
 /**
- *
- * @param num
- * @returns {boolean}
+ * @description:
+ * @param: {number} num
+ * @return: {boolean}
  */
 function isNumber(num) {
     return javaScriptTypes.number === type(num);
 }
 
 /**
- *
- * @param str
- * @returns {boolean}
+ * @description:
+ * @param: {string} str
+ * @return: {boolean}
  */
 function isString(str) {
     return javaScriptTypes.string === type(str);
 }
 
 /**
- *
- * @param bool
- * @returns {boolean}
+ * @description:
+ * @param: {boolean} bool
+ * @return: {boolean}
  */
 function isBoolean(bool) {
     return javaScriptTypes.boolean === type(bool);
 }
 
 /**
- *
- * @param sym
- * @returns {boolean}
+ * @description:
+ * @param: {Symbol} sym
+ * @return: {boolean}
  */
 function isSymbol(sym) {
     return javaScriptTypes.symbol === type(sym);
 }
 
 /**
- *
- * @param n
- * @returns {string|boolean}
+ * @description:
+ * @param: {*} n
+ * @return: {string|boolean}
  */
 function isNull(n) {
     return type(n) && null === n;
 }
 
 /**
- *
- * @param u
- * @returns {boolean}
+ * @description:
+ * @param: {*} u
+ * @return: {boolean}
  */
 function isUndefined(u) {
     return javaScriptTypes.undefined === type(u);
 }
 
 /**
- *
- * @param x
- * @returns {boolean}
+ * @description:
+ * @param: {*} x
+ * @return: {boolean}
  */
 function isNothing(x) {
     return null == x;
 }
 
 /**
- *
- * @param x
- * @returns {boolean}
+ * @description:
+ * @param: {*} x
+ * @return: {boolean}
  */
 function isSomething(x) {
     return null != x;
@@ -383,13 +395,13 @@ function isSomething(x) {
 /**
  * not :: () -> !()
  *
- * @description - Returns a function, that, when invoked, will return the
+ * @description: - Returns a function, that, when invoked, will return the
  * result of the inversion of the invocation of the function argument. The
  * returned function is curried to the same arity as the function argument,
  * so it can be partially applied even after being 'wrapped' inside the
  * not function.
- * @param fn
- * @returns {*}
+ * @param: {function} fn
+ * @return: {*}
  */
 function not(fn) {
     return function _not(...args) {
@@ -399,8 +411,12 @@ function not(fn) {
 
 /**
  * or :: (*... -> Boolean) -> ((*... -> Boolean) -> ((*... -> Boolean)))
- *
- * @type {*}
+ * @description:
+ * @type {function}
+ * @param: {function} a
+ * @param: {function} b
+ * @param: {*} item
+ * @return: {boolean}
  */
 var or = curry(function _or(a, b, item) {
     return a(item) || b(item);
@@ -408,32 +424,37 @@ var or = curry(function _or(a, b, item) {
 
 /**
  * and :: (*... -> Boolean) -> ((*... -> Boolean) -> ((*... -> Boolean)))
- *
- * @type {*}
+ * @description:
+ * @type {function}
+ * @param: {function} a
+ * @param: {function} b
+ * @param: {*}
+ * @return: {boolean}
  */
 var and = curry(function _and(a, b, item) {
     return a(item) && b(item);
 });
 
 /**
- *
- * @param {*} x
- * @returns {boolean}
+ * @description:
+ * @param: {*} x
+ * @return: {boolean}
  */
 function flip(x) {
     return !x;
 }
 
 /**
- *
- * @param {*} x
- * @returns {boolean}
+ * @description:
+ * @param: {*} x
+ * @return: {boolean}
  */
 function truthy(x) {
     return !!x;
 }
 
 /**
+ * @description:
  * @type {flip}
  * @see flip
  * @param {*} x
@@ -442,65 +463,65 @@ function truthy(x) {
 var falsey = flip;
 
 /**
- *
- * @type {function}
- * @param {number} x
- * @param {number} y
- * @returns {number}
+ * @description:
+ * @type: {function}
+ * @param: {number} x
+ * @param: {number} y
+ * @return: {number}
  */
 var add = curry(function _add(x, y) {
     return x + y;
 });
 
 /**
- *
- * @type {function}
- * @param {number} x
- * @param {number} y
- * @returns {number}
+ * @description:
+ * @type: {function}
+ * @param: {number} x
+ * @param: {number} y
+ * @return: {number}
  */
 var subtract = curry(function _subtract(x, y) {
     return x - y;
 });
 
 /**
- *
- * @type {function}
- * @param {number} x
- * @param {number} y
- * @returns {number}
+ * @description:
+ * @type: {function}
+ * @param: {number} x
+ * @param: {number} y
+ * @return: {number}
  */
 var divide = curry(function _divide(x, y) {
     return x / y;
 });
 
 /**
- *
- * @type {function}
- * @param {number} x
- * @param {number} y
- * @returns {number}
+ * @description:
+ * @type: {function}
+ * @param: {number} x
+ * @param: {number} y
+ * @return: {number}
  */
 var multiple = curry(function _multiple(x, y) {
     return x * y;
 });
 
 /**
- *
- * @type {function}
- * @param {number} x
- * @param {number} y
- * @returns {number}
+ * @description:
+ * @type: {function}
+ * @param: {number} x
+ * @param: {number} y
+ * @return: {number}
  */
 var modulus = curry(function _modulus(x, y) {
     return x % y;
 });
 
 /**
- *
- * @param {Array} first
- * @param {Array} rest
- * @returns {string | Array}
+ * @description:
+ * @param: {Array} first
+ * @param: {Array} rest
+ * @return: {string | Array}
  */
 function concat(first, ...rest) {
     if (null == rest || !rest.length) return first;
@@ -510,97 +531,97 @@ function concat(first, ...rest) {
 }
 
 /**
- *
- * @param {number} x
- * @returns {number}
+ * @description:
+ * @param: {number} x
+ * @return: {number}
  */
 function negate(x) {
     return -x;
 }
 
 /**
- *
- * @type {function}
- * @param {*} x
- * @param {*} y
- * @returns {boolean}
+ * @description:
+ * @type: {function}
+ * @param: {*} x
+ * @param: {*} y
+ * @return: {boolean}
  */
 var equal = curry(function _curry(x, y) {
     return x == y;
 });
 
 /**
- *
- * @type {function}
- * @param {*} x
- * @param {*} y
- * @returns {boolean}
+ * @description:
+ * @type: {function}
+ * @param: {*} x
+ * @param: {*} y
+ * @return: {boolean}
  */
 var strictEqual = curry(function _strictEqual(x, y) {
     return x === y;
 });
 
 /**
- *
- * @type {function}
- * @param {*}
- * @param {*}
- * @returns {boolean}
+ * @description:
+ * @type: {function}
+ * @param: {*}
+ * @param: {*}
+ * @return: {boolean}
  */
 var notEqual = curry(function _notEqual(x, y) {
     return x != y;
 });
 
 /**
- *
- * @type {function}
- * @param {*} x
- * @param {*} y
- * @returns {boolean}
+ * @description:
+ * @type: {function}
+ * @param: {*} x
+ * @param: {*} y
+ * @return: {boolean}
  */
 var strictNotEqual = curry(function _strictNotEqual(x, y) {
     return x !== y;
 });
 
 /**
- *
- * @type {function}
- * @param {number | string} x
- * @param {number | string} y
- * @returns {boolean}
+ * @description:
+ * @type: {function}
+ * @param: {number | string} x
+ * @param: {number | string} y
+ * @return: {boolean}
  */
 var greaterThan = curry(function _greaterThan(x, y) {
     return x > y;
 });
 
 /**
- *
- * @type {function}
- * @param {string | number} x
- * @param {string | number} y
- * @returns {boolean}
+ * @description:
+ * @type: {function}
+ * @param: {string | number} x
+ * @param: {string | number} y
+ * @return: {boolean}
  */
 var greaterThanOrEqual = curry(function _greaterThanOrEqual(x, y) {
     return x >= y;
 });
 
 /**
- *
- * @type {function}
- * @param {string | number} x
- * @param {string | number} y
- * @returns {boolean}
+ * @description:
+ * @type: {function}
+ * @param: {string | number} x
+ * @param: {string | number} y
+ * @return: {boolean}
  */
 var lessThan = curry(function _lessThan(x, y) {
     return x < y;
 });
 
 /**
- *
- * @type {function}
- * @param {string | number} x
- * @param {string | number} y
- * @returns {boolean}
+ * @description:
+ * @type: {function}
+ * @param: {string | number} x
+ * @param: {string | number} y
+ * @return: {boolean}
  */
 var lessThanOrEqual = curry(function _lessThanOrEqual(x, y) {
     return x <= y;
@@ -629,8 +650,12 @@ var delegatesFrom = curry(function _delegatesFrom(delegate, delegator) {
 });
 
 /**
- *
- * @type {*}
+ * @description:
+ * @type: {function}
+ * @param: {number} idx
+ * @param: {function} f
+ * @param: {Array} xs
+ * @return: {Array}
  */
 var arrayLens = curry(function _arrayLens(idx, f, xs) {
     return map(function (val) {
@@ -639,8 +664,12 @@ var arrayLens = curry(function _arrayLens(idx, f, xs) {
 });
 
 /**
- *
- * @type {*}
+ * @description:
+ * @type: {function}
+ * @param: {string} prop
+ * @param: {function} f
+ * @param: {Object} xs
+ * @return: {Object}
  */
 var objectLens = curry(function _objectLens(prop, f, xs) {
     return map(function _map(rep) {
@@ -649,16 +678,23 @@ var objectLens = curry(function _objectLens(prop, f, xs) {
 });
 
 /**
- *
- * @type {*}
+ * @description:
+ * @type: {function}
+ * @param: {function} lens
+ * @param: {Object} target
+ * @return:
  */
 var view = curry(function _view(lens, target) {
     return lens(kestrel)(target).value;
 });
 
 /**
- *
- * @type {*}
+ * @description:
+ * @type: {function}
+ * @param: {function} lens
+ * @param: {function} mapFn
+ * @param: {Object} target
+ * @return:
  */
 var over = curry(function _over(lens, mapFn, target) {
     return lens(function _lens(y) {
@@ -667,17 +703,21 @@ var over = curry(function _over(lens, mapFn, target) {
 });
 
 /**
- *
- * @type {*}
+ * @description:
+ * @type: {function}
+ * @param: {function} lens
+ * @param: {*} val
+ * @param: {*} target
+ * @return:
  */
 var put = curry(function _put(lens, val, target) {
     return over(lens, kestrel(val), target);
 });
 
 /**
- *
- * @param paths
- * @returns {*}
+ * @description:
+ * @param: {Array} paths
+ * @return: {*}
  */
 function makeLenses(...paths) {
     return paths.reduce(function _pathReduce(cur, next) {
@@ -687,9 +727,9 @@ function makeLenses(...paths) {
 }
 
 /**
- *
- * @param path
- * @returns {*}
+ * @description:
+ * @param: {Array} path
+ * @return: {*}
  */
 function lensPath(...path) {
     return compose(...path.map(function _pathMap(p) {
@@ -698,11 +738,11 @@ function lensPath(...path) {
 }
 
 /**
- *
- * @type {function}
- * @param {function} f
- * @param {object} x
- * @returns {identity<T>}
+ * @description:
+ * @type: {function}
+ * @param: {function} f
+ * @param: {object} x
+ * @return: {identity<T>}
  */
 var mapped = curry(function _mapped(f, x) {
     return identity(map(compose(function _mCompose(x) {
@@ -715,15 +755,15 @@ var mapped = curry(function _mapped(f, x) {
  * argument should be some form of a unary projector. The 'projector' function will receive
  * the value stored in the existing array at the specified 'idx' argument location. A new array
  * is returned and the original array remains unchanged.
- * @type {function}
- * @param {function} fn - A function that can operate on a single point of data from the array
+ * @type: {function}
+ * @param: {function} fn - A function that can operate on a single point of data from the array
  * and a value to be used as an update for the same index in the new array.
- * @param {number} idx - A number representing the zero-based offset of the array; idx determines
+ * @param: {number} idx - A number representing the zero-based offset of the array; idx determines
  * what value will be passed as the unary argument to the operator function and what index in the
  * newly created array will be altered. If the value is less than zero, the function will use the
  * 'idx' argument value as an offset from the last element in the array.
- * @param {Array} list - The list to update.
- * @returns {Array} - Returns a new array identical to the original array except where the new,
+ * @param: {Array} list - The list to update.
+ * @return: {Array} - Returns a new array identical to the original array except where the new,
  * computed value is inserted
  */
 var adjust = curry(function _adjust(fn, idx, list) {
@@ -738,9 +778,9 @@ var adjust = curry(function _adjust(fn, idx, list) {
 
 /**
  * curry :: (* -> a) -> (* -> a)
- *
- * @param fn
- * @returns {*}
+ * @description:
+ * @param: {function} fn
+ * @return: {function|*}
  */
 function curry(fn) {
     if (!fn.length || 1 === fn.length) return fn;
@@ -748,11 +788,11 @@ function curry(fn) {
 }
 
 /**
- * Curries a function to a specified arity
- * @param {number} arity - The number of arguments to curry the function for
- * @param {Array} received - An array of the arguments to be applied to the function
- * @param {function} fn - The function to be curried
- * @returns {function | *} - Returns either a function waiting for more arguments to
+ * @description: Curries a function to a specified arity
+ * @param: {number} arity - The number of arguments to curry the function for
+ * @param: {Array} received - An array of the arguments to be applied to the function
+ * @param: {function} fn - The function to be curried
+ * @return: {function | *} - Returns either a function waiting for more arguments to
  * be applied before invocation, or will return the result of the function invocation
  * if the specified number of arguments have been received
  */

@@ -1,4 +1,4 @@
-import { deepClone, defaultEqualityComparer, sortComparer, sortDirection } from '../helpers';
+import { deepClone, sortComparer } from '../helpers';
 
 /**
  * @description:
@@ -11,30 +11,35 @@ import { deepClone, defaultEqualityComparer, sortComparer, sortDirection } from 
 function sortData(data, sortObject, comparer = sortComparer) {
     var sortedData = data;
     sortObject.forEach(function _sortItems(sort, index) {
-        if (index === 0) sortedData = quickSort(data, sort.direction, sort.keySelector, comparer);
+        if (0 === index) sortedData = 5001 < data.length ?
+            insertionSort(data, sort.keySelector, comparer, sort.direction) : mergeSort(data, sort.keySelector, comparer, sort.direction);
+        //if (index === 0) sortedData = quickSort(data, sort.direction, sort.keySelector, comparer);
         else {
             let sortedSubData = [],
                 itemsToSort = [],
                 prevKeySelector = sortObject[index - 1].keySelector;
             sortedData.forEach(function _sortData(item, idx) {
                 //TODO: re-examine this logic; I think it is in reverse order
-                if (!itemsToSort.length || defaultEqualityComparer(prevKeySelector(itemsToSort[0]), prevKeySelector(item)))
+                if (!itemsToSort.length || 0 === comparer(prevKeySelector(itemsToSort[0]), prevKeySelector(item), sort.direction))
                     itemsToSort.push(item);
                 else {
                     //TODO: see if there's a realistic way that length === 1 || 2 could be combined into one statement
                     if (itemsToSort.length === 1) sortedSubData = sortedSubData.concat(itemsToSort);
                     else if (itemsToSort.length === 2) {
-                        sortedSubData = 0 <= comparer(sort.keySelector, 0, 1, itemsToSort, sort.direction) ?
+                        sortedSubData = -1 < comparer(sort.keySelector(itemsToSort[0]), sort.keySelector(itemsToSort[1]), sort.direction) ?
                             sortedSubData.concat(itemsToSort) : sortedSubData.concat(itemsToSort.reverse());
                     }
                     else {
-                        sortedSubData = sortedSubData.concat(quickSort(itemsToSort, sort.direction, sort.keySelector, comparer));
+                        sortedSubData = sortedSubData.concat(itemsToSort.length < 5001 ?
+                            insertionSort(itemsToSort, sort.keySelector, comparer, sort.direction) : mergeSort(itemsToSort, sort.keySelector, comparer, sort.direction));
+                        //sortedSubData = sortedSubData.concat(quickSort(itemsToSort, sort.direction, sort.keySelector, comparer));
                     }
                     itemsToSort.length = 0;
-                    itemsToSort.push(item);
+                    itemsToSort[0] = item;
                 }
                 if (idx === sortedData.length - 1) {
-                    sortedSubData = sortedSubData.concat(quickSort(itemsToSort, sort.direction, sort.keySelector, comparer));
+                    sortedSubData = sortedSubData.concat(itemsToSort.length < 5001 ?
+                        insertionSort(itemsToSort, sort.keySelector, comparer, sort.direction) : mergeSort(itemsToSort, sort.keySelector, comparer, sort.direction));
                 }
             });
             sortedData = sortedSubData;
@@ -43,19 +48,37 @@ function sortData(data, sortObject, comparer = sortComparer) {
     return sortedData;
 }
 
-function mergeSort(data, keySelector, comparer) {
+/**
+ * @description:
+ * @param: {Array} data
+ * @param: {function} keySelector
+ * @param: {function} comparer
+ * @param: {string} direction
+ * @return {Array}
+ */
+function mergeSort(data, keySelector, comparer, direction) {
     if (data.length < 2) return data;
     var middle = parseInt(data.length / 2);
-    return merge(mergeSort(data.slice(0, middle), keySelector, comparer), mergeSort(data.slice(middle), keySelector, comparer), keySelector, comparer);
+    return merge(mergeSort(data.slice(0, middle), keySelector, comparer, direction),
+        mergeSort(data.slice(middle), keySelector, comparer, direction), keySelector, comparer, direction);
 }
 
-function merge(left, right, keySelector, comparer) {
+/**
+ * @description:
+ * @param: {Array} left
+ * @param: {Array} right
+ * @param: {function} keySelector
+ * @param: {function} comparer
+ * @param: {string} direction
+ * @return {Array}
+ */
+function merge(left, right, keySelector, comparer, direction) {
     if (!left.length) return right;
     if (!right.length) return left;
 
-    if (comparer(keySelector(left[0]), keySelector(right[0])))
-        return [deepClone(left[0])].concat(merge(left.slice(1, left.length), right, keySelector, comparer));
-    return [deepClone(right[0])].concat(merge(left, right.slice(1, right.length), keySelector, comparer));
+    if (comparer(keySelector(left[0]), keySelector(right[0]), direction) > -1)
+        return [deepClone(left[0])].concat(merge(left.slice(1, left.length), right, keySelector, comparer, direction));
+    return [deepClone(right[0])].concat(merge(left, right.slice(1, right.length), keySelector, comparer, direction));
 }
 
 /**
@@ -117,6 +140,47 @@ function qSort(data, left, right, dir, keySelector, keyComparer) {
         }
     }
     while (left < right);
+}
+
+/**
+ * @description:
+ * @param: {Array} source
+ * @param: {function} keySelector
+ * @param: {function} keyComparer
+ * @param: {string} direction
+ * @return: {Array}
+ */
+function insertionSort(source, keySelector, keyComparer, direction) {
+    var i = 0,
+        cop = [];
+
+    while (i < source.length) {
+        cop[i] = source[i];
+        ++i;
+    }
+    iSort(cop, keySelector, keyComparer, direction);
+    return cop;
+}
+
+/**
+ * @description:
+ * @param: {Array} source
+ * @param: {function} keySelector
+ * @param: {function} keyComparer
+ * @param: {string} direction
+ */
+function iSort(source, keySelector, keyComparer, direction) {
+    var i, j, item, val;
+    for (i = 1; i < source.length; ++i) {
+        item = source[i];
+        val = keySelector(source[i]);
+        j = i - 1;
+        while (0 <= j && keyComparer(keySelector(source[j]), val, direction) >= 0) {
+            source[j + 1] = source[j];
+            --j;
+        }
+        source[j + 1] = item;
+    }
 }
 
 export { sortData, quickSort };

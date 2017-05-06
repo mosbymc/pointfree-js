@@ -1,7 +1,7 @@
 import { curry, kestrel } from './functionalHelpers';
 
 /**
- *
+ * @description:
  * @type {{function: string, object: string, boolean: string, number: string, symbol: string, string: string, undefined: string}}
  */
 var javaScriptTypes = {
@@ -15,8 +15,8 @@ var javaScriptTypes = {
 };
 
 /**
- *
- * @type {{inactive: number, active: number, paused: number, complete: number}}
+ * @description:
+ * @type: {{inactive: number, active: number, paused: number, complete: number}}
  */
 var observableStatus = {
     inactive: 0,
@@ -26,8 +26,8 @@ var observableStatus = {
 };
 
 /**
- *
- * @type {{ascending: number, descending: number}}
+ * @description:
+ * @type: {{ascending: number, descending: number}}
  */
 var sortDirection = {
     ascending: 1,
@@ -36,68 +36,61 @@ var sortDirection = {
 
 /**
  * @description:
- * @type: {function}
- * @param: {function} keySelector
- * @param: {number} idx1
- * @param: {number} idx2
- * @param: {Array} list
+ * @param: {*} x
+ * @param: {*} y
  * @param: {string} dir
  * @returns: {number}
  */
-var sortComparer = curry(function _sortComparer(keySelector, idx1, idx2, source, dir) {
-    var val1 = keySelector(source[idx1]),
-        val2 = keySelector(source[idx2]),
-        c = val1 > val2 ? 1 : val1 < val2 ? -1 : idx1 - idx2;
-    return dir === sortDirection.descending ? c : -c;
-});
+function sortComparer(x, y, dir) {
+    var t = x > y ? 1 : x === y ? 0 : -1;
+    return sortDirection.ascending === dir ? t : -t;
+}
 
 /**
- *
- * @type {function}
- * @param {*} a
- * @param {*} b
- * @returns {boolean}
+ * @description:
+ * @type: {function}
+ * @param: {*} a
+ * @param: {*} b
+ * @returns: {boolean}
  */
 var defaultEqualityComparer = curry(function _defaultEqualityComparer(a, b) {
     return a === b;
 });
 
 /**
- *
- * @type {function}
- * @param {*} a
- * @param {*} b
- * @returns {boolean}
+ * @description:
+ * @type: {function}
+ * @param: {*} a
+ * @param: {*} b
+ * @returns: {boolean}
  */
 var defaultGreaterThanComparer = curry(function defaultGreaterThanComparer(a, b) {
     return a > b;
 });
 
 /**
- * @type {function}
- * @returns {boolean}
+ * @description:
+ * @type: {function}
+ * @returns: {boolean}
  */
 var defaultPredicate = kestrel(true);
 
 /**
- * @description - Prototype of a generator; used to detect if a function
+ * @description: - Prototype of a generator; used to detect if a function
  * argument is a generator or a regular function.
- * @type {Object}
+ * @type: {Object}
  */
 var generatorProto = Object.getPrototypeOf(function *_generator(){});
 
-//TODO: this will have to be changed as the false value could be a legit value for a collection...
-//TODO:... I'm thinking reusing the 'flag' object to indicate the end of the list for the .next functions
-//TODO: should be reusable here to indicate a 'false' value
-function memoizer(comparer) {
+/**
+ * @description:
+ * @param: {function} comparer
+ * @return: {function}
+ */
+function cacher(comparer) {
     comparer = comparer || defaultEqualityComparer;
-    //TODO: need to make another change here... ideally, no queryable function should ever pass an undefined value to
-    //TODO: the memoizer, but I don't want to depend on that. The problem here is that, if the defaultEqualityComparer is
-    //TODO: not used, then an exception could well be thrown if the comparer tries to access a property on or invoke the
-    //TODO: undefined value that the memoizer's array is initialized with. Likely the best approach is to examine the item
-    //TODO to be memoized, and if it is undefined, then just return true
-    var items = [];    //initialize the array with an undefined value as we don't accept that as a legit value for the comparator
-    return function _memoizeThis(item) {
+    var items = [];
+    return function cacheChecker(item) {
         if (undefined === item || items.some(function _checkEquality(it) { return comparer(it, item); })) {
             return true;
         }
@@ -106,20 +99,13 @@ function memoizer(comparer) {
     };
 }
 
-function newMemoizer(fn, comparer = defaultEqualityComparer) {
-    var items = [];
-
-    return function _memoizedFunc(...args) {
-        if (!args.length || items.some(function _checkEquality(it) {
-            return comparer(it, args);
-            }))
-            return true;
-        items[items.length] = args;
-        return fn(...args);
-    }
-}
-
-function memoized(fn, keyMaker) {
+/**
+ * @description:
+ * @param: {function} fn
+ * @param: {function} keyMaker
+ * @return {function}
+ */
+function memoizer(fn, keyMaker) {
     var lookup = new Map();
     return function _memoized(...args) {
         var key = javaScriptTypes.function === typeof keyMaker ? keyMaker(...args) : args;
@@ -128,9 +114,9 @@ function memoized(fn, keyMaker) {
 }
 
 /**
- *
- * @param {*} obj
- * @returns {object}
+ * @description:
+ * @param: {*} obj
+ * @returns: {*}
  */
 function deepClone(obj) {
     if (null == obj || javaScriptTypes.object !== typeof obj)
@@ -147,9 +133,9 @@ function deepClone(obj) {
 }
 
 /**
- *
- * @param {Array} arr
- * @returns {Array}
+ * @description:
+ * @param: {Array} arr
+ * @returns: {Array}
  */
 function deepCopy(arr) {
     var length = arr.length,
@@ -162,9 +148,9 @@ function deepCopy(arr) {
 }
 
 /**
- *
- * @param {object} obj
- * @returns {object}
+ * @description:
+ * @param: {object} obj
+ * @returns: {object}
  */
 function shallowClone(obj) {
     var clone = {};
@@ -175,11 +161,11 @@ function shallowClone(obj) {
 }
 
 /**
- *
- * @type {function}
- * @param {number} len
- * @param {function} fn
- * @returns {function}
+ * @description:
+ * @type: {function}
+ * @param: {number} len
+ * @param: {function} fn
+ * @returns: {function}
  */
 var alterFunctionLength = curry(function _alterFunctionLength(len, fn) {
     return Object.defineProperty(
@@ -190,5 +176,5 @@ var alterFunctionLength = curry(function _alterFunctionLength(len, fn) {
     );
 });
 
-export { javaScriptTypes, sortDirection, observableStatus, sortComparer, defaultEqualityComparer, defaultGreaterThanComparer, defaultPredicate, memoizer,
+export { javaScriptTypes, sortDirection, observableStatus, sortComparer, defaultEqualityComparer, defaultGreaterThanComparer, defaultPredicate, cacher,
     deepClone, deepCopy, shallowClone, generatorProto, alterFunctionLength };

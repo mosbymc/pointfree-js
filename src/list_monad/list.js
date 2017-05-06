@@ -1,5 +1,5 @@
 import { addFront, concat, except, groupJoin, intersect, join, union, zip } from '../collation/collationFunctions';
-import { all, any, contains, first, fold, last, count } from '../evaluation/evaluationFunctions';
+import { all, any, binary, contains, first, fold, last, count } from '../evaluation/evaluationFunctions';
 import { distinct, ofType, where } from '../limitation/limitationFunctions';
 import { deepFlatten, deepMap, flatMap, flatten, groupBy, orderBy, map } from '../projection/projectionFunctions';
 import { generatorProto, defaultPredicate } from '../helpers';
@@ -519,6 +519,23 @@ var list_core = {
 };
 
 /**
+ * @description: Performs the same functionality as list_core#contains, but utilizes
+ * a binary searching algorithm rather than a sequential search. If this function is called
+ * an a non-ordered list, it will internally delegate to list_core#contains instead. This
+ * function should not be called on a sorted list for look for a value that is not the
+ * primary field on which the list's data is sorted on as an incorrect result will likely
+ * be returned.
+ * @param: {*} val - The value that should be searched for
+ * @param: {function} comparer - The function used to compare values in the list to
+ * the 'val' parameter
+ * @return {boolean} - Returns true if the list contains the searched for value, false
+ * otherwise.
+ */
+list_core.contains.binary = function _binary(val, comparer) {
+    return binary(this, val, comparer);
+};
+
+/**
  * @description: A list_core delegator object that, in addition to the delegatable functionality
  * it has from the list_core object, also exposes .orderBy and .orderByDescending
  * functions. These functions allow a consumer to sort a list's data by
@@ -723,4 +740,4 @@ list.extend = function _extend(propName, fn) {
     }
 };
 
-export { list, list_core };
+export { list, list_core, m_list, ordered_m_list };
