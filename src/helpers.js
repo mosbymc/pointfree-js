@@ -43,7 +43,7 @@ var sortDirection = {
  */
 function sortComparer(x, y, dir) {
     var t = x > y ? 1 : x === y ? 0 : -1;
-    return sortDirection.ascending === dir ? t : -t;
+    return sortDirection.descending === dir ? t : -t;
 }
 
 /**

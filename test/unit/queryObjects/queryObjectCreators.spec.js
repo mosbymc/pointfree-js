@@ -1,5 +1,6 @@
 import { createNewQueryableDelegator, createNewOrderedQueryableDelegator } from '../../../src/queryObjects/queryDelegatorCreators';
 import { internal_queryable, internal_orderedQueryable } from '../../../src/queryObjects/queryable';
+import { sortDirection } from '../../../src/helpers';
 import { orderBy } from '../../../src/projection/orderBy';
 import { testData } from '../../testData';
 
@@ -21,7 +22,7 @@ function comparer(a, b) {
 
 function keySelector(item) { return item.State; }
 function lessThanComparer(a, b) { return a < b; }
-var sortObj = [{ keySelector: keySelector, direction: 'asc' }];
+var sortObj = [{ keySelector: keySelector, direction: sortDirection.ascending }];
 
 describe('createNewQueryableDelegator', function testQueryableDelegatorObjectCreation() {
     it('should create a new queryable object delegator with actual pipeline array', function testSuccessfulCreation() {
@@ -378,7 +379,7 @@ describe('createNewOrderedQueryableDelegator', function testCreateNewQueryableDe
             any2 = basedOrderedDelegate.any(function _predicate(item) { return item.FirstName === 'Mike'; }),
             all1 = basedOrderedDelegate.all(),
             all2 = basedOrderedDelegate.all(function _predicate(item) { return item.drillDownData.length; }),
-            contains = basedOrderedDelegate.contains(testData.dataSource.data[0]),
+            contains = basedOrderedDelegate.contains(testData.dataSource.data[0], function _c(a, b) { return a.FirstName === b.FirstName; }),
             first1 = basedOrderedDelegate.first(),
             first2 = basedOrderedDelegate.first(function _predicate(item) { return item.FirstName === 'Phillip J.'; }),
             fold = basedOrderedDelegate.fold(function _fold(val, cur, idx){ return val + idx}, 0),

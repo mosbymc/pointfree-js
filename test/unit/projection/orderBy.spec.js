@@ -29,7 +29,6 @@ describe('Test orderBy...', function testOrderBy() {
 
             orderByRes.should.have.lengthOf(testData.dataSource.data.length);
             orderByRes.forEach(function validateResults(item) {
-                console.log(item);
                 if (!previousFieldsValues.length)
                     previousFieldsValues[0] = item.FirstName;
                 else {
@@ -67,7 +66,8 @@ describe('Test orderBy...', function testOrderBy() {
                 orderByRes = Array.from(orderByIterable());
 
             orderByRes.should.have.lengthOf(testData.dataSource.data.length);
-            orderByRes.forEach(function validateResults(item) {
+            //console.log(orderByRes);
+            orderByRes.forEach(function validateResults(item, idx) {
                 if (!previousFieldsValues.length) {
                     previousFieldsValues[0] = item.State;
                     previousFieldsValues[1] = item.LastName;
@@ -81,6 +81,7 @@ describe('Test orderBy...', function testOrderBy() {
                         previousFieldsValues[2] = null;
                     }
                     else if (item.LastName !== previousFieldsValues[1]) {
+                        console.log(idx, previousFieldsValues[0], previousFieldsValues[1], previousFieldsValues[2]);
                         if (null !== previousFieldsValues[1]) {
                             item.LastName.should.be.at.least(previousFieldsValues[1]);
                         }

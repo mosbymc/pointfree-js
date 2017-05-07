@@ -1,4 +1,4 @@
-import { deepClone, sortComparer } from '../helpers';
+import { deepClone, sortComparer, sortDirection } from '../helpers';
 
 /**
  * @description:
@@ -25,10 +25,16 @@ function sortData(data, sortObject, comparer = sortComparer) {
                 else {
                     //TODO: see if there's a realistic way that length === 1 || 2 could be combined into one statement
                     if (itemsToSort.length === 1) sortedSubData = sortedSubData.concat(itemsToSort);
-                    else if (itemsToSort.length === 2) {
-                        sortedSubData = -1 < comparer(sort.keySelector(itemsToSort[0]), sort.keySelector(itemsToSort[1]), sort.direction) ?
+                    //else if (itemsToSort.length === 2) {
+                        //sortedSubData = -1 < comparer(sort.keySelector(itemsToSort[0]), sort.keySelector(itemsToSort[1]), sort.direction) ?
+                            //sortedSubData.concat(itemsToSort) : sortedSubData.concat(itemsToSort.reverse());
+                        /*if (sortDirection.descending === sort.ascending)
+                            sortedSubData = -1 < comparer(sort.keySelector(itemsToSort[0]), sort.keySelector(itemsToSort[1]), sort.direction) ?
+                                sortedSubData.concat(itemsToSort) : sortedSubData.concat(itemsToSort.reverse());
+                        else sortedSubData = 1 > comparer(sort.keySelector(itemsToSort[0]), sort.keySelector(itemsToSort[1]), sort.direction) ?
                             sortedSubData.concat(itemsToSort) : sortedSubData.concat(itemsToSort.reverse());
-                    }
+                        */
+                    //}
                     else {
                         sortedSubData = sortedSubData.concat(itemsToSort.length < 5001 ?
                             insertionSort(itemsToSort, sort.keySelector, comparer, sort.direction) : mergeSort(itemsToSort, sort.keySelector, comparer, sort.direction));
@@ -175,9 +181,20 @@ function iSort(source, keySelector, keyComparer, direction) {
         item = source[i];
         val = keySelector(source[i]);
         j = i - 1;
-        while (0 <= j && keyComparer(keySelector(source[j]), val, direction) >= 0) {
-            source[j + 1] = source[j];
-            --j;
+        if (sortDirection.ascending === direction) {
+            if (val.LastName  === 'Tate' || val.LastName === 'Slim') {
+                console.log(val, source[j], keyComparer(keySelector(source[j]), val, direction));
+            }
+            while (0 <= j && keyComparer(keySelector(source[j]), val, direction) > 0) {
+                source[j + 1] = source[j];
+                --j;
+            }
+        }
+        else {
+            while (0 <= j && keyComparer(keySelector(source[j]), val, direction) < 0) {
+                source[j + 1] = source[j];
+                --j;
+            }
         }
         source[j + 1] = item;
     }

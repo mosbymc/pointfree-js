@@ -1,4 +1,5 @@
 import { /*sortData,*/ sortData } from '../../../src/projection/sortHelpers';
+import { sortDirection } from '../../../src/helpers'
 import { testData } from '../../testData';
 
 /*
@@ -81,15 +82,10 @@ describe('sort data 2', function test() {
             return item.FirstName;
         }
 
-        function comparer(a, b) {
-            return a <= b;
-        }
-
-        var sortObj = [{ keySelector: keySelector, comparer: comparer, direction: 'asc' }];
+        var sortObj = [{ keySelector: keySelector, direction: sortDirection.ascending }];
         var sss = sortData(testData.dataSource.data, sortObj);
         sss.should.be.an('array');
         sss.should.have.lengthOf(testData.dataSource.data.length);
-        console.log(sss);
         sss.forEach(function validateResults(item) {
             if (!previousFieldsValues.length)
                 previousFieldsValues.push(item.FirstName);
@@ -107,11 +103,7 @@ describe('sort data 2', function test() {
             return item.FirstName;
         }
 
-        function comparer(a, b) {
-            return a <= b;
-        }
-
-        var sortObj = [{ keySelector: keySelector, comparer: comparer, direction: 'desc' }];
+        var sortObj = [{ keySelector: keySelector, direction: sortDirection.descending }];
         var sss = sortData(testData.dataSource.data, sortObj);
 
         sss.should.be.an('array');
@@ -130,9 +122,6 @@ describe('sort data 2', function test() {
     it('should do stuff multiple times', function testStuffMoreThanOnce() {
         previousFieldsValues.length = 0;
         function nameSelector(item) {
-            if (!item || !item.FirstName) {
-                console.log(item);
-            }
             return item.FirstName;
         }
 
@@ -141,8 +130,8 @@ describe('sort data 2', function test() {
         }
 
         var sortObj = [
-            { keySelector: stateSelector, direction: 'asc' },
-            { keySelector: nameSelector, direction: 'desc' }
+            { keySelector: stateSelector, direction: sortDirection.ascending },
+            { keySelector: nameSelector, direction: sortDirection.descending }
         ];
 
         var sss = sortData(testData.dataSource.data, sortObj);
@@ -160,7 +149,9 @@ describe('sort data 2', function test() {
                     previousFieldsValues[0] = item.State;
                     previousFieldsValues[1] = item.FirstName;
                 }
-                else item.FirstName.should.be.at.most(previousFieldsValues[1]);
+                else {
+                    item.FirstName.should.be.at.most(previousFieldsValues[1]);
+                }
             }
         });
     });
