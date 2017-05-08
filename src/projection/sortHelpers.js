@@ -1,4 +1,4 @@
-import { deepClone, sortComparer, sortDirection } from '../helpers';
+import { deepClone, sortComparer } from '../helpers';
 
 /**
  * @description:
@@ -11,7 +11,7 @@ import { deepClone, sortComparer, sortDirection } from '../helpers';
 function sortData(data, sortObject, comparer = sortComparer) {
     var sortedData = data;
     sortObject.forEach(function _sortItems(sort, index) {
-        if (0 === index) sortedData = 5001 < data.length ?
+        if (0 === index) sortedData = 5001 > data.length ?
             insertionSort(data, sort.keySelector, comparer, sort.direction) : mergeSort(data, sort.keySelector, comparer, sort.direction);
         //if (index === 0) sortedData = quickSort(data, sort.direction, sort.keySelector, comparer);
         else {
@@ -181,20 +181,9 @@ function iSort(source, keySelector, keyComparer, direction) {
         item = source[i];
         val = keySelector(source[i]);
         j = i - 1;
-        if (sortDirection.ascending === direction) {
-            if (val.LastName  === 'Tate' || val.LastName === 'Slim') {
-                console.log(val, source[j], keyComparer(keySelector(source[j]), val, direction));
-            }
-            while (0 <= j && keyComparer(keySelector(source[j]), val, direction) > 0) {
-                source[j + 1] = source[j];
-                --j;
-            }
-        }
-        else {
-            while (0 <= j && keyComparer(keySelector(source[j]), val, direction) < 0) {
-                source[j + 1] = source[j];
-                --j;
-            }
+        while (0 <= j && keyComparer(keySelector(source[j]), val, direction) < 0) {
+            source[j + 1] = source[j];
+            --j;
         }
         source[j + 1] = item;
     }

@@ -66,7 +66,6 @@ describe('Test orderBy...', function testOrderBy() {
                 orderByRes = Array.from(orderByIterable());
 
             orderByRes.should.have.lengthOf(testData.dataSource.data.length);
-            //console.log(orderByRes);
             orderByRes.forEach(function validateResults(item, idx) {
                 if (!previousFieldsValues.length) {
                     previousFieldsValues[0] = item.State;

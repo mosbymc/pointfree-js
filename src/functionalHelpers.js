@@ -42,6 +42,13 @@ var kestrel = constant;
 
 /**
  * @description:
+ * @type: {function}
+ * @returns: {boolean}
+ */
+var defaultPredicate = kestrel(true);
+
+/**
+ * @description:
  * @param: {function} fn
  * @return: {function}
  */
@@ -809,4 +816,4 @@ export { noop, identity, constant, apply, once, kestrel, get, set, objectSet, ar
         when, whenNot, wrap, type, isArray, isObject, isFunction, isNumber, isString, isBoolean, isSymbol, isNull,
         isUndefined, isNothing, isSomething, not, or, and, flip, truthy, falsey, add, subtract, divide, multiple, modulus, concat, negate,
         equal, strictEqual, notEqual, strictNotEqual, greaterThan, greaterThanOrEqual, lessThan, lessThanOrEqual, delegatesTo, delegatesFrom,
-        arrayLens, objectLens, view, over, put, makeLenses, lensPath, mapped, adjust, curry, curryN, tap, fork, sequence };
+        arrayLens, objectLens, view, over, put, makeLenses, lensPath, mapped, adjust, curry, curryN, tap, fork, sequence, defaultPredicate };

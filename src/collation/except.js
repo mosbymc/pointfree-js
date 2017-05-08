@@ -1,9 +1,6 @@
-import { defaultEqualityComparer } from '../helpers';
-import { when, not, isArray } from '../functionalHelpers';
+import { when, not, isArray, strictEqual } from '../functionalHelpers';
 
-function except(source, enumerable, comparer) {
-    comparer = comparer || defaultEqualityComparer;
-
+function except(source, enumerable, comparer = strictEqual) {
     return function *exceptIterator() {
         var res;
         for (let item of source) {

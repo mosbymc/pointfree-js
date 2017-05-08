@@ -2,8 +2,8 @@ import { addFront, concat, except, groupJoin, intersect, join, union, zip } from
 import { all, any, contains, first, fold, last, count } from '../evaluation/evaluationFunctions';
 import { distinct, ofType, where } from '../limitation/limitationFunctions';
 import { deepFlatten, deepMap, flatten, groupBy, orderBy, map } from '../projection/projectionFunctions';
-import { createNewQueryableDelegator, createNewOrderedQueryableDelegator, constructQueryableDelegator } from './queryDelegatorCreators';
-import { generatorProto, defaultPredicate } from '../helpers';
+import { createNewQueryableDelegator, createNewOrderedQueryableDelegator } from './queryDelegatorCreators';
+import { generatorProto } from '../helpers';
 import { isArray, wrap } from '../functionalHelpers';
 
 /**

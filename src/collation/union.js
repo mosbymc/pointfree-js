@@ -1,8 +1,7 @@
-import { defaultEqualityComparer, cacher } from '../helpers';
-import { when, not, isArray } from '../functionalHelpers';
+import { cacher } from '../helpers';
+import { when, not, isArray, strictEqual } from '../functionalHelpers';
 
-function union(source, enumerable, comparer) {
-    comparer = comparer || defaultEqualityComparer;
+function union(source, enumerable, comparer = strictEqual) {
     var isInCache = cacher(comparer);
 
     return function *unionIterator() {

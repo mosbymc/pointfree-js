@@ -1,9 +1,7 @@
-import { defaultEqualityComparer, javaScriptTypes } from '../helpers';
-import { when, not, isArray } from '../functionalHelpers';
+import { javaScriptTypes } from '../helpers';
+import { when, not, isArray, strictEqual } from '../functionalHelpers';
 
-function intersect(source, enumerable, comparer) {
-    comparer = comparer || defaultEqualityComparer;
-
+function intersect(source, enumerable, comparer = strictEqual) {
     return function *intersectIterator() {
         enumerable = when(not(isArray), Array.from, enumerable);
         for (let item of source) {

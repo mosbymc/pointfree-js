@@ -1,5 +1,3 @@
-import { curry, kestrel } from './functionalHelpers';
-
 /**
  * @description:
  * @type {{function: string, object: string, boolean: string, number: string, symbol: string, string: string, undefined: string}}
@@ -47,35 +45,6 @@ function sortComparer(x, y, dir) {
 }
 
 /**
- * @description:
- * @type: {function}
- * @param: {*} a
- * @param: {*} b
- * @returns: {boolean}
- */
-var defaultEqualityComparer = curry(function _defaultEqualityComparer(a, b) {
-    return a === b;
-});
-
-/**
- * @description:
- * @type: {function}
- * @param: {*} a
- * @param: {*} b
- * @returns: {boolean}
- */
-var defaultGreaterThanComparer = curry(function defaultGreaterThanComparer(a, b) {
-    return a > b;
-});
-
-/**
- * @description:
- * @type: {function}
- * @returns: {boolean}
- */
-var defaultPredicate = kestrel(true);
-
-/**
  * @description: - Prototype of a generator; used to detect if a function
  * argument is a generator or a regular function.
  * @type: {Object}
@@ -88,7 +57,6 @@ var generatorProto = Object.getPrototypeOf(function *_generator(){});
  * @return: {function}
  */
 function cacher(comparer) {
-    comparer = comparer || defaultEqualityComparer;
     var items = [];
     return function cacheChecker(item) {
         if (undefined === item || items.some(function _checkEquality(it) { return comparer(it, item); })) {
@@ -167,7 +135,7 @@ function shallowClone(obj) {
  * @param: {function} fn
  * @returns: {function}
  */
-var alterFunctionLength = curry(function _alterFunctionLength(len, fn) {
+/*var alterFunctionLength = curry(function _alterFunctionLength(len, fn) {
     return Object.defineProperty(
         fn,
         'length', {
@@ -175,6 +143,7 @@ var alterFunctionLength = curry(function _alterFunctionLength(len, fn) {
         }
     );
 });
+*/
 
-export { javaScriptTypes, sortDirection, observableStatus, sortComparer, defaultEqualityComparer, defaultGreaterThanComparer, defaultPredicate, cacher,
-    deepClone, deepCopy, shallowClone, generatorProto, alterFunctionLength };
+export { javaScriptTypes, sortDirection, observableStatus, sortComparer, cacher,
+    deepClone, deepCopy, shallowClone, generatorProto };
