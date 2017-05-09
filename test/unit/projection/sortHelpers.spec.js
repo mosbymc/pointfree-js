@@ -1,4 +1,4 @@
-import { /*sortData,*/ sortData } from '../../../src/projection/sortHelpers';
+import { sortData } from '../../../src/projection/sortHelpers';
 import { sortDirection } from '../../../src/helpers'
 import { testData } from '../../testData';
 

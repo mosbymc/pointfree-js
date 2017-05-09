@@ -126,7 +126,7 @@
       if (base != null) gatherCompletions(base);
     }
     else {
-      // If not, just look in the window object and any local scope
+      // If not, Just look in the window object and any local scope
       // (reading into JS mode internals to get at the local variables)
       for (var v = token.state.localVars; v; v = v.next) maybeAdd(v.name);
       gatherCompletions(window);

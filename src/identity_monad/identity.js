@@ -22,7 +22,7 @@ var _identity = {
     flatMap: function _flatMap(fn) {
         return fn(this.value);
     },
-    join: function _join() {
+    mjoin: function _mjoin() {
         return this.value;
     },
     of: function _of(item) {

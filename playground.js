@@ -22,7 +22,7 @@
 //TODO:    iterator is a generator, they can gather as few or as many of the items from the 'source' as needed before 'evaluating themselves'. The one
 //TODO:    potential problem I see is that, once a queryable pipeline has been built up by chaining 'methods', the evaluation of the final queryable
 //TODO:    will cause all prior queryables to also be evaluated. To an extent this isn't an issue, since, even if it didn't cause the evaluation of the
-//TODO:    previous queryable objects themselves, but instead it just sorta reduced each queryable's function over the source collection, the evaluation
+//TODO:    previous queryable objects themselves, but instead it Just sorta reduced each queryable's function over the source collection, the evaluation
 //TODO:    would have to occur anyway... in other words, it wouldn't be performing any additional work by evaluating prior queryables. However, there are
 //TODO:    a few things I need to be careful of and watch out for:
 //TODO:         - If the evaluation of a queryable causes all prior queryable's to also be evaluated, then it would make sense to 'save' the evaluation
@@ -76,11 +76,11 @@
 //TODO:         - Finally, as mentioned above, 'saving' the evaluated data of a queryable object kinda assumes a non-streaming version/usage of this library.
 //TODO:           While I don't want to extend my focus on more than is necessary to implement the core functionality, I think this library would be
 //TODO:           significantly more useful if it could handle both finite and potentially infinite (i.e. streaming) sets. The problem is that the concept
-//TODO:           of a 'pre-evaluated' queryable is ridiculous in a streaming context. Obviously, I could take the hacky way out and just create two
-//TODO:           separate queryable object types; one for finite sets, and one for potentially infinite sets. But, not only is that hacky, ugly, and just
+//TODO:           of a 'pre-evaluated' queryable is ridiculous in a streaming context. Obviously, I could take the hacky way out and Just create two
+//TODO:           separate queryable object types; one for finite sets, and one for potentially infinite sets. But, not only is that hacky, ugly, and Just
 //TODO:           plain lazy, but I also feel it reduces the usability practicality of this library if a user must learn not one, but two APIs for the
 //TODO:           two queryable objects, and when to use each one. In general, it is sacrificing consumer convenience for developer convenience, and I
-//TODO:           just won't stand for it!
+//TODO:           Just won't stand for it!
 //TODO:
 //TODO: 4) Every queryable collation 'method' should be capable of taking any enumerable object as an argument for the 'collection' parameter, including
 //TODO:    another queryable object. Utilizing generators and for-of loops should make this very possible. Only objects that have an iterator, built-in or
@@ -89,12 +89,12 @@
 
 //TODO: Ok. I think I finally get it. Took me ~9 months, but containers are starting to make sense. Linq is a functor, and, were it not for a couple
 //TODO: of methods that it is "missing", it would be a monad; same goes for Rx. I had no idea that containers and linq/Rx were one in the same thing.
-//TODO: Granted, linq is not just a generic monad, it's a monad<list>. So if you wanted a maybe, or a future, or an IO, you'd still need to implement
+//TODO: Granted, linq is not Just a generic monad, it's a monad<List>. So if you wanted a Maybe, or a future, or an IO, you'd still need to implement
 //TODO: those data structures in C#. Essentially, if C# had given us IFunctor instead of IEnumerable, we could have created any tricked out functor
-//TODO: implementation by overriding some base methods, like a maybe's null check before apply a fn to it's underlying. In other words, Rx and Linq
-//TODO: screwed us! Not really, but that's kinda my feeling. Granted, if it hand't taken me so long to understand "why containers", then maybe I
+//TODO: implementation by overriding some base methods, like a Maybe's null check before apply a fn to it's underlying. In other words, Rx and Linq
+//TODO: screwed us! Not really, but that's kinda my feeling. Granted, if it hand't taken me so long to understand "why containers", then Maybe I
 //TODO: wouldn't be as critical, but still, I could have an interface for a tricked out monad(functor), but instead I get a single implementation
-//TODO: of a monad and have to create all other versions myself since both Rx and linq basically "expect" to be sitting on top of a list.
+//TODO: of a monad and have to create all other versions myself since both Rx and linq basically "expect" to be sitting on top of a List.
 
 
  function union(previousFunc, collection, comparer) {
@@ -553,7 +553,7 @@ attachListener('click');
     /**
      * Represents a disposable resource, such as the execution of an Observable. A
      * Subscription has one important method, `unsubscribe`, that takes no argument
-     * and just disposes the resource held by the subscription.
+     * and Just disposes the resource held by the subscription.
      *
      * Additionally, subscriptions may be grouped together through the `add()`
      * method, which will attach a child Subscription to the current Subscription.
@@ -656,9 +656,9 @@ attachListener('click');
          * @param {TeardownLogic} teardown The additional logic to execute on
          * teardown.
          * @return {Subscription} Returns the Subscription used or created to be
-         * added to the inner subscriptions list. This Subscription can be used with
+         * added to the inner subscriptions List. This Subscription can be used with
          * `remove()` to remove the passed teardown logic from the inner subscriptions
-         * list.
+         * List.
          */
         Subscription.prototype.add = function (teardown) {
             if (!teardown || (teardown === Subscription.EMPTY)) {
@@ -694,7 +694,7 @@ attachListener('click');
             return subscription;
         };
         /**
-         * Removes a Subscription from the internal list of subscriptions that will
+         * Removes a Subscription from the internal List of subscriptions that will
          * unsubscribe during the unsubscribe process of this Subscription.
          * @param {Subscription} subscription The subscription to remove.
          * @return {void}
@@ -721,7 +721,7 @@ attachListener('click');
                 this._parents = [parent];
             }
             else if (_parents.indexOf(parent) === -1) {
-                // Only add the new parent to the _parents list if it's not already there.
+                // Only add the new parent to the _parents List if it's not already there.
                 _parents.push(parent);
             }
         };
@@ -1126,7 +1126,7 @@ attachListener('click');
                     }
                     else {
                         // if there is NO subscription, then we're getting a nexted
-                        // value synchronously during subscription. We can just call it.
+                        // value synchronously during subscription. We can Just call it.
                         // If it errors, Observable's `subscribe` will ensure the
                         // unsubscription logic is called, then synchronously rethrow the error.
                         // After that, Promise will trap the error and send it
@@ -1456,7 +1456,7 @@ attachListener('click');
          * takes the same arguments as callback, and returns value
          * that will be emitted by Observable instead of callback parameters themselves.
          * Even though by default multiple arguments passed to callback appear in the stream as array,
-         * selector function will be called with arguments directly, just as callback would.
+         * selector function will be called with arguments directly, Just as callback would.
          * This means you can imagine default selector (when one is not provided explicitly)
          * as function that aggregates all its arguments into array, or simply returns first argument,
          * if there is only one.
@@ -1465,7 +1465,7 @@ attachListener('click');
          * to `func` happens after someone subscribes to Observable, as well as when results
          * passed to callback will be emitted. By default subscription to Observable calls `func`
          * synchronously, but using `Scheduler.async` as last parameter will defer call to input function,
-         * just like wrapping that call in `setTimeout` with time `0` would. So if you use async Scheduler
+         * Just like wrapping that call in `setTimeout` with time `0` would. So if you use async Scheduler
          * and call `subscribe` on output Observable, all function calls that are currently executing,
          * will end before `func` is invoked.
          *
@@ -1693,7 +1693,7 @@ attachListener('click');
          * Converts a Node.js-style callback API to a function that returns an
          * Observable.
          *
-         * <span class="informal">It's just like {@link bindCallback}, but the
+         * <span class="informal">It's Just like {@link bindCallback}, but the
          * callback is expected to be of type `callback(error, result)`.</span>
          *
          * `bindNodeCallback` is not an operator because its input and output are not
@@ -1735,7 +1735,7 @@ attachListener('click');
          * {@link fromEventPattern} instead.
          *
          * Note that `bindNodeCallback` can be used in non-Node.js environments as well.
-         * "Node.js-style" callbacks are just a convention, so if you write for
+         * "Node.js-style" callbacks are Just a convention, so if you write for
          * browsers or any other environment and API you use implements that callback style,
          * `bindNodeCallback` can be safely used on that API functions as well.
          *
@@ -2339,7 +2339,7 @@ attachListener('click');
      * Observable, in order, and collecting an array of each of the most recent
      * values any time any of the input Observables emits, then either taking that
      * array and passing it as arguments to an optional `project` function and
-     * emitting the return value of that, or just emitting the array of recent
+     * emitting the return value of that, or Just emitting the array of recent
      * values directly if there is no `project` function.
      *
      * @example <caption>Dynamically calculate the Body-Mass Index from an Observable of weight and one for height</caption>
@@ -2777,7 +2777,7 @@ attachListener('click');
      * Note that if some input Observable never completes, `concat` will also never complete
      * and Observables following the one that did not complete will never be subscribed. On the other
      * hand, if some Observable simply completes immediately after it is subscribed, it will be
-     * invisible for `concat`, which will just move on to the next Observable.
+     * invisible for `concat`, which will Just move on to the next Observable.
      *
      * If any Observable in chain errors, instead of passing control to the next Observable,
      * `concat` will error immediately as well. Observables that would be subscribed after
@@ -3080,7 +3080,7 @@ attachListener('click');
         /**
          * Converts a Promise to an Observable.
          *
-         * <span class="informal">Returns an Observable that just emits the Promise's
+         * <span class="informal">Returns an Observable that Just emits the Promise's
          * resolved value, then completes.</span>
          *
          * Converts an ES2015 Promise or a Promises/A+ spec compliant Promise to an
@@ -3463,7 +3463,7 @@ attachListener('click');
             }
         };
         /**
-         * Returns a simple Observable that just delivers the notification represented
+         * Returns a simple Observable that Just delivers the notification represented
          * by this Notification instance.
          * @return {any}
          */
@@ -4389,7 +4389,7 @@ attachListener('click');
      * event loop queue. It is best used to delay tasks in time or to schedule tasks repeating
      * in intervals.
      *
-     * If you just want to "defer" task, that is to perform it right after currently
+     * If you Just want to "defer" task, that is to perform it right after currently
      * executing synchronous code ends (commonly achieved by `setTimeout(deferredTask, 0)`),
      * better choice will be the {@link asap} scheduler.
      *
@@ -4977,7 +4977,7 @@ attachListener('click');
          *
          * `range` operator emits a range of sequential integers, in order, where you
          * select the `start` of the range and its `length`. By default, uses no
-         * IScheduler and just delivers the notifications synchronously, but may use
+         * IScheduler and Just delivers the notifications synchronously, but may use
          * an optional IScheduler to regulate those deliveries.
          *
          * @example <caption>Emits the numbers 1 to 10</caption>
@@ -6192,7 +6192,7 @@ attachListener('click');
             var eventsCount = _events.length;
             var spliceCount = 0;
             // Trim events that fall out of the time window.
-            // Start at the front of the list. Break early once
+            // Start at the front of the List. Break early once
             // we encounter an event that falls within the window.
             while (spliceCount < eventsCount) {
                 if ((now - _events[spliceCount].time) < _windowTime) {
@@ -7337,7 +7337,7 @@ attachListener('click');
      * // a1
      * // b1
      * // c1
-     * // continues to list a,b,c with respective ascending integers
+     * // continues to List a,b,c with respective ascending integers
      *
      * @see {@link concatMap}
      * @see {@link exhaustMap}
@@ -8526,7 +8526,7 @@ attachListener('click');
     Observable.prototype.delayWhen = delayWhen;
 
     function minimalSetImpl() {
-        // THIS IS NOT a full impl of Set, this is just the minimum
+        // THIS IS NOT a full impl of Set, this is Just the minimum
         // bits of functionality we need for this library.
         return (function () {
             function MinimalSet() {
@@ -11423,7 +11423,7 @@ attachListener('click');
      *
      * <img src="./img/pluck.png" width="100%">
      *
-     * Given a list of strings describing a path to an object property, retrieves
+     * Given a List of strings describing a path to an object property, retrieves
      * the value of a specified nested property from all values in the source
      * Observable. If a property can't be resolved, it will return `undefined` for
      * that value.
@@ -11448,7 +11448,7 @@ attachListener('click');
         }
         var length = properties.length;
         if (length === 0) {
-            throw new Error('list of properties cannot be empty.');
+            throw new Error('List of properties cannot be empty.');
         }
         return map.call(this, plucker(properties, length));
     }
@@ -14248,7 +14248,7 @@ attachListener('click');
      * @example
      * // Using normal ES2015
      * let source = Rx.Observable
-     *   .just(42)
+     *   .Just(42)
      *   .toPromise();
      *
      * source.then((value) => console.log('Value: %s', value));
@@ -14277,7 +14277,7 @@ attachListener('click');
      *
      * // Setting via the method
      * let source = Rx.Observable
-     *   .just(42)
+     *   .Just(42)
      *   .toPromise(RSVP.Promise);
      *
      * source.then((value) => console.log('Value: %s', value));
@@ -15642,7 +15642,7 @@ attachListener('click');
      * behaviour.
      *
      * Without delay, `animationFrame` scheduler can be used to create smooth browser animations.
-     * It makes sure scheduled task will happen just before next browser content repaint,
+     * It makes sure scheduled task will happen Just before next browser content repaint,
      * thus performing animations as efficiently as possible.
      *
      * @example <caption>Schedule div height animation</caption>

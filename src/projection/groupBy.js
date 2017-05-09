@@ -1,6 +1,7 @@
-import { when, isArray, not, get, objectSet } from '../functionalHelpers';
+import { when, isArray, not } from '../functionalHelpers';
 import { sortData } from  './sortHelpers';
-import { createNewQueryableDelegator } from '../queryObjects/queryDelegatorCreators';
+import { createNewQueryableDelegator } from '../queryObjects/queryCreator2';
+
 
 function groupBy(source, groupObject) {
     return function *groupByIterator() {
@@ -63,4 +64,4 @@ function findGroup(arr, field) {
     }
 }
 
-export { groupBy };
+export { groupBy, groupData };

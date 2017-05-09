@@ -156,7 +156,7 @@ var objectSet = curry(function _objectSet(prop, val, obj) {
  * @note: @see {@link adjust}
  * @param: {number} idx - The index of the array to which the alternate value will be set.
  * @param: {*} x - The value to be used to update the array at the index specified.
- * @param: {Array} list - The list on which to perform the update.
+ * @param: {Array} List - The List on which to perform the update.
  * @returns: {Array} - Returns a new array with the value at the specified index being
  * set to the value of the 'x' argument.
  */
@@ -165,7 +165,7 @@ var arraySet = curry(function _arraySet(idx, x, list) {
 });
 
 /**
- * compose :: [a] -> (b -> c)
+ * compose :: (b -> c) -> (a -> b) -> (a -> c)
  * @description:
  * @type: {function}
  * @note: @see {@link pipe}
@@ -178,10 +178,10 @@ function compose(...funcs) {
 
 /**
  * pipe :: [a] -> (b -> c)
- * @description: -  Takes a list of functions as arguments and returns
+ * @description: -  Takes a List of functions as arguments and returns
  * a function waiting to be invoked with a single item. Once the returned
- * function is invoked, it will reduce the list of functions over the item,
- * starting with the first function in the list and working through
+ * function is invoked, it will reduce the List of functions over the item,
+ * starting with the first function in the List and working through
  * sequentially. Performs a similar functionality to compose, but applies
  * the functions in reverse order to that of compose.
  * @refer: {compose}
@@ -268,7 +268,7 @@ var whenNot = curry(function _whenNot(predicate, transform, data) {
  * @description:
  * @type: {function}
  * @param: {number} offset
- * @param: {Array} list
+ * @param: {Array} List
  * @return: {*}
  */
 var nth = curry(function nth(offset, list) {
@@ -769,7 +769,7 @@ var mapped = curry(function _mapped(f, x) {
  * what value will be passed as the unary argument to the operator function and what index in the
  * newly created array will be altered. If the value is less than zero, the function will use the
  * 'idx' argument value as an offset from the last element in the array.
- * @param: {Array} list - The list to update.
+ * @param: {Array} List - The List to update.
  * @return: {Array} - Returns a new array identical to the original array except where the new,
  * computed value is inserted
  */

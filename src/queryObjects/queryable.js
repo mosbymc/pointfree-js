@@ -1,10 +1,12 @@
 import { addFront, concat, except, groupJoin, intersect, join, union, zip } from '../collation/collationFunctions';
 import { all, any, contains, first, fold, last, count } from '../evaluation/evaluationFunctions';
 import { distinct, ofType, where } from '../limitation/limitationFunctions';
-import { deepFlatten, deepMap, flatten, groupBy, orderBy, map } from '../projection/projectionFunctions';
+import { deepFlatten, deepMap, flatten, orderBy, map } from '../projection/projectionFunctions';
 import { createNewQueryableDelegator, createNewOrderedQueryableDelegator } from './queryDelegatorCreators';
 import { generatorProto } from '../helpers';
-import { isArray, wrap } from '../functionalHelpers';
+import { isArray, wrap, defaultPredicate, when, not } from '../functionalHelpers';
+
+import { groupData } from '../projection/groupBy';
 
 /**
  * Object that contains the core functionality; both the queryable and orderedQueryable
@@ -79,25 +81,24 @@ var queryable_core = {
         return createNewQueryableDelegator(this, map(this, mapFunc));
     },
 
+    //TODO: see about passing the list creator function to groupBy rather than including groupBy's functionality in this module
     /**
      *
      * @param keySelector
-     * @param comparer
      * @returns {*}
      */
-    groupBy: function _groupBy(keySelector, comparer) {
-        var groupObj = [{ keySelector: keySelector, comparer: comparer, direction: 'asc' }];
+    groupBy: function _groupBy(keySelector) {
+        var groupObj = [{ keySelector: keySelector, direction: 'ascending' }];
         return createNewQueryableDelegator(this, groupBy(this, groupObj));
     },
 
     /**
      *
      * @param keySelector
-     * @param comparer
      * @returns {*}
      */
-    groupByDescending: function _groupByDescending(keySelector, comparer) {
-        var groupObj = [{ keySelector: keySelector, comparer: comparer, direction: 'desc' }];
+    groupByDescending: function _groupByDescending(keySelector) {
+        var groupObj = [{ keySelector: keySelector, direction: 'descending' }];
         return createNewQueryableDelegator(this, groupBy(this, groupObj));
     },
 
@@ -134,7 +135,7 @@ var queryable_core = {
     },
 
     /**
-     * Concatenates two or more lists by appending the "method's" list argument(s) to the
+     * Concatenates two or more lists by appending the "method's" List argument(s) to the
      * queryable's source. This function is a deferred execution call that returns
      * a new queryable object delegator instance that contains all the requisite
      * information on how to perform the operation.
@@ -146,10 +147,10 @@ var queryable_core = {
     },
 
     /**
-     * Produces a list that contains the objectSet difference between the queryable object
-     * and the list that is passed as a function argument. A comparer function may be
+     * Produces a List that contains the objectSet difference between the queryable object
+     * and the List that is passed as a function argument. A comparer function may be
      * provided to the function that determines the equality/inequality of the items in
-     * each list; if left undefined, the function will use a default equality comparer.
+     * each List; if left undefined, the function will use a default equality comparer.
      * This function is a deferred execution call that returns a new queryable
      * object delegator instance that contains all the requisite information on
      * how to perform the operation.
@@ -166,7 +167,7 @@ var queryable_core = {
      * Correlates the items in two lists based on the equality of a key and groups
      * all items that share the same key. A comparer function may be provided to
      * the function that determines the equality/inequality of the items in each
-     * list; if left undefined, the function will use a default equality comparer.
+     * List; if left undefined, the function will use a default equality comparer.
      * This function is a deferred execution call that returns a new queryable
      * object delegator instance that contains all the requisite information on
      * how to perform the operation.
@@ -182,10 +183,10 @@ var queryable_core = {
     },
 
     /**
-     * Produces the objectSet intersection of the queryable object's source and the list
+     * Produces the objectSet intersection of the queryable object's source and the List
      * that is passed as a function argument. A comparer function may be
      * provided to the function that determines the equality/inequality of the items in
-     * each list; if left undefined, the function will use a default equality comparer.
+     * each List; if left undefined, the function will use a default equality comparer.
      * This function is a deferred execution call that returns a new queryable
      * object delegator instance that contains all the requisite information on
      * how to perform the operation.
@@ -199,8 +200,8 @@ var queryable_core = {
 
     /**
      * Correlates the items in two lists based on the equality of items in each
-     * list. A comparer function may be provided to the function that determines
-     * the equality/inequality of the items in each list; if left undefined, the
+     * List. A comparer function may be provided to the function that determines
+     * the equality/inequality of the items in each List; if left undefined, the
      * function will use a default equality comparer. This function is a deferred
      * execution call that returns a new queryable object delegator instance that
      * contains all the requisite information on how to perform the operation.
@@ -218,7 +219,7 @@ var queryable_core = {
     /**
      * Produces the objectSet union of two lists by selecting each unique item in both
      * lists. A comparer function may be provided to the function that determines
-     * the equality/inequality of the items in each list; if left undefined, the
+     * the equality/inequality of the items in each List; if left undefined, the
      * function will use a default equality comparer. This function is a deferred
      * execution call that returns a new queryable object delegator instance that
      * contains all the requisite information on how to perform the operation.
@@ -231,9 +232,9 @@ var queryable_core = {
     },
 
     /**
-     * Produces a list of the items in the queryable object and the list passed as
+     * Produces a List of the items in the queryable object and the List passed as
      * a function argument. A comparer function may be provided to the function that determines
-     * the equality/inequality of the items in each list; if left undefined, the
+     * the equality/inequality of the items in each List; if left undefined, the
      * function will use a default equality comparer. This function is a deferred
      * execution call that returns a new queryable object delegator instance that
      * contains all the requisite information on how to perform the operation.
@@ -586,5 +587,30 @@ var queryable = {
         return createNewQueryableDelegator(null !== source && source[Symbol.iterator] ? Array.from(source) : wrap(source));
     }
 };
+
+
+function groupBy(source, groupObject) {
+    return function *groupByIterator() {
+        //gather all data from the source before grouping
+        var groupedData = nestLists(groupData(when(not(isArray), Array.from, source), groupObject), 0);
+        for (let item of groupedData) yield item;
+    };
+}
+
+function nestLists(data, depth, key) {
+    if (isArray(data)) {
+        data = data.map(function _createLists(item) {
+            if (null != item.key) return nestLists(item, depth + 1, item.key);
+            return item;
+        });
+    }
+    if (0 !== depth) {
+        data = createNewQueryableDelegator(data);
+        data.key = key;
+    }
+    return data;
+}
+
+
 
 export { queryable_core, internal_queryable, internal_orderedQueryable, queryable };

@@ -1,6 +1,6 @@
 import { internal_queryable, internal_orderedQueryable } from './queryable';
 import { generatorProto } from '../helpers';
-import { set, when, compose, isSomething, constant, apply, tap, ifElse } from '../functionalHelpers';
+import { set, when, compose, isSomething, apply, ifElse } from '../functionalHelpers';
 
 
 //=========================================================================================//

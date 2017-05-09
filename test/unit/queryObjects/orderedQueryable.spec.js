@@ -45,8 +45,8 @@ describe('Test orderedQueryable... ', function testOrderedQueryable() {
             queryableReverse = internal_orderedQueryable.reverse(),
             queryableMap = internal_orderedQueryable.map(function (item) { return item; }),
             queryableDeepMap = internal_orderedQueryable.deepMap(function() {}),
-            queryableGroupBy = internal_orderedQueryable.groupBy(function selector(item) { return item.FirstName; }, function comparer(a, b) { return a <= b; }),
-            queryableGroupByDescending = internal_orderedQueryable.groupByDescending(function selector(item) { return item.FirstName; }, function comparer(a, b) { return a <= b; }),
+            queryableGroupBy = internal_orderedQueryable.groupBy(function selector(item) { return item.FirstName; }),
+            queryableGroupByDescending = internal_orderedQueryable.groupByDescending(function selector(item) { return item.FirstName; }),
             queryableFlatten = internal_orderedQueryable.flatten(),
             queryableDeepFlatten = internal_orderedQueryable.deepFlatten();
 

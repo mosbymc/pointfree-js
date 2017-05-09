@@ -6,7 +6,7 @@
   version: 0.0.1
 
   A very first draft to add the ability to sort
-  the "file-list" by the displayed 'numbers' for:
+  the "file-List" by the displayed 'numbers' for:
 
    + lint-errors
    + complexity
@@ -14,14 +14,14 @@
    + estimated errors
 
   A group of buttons is added to the template above
-  to trigger the update of the file-list.
+  to trigger the update of the file-List.
 */
 
 $(function sortable_file_list () {
 
   "use strict";
 
-    var file_list = $('ul.file-list');
+    var file_list = $('ul.file-List');
 
     var files = file_list.find('li');
 
@@ -53,9 +53,9 @@ $(function sortable_file_list () {
         return _sortBy('data-complexity');
     };
 
-    // appends the 'list' of '<li>' elements
+    // appends the 'List' of '<li>' elements
     // to its parent '<ul>'.
-    // @param: a list of '<li>'' elements
+    // @param: a List of '<li>'' elements
     //
     var _update_list = function _update_list (list) {
       file_list.append($(list));

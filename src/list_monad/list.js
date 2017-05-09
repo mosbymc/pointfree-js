@@ -2,11 +2,15 @@ import { addFront, concat, except, groupJoin, intersect, join, union, zip } from
 import { all, any, binary, contains, first, fold, last, count } from '../evaluation/evaluationFunctions';
 import { distinct, ofType, where } from '../limitation/limitationFunctions';
 import { deepFlatten, deepMap, flatMap, flatten, groupBy, orderBy, map } from '../projection/projectionFunctions';
-import { generatorProto, defaultPredicate } from '../helpers';
-import { set, when, isSomething, apply, ifElse, wrap, delegatesFrom } from '../functionalHelpers';
+import { generatorProto } from '../helpers';
+import { set, when, isSomething, apply, ifElse, wrap, delegatesFrom, defaultPredicate } from '../functionalHelpers';
+
+//import { Maybe } from '../maybe_monad/maybe';
+//import { Just } from '../just_monad/just';
+//import { Identity } from '../identity_monad/identity';
 
 /**
- * @description: Object that contains the core functionality of a list; both the m_list and ordered_m_list
+ * @description: Object that contains the core functionality of a List; both the m_list and ordered_m_list
  * objects delegate to this object for all functionality besides orderBy/orderByDescending
  * and thenBy/thenByDescending respectively. Getter/setters are present for state-manipulation
  * at the consumer-object level, as well as to provide default values for a consumer-level
@@ -54,7 +58,7 @@ var list_core = {
     //logic beneath changes
 
     /**
-     * @description: Getter for the underlying source object of the list
+     * @description: Getter for the underlying source object of the List
      * @returns: {*}
      */
     get value() {
@@ -62,7 +66,7 @@ var list_core = {
     },
 
     /**
-     * @description: Setter for the underlying source object of the list
+     * @description: Setter for the underlying source object of the List
      * @param: val
      */
     set value(val) {
@@ -71,13 +75,17 @@ var list_core = {
 
     /**
      * @description: Applies a function contained in another functor to the source
-     * of this list object instance's underlying source. A new list object instance
+     * of this List object instance's underlying source. A new List object instance
      * is returned.
      * @param: ma
      * @return: {*}
      */
     apply: function _apply(ma) {
         return this.map(ma.value);
+    },
+
+    mjoin: function _mjoin() {
+
     },
 
     /**
@@ -155,8 +163,8 @@ var list_core = {
     },
 
     /**
-     * @description: Concatenates two or more lists by appending the "method's" list argument(s) to the
-     * list's value. This function is a deferred execution call that returns
+     * @description: Concatenates two or more lists by appending the "method's" List argument(s) to the
+     * List's value. This function is a deferred execution call that returns
      * a new queryable object delegator instance that contains all the requisite
      * information on how to perform the operation.
      * @param: {Array | *} enumerables
@@ -167,10 +175,10 @@ var list_core = {
     },
 
     /**
-     * @description: Produces a list that contains the objectSet difference between the queryable object
-     * and the list that is passed as a function argument. A comparer function may be
+     * @description: Produces a List that contains the objectSet difference between the queryable object
+     * and the List that is passed as a function argument. A comparer function may be
      * provided to the function that determines the equality/inequality of the items in
-     * each list; if left undefined, the function will use a default equality comparer.
+     * each List; if left undefined, the function will use a default equality comparer.
      * This function is a deferred execution call that returns a new queryable
      * object delegator instance that contains all the requisite information on
      * how to perform the operation.
@@ -187,11 +195,11 @@ var list_core = {
      * @description: Correlates the items in two lists based on the equality of a key and groups
      * all items that share the same key. A comparer function may be provided to
      * the function that determines the equality/inequality of the items in each
-     * list; if left undefined, the function will use a default equality comparer.
+     * List; if left undefined, the function will use a default equality comparer.
      * This function is a deferred execution call that returns a new queryable
      * object delegator instance that contains all the requisite information on
      * how to perform the operation.
-     * @param: {Array|list} inner
+     * @param: {Array|List} inner
      * @param: {function} outerSelector
      * @param: {function} innerSelector
      * @param: {function} projector
@@ -203,10 +211,10 @@ var list_core = {
     },
 
     /**
-     * @description: Produces the objectSet intersection of the list object's value and the list
+     * @description: Produces the objectSet intersection of the List object's value and the List
      * that is passed as a function argument. A comparer function may be
      * provided to the function that determines the equality/inequality of the items in
-     * each list; if left undefined, the function will use a default equality comparer.
+     * each List; if left undefined, the function will use a default equality comparer.
      * This function is a deferred execution call that returns a new queryable
      * object delegator instance that contains all the requisite information on
      * how to perform the operation.
@@ -218,17 +226,14 @@ var list_core = {
         return createListDelegator(this, intersect(this, enumerable, comparer));
     },
 
-    //TODO: need to think of a different name for the .join function property as that is needed
-    //TODO: for monadic functionality. This will also force a renaming of the .groupJoin function
-    //TODO: property.
     /**
      * @description: Correlates the items in two lists based on the equality of items in each
-     * list. A comparer function may be provided to the function that determines
-     * the equality/inequality of the items in each list; if left undefined, the
+     * List. A comparer function may be provided to the function that determines
+     * the equality/inequality of the items in each List; if left undefined, the
      * function will use a default equality comparer. This function is a deferred
      * execution call that returns a new queryable object delegator instance that
      * contains all the requisite information on how to perform the operation.
-     * @param: {Array|list} inner
+     * @param: {Array|List} inner
      * @param: {function} outerSelector
      * @param: {function} innerSelector
      * @param: {function} projector
@@ -242,7 +247,7 @@ var list_core = {
     /**
      * @description: Produces the objectSet union of two lists by selecting each unique item in both
      * lists. A comparer function may be provided to the function that determines
-     * the equality/inequality of the items in each list; if left undefined, the
+     * the equality/inequality of the items in each List; if left undefined, the
      * function will use a default equality comparer. This function is a deferred
      * execution call that returns a new queryable object delegator instance that
      * contains all the requisite information on how to perform the operation.
@@ -255,9 +260,9 @@ var list_core = {
     },
 
     /**
-     * @description: Produces a list of the items in the queryable object and the list passed as
+     * @description: Produces a List of the items in the queryable object and the List passed as
      * a function argument. A comparer function may be provided to the function that determines
-     * the equality/inequality of the items in each list; if left undefined, the
+     * the equality/inequality of the items in each List; if left undefined, the
      * function will use a default equality comparer. This function is a deferred
      * execution call that returns a new queryable object delegator instance that
      * contains all the requisite information on how to perform the operation.
@@ -466,26 +471,74 @@ var list_core = {
 
     /**
      * @description:
+     * @return: {@see _maybe}
+     */
+    /*toMaybe: function _toMaybe() {
+        return Maybe(this.data);
+    },*/
+
+    /**
+     * @description:
+     * @return: {@see _maybe}
+     */
+    /*asMaybe: function _asMaybe() {
+        return Maybe(this);
+    },*/
+
+    /**
+     * @description:
+     * @return: {@see _identity}
+     */
+    /*toIdentity: function _toIdentity() {
+        return Identity(this.data);
+    },*/
+
+    /**
+     * @description:
+     * @return: {@see _identity}
+     */
+    /*asIdentity: function _asIdentity() {
+        return Identity(this);
+    },*/
+
+    /**
+     * @description:
+     * @return: {@see _just}
+     */
+    /*toJust: function _toJust() {
+        return Just(this.data);
+    },*/
+
+    /**
+     * @description:
+     * @return: {@see _just}
+     */
+    /*asJust: function _asJust() {
+        return Just(this);
+    },*/
+
+    /**
+     * @description:
      * @param: {*} item
      * @returns: {m_list}
      */
     of: function _of(item) {
-        return list(item);
+        return List(item);
     },
 
     /**
-     * @description: Evaluates the current list instance and returns a new list
+     * @description: Evaluates the current List instance and returns a new List
      * instance with the evaluated data as its source. This is used when the
-     * initial list's data must be iterated more than once as it will cause
+     * initial List's data must be iterated more than once as it will cause
      * the evaluation to happen each item it is iterated. Rather the pulling the
-     * initial data through the list's 'pipeline' every time, this property will
-     * allow you to evaluate the list's data and store it in a new list that can
+     * initial data through the List's 'pipeline' every time, this property will
+     * allow you to evaluate the List's data and store it in a new List that can
      * be iterated many times without needing to re-evaluate. It is effectively
-     * a syntactical shortcut for: list.from(listInstance.data);
+     * a syntactical shortcut for: List.from(listInstance.data);
      * @returns: {m_list}
      */
     toEvaluatedList: function _toEvaluatedList() {
-        return list.from(this.data /* the .data property is a getter function that forces evaluation */);
+        return List.from(this.data /* the .data property is a getter function that forces evaluation */);
     },
 
     /**
@@ -507,7 +560,7 @@ var list_core = {
     },
 
     /**
-     * @description: Returns a string representation of an instance of a list
+     * @description: Returns a string representation of an instance of a List
      * delegator object. This function does not cause evaluation of the source,
      * but this also means the returned value only reflects the underlying
      * data, not the evaluated data.
@@ -521,14 +574,14 @@ var list_core = {
 /**
  * @description: Performs the same functionality as list_core#contains, but utilizes
  * a binary searching algorithm rather than a sequential search. If this function is called
- * an a non-ordered list, it will internally delegate to list_core#contains instead. This
- * function should not be called on a sorted list for look for a value that is not the
- * primary field on which the list's data is sorted on as an incorrect result will likely
+ * an a non-ordered List, it will internally delegate to list_core#contains instead. This
+ * function should not be called on a sorted List for look for a value that is not the
+ * primary field on which the List's data is sorted on as an incorrect result will likely
  * be returned.
  * @param: {*} val - The value that should be searched for
- * @param: {function} comparer - The function used to compare values in the list to
+ * @param: {function} comparer - The function used to compare values in the List to
  * the 'val' parameter
- * @return {boolean} - Returns true if the list contains the searched for value, false
+ * @return {boolean} - Returns true if the List contains the searched for value, false
  * otherwise.
  */
 list_core.contains.binary = function _binary(val, comparer) {
@@ -538,7 +591,7 @@ list_core.contains.binary = function _binary(val, comparer) {
 /**
  * @description: A list_core delegator object that, in addition to the delegatable functionality
  * it has from the list_core object, also exposes .orderBy and .orderByDescending
- * functions. These functions allow a consumer to sort a list's data by
+ * functions. These functions allow a consumer to sort a List's data by
  * a given key.
  * @type: {list_core}
  */
@@ -579,7 +632,7 @@ var ordered_m_list = Object.create(list_core, {
     _appliedSorts: {
         value: []
     },
-    //In these two functions, feeding the call to "orderBy" with the .value property of the list delegate
+    //In these two functions, feeding the call to "orderBy" with the .value property of the List delegate
     //rather than the delegate itself, effectively excludes the previous call to the orderBy/orderByDescending
     //since the iterator exists on the delegate, not on its value. Each subsequent call to thenBy/thenByDescending
     //will continue to exclude the previous call's iterator... effectively what we're doing is ignoring all the
@@ -653,78 +706,78 @@ function createOrderedList(sorts) {
 }
 
 /**
- * @description: Creator function for list delegate object instances. Creates a m_list delegator
+ * @description: Creator function for List delegate object instances. Creates a m_list delegator
  * if no sort object is passed, otherwise, it will create an ordered_m_list delegator. If no
  * iterator is passed, the delegator will fall back on the delegate's iterator.
- * @param: {*} value - Any value that should be used as the underlying source of the list. It the
+ * @param: {*} value - Any value that should be used as the underlying source of the List. It the
  * value has an iterator it will be accepted as is, if not, it will be wrapped in an array.
  * @param: {generator} iterator - A generator function that should be used as the iterator for
- * the new list delegator instance.
+ * the new List delegator instance.
  * @param: {m_list|ordered_m_list} sortObj - A 'sort object' that the ordered_m_list knows how
- * to utilize when sorting or grouping a list.
+ * to utilize when sorting or grouping a List.
  */
 function createListDelegator(value, iterator, sortObj) {
     return when(isIterator(iterator), setIterator(iterator), setValue(value, create(sortObj)));
 }
 
 /**
- * @description: Creator function for a new list object. Takes any value/type as a parameter
- * and, if it has an iterator defined, with set it as the underlying source of the list as is,
+ * @description: Creator function for a new List object. Takes any value/type as a parameter
+ * and, if it has an iterator defined, with set it as the underlying source of the List as is,
  * or, wrap the item in an array if there is no defined iterator.
- * @param: {*} source - Any type, any value; used as the underlying source of the list
- * @returns: {m_list} - A new list instance with the value provided as the underlying source.
+ * @param: {*} source - Any type, any value; used as the underlying source of the List
+ * @returns: {m_list} - A new List instance with the value provided as the underlying source.
  */
-function list(source) {
+function List(source) {
     //TODO: should I exclude strings from being used as a source directly, or allow it because
     //TODO: they have an iterator?
     return createListDelegator(source && source[Symbol.iterator] ? source : wrap(source));
 }
 
 /**
- * @description: Convenience function for create a new list instance; internally calls list.
- * @see: list
- * @param: {*} source - Any type, any value; used as the underlying source of the list
- * @returns: {m_list} - A new list instance with the value provided as the underlying source.
+ * @description: Convenience function for create a new List instance; internally calls List.
+ * @see: List
+ * @param: {*} source - Any type, any value; used as the underlying source of the List
+ * @returns: {m_list} - A new List instance with the value provided as the underlying source.
  */
-list.from = function _from(source) {
-    return list(source);
+List.from = function _from(source) {
+    return List(source);
 };
 
 /**
- * @description: Alias for list.from
- * @see: list.from
+ * @description: Alias for List.from
+ * @see: List.from
  * @type: {function}
  * @param: {*}
  * @returns: {m_list}
  */
-list.of = list.from;
+List.of = List.from;
 
 /**
  * @description: Extension function that allows new functionality to be applied to
  * the queryable object
- * @param: {string} propName - The name of the new property that should exist on the list; must be unique
- * @param: {function} fn - A function that defines the new list functionality and
- * will be called when this new list property is invoked.
+ * @param: {string} propName - The name of the new property that should exist on the List; must be unique
+ * @param: {function} fn - A function that defines the new List functionality and
+ * will be called when this new List property is invoked.
  *
  * NOTE: The fn parameter must be a non-generator function that takes one or more
- * arguments. If this new list function should be an immediately evaluated
+ * arguments. If this new List function should be an immediately evaluated
  * function (like: take, any, reverse, etc.), it merely needs the accept one or more
  * arguments and know how to iterate the source. In the case of an immediately evaluated
  * function, the return type can be any javascript type. The first argument is always the
- * previous list instance that must be iterated. Additional arguments may be specified
+ * previous List instance that must be iterated. Additional arguments may be specified
  * if desired.
  *
  * If the function's evaluation should be deferred it needs to work a bit differently.
  * In this case, the function should accept one or more arguments, the first and only
- * required argument being the underlying source of the list object. This underlying
+ * required argument being the underlying source of the List object. This underlying
  * source can be anything with an iterator (generator, array, map, set, another queryable).
  * Any additional arguments that the function needs should be specified in the signature.
  * The return value of the function should be a generator that knows how to iterate the
- * underlying source. If the generator should operate like most list functions, i.e.
+ * underlying source. If the generator should operate like most List functions, i.e.
  * take a single item, process it, and then yield it out before asking for the next, a
  * for-of loop is the preferred method for employment. However, if the generator needs
  * all of the underlying data upfront (like orderBy and groupBy), Array.from is the
- * preferred method. Array.from will 'force' all the underlying list instances
+ * preferred method. Array.from will 'force' all the underlying List instances
  * to evaluate their data before it is handed over in full to the generator. The generator
  * can then act with full knowledge of the data and perform whatever operation is needed
  * before ultimately yielding out a single item at a time. If your extension function
@@ -732,7 +785,7 @@ list.of = list.from;
  * function and should be constructed like the immediately evaluated functions described
  * above.
  */
-list.extend = function _extend(propName, fn) {
+List.extend = function _extend(propName, fn) {
     if (!(propName in m_list) && !(propName in ordered_m_list)) {
         list_core[propName] = function(...args) {
             return createListDelegator(this, fn(this, ...args));
@@ -740,4 +793,4 @@ list.extend = function _extend(propName, fn) {
     }
 };
 
-export { list, list_core, m_list, ordered_m_list };
+export { List, list_core, m_list, ordered_m_list };

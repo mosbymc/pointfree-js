@@ -1,5 +1,4 @@
 import { isArray } from '../functionalHelpers';
-import { list_core } from '../list_monad/list';
 
 function deepMap(source, fn) {
     return function *deepMapIterator() {
@@ -67,7 +66,8 @@ function flatMap(source, fn) {
         for (let item of source) {
             if (null != item && item.map && 'function' === typeof item.map) {
                 var res;
-                if (list_core.isPrototypeOf(item)) res = item.map(fn).data;
+                if (item.value && item.value.value) res = item.map(fn).data;
+                //if (list_core.isPrototypeOf(item)) res = item.map(fn).data;
                 else res = item.map(fn);
 
                 yield res;

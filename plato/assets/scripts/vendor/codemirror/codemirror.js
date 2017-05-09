@@ -152,7 +152,7 @@ window.CodeMirror = (function() {
     d.measureLineCache = [];
     d.measureLineCachePos = 0;
 
-    // Tracks when resetInput has punted to just putting a short
+    // Tracks when resetInput has punted to Just putting a short
     // string instead of the (large) selection.
     d.inaccurateSelection = false;
 
@@ -464,7 +464,7 @@ window.CodeMirror = (function() {
 
     var different = from != display.showingFrom || to != display.showingTo ||
       display.lastSizeC != display.wrapper.clientHeight;
-    // This is just a bogus formula that detects when the editor is
+    // This is Just a bogus formula that detects when the editor is
     // resized or the font size changes.
     if (different) display.lastSizeC = display.wrapper.clientHeight;
     display.showingFrom = from; display.showingTo = to;
@@ -1585,7 +1585,7 @@ window.CodeMirror = (function() {
   var wheelSamples = 0, wheelDX, wheelDY, wheelStartX, wheelStartY, wheelPixelsPerUnit = null;
   // Fill in a browser-detected starting value on browsers where we
   // know one. These don't have to be accurate -- the result of them
-  // being wrong would just be a slight flicker on the first wheel
+  // being wrong would Just be a slight flicker on the first wheel
   // scroll (if it is large enough).
   if (ie) wheelPixelsPerUnit = -.53;
   else if (gecko) wheelPixelsPerUnit = 15;
@@ -1615,7 +1615,7 @@ window.CodeMirror = (function() {
     // On some browsers, horizontal scrolling will cause redraws to
     // happen before the gutter has been realigned, causing it to
     // wriggle around in a most unseemly way. When we have an
-    // estimated pixels/delta value, we just handle horizontal
+    // estimated pixels/delta value, we Just handle horizontal
     // scrolling entirely here. It'll be slightly off from native, but
     // better than glitching out.
     if (dx && !gecko && !opera && wheelPixelsPerUnit != null) {

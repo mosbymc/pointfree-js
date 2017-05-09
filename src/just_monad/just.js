@@ -1,4 +1,4 @@
-function just(item) {
+function Just(item) {
     return Object.create(_just, {
         _value: {
             value: item,
@@ -8,8 +8,8 @@ function just(item) {
     });
 }
 
-just.of = function _of(item) {
-    return just(item);
+Just.of = function _of(item) {
+    return Just(item);
 };
 
 var _just = {
@@ -23,13 +23,13 @@ var _just = {
         return ma.map(this.value);
     },
     flatMap: this.map,
-    join: this.map,
+    mjoin: this.map,
     of: function _of(item) {
-        return just.of(item);
+        return Just.of(item);
     },
     toString: function _toString() {
         return `Just(${this.value})`;
     }
 };
 
-export { just, _just };
+export { Just, _just };
