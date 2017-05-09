@@ -13,8 +13,6 @@ describe('Test queryable object function chaining', function testQueryable() {
         var queryRes = createNewQueryableDelegator(testData.dataSource.data)
             .groupBy(function state(item) {
                 return item.State;
-            }, function comparer(a, b) {
-                return a <= b;
             })
             .flatten()
             .intersect(firstThird, function _comparer(a, b) {

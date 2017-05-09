@@ -41,5 +41,8 @@ var _maybe = {
     }
 };
 
+_maybe.chain = _maybe.flatMap;
+_maybe.bind = _maybe.flatMap;
+
 
 export { Maybe, _maybe };

@@ -1,25 +1,24 @@
 import { when, isArray, not } from '../functionalHelpers';
 import { sortData } from  './sortHelpers';
-import { createNewQueryableDelegator } from '../queryObjects/queryCreator2';
 
 
-function groupBy(source, groupObject) {
+function groupBy(source, groupObject, queryableConstructor) {
     return function *groupByIterator() {
         //gather all data from the source before grouping
-        var groupedData = nestLists(groupData(when(not(isArray), Array.from, source), groupObject), 0);
+        var groupedData = nestLists(groupData(when(not(isArray), Array.from, source), groupObject), 0, null, queryableConstructor);
         for (let item of groupedData) yield item;
     };
 }
 
-function nestLists(data, depth, key) {
+function nestLists(data, depth, key, queryableConstructor) {
     if (isArray(data)) {
         data = data.map(function _createLists(item) {
-            if (null != item.key) return nestLists(item, depth + 1, item.key);
+            if (null != item.key) return nestLists(item, depth + 1, item.key, queryableConstructor);
             return item;
         });
     }
     if (0 !== depth) {
-        data = createNewQueryableDelegator(data);
+        data = queryableConstructor(data);
         data.key = key;
     }
     return data;

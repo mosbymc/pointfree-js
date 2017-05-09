@@ -1,12 +1,10 @@
 import { addFront, concat, except, groupJoin, intersect, join, union, zip } from '../collation/collationFunctions';
 import { all, any, contains, first, fold, last, count } from '../evaluation/evaluationFunctions';
 import { distinct, ofType, where } from '../limitation/limitationFunctions';
-import { deepFlatten, deepMap, flatten, orderBy, map } from '../projection/projectionFunctions';
+import { deepFlatten, deepMap, flatten, groupBy, orderBy, map } from '../projection/projectionFunctions';
 import { createNewQueryableDelegator, createNewOrderedQueryableDelegator } from './queryDelegatorCreators';
 import { generatorProto } from '../helpers';
-import { isArray, wrap, defaultPredicate, when, not } from '../functionalHelpers';
-
-import { groupData } from '../projection/groupBy';
+import { isArray, wrap, defaultPredicate } from '../functionalHelpers';
 
 /**
  * Object that contains the core functionality; both the queryable and orderedQueryable
@@ -89,7 +87,7 @@ var queryable_core = {
      */
     groupBy: function _groupBy(keySelector) {
         var groupObj = [{ keySelector: keySelector, direction: 'ascending' }];
-        return createNewQueryableDelegator(this, groupBy(this, groupObj));
+        return createNewQueryableDelegator(this, groupBy(this, groupObj, createNewQueryableDelegator));
     },
 
     /**
@@ -99,7 +97,7 @@ var queryable_core = {
      */
     groupByDescending: function _groupByDescending(keySelector) {
         var groupObj = [{ keySelector: keySelector, direction: 'descending' }];
-        return createNewQueryableDelegator(this, groupBy(this, groupObj));
+        return createNewQueryableDelegator(this, groupBy(this, groupObj), createNewQueryableDelegator);
     },
 
     /**
@@ -587,30 +585,5 @@ var queryable = {
         return createNewQueryableDelegator(null !== source && source[Symbol.iterator] ? Array.from(source) : wrap(source));
     }
 };
-
-
-function groupBy(source, groupObject) {
-    return function *groupByIterator() {
-        //gather all data from the source before grouping
-        var groupedData = nestLists(groupData(when(not(isArray), Array.from, source), groupObject), 0);
-        for (let item of groupedData) yield item;
-    };
-}
-
-function nestLists(data, depth, key) {
-    if (isArray(data)) {
-        data = data.map(function _createLists(item) {
-            if (null != item.key) return nestLists(item, depth + 1, item.key);
-            return item;
-        });
-    }
-    if (0 !== depth) {
-        data = createNewQueryableDelegator(data);
-        data.key = key;
-    }
-    return data;
-}
-
-
 
 export { queryable_core, internal_queryable, internal_orderedQueryable, queryable };

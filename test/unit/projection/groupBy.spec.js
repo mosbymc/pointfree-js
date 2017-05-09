@@ -1,4 +1,5 @@
 import { groupBy } from '../../../src/projection/groupBy';
+import { createNewQueryableDelegator } from '../../../src/queryObjects/queryDelegatorCreators';
 import { sortDirection } from '../../../src/helpers';
 import { testData } from '../../testData';
 
@@ -53,8 +54,9 @@ testData.dataSource.data.forEach(function _findUniqueStates(item) {
 describe('Test groupBy...', function testGroupBy() {
     describe('...using arrays', function testGroupByUsingArrays() {
         it('should group test data by state descending', function testGroupByOnStateDescending() {
+            console.log(createNewQueryableDelegator);
             var groupObj = [ { keySelector: stateSelector, comparer: comparer, direction: sortDirection.descending } ],
-                groupByIterable = groupBy(testData.dataSource.data, groupObj),
+                groupByIterable = groupBy(testData.dataSource.data, groupObj, createNewQueryableDelegator),
                 groupByRes = Array.from(groupByIterable());
 
             groupByRes.should.have.lengthOf(uniqueStates.length);
@@ -70,7 +72,7 @@ describe('Test groupBy...', function testGroupBy() {
 
         it('should group test data by state ascending', function testGroupByOnStateAscending() {
             var groupObj = [ { keySelector: stateSelector, comparer: comparer, direction: sortDirection.ascending } ],
-                groupByIterable = groupBy(testData.dataSource.data, groupObj),
+                groupByIterable = groupBy(testData.dataSource.data, groupObj, createNewQueryableDelegator),
                 groupByRes = Array.from(groupByIterable());
 
             groupByRes.should.have.lengthOf(uniqueStates.length);
@@ -90,7 +92,7 @@ describe('Test groupBy...', function testGroupBy() {
                 { keySelector: lastNameSelector, direction: sortDirection.descending },
                 { keySelector: firstNameSelector, direction: sortDirection.descending }
             ];
-            var groupByIterable = groupBy(testData.dataSource.data, groupObj),
+            var groupByIterable = groupBy(testData.dataSource.data, groupObj, createNewQueryableDelegator),
                 groupByRes = Array.from(groupByIterable());
 
             groupByRes.should.have.lengthOf(uniqueStates.length);

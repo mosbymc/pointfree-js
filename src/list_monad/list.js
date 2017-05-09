@@ -84,6 +84,10 @@ var list_core = {
         return this.map(ma.value);
     },
 
+    /**
+     * @description:
+     * @return: {@see list_core}
+     */
     mjoin: function _mjoin() {
 
     },
@@ -113,8 +117,8 @@ var list_core = {
      * @returns: {m_list}
      */
     groupBy: function _groupBy(keySelector, comparer) {
-        var groupObj = [{ keySelector: keySelector, comparer: comparer, direction: 'asc' }];
-        return createListDelegator(this, groupBy(this, groupObj));
+        var groupObj = [{ keySelector: keySelector, comparer: comparer, direction: 'ascending' }];
+        return createListDelegator(this, groupBy(this, groupObj, createGroupedListDelegator));
     },
 
     /**
@@ -124,8 +128,8 @@ var list_core = {
      * @returns: {*}
      */
     groupByDescending: function _groupByDescending(keySelector, comparer) {
-        var groupObj = [{ keySelector: keySelector, comparer: comparer, direction: 'desc' }];
-        return createListDelegator(this, groupBy(this, groupObj));
+        var groupObj = [{ keySelector: keySelector, comparer: comparer, direction: 'descending' }];
+        return createListDelegator(this, groupBy(this, groupObj, createGroupedListDelegator));
     },
 
     /**
@@ -685,6 +689,10 @@ var setValue = set('value'),
     isIterator = apply(delegatesFrom(generatorProto)),
     create = ifElse(isSomething, createOrderedList, createList);
 
+/**
+ * @description:
+ * @return: {@see m_list}
+ */
 function createList() {
     return Object.create(m_list, {
         data: {
@@ -695,6 +703,11 @@ function createList() {
     });
 }
 
+/**
+ * @description:
+ * @param: {Array} sorts
+ * @return: {@see ordered_m_list}
+ */
 function createOrderedList(sorts) {
     return set('_appliedSorts', sorts, Object.create(ordered_m_list, {
         data: {
@@ -703,6 +716,31 @@ function createOrderedList(sorts) {
             }
         }
     }));
+}
+
+/**
+ * @description:
+ * @param: {*} val
+ * @return: {m_list}
+ */
+function createGroupedList(val) {
+    return Object.create(m_list, {
+        data: {
+            get: function _getData() {
+                return Array.from(this);
+            }
+        },
+        _key: {
+            value: val,
+            writable: false,
+            configurable: false
+        },
+        key: {
+            get: function _getKey() {
+                return this._key;
+            }
+        }
+    })
 }
 
 /**
@@ -718,6 +756,17 @@ function createOrderedList(sorts) {
  */
 function createListDelegator(value, iterator, sortObj) {
     return when(isIterator(iterator), setIterator(iterator), setValue(value, create(sortObj)));
+}
+
+/**
+ * @description:
+ * @param: {*} value
+ * @param: {function} iterator
+ * @param: {string} key
+ * @return: {@see m_list}
+ */
+function createGroupedListDelegator(value, iterator, key) {
+    return when(isIterator(iterator), setIterator(iterator), setValue(value, createGroupedList(key)));
 }
 
 /**
