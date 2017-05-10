@@ -79,7 +79,6 @@ var queryable_core = {
         return createNewQueryableDelegator(this, map(this, mapFunc));
     },
 
-    //TODO: see about passing the list creator function to groupBy rather than including groupBy's functionality in this module
     /**
      *
      * @param keySelector

@@ -2,6 +2,12 @@ import { when, not, isArray, strictEqual, delegatesTo, isObject, ifElse } from '
 import { javaScriptTypes, cacher } from '../helpers';
 import { sortData } from  '../projection/sortHelpers';
 
+/**
+ * @description:
+ * @param: {iterable} source
+ * @param {iterable} enumerable
+ * @return {generator}
+ */
 function addFront(source, enumerable) {
     return function *addFront() {
         enumerable = when(not(isArray), Array.from, enumerable);
@@ -15,6 +21,13 @@ function addFront(source, enumerable) {
     };
 }
 
+/**
+ * @description:
+ * @param: {iterable} source
+ * @param: {Array} enumerables
+ * @param: {number} argsCount
+ * @return {generator}
+ */
 function concat(source, enumerables, argsCount) {
     return function *concatIterator() {
         for (let item of source) {
@@ -39,6 +52,13 @@ function concat(source, enumerables, argsCount) {
     };
 }
 
+/**
+ * @description:
+ * @param: {iterable} source
+ * @param: {iterable} enumerable
+ * @param: {function} comparer
+ * @return {generator}
+ */
 function except(source, enumerable, comparer = strictEqual) {
     return function *exceptIterator() {
         var res;
@@ -52,6 +72,16 @@ function except(source, enumerable, comparer = strictEqual) {
     };
 }
 
+/**
+ * @description:
+ * @param: {iterable} outer
+ * @param: {iterable} inner
+ * @param: {function} outerSelector
+ * @param: {function} innerSelector
+ * @param: {function} projector
+ * @param: {function} comparer
+ * @return {generator}
+ */
 function groupJoin(outer, inner, outerSelector, innerSelector, projector, comparer = strictEqual) {
     return function *groupJoinIterator() {
         var innerGroups = [];
@@ -80,6 +110,13 @@ function groupJoin(outer, inner, outerSelector, innerSelector, projector, compar
     };
 }
 
+/**
+ * @description:
+ * @param: {iterable} source
+ * @param: {iterable} enumerable
+ * @param: {function} comparer
+ * @return {generator}
+ */
 function intersect(source, enumerable, comparer = strictEqual) {
     return function *intersectIterator() {
         enumerable = when(not(isArray), Array.from, enumerable);
@@ -94,6 +131,16 @@ function intersect(source, enumerable, comparer = strictEqual) {
     };
 }
 
+/**
+ * @description:
+ * @param: {iterable} outer
+ * @param: {iterable} inner
+ * @param: {function} outerSelector
+ * @param: {function} innerSelector
+ * @param: {function} projector
+ * @param: {function} comparer
+ * @return {generator}
+ */
 function join(outer, inner, outerSelector, innerSelector, projector, comparer = strictEqual) {
     return function *joinIterator() {
         inner = when(not(isArray), Array.from, inner);
@@ -109,6 +156,13 @@ function join(outer, inner, outerSelector, innerSelector, projector, comparer = 
     };
 }
 
+/**
+ * @description:
+ * @param: {iterable} source
+ * @param: {iterable} enumerable
+ * @param: {function} comparer
+ * @return {generator}
+ */
 function union(source, enumerable, comparer = strictEqual) {
     var isInCache = cacher(comparer);
 
@@ -124,6 +178,13 @@ function union(source, enumerable, comparer = strictEqual) {
     };
 }
 
+/**
+ * @description:
+ * @param: {iterable} source
+ * @param: {iterable} enumerable
+ * @param: {function} selector
+ * @return {generator}
+ */
 function zip(source, enumerable, selector) {
     return function *zipIterator() {
         var res,
@@ -141,18 +202,37 @@ function zip(source, enumerable, selector) {
     };
 }
 
+/**
+ * @description:
+ * @param: {iterable} source
+ * @param: {function} predicate
+ * @return: {boolean}
+ */
 function all(source, predicate) {
     if (javaScriptTypes.function !== typeof predicate)
         return false;
     return Array.from(source).every(predicate);
 }
 
+/**
+ * @description:
+ * @param: {iterable} source
+ * @param: {function} predicate
+ * @return: {boolean}
+ */
 function any(source, predicate) {
     if (javaScriptTypes.function !== typeof predicate)
         return Array.from(source).length > 0;
     return Array.from(source).some(predicate);
 }
 
+/**
+ * @description:
+ * @param: {iterable} source
+ * @param: {*} val
+ * @param: {function} comparer
+ * @return: {*}
+ */
 function contains(source, val, comparer) {
     source = when(not(isArray), Array.from, source);
     if (javaScriptTypes.undefined === typeof comparer)
@@ -162,6 +242,12 @@ function contains(source, val, comparer) {
     });
 }
 
+/**
+ * @description:
+ * @param: {iterable} source
+ * @param: {function} predicate
+ * @return {Number}
+ */
 function count(source, predicate) {
     if (javaScriptTypes.undefined === typeof predicate)
         return Array.from(source).length;
@@ -170,16 +256,35 @@ function count(source, predicate) {
     }).length;
 }
 
+/**
+ * @description:
+ * @param: {iterable} source
+ * @param: {function} predicate
+ * @return {*}
+ */
 function first(source, predicate) {
     if (javaScriptTypes.function === typeof predicate)
         return Array.from(source).find(predicate);
     return Array.from(source)[0];
 }
 
+/**
+ * @description:
+ * @param: {iterable} source
+ * @param: {function} fn
+ * @param: {*} initial
+ * @return: {*}
+ */
 function fold(source, fn, initial = 0) {
     return when(not(isArray), Array.from, source).reduce(fn, initial);
 }
 
+/**
+ * @description:
+ * @param: {iterable} source
+ * @param: {function} predicate
+ * @return: {*}
+ */
 function last(source, predicate) {
     var data = Array.from(source);
     if (javaScriptTypes.function === typeof predicate)
@@ -187,6 +292,12 @@ function last(source, predicate) {
     return data[data.length - 1];
 }
 
+/**
+ * @description:
+ * @param: {iterable} source
+ * @param: {function} comparer
+ * @return: {generator}
+ */
 function distinct(source, comparer = strictEqual) {
     var isInCache = cacher(comparer);
 
@@ -197,6 +308,12 @@ function distinct(source, comparer = strictEqual) {
     };
 }
 
+/**
+ * @description:
+ * @param: {iterable} source
+ * @param: {string} dataType
+ * @return: {generator}
+ */
 function ofType(source, dataType) {
     return function *ofTypeIterator() {
         function _checkTypeKeys(key) {
@@ -236,6 +353,12 @@ function ofType(source, dataType) {
     };
 }
 
+/**
+ * @description:
+ * @param: {iterable} source
+ * @param: {function} predicate
+ * @return: {generator}
+ */
 function where(source, predicate) {
     return function *whereIterator() {
         for (let item of source) {
@@ -244,6 +367,11 @@ function where(source, predicate) {
     };
 }
 
+/**
+ * @description:
+ * @param: {iterable} source
+ * @return: {generator}
+ */
 function deepFlatten(source) {
     return function *iterator() {
         var unyieldedData = [],
@@ -260,22 +388,42 @@ function deepFlatten(source) {
     };
 }
 
+/**
+ * @description:
+ * @param: {*} data
+ * @return:
+ */
 function flatteningFunc(data) {
     return ifElse(isArray, mapData, when(isObject, when(objectContainsOnlyArrays, getObjectKeysAsArray)), data);
 }
 
+/**
+ * @description:
+ * @param: {*} data
+ * @return: {*}
+ */
 function mapData(data) {
     return Array.prototype.concat.apply([], data.map(function flattenArray(item) {
         return flatteningFunc(item);
     }));
 }
 
+/**
+ * @description:
+ * @param: {*} data
+ * @return: {Array}
+ */
 function getObjectKeysAsArray(data) {
     return Object.keys(data).map(function _flattenKeys(key) {
         return flatteningFunc(data[key]);
     });
 }
 
+/**
+ * @description:
+ * @param: {*} data
+ * @return: {boolean}
+ */
 function objectContainsOnlyArrays(data) {
     return Object.keys(data).every(function _isMadeOfArrays(key) {
         return isArray(data[key]);
@@ -304,6 +452,11 @@ function flatMap(source, fn) {
     };
 }
 
+/**
+ * @description:
+ * @param: {iterable} source
+ * @return: {generator}
+ */
 function flatten(source) {
     return function *flattenIterator() {
         var unyieldedData = [];
@@ -318,6 +471,13 @@ function flatten(source) {
     };
 }
 
+/**
+ * @description:
+ * @param: {iterable} source
+ * @param: {object} groupObject
+ * @param: {function} queryableConstructor
+ * @return: {generator}
+ */
 function groupBy(source, groupObject, queryableConstructor) {
     return function *groupByIterator() {
         //gather all data from the source before grouping
@@ -326,6 +486,14 @@ function groupBy(source, groupObject, queryableConstructor) {
     };
 }
 
+/**
+ * @description:
+ * @param: {*} data
+ * @param: {number} depth
+ * @param: {string} key
+ * @param: {function} queryableConstructor
+ * @return {Array}
+ */
 function nestLists(data, depth, key, queryableConstructor) {
     if (isArray(data)) {
         data = data.map(function _createLists(item) {
@@ -340,6 +508,12 @@ function nestLists(data, depth, key, queryableConstructor) {
     return data;
 }
 
+/**
+ * @description:
+ * @param: {*} data
+ * @param: {object} groupObject
+ * @return: {Array}
+ */
 function groupData(data, groupObject) {
     var sortedData = sortData(data, groupObject),
         retData = [];
@@ -354,6 +528,12 @@ function groupData(data, groupObject) {
     return retData;
 }
 
+/**
+ * @description:
+ * @param: {Array} arr
+ * @param: {string} field
+ * @return: {Array}
+ */
 function findGroup(arr, field) {
     var grp;
     if (arr.some(function _findGroup(group) {
@@ -372,6 +552,12 @@ function findGroup(arr, field) {
     }
 }
 
+/**
+ * @description:
+ * @param: {iterable} source
+ * @param: {function} fn
+ * @return: {generator}
+ */
 function map(source, fn) {
     return function *mapIterator() {
         for (let item of source) {
@@ -381,6 +567,13 @@ function map(source, fn) {
     };
 }
 
+/**
+ * @description:
+ * @param: {iterable} source
+ * @param: {Array} orderObject
+ * @param: {function} comparer
+ * @return: {generator}
+ */
 function orderBy(source, orderObject, comparer) {
     return function *orderByIterator() {
         //gather all data from the source before sorting

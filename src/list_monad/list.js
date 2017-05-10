@@ -2,7 +2,7 @@ import { addFront, concat, except, groupJoin, intersect, join, union, zip } from
 import { all, any, binary, contains, first, fold, last, count } from '../evaluation/evaluationFunctions';
 import { distinct, ofType, where } from '../limitation/limitationFunctions';
 import { deepFlatten, deepMap, flatMap, flatten, groupBy, orderBy, map } from '../projection/projectionFunctions';
-import { generatorProto } from '../helpers';
+import { generatorProto, sortDirection } from '../helpers';
 import { set, when, isSomething, apply, ifElse, wrap, delegatesFrom, defaultPredicate } from '../functionalHelpers';
 
 //import { Maybe } from '../maybe_monad/maybe';
@@ -117,7 +117,7 @@ var list_core = {
      * @returns: {m_list}
      */
     groupBy: function _groupBy(keySelector, comparer) {
-        var groupObj = [{ keySelector: keySelector, comparer: comparer, direction: 'ascending' }];
+        var groupObj = [{ keySelector: keySelector, comparer: comparer, direction: sortDirection.ascending }];
         return createListDelegator(this, groupBy(this, groupObj, createGroupedListDelegator));
     },
 
@@ -128,7 +128,7 @@ var list_core = {
      * @returns: {*}
      */
     groupByDescending: function _groupByDescending(keySelector, comparer) {
-        var groupObj = [{ keySelector: keySelector, comparer: comparer, direction: 'descending' }];
+        var groupObj = [{ keySelector: keySelector, comparer: comparer, direction: sortDirection.descending }];
         return createListDelegator(this, groupBy(this, groupObj, createGroupedListDelegator));
     },
 
@@ -608,7 +608,7 @@ var m_list = Object.create(list_core, {
      */
     orderBy: {
         value: function _orderBy(keySelector, comparer) {
-            var sortObj = [{ keySelector: keySelector, comparer: comparer, direction: 'asc' }];
+            var sortObj = [{ keySelector: keySelector, comparer: comparer, direction: sortDirection.ascending }];
             return createListDelegator(this, orderBy(this, sortObj), sortObj);
         }
     },
@@ -620,7 +620,7 @@ var m_list = Object.create(list_core, {
      */
     orderByDescending: {
         value: function _orderByDescending(keySelector, comparer) {
-            var sortObj = [{ keySelector: keySelector, comparer: comparer, direction: 'desc' }];
+            var sortObj = [{ keySelector: keySelector, comparer: comparer, direction: sortDirection.descending }];
             return createListDelegator(this, orderBy(this, sortObj), sortObj);
         }
     }
@@ -650,7 +650,7 @@ var ordered_m_list = Object.create(list_core, {
      */
     thenBy: {
         value: function _thenBy(keySelector, comparer) {
-            var sortObj = this._appliedSorts.concat({ keySelector: keySelector, comparer: comparer, direction: 'asc' });
+            var sortObj = this._appliedSorts.concat({ keySelector: keySelector, comparer: comparer, direction: sortDirection.ascending });
             return createListDelegator(this.value, orderBy(this, sortObj), sortObj);
         }
     },
@@ -662,7 +662,7 @@ var ordered_m_list = Object.create(list_core, {
      */
     thenByDescending: {
         value: function thenByDescending(keySelector, comparer) {
-            var sortObj = this._appliedSorts.concat({ keySelector: keySelector, comparer: comparer, direction: 'desc' });
+            var sortObj = this._appliedSorts.concat({ keySelector: keySelector, comparer: comparer, direction: sortDirection.descending });
             return createListDelegator(this.value, orderBy(this, sortObj), sortObj);
         }
     }
