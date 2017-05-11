@@ -69,7 +69,7 @@ var mcompose = function _mcompose(f, g) {
  * @param: {function} f
  * @param: {functor} m1
  * @param: {functor} m2
- * @return:
+ * @return: {Mb}
  */
 var lift2 = curry(function _lift2(f, m1, m2) {
     return m1.map(f).apply(m2);
@@ -82,7 +82,7 @@ var lift2 = curry(function _lift2(f, m1, m2) {
  * @param: {functor} m1
  * @param: {functor} m2
  * @param: {functor} m3
- * @return:
+ * @return: {Mb}
  */
 var lift3 = curry(function _lift3(f, m1, m2, m3) {
     return lift2(f, m1, m2).apply(m3);
@@ -96,7 +96,7 @@ var lift3 = curry(function _lift3(f, m1, m2, m3) {
  * @param: {functor} m2
  * @param: {functor} m3
  * @param: {functor} m4
- * @return:
+ * @return: {Mb}
  */
 var lift4 = curry(function _lift4(f, m1, m2, m3, m4) {
     return lift3(f, m1, m2, m3).apply(m4);
@@ -107,7 +107,7 @@ var lift4 = curry(function _lift4(f, m1, m2, m3, m4) {
  * @type: {function}
  * @param: {function} f
  * @param: {Ma} ...ms
- * @return:
+ * @return: {Mb}
  */
 var liftN = curry(function _liftN(f, ...ms) {
     return ms.slice(1).reduce(function _apply(curM, nextM) {
@@ -115,20 +115,19 @@ var liftN = curry(function _liftN(f, ...ms) {
     }, ms.shift().map(f));
 });
 
-//TODO: seems like mjoin may require that both outer and inner containers be of same type
 /**
  * @description:
- * @param: {functor} m
+ * @param: {functor} ma
  * @return: {functor}
  */
-function mjoin(m) {
-    return m.join();
+function mjoin(ma) {
+    return ma.join();
 }
 
 /**
  * @description:
  * @param: {functor} ma
- * @return {@see m_list}
+ * @return: {@see m_list}
  */
 function toList(ma) {
     return List(mjoin(ma));
@@ -137,7 +136,7 @@ function toList(ma) {
 /**
  * @description:
  * @param: {functor} ma
- * @return {@see _maybe}
+ * @return: {@see _maybe}
  */
 function toMaybe(ma) {
     return Maybe(mjoin(ma));
@@ -146,7 +145,7 @@ function toMaybe(ma) {
 /**
  * @description:
  * @param: {functor} ma
- * @return {@see _future}
+ * @return: {@see _future}
  */
 function toFuture(ma) {
     return Future(mjoin(ma));
@@ -155,7 +154,7 @@ function toFuture(ma) {
 /**
  * @description:
  * @param: {functor} ma
- * @return {@see _identity}
+ * @return: {@see _identity}
  */
 function toIdentity(ma) {
     return Identity(mjoin(ma));
@@ -164,7 +163,7 @@ function toIdentity(ma) {
 /**
  * @description:
  * @param: {functor} ma
- * @return {@see _just}
+ * @return: {@see _just}
  */
 function toJust(ma) {
     return Just(mjoin(ma));

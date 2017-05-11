@@ -1,7 +1,5 @@
-import { addFront, concat, except, groupJoin, intersect, join, union, zip } from '../collation/collationFunctions';
-import { all, any, binary, contains, first, fold, last, count } from '../evaluation/evaluationFunctions';
-import { distinct, ofType, where } from '../limitation/limitationFunctions';
-import { deepFlatten, deepMap, flatMap, flatten, groupBy, orderBy, map } from '../projection/projectionFunctions';
+import { all, any, except, intersect, union, map, flatMap, groupBy, orderBy, addFront, concat, groupJoin, join,
+    zip, where, contains, first, last, count, fold, distinct, ofType } from './list_iterators';
 import { generatorProto, sortDirection } from '../helpers';
 import { set, when, isSomething, apply, ifElse, wrap, delegatesFrom, defaultPredicate } from '../functionalHelpers';
 
