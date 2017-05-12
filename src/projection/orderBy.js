@@ -5,7 +5,8 @@ import { javaScriptTypes } from '../helpers';
 function orderBy(source, orderObject, comparer) {
     return function *orderByIterator() {
         //gather all data from the source before sorting
-        var orderedData = sortData(when(not(isArray), Array.from, source), orderObject, comparer);
+        orderObject.comparer = comparer;
+        var orderedData = sortData(when(not(isArray), Array.from, source), orderObject);
         for (let item of orderedData) {
             if (javaScriptTypes.undefined !== typeof item) yield item;
         }

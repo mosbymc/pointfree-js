@@ -1,11 +1,11 @@
-import { all, any, except, intersect, union, map, flatMap, groupBy, orderBy, addFront, concat, groupJoin, join,
-    zip, where, contains, first, last, count, fold, distinct, ofType } from './list_iterators';
+import { all, any, except, intersect, union, map, flatMap, groupBy, sortBy, addFront, concat, groupJoin, join, zip, filter,
+    contains, first, last, count, fold, distinct, ofType, binarySearch, equals, take, takeWhile, skip, skipWhile, reverse } from './list_iterators';
 import { generatorProto, sortDirection } from '../helpers';
-import { set, when, isSomething, apply, ifElse, wrap, delegatesFrom, defaultPredicate } from '../functionalHelpers';
+import { set, when, isSomething, apply, ifElse, wrap, delegatesFrom, defaultPredicate, delegatesTo, not, isArray } from '../functionalHelpers';
 
-//import { Maybe } from '../maybe_monad/maybe';
-//import { Just } from '../just_monad/just';
-//import { Identity } from '../identity_monad/identity';
+import { Maybe } from '../maybe_monad/maybe';
+import { Just } from '../just_monad/just';
+import { Identity } from '../identity_monad/identity';
 
 /**
  * @description: Object that contains the core functionality of a List; both the m_list and ordered_m_list
@@ -19,9 +19,7 @@ import { set, when, isSomething, apply, ifElse, wrap, delegatesFrom, defaultPred
  * map: list_core._map,
  * groupBy: list_core._groupBy,
  * groupByDescending: list_core._groupByDescending,
- * flatten: list_core._flatten,
- * deepFlatten: list_core._deepFlatten,
- * deepMap: list_core._deepMap,
+ * flatMap: list_core._flatMap,
  * addFront: list_core._addFront,
  * concat: list_core._concat,
  * except: list_core._except,
@@ -57,7 +55,7 @@ var list_core = {
 
     /**
      * @description: Getter for the underlying source object of the List
-     * @returns: {*}
+     * @return: {*}
      */
     get value() {
         return this._value;
@@ -75,8 +73,8 @@ var list_core = {
      * @description: Applies a function contained in another functor to the source
      * of this List object instance's underlying source. A new List object instance
      * is returned.
-     * @param: ma
-     * @return: {*}
+     * @param: {monad} ma
+     * @return: {@see m_list}
      */
     apply: function _apply(ma) {
         return this.map(ma.value);
@@ -84,16 +82,26 @@ var list_core = {
 
     /**
      * @description:
-     * @return: {@see list_core}
+     * @return: {@see m_list}
      */
     mjoin: function _mjoin() {
+        return list_core.isPrototypeOf(this.value) ? this.value : List.of(this.value);
+    },
 
+    /**
+     * @description:
+     * @param: {@see list_core} ma
+     * @param: {function} comparer
+     * @return: {boolean}
+     */
+    equals: function _equals(ma, comparer) {
+        return list_core.isPrototypeOf(ma) && equals(this, ma, comparer);
     },
 
     /**
      * @description:
      * @param: {function} mapFunc
-     * @returns: {*}
+     * @return: {@see m_list}
      */
     map: function _map(mapFunc) {
         return createListDelegator(this, map(this, mapFunc));
@@ -101,18 +109,9 @@ var list_core = {
 
     /**
      * @description:
-     * @param: {function} fn
-     * @return: {*}
-     */
-    flatMap: function _flatMap(fn) {
-        return createListDelegator(this, flatMap(this, fn));
-    },
-
-    /**
-     * @description:
      * @param: {function} keySelector
      * @param: {function} comparer
-     * @returns: {m_list}
+     * @return: {@see m_list}
      */
     groupBy: function _groupBy(keySelector, comparer) {
         var groupObj = [{ keySelector: keySelector, comparer: comparer, direction: sortDirection.ascending }];
@@ -123,7 +122,7 @@ var list_core = {
      * @description:
      * @param: {function} keySelector
      * @param: {function} comparer
-     * @returns: {*}
+     * @return: {@see m_list}
      */
     groupByDescending: function _groupByDescending(keySelector, comparer) {
         var groupObj = [{ keySelector: keySelector, comparer: comparer, direction: sortDirection.descending }];
@@ -132,33 +131,17 @@ var list_core = {
 
     /**
      * @description:
-     * @returns:
-     */
-    flatten: function _flatten() {
-        return createListDelegator(this, flatten(this));
-    },
-
-    /**
-     * @description:
-     * @returns:
-     */
-    deepFlatten: function _deepFlatten() {
-        return createListDelegator(this, deepFlatten(this));
-    },
-
-    /**
-     * @description:
      * @param: {function} fn
-     * @returns: {*}
+     * @return: {@see m_list}
      */
-    deepMap: function _deepMap(fn) {
-        return createListDelegator(this, deepMap(this, fn));
+    flatMap: function _flatMap(fn) {
+        return createListDelegator(this, flatMap(this, fn));
     },
 
     /**
      * @description:
-     * @param: enumerable
-     * @returns: {*}
+     * @param: {iterable} enumerable
+     * @return: {@see m_list}
      */
     addFront: function _addFront(enumerable) {
         return createListDelegator(this, addFront(this, enumerable));
@@ -170,7 +153,7 @@ var list_core = {
      * a new queryable object delegator instance that contains all the requisite
      * information on how to perform the operation.
      * @param: {Array | *} enumerables
-     * @returns: {*}
+     * @return: {@see m_list}
      */
     concat: function _concat(...enumerables) {
         return createListDelegator(this, concat(this, enumerables, enumerables.length));
@@ -185,9 +168,9 @@ var list_core = {
      * object delegator instance that contains all the requisite information on
      * how to perform the operation.
      * equality comparer.
-     * @param: enumerable
+     * @param: {iterable} enumerable
      * @param: {function} comparer
-     * @returns: {*}
+     * @return: {@see m_list}
      */
     except: function _except(enumerable, comparer) {
         return createListDelegator(this, except(this, enumerable, comparer));
@@ -201,12 +184,12 @@ var list_core = {
      * This function is a deferred execution call that returns a new queryable
      * object delegator instance that contains all the requisite information on
      * how to perform the operation.
-     * @param: {Array|List} inner
+     * @param: {@see list_core | Array} inner
      * @param: {function} outerSelector
      * @param: {function} innerSelector
      * @param: {function} projector
      * @param: {function} comparer
-     * @returns: {*}
+     * @return: {@see m_list}
      */
     groupJoin: function _groupJoin(inner, outerSelector, innerSelector, projector, comparer) {
         return createListDelegator(this, groupJoin(this, inner, outerSelector, innerSelector, projector, comparer));
@@ -220,9 +203,9 @@ var list_core = {
      * This function is a deferred execution call that returns a new queryable
      * object delegator instance that contains all the requisite information on
      * how to perform the operation.
-     * @param: enumerable
+     * @param: {iterable} enumerable
      * @param: {function} comparer
-     * @returns: {*}
+     * @return: {@see m_list}
      */
     intersect: function _intersect(enumerable, comparer) {
         return createListDelegator(this, intersect(this, enumerable, comparer));
@@ -240,7 +223,7 @@ var list_core = {
      * @param: {function} innerSelector
      * @param: {function} projector
      * @param: {function} comparer
-     * @returns: {*}
+     * @return: {@see m_list}
      */
     join: function _join(inner, outerSelector, innerSelector, projector, comparer) {
         return createListDelegator(this, join(this, inner, outerSelector, innerSelector, projector, comparer));
@@ -253,9 +236,9 @@ var list_core = {
      * function will use a default equality comparer. This function is a deferred
      * execution call that returns a new queryable object delegator instance that
      * contains all the requisite information on how to perform the operation.
-     * @param: enumerable
+     * @param: {iterable} enumerable
      * @param: {function} comparer
-     * @returns: {*}
+     * @return: {@see m_list}
      */
     union: function _union(enumerable, comparer) {
         return createListDelegator(this, union(this, enumerable, comparer));
@@ -269,8 +252,8 @@ var list_core = {
      * execution call that returns a new queryable object delegator instance that
      * contains all the requisite information on how to perform the operation.
      * @param: {function} selector
-     * @param: enumerable
-     * @returns {*}
+     * @param: {iterable} enumerable
+     * @return: {@see m_list}
      */
     zip: function _zip(selector, enumerable) {
         return createListDelegator(this, zip(this, selector, enumerable));
@@ -279,16 +262,16 @@ var list_core = {
     /**
      * @description:
      * @param: {function} predicate
-     * @returns: {*}
+     * @return: {@see m_list}
      */
-    where: function _where(predicate) {
-        return createListDelegator(this, where(this, predicate));
+    filter: function _where(predicate) {
+        return createListDelegator(this, filter(this, predicate));
     },
 
     /**
      * @description:
      * @param: type
-     * @returns: {*}
+     * @returns: {@see m_list}
      */
     ofType: function _ofType(type) {
         return createListDelegator(this, ofType(this, type));
@@ -297,7 +280,7 @@ var list_core = {
     /**
      * @description:
      * @param: {function} comparer
-     * @returns: {*}
+     * @return: {@see m_list}
      */
     distinct: function _distinct(comparer) {
         return createListDelegator(this, distinct(this, comparer));
@@ -306,84 +289,55 @@ var list_core = {
     /**
      * @description:
      * @param: {number} amt
-     * @returns: {Array}
+     * @return: {@see m_list}
      */
     take: function _take(amt) {
-        if (!amt) return [];
-        var res = [],
-            idx = 0;
-
-        for (let item of this) {
-            if (idx < amt) res[res.length] = item;
-            else break;
-            ++idx;
-        }
-        return res;
+        return createListDelegator(this, take(this, amt));
     },
 
     /**
      * @description:
      * @param: {function} predicate
-     * @returns: {Array}
+     * @return: {@see m_list}
      */
     takeWhile: function _takeWhile(predicate = defaultPredicate) {
-        var res = [];
-
-        for (let item of this.value) {
-            if (predicate(item))
-                res[res.length] = item;
-            else  {
-                return res;
-            }
-        }
+        return createListDelegator(this, takeWhile(this, predicate));
     },
 
     /**
      * @description: Skips over a specified number of items in the source and returns the
-     * remaining items. If no amount is specified, an empty array is returned;
-     * Otherwise, an array containing the items collected from the source is
+     * remaining items. If no amount is specified, an empty list is returned;
+     * Otherwise, a list containing the items collected from the source is
      * returned.
      * @param: {number} amt - The number of items in the source to skip before
      * returning the remainder.
-     * @returns: {*}
+     * @return: {@see m_list}
      */
     skip: function _skip(amt) {
-        var idx = 0,
-            res = [];
-
-        for (let item of this.value) {
-            if (idx >= amt)
-                res[res.length] = item;
-            ++idx;
-        }
-        return res;
+        return createListDelegator(this, skip(this, amt));
     },
 
     /**
      * @description:
      * @param: {function} predicate
-     * @returns: {Array}
+     * @return: {@see m_list}
      */
     skipWhile: function _skipWhile(predicate = defaultPredicate) {
-        var hasFailed = false,
-            res = [];
+        return createListDelegator(this, skipWhile(this, predicate));
+    },
 
-        for (let item of this.value) {
-            if (!hasFailed) {
-                if (!predicate(item)) {
-                    hasFailed = true;
-                    res[res.length] = item;
-                }
-            }
-            else res[res.length] = item;
-        }
-        return res;
+    /**
+     * @description:
+     * @return: {@see m_list}
+     */
+    reverse: function _reverse() {
+        return createListDelegator(this, reverse(this));
     },
 
     /**
      * @description:
      * @param: {function} predicate
-     * @returns: {*}
+     * @return: {boolean}
      */
     any: function _any(predicate = defaultPredicate) {
         return any(this, predicate);
@@ -392,7 +346,7 @@ var list_core = {
     /**
      * @description:
      * @param: {function} predicate
-     * @returns: {*}
+     * @return: {boolean}
      */
     all: function _all(predicate = defaultPredicate) {
         return all(this, predicate);
@@ -400,9 +354,9 @@ var list_core = {
 
     /**
      * @description:
-     * @param: val
+     * @param: {*} val
      * @param: {function} comparer
-     * @returns: {*}
+     * @return: {boolean}
      */
     contains: function _contains(val, comparer) {
         return contains(this, val, comparer);
@@ -411,7 +365,7 @@ var list_core = {
     /**
      * @description:
      * @param: {function} predicate
-     * @returns: {*}
+     * @return: {*}
      */
     first: function _first(predicate = defaultPredicate) {
         return first(this, predicate);
@@ -421,7 +375,7 @@ var list_core = {
      * @description:
      * @param: {function} fn
      * @param: initial
-     * @returns: {*}
+     * @return: {*}
      */
     fold: function _fold(fn, initial) {
         return fold(this, fn, initial);
@@ -430,9 +384,9 @@ var list_core = {
     /**
      * @description:
      * @see: list_core.fold
-     * @param: fn
-     * @param: initial
-     * @returns:
+     * @param: {function} fn
+     * @param: {*} initial
+     * @return: {*}
      */
     reduce: function _reduce(fn, initial) {
         return fold(this, fn, initial);
@@ -441,7 +395,7 @@ var list_core = {
     /**
      * @description:
      * @param: {function} predicate
-     * @returns: {*}
+     * @return: {*}
      */
     last: function _last(predicate = defaultPredicate) {
         return last(this, predicate);
@@ -449,7 +403,7 @@ var list_core = {
 
     /**
      * @description:
-     * @returns: {*}
+     * @return: {*}
      */
     count: function _count() {
         return count(this);
@@ -457,7 +411,7 @@ var list_core = {
 
     /**
      * @description:
-     * @returns: {Array}
+     * @return: {Array}
      */
     toArray: function _toArray() {
         return Array.from(this);
@@ -465,7 +419,7 @@ var list_core = {
 
     /**
      * @description:
-     * @returns: {Set}
+     * @return: {Set}
      */
     toSet: function _toSet() {
         return new Set(this);
@@ -475,54 +429,54 @@ var list_core = {
      * @description:
      * @return: {@see _maybe}
      */
-    /*toMaybe: function _toMaybe() {
+    toMaybe: function _toMaybe() {
         return Maybe(this.data);
-    },*/
+    },
 
     /**
      * @description:
      * @return: {@see _maybe}
      */
-    /*asMaybe: function _asMaybe() {
+    asMaybe: function _asMaybe() {
         return Maybe(this);
-    },*/
+    },
 
     /**
      * @description:
      * @return: {@see _identity}
      */
-    /*toIdentity: function _toIdentity() {
+    toIdentity: function _toIdentity() {
         return Identity(this.data);
-    },*/
+    },
 
     /**
      * @description:
      * @return: {@see _identity}
      */
-    /*asIdentity: function _asIdentity() {
+    asIdentity: function _asIdentity() {
         return Identity(this);
-    },*/
+    },
 
     /**
      * @description:
      * @return: {@see _just}
      */
-    /*toJust: function _toJust() {
+    toJust: function _toJust() {
         return Just(this.data);
-    },*/
+    },
 
     /**
      * @description:
      * @return: {@see _just}
      */
-    /*asJust: function _asJust() {
+    asJust: function _asJust() {
         return Just(this);
-    },*/
+    },
 
     /**
      * @description:
      * @param: {*} item
-     * @returns: {m_list}
+     * @return: {@see m_list}
      */
     of: function _of(item) {
         return List(item);
@@ -537,18 +491,10 @@ var list_core = {
      * allow you to evaluate the List's data and store it in a new List that can
      * be iterated many times without needing to re-evaluate. It is effectively
      * a syntactical shortcut for: List.from(listInstance.data);
-     * @returns: {m_list}
+     * @return: {@see m_list}
      */
     toEvaluatedList: function _toEvaluatedList() {
         return List.from(this.data /* the .data property is a getter function that forces evaluation */);
-    },
-
-    /**
-     * @description:
-     * @returns: {Array<*>}
-     */
-    reverse: function _reverse() {
-        return Array.from(this).reverse();
     },
 
     /**
@@ -587,7 +533,9 @@ var list_core = {
  * otherwise.
  */
 list_core.contains.binary = function _binary(val, comparer) {
-    return binary(this, val, comparer);
+    if (delegatesTo(source, ordered_m_list) && 'undefined' === typeof comparer)
+        return binarySearch(when(not(isArray), Array.from, source), val, comparer);
+    return list_core.contains(val, comparer);
 };
 
 /**
@@ -600,26 +548,26 @@ list_core.contains.binary = function _binary(val, comparer) {
 var m_list = Object.create(list_core, {
     /**
      * @description:
-     * @param: keySelector
-     * @param: comparer
-     * @returns: {*}
+     * @param: {function} keySelector
+     * @param: {function} comparer
+     * @return: {@see m_list}
      */
-    orderBy: {
+    sortBy: {
         value: function _orderBy(keySelector, comparer) {
             var sortObj = [{ keySelector: keySelector, comparer: comparer, direction: sortDirection.ascending }];
-            return createListDelegator(this, orderBy(this, sortObj), sortObj);
+            return createListDelegator(this, sortBy(this, sortObj), sortObj);
         }
     },
     /**
      * @description:
-     * @param: keySelector
-     * @param: comparer
-     * @returns: {*}
+     * @param: {function} keySelector
+     * @param: {function} comparer
+     * @return: {@see m_list}
      */
-    orderByDescending: {
+    sortByDescending: {
         value: function _orderByDescending(keySelector, comparer) {
             var sortObj = [{ keySelector: keySelector, comparer: comparer, direction: sortDirection.descending }];
-            return createListDelegator(this, orderBy(this, sortObj), sortObj);
+            return createListDelegator(this, sortBy(this, sortObj), sortObj);
         }
     }
 });
@@ -642,26 +590,26 @@ var ordered_m_list = Object.create(list_core, {
     //of the the requested sorts.
     /**
      * @description:
-     * @param: keySelector
-     * @param: comparer
-     * @returns: {*}
+     * @param: {function} keySelector
+     * @param: {function} comparer
+     * @return: {@see ordered_m_list}
      */
     thenBy: {
         value: function _thenBy(keySelector, comparer) {
             var sortObj = this._appliedSorts.concat({ keySelector: keySelector, comparer: comparer, direction: sortDirection.ascending });
-            return createListDelegator(this.value, orderBy(this, sortObj), sortObj);
+            return createListDelegator(this.value, sortBy(this, sortObj), sortObj);
         }
     },
     /**
      * @description:
-     * @param: keySelector
-     * @param: comparer
-     * @returns: {*}
+     * @param: {function} keySelector
+     * @param: {function} comparer
+     * @return: {@see ordered_m_list}
      */
     thenByDescending: {
         value: function thenByDescending(keySelector, comparer) {
             var sortObj = this._appliedSorts.concat({ keySelector: keySelector, comparer: comparer, direction: sortDirection.descending });
-            return createListDelegator(this.value, orderBy(this, sortObj), sortObj);
+            return createListDelegator(this.value, sortBy(this, sortObj), sortObj);
         }
     }
 });
@@ -751,6 +699,7 @@ function createGroupedList(val) {
  * the new List delegator instance.
  * @param: {m_list|ordered_m_list} sortObj - A 'sort object' that the ordered_m_list knows how
  * to utilize when sorting or grouping a List.
+ * @return: {@see list_core}
  */
 function createListDelegator(value, iterator, sortObj) {
     return when(isIterator(iterator), setIterator(iterator), setValue(value, create(sortObj)));
@@ -772,7 +721,7 @@ function createGroupedListDelegator(value, iterator, key) {
  * and, if it has an iterator defined, with set it as the underlying source of the List as is,
  * or, wrap the item in an array if there is no defined iterator.
  * @param: {*} source - Any type, any value; used as the underlying source of the List
- * @returns: {m_list} - A new List instance with the value provided as the underlying source.
+ * @return: {@see m_list} - A new List instance with the value provided as the underlying source.
  */
 function List(source) {
     //TODO: should I exclude strings from being used as a source directly, or allow it because
@@ -784,7 +733,7 @@ function List(source) {
  * @description: Convenience function for create a new List instance; internally calls List.
  * @see: List
  * @param: {*} source - Any type, any value; used as the underlying source of the List
- * @returns: {m_list} - A new List instance with the value provided as the underlying source.
+ * @return: {@see m_list} - A new List instance with the value provided as the underlying source.
  */
 List.from = function _from(source) {
     return List(source);
@@ -795,7 +744,7 @@ List.from = function _from(source) {
  * @see: List.from
  * @type: {function}
  * @param: {*}
- * @returns: {m_list}
+ * @return: {@see m_list}
  */
 List.of = List.from;
 
@@ -805,6 +754,7 @@ List.of = List.from;
  * @param: {string} propName - The name of the new property that should exist on the List; must be unique
  * @param: {function} fn - A function that defines the new List functionality and
  * will be called when this new List property is invoked.
+ * @return: {@see List}
  *
  * NOTE: The fn parameter must be a non-generator function that takes one or more
  * arguments. If this new List function should be an immediately evaluated
@@ -838,6 +788,7 @@ List.extend = function _extend(propName, fn) {
             return createListDelegator(this, fn(this, ...args));
         };
     }
+    return List;
 };
 
 export { List, list_core, m_list, ordered_m_list };

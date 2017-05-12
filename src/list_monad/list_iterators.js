@@ -245,6 +245,24 @@ function contains(source, val, comparer) {
 /**
  * @description:
  * @param: {iterable} source
+ * @param: {number} left
+ * @param: {number} right
+ * @param: {*} val
+ * @param: {function} comparer
+ * @return {boolean}
+ */
+function binarySearch(source, left, right, val, comparer) {
+    if (left > right) return false;
+    var mid = (left + (right - left)) / 2,
+        res = comparer(val, source[mid]);
+    if (0 === res) return true;
+    else if (0 < res) return binarySearch(source, left, mid - 1, val, comparer);
+    else return binarySearch(source, mid + 1, right, val, comparer);
+}
+
+/**
+ * @description:
+ * @param: {iterable} source
  * @param: {function} predicate
  * @return {Number}
  */
@@ -359,8 +377,8 @@ function ofType(source, dataType) {
  * @param: {function} predicate
  * @return: {generator}
  */
-function where(source, predicate) {
-    return function *whereIterator() {
+function filter(source, predicate) {
+    return function *filterIterator() {
         for (let item of source) {
             if (false !== predicate(item)) yield item;
         }
@@ -492,7 +510,7 @@ function groupBy(source, groupObject, queryableConstructor) {
  * @param: {number} depth
  * @param: {string} key
  * @param: {function} queryableConstructor
- * @return {Array}
+ * @return: {Array}
  */
 function nestLists(data, depth, key, queryableConstructor) {
     if (isArray(data)) {
@@ -574,15 +592,118 @@ function map(source, fn) {
  * @param: {function} comparer
  * @return: {generator}
  */
-function orderBy(source, orderObject, comparer) {
+function sortBy(source, orderObject) {
     return function *orderByIterator() {
         //gather all data from the source before sorting
-        var orderedData = sortData(when(not(isArray), Array.from, source), orderObject, comparer);
+        var orderedData = sortData(when(not(isArray), Array.from, source), orderObject);
         for (let item of orderedData) {
             if (javaScriptTypes.undefined !== typeof item) yield item;
         }
     };
 }
 
-export { all, any, except, intersect, union, map, flatMap, groupBy, orderBy, addFront,
-    concat, groupJoin, join, zip, where, contains, first, last, count, fold, distinct, ofType };
+/**
+ * @description:
+ * @param: {@see m_list} l1
+ * @param: {@see m_list} l2
+ * @param: {function} comparer
+ * @return: {boolean}
+ */
+function equals(l1, l2, comparer = strictEqual) {
+    var l1Data = l1.data,
+        l2Data = l2.data;
+
+    return l1Data.length === l2Data.length &&
+            l1Data.every(function _checkEquality(item, idx) {
+                return comparer(item, l2Data[idx]);
+            });
+}
+
+/**
+ * @description:
+ * @param: {iterable} source
+ * @param: {number} amt
+ * @return {generator}
+ */
+function take(source, amt) {
+    return function *takeIterator() {
+        if (!amt) return [];
+        var idx = 0;
+
+        for (let item of source) {
+            if (idx < amt) yield item;
+            else break;
+            ++idx;
+        }
+    };
+}
+
+/**
+ * @description:
+ * @param: {iterable} source
+ * @param: {function} predicate
+ * @return {generator}
+ */
+function takeWhile(source, predicate) {
+    return function *takeWhileIterator() {
+        for (let item of source) {
+            if (predicate(item)) yield item;
+            else break;
+        }
+    };
+}
+
+/**
+ * @description:
+ * @param: {iterable} source
+ * @param: {number} amt
+ * @return {generator}
+ */
+function skip(source, amt) {
+    return function *skipIterator() {
+        var count = 0;
+
+        for (let item of source) {
+            if (count > amt) {
+                ++count;
+                yield item;
+            }
+        }
+    };
+}
+
+/**
+ * @description:
+ * @param: {iterable} source
+ * @param: {function} predicate
+ * @return: {generator}
+ */
+function skipWhile(source, predicate) {
+    return function *skipWhileIterator() {
+        var hasFailed = false;
+        for (let item of source) {
+            if (!hasFailed) {
+                if (!predicate(item)) {
+                    hasFailed = true;
+                    yield item;
+                }
+            }
+            else yield item;
+        }
+    };
+}
+
+/**
+ * @description:
+ * @param: {iterable} source
+ * @return: {generator}
+ */
+function reverse(source) {
+    return function *reverseIterator() {
+        source = Array.from(source).reverse();
+        for (let item of source) yield item;
+    };
+}
+
+export { all, any, except, intersect, union, map, flatMap, groupBy, sortBy, addFront, concat, groupJoin, join, zip, filter,
+    contains, first, last, count, fold, distinct, ofType, binarySearch, equals, take, takeWhile, skip, skipWhile, reverse };

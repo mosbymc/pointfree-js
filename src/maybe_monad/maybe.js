@@ -1,3 +1,8 @@
+/**
+ * @description:
+ * @param: {*} item
+ * @return {@see _maybe}
+ */
 function Maybe(item) {
     /*return Object.create(_maybe, {
         _value: {
@@ -39,58 +44,131 @@ function Maybe(item) {
 }
 
 /**
- *
- * @param item
- * @returns {*}
+ * @description:
+ * @param: {*} item
+ * @return: {@see _maybe}
  */
 Maybe.of = function _of(item) {
     return Maybe(item);
 };
 
+/**
+ * @description:
+ * @param: {*} val
+ * @return: {@see _maybe}
+ */
 Maybe.Just = function _justASomething(val) {
     return Maybe(val);
 };
 
+/**
+ * @description:
+ * @return: {@see _maybe}
+ */
 Maybe.Nothing = function _notASomething() {
     return Maybe();
 };
 
+/**
+ * @description:
+ * @type {{
+ * isJust: {boolean} isJust,
+ * isNothing: {boolean} isNothing,
+ * isEmpty: {function} _maybe._isEmpty,
+ * map: {function} _maybe._map,
+ * apply: {function} _maybe._apply,
+ * flatMap: {function} _maybe._flatMap,
+ * mjoin: {function} _maybe._mjoin,
+ * concat: {function} _maybe._concat,
+ * equals: {function} _maybe._equals,
+ * of: {function} _maybe._of,
+ * toString: {function} _maybe._toString
+ * }}
+ * @private
+ */
 var _maybe = {
+    /**
+     * @description:
+     * @return: {boolean}
+     */
     get isJust() {
         return _just.isPrototypeOf(this);
     },
+    /**
+     * @description:
+     * @return: {boolean}
+     */
     get isNothing() {
         return _nothing.isPrototypeOf(this);
     },
+    /**
+     * @description:
+     * @return: {boolean}
+     */
     isEmpty: function _isEmpty() {
         return null == this.value;
     },
+    /**
+     * @description:
+     * @param: {function} fn
+     * @return: {@see _maybe}
+     */
     map: function _map(fn) {
         return this.isEmpty() ? Maybe(this.value) : Maybe(fn(this.value));
     },
+    /**
+     * @description:
+     * @param: {monad} ma
+     * @return: {@see _maybe}
+     */
     apply: function _apply(ma) {
         return this.isEmpty() ? this : ma.map(this.value);
     },
+    /**
+     * @description:
+     * @param: {function} fn
+     * @return: {*}
+     */
     flatMap: function _flatMap(fn) {
         return this.isEmpty() ? this.value : fn(this.value);
     },
+    /**
+     * @description:
+     * @return: {@see _maybe}
+     */
     mjoin: function _mjoin() {
         if (this.isEmpty()) return Maybe.empty();
         return Maybe.isPrototypeOf(this.value) ? this.value : Maybe(this.value);
     },
+    /**
+     * @description:
+     * @param: {monad} ma
+     * @return: {_maybe}
+     */
     concat: function _concat(ma) {
         return ma.isNothing ? this : this.of(this.value.concat(ma.value));
     },
+    /**
+     * @description:
+     * @param: {monad} ma
+     * @return: {boolean}
+     */
     equals: function _equals(ma) {
       //TODO: going to need to refactor this equality check because it won't work as implemented
         return _maybe.isPrototypeOf(ma) && ma.value === this.value;
     },
-    valueEquals: function _valueEquals(ma) {
-        return ma.value === this.value;
-    },
+    /**
+     * @description:
+     * @param: {*} item
+     * @return: {@see _maybe}
+     */
     of: function _of(item) {
         return Maybe.of(item);
     },
+    /**
+     * @description:
+     * @return: {string}
+     */
     toString: function _toString() {
         return `Maybe(${this.value})`;
     }
@@ -99,6 +177,11 @@ var _maybe = {
 _maybe.chain = _maybe.flatMap;
 _maybe.bind = _maybe.flatMap;
 
+/**
+ * @description:
+ * @param: {*} item
+ * @return: {@see _just}
+ */
 function Just(item) {
     return Object.create(_just, {
         _value: {
@@ -109,6 +192,11 @@ function Just(item) {
     });
 }
 
+/**
+ * @description:
+ * @param: {*} item
+ * @return: {@see _just}
+ */
 Just.of = function _of(item) {
     return Just(item);
 };
@@ -152,6 +240,10 @@ var _just = {
     }
 };
 
+/**
+ * @description:
+ * @return: {@see _nothing}
+ */
 function Nothing() {
     return Object.create(_nothing, {
         _value: {
@@ -166,6 +258,14 @@ function Nothing() {
         }
     });
 }
+
+/**
+ * @description:
+ * @return: {@see _nothing}
+ */
+Nothing.of = function _of() {
+    return Nothing();
+};
 
 var _nothing = {
     get isJust() {

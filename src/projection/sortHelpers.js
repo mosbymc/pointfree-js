@@ -4,13 +4,13 @@ import { deepClone, sortComparer } from '../helpers';
  * @description:
  * @param: {Array} data
  * @param: {Object} sortObject
- * @param: {function} comparer
  * @return {Array} - Returns an array sorted on 'n' fields in either ascending or descending
  * order for each field as specified in the 'sortObject' parameter
  */
-function sortData(data, sortObject, comparer = sortComparer) {
+function sortData(data, sortObject) {
     var sortedData = data;
     sortObject.forEach(function _sortItems(sort, index) {
+        var comparer = sortObject.comparer && 'function' === typeof sort.comparer ? sort.comparer : sortComparer;
         if (0 === index) sortedData = 5001 > data.length ?
             insertionSort(data, sort.keySelector, comparer, sort.direction) : mergeSort(data, sort.keySelector, comparer, sort.direction);
         //if (index === 0) sortedData = quickSort(data, sort.direction, sort.keySelector, comparer);
