@@ -38,6 +38,11 @@ function Maybe(item) {
         });
 }
 
+/**
+ *
+ * @param item
+ * @returns {*}
+ */
 Maybe.of = function _of(item) {
     return Maybe(item);
 };
