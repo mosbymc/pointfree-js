@@ -3,9 +3,9 @@ import { all, any, except, intersect, union, map, flatMap, groupBy, sortBy, addF
 import { generatorProto, sortDirection } from '../helpers';
 import { set, when, isSomething, apply, ifElse, wrap, delegatesFrom, defaultPredicate, delegatesTo, not, isArray } from '../functionalHelpers';
 
-import { Maybe } from '../maybe_monad/maybe';
-import { Just } from '../just_monad/just';
-import { Identity } from '../identity_monad/identity';
+//import { Maybe } from '../maybe_monad/maybe';
+//import { Just } from '../just_monad/just';
+//import { Identity } from '../identity_monad/identity';
 
 /**
  * @description: Object that contains the core functionality of a List; both the m_list and ordered_m_list
@@ -429,49 +429,49 @@ var list_core = {
      * @description:
      * @return: {@see _maybe}
      */
-    toMaybe: function _toMaybe() {
+    /*toMaybe: function _toMaybe() {
         return Maybe(this.data);
-    },
+    },*/
 
     /**
      * @description:
      * @return: {@see _maybe}
      */
-    asMaybe: function _asMaybe() {
+    /*asMaybe: function _asMaybe() {
         return Maybe(this);
-    },
+    },*/
 
     /**
      * @description:
      * @return: {@see _identity}
      */
-    toIdentity: function _toIdentity() {
+    /*toIdentity: function _toIdentity() {
         return Identity(this.data);
-    },
+    },*/
 
     /**
      * @description:
      * @return: {@see _identity}
      */
-    asIdentity: function _asIdentity() {
+    /*asIdentity: function _asIdentity() {
         return Identity(this);
-    },
+    },*/
 
     /**
      * @description:
      * @return: {@see _just}
      */
-    toJust: function _toJust() {
+    /*toJust: function _toJust() {
         return Just(this.data);
-    },
+    },*/
 
     /**
      * @description:
      * @return: {@see _just}
      */
-    asJust: function _asJust() {
+    /*asJust: function _asJust() {
         return Just(this);
-    },
+    },*/
 
     /**
      * @description:
