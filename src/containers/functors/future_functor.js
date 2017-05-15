@@ -30,13 +30,19 @@ var _future_f = {
     },
     subscribers: [],
     map: function _map(fn) {
-        return Future((function _futureMap(reject, resolve) {
+        return this.of((function _futureMap(reject, resolve) {
             return this.fork(function _rej(err) {
                 return reject(err);
             }, function _res(val) {
                 return resolve(fn(val));
             })
         }).bind(this));
+    },
+    //TODO: probably need to compose here, not actually map over the value; this is a temporary fill-in until
+    //TODO: I have time to finish working on the Future
+    flatMap: function _flatMap(fn) {
+        return _future_f.isPrototypeOf(this.value) ? this.value.map(fn) :
+            this.of(fn(this.value));
     },
     of: function _of(a) {
         return Future.of(a);

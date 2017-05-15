@@ -22,7 +22,7 @@ var _io_f = {
         return this.of(compose(fn, this.value));
     },
     flatMap: function _flatMap(fn) {
-        return compose(fn, this.value);
+        return _io_f.isPrototypeOf(this.value) ? this.value.map(fn) : this.of(compose(fn, this.value));
     },
     of: function _of(item) {
         return Io.of(item);
