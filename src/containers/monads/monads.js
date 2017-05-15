@@ -1,56 +1,81 @@
 import { Constant, _constant_m } from './constant_monad';
+import { Future, _future_m } from './future_monad';
 import { Identity, _identity_m } from './identity_monad';
 import { Io, _io_m } from './io_monad';
 import { List, _list_m, ordered_list_m } from './list_monad';
 import { Maybe, _maybe_m } from './maybe_monad';
 
-function _toConstant() {
-    return Constant.of(this.value);
+import { identity } from '../../functionalHelpers';
+
+function _mapToConstant(fn = identity) {
+    return Constant.of(fn(this.value));
 }
 
-function _toIdentity() {
-    return Identity.of(this.value);
+function _mapToFuture(fn = identity) {
+    return Future.of(fn(this.value));
 }
 
-function _toIo() {
-    return Io.of(this.value);
+function _mapToIdentity(fn = identity) {
+    return Identity.of(fn(this.value));
 }
 
-function _toList() {
-    return List.from(this.value);
+function _mapToIo(fn = identity) {
+    return Io.of(fn(this.value));
 }
 
-function _toMaybe() {
-    return Maybe.of(this.value);
+function _mapToList(fn = identity) {
+    return List.from(fn(this.value));
 }
 
-_constant_m.toIdentity = _toIdentity;
-_constant_m.toIo = _toIo;
-_constant_m.toList = _toList;
-_constant_m.toMaybe = _toMaybe;
+function _mapToMaybe(fn = identity) {
+    return Maybe.of(fn(this.value));
+}
 
-_identity_m.toConstant = _toConstant;
-_identity_m.toIo = _toIo;
-_identity_m.toList = _toList;
-_identity_m.toMaybe = _toMaybe;
+_constant_m.mapToFuture = _mapToFuture;
+_constant_m.mapToIdentity = _mapToIdentity;
+_constant_m.mapToIo = _mapToIo;
+_constant_m.mapToList = _mapToList;
+_constant_m.mapToMaybe = _mapToMaybe;
 
-_list_m.toConstant = _toConstant;
-_list_m.toIdentity = _toIdentity;
-_list_m.toIo = _toIo;
-_list_m.toMaybe = _toMaybe;
+_future_m.mapToConstant = _mapToConstant;
+_future_m.mapToIdentity = _mapToIdentity;
+_future_m.mapToIo = _mapToIo;
+_future_m.mapToList = _mapToList;
+_future_m.mapToMaybe = _mapToMaybe;
 
-ordered_list_m.toConstant = _toConstant;
-ordered_list_m.toIdentity = _toIdentity;
-ordered_list_m.toIo = _toIo;
-ordered_list_m.toMaybe = _toMaybe;
+_identity_m.mapToConstant = _mapToConstant;
+_identity_m.mapToFuture = _mapToFuture;
+_identity_m.mapToIo = _mapToIo;
+_identity_m.mapToList = _mapToList;
+_identity_m.mapToMaybe = _mapToMaybe;
 
-_maybe_m.toIdentity = _toIdentity;
-_maybe_m.toIo = _toIo;
-_maybe_m.toConstant = _toConstant;
-_maybe_m.toList = _toList;
+_io_m.mapToConstant = _mapToConstant;
+_io_m.mapToFuture = _mapToFuture;
+_io_m.mapToIdentity = _mapToIdentity;
+_io_m.mapToList = _mapToList;
+_io_m.mapToMaybe = _mapToMaybe;
+
+_list_m.mapToConstant = _mapToConstant;
+_list_m.mapToFuture = _mapToFuture;
+_list_m.mapToIdentity = _mapToIdentity;
+_list_m.mapToIo = _mapToIo;
+_list_m.mapToMaybe = _mapToMaybe;
+
+ordered_list_m.mapToConstant = _mapToConstant;
+ordered_list_m.mapToFuture = _mapToFuture;
+ordered_list_m.mapToIdentity = _mapToIdentity;
+ordered_list_m.mapToIo = _mapToIo;
+ordered_list_m.mapToMaybe = _mapToMaybe;
+
+_maybe_m.mapToIdentity = _mapToIdentity;
+_maybe_m.mapToFuture = _mapToFuture;
+_maybe_m.mapToIo = _mapToIo;
+_maybe_m.mapToConstant = _mapToConstant;
+_maybe_m.mapToList = _mapToList;
 
 var monads = {
     Constant,
+    Future,
     Identity,
     Io,
     List,
