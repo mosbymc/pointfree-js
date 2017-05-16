@@ -32,4 +32,6 @@ var _io_m = Object.create(_io_f, {
     }
 });
 
+_io_m.ap =_io_m.apply;
+
 export { Io, _io_m };

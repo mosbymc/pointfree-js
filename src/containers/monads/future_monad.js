@@ -34,4 +34,6 @@ var _future_m = Object.create(_future_f, {
     }
 });
 
+_future_m.ap = _future_m.apply;
+
 export { Future, _future_m };

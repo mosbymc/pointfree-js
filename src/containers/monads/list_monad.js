@@ -191,11 +191,16 @@ var _list_m = Object.create(_list_f, {
     }
 });
 
+_list_m.ap =_list_m.apply;
+
 var ordered_list_m = Object.create(ordered_list_f, {
     mjoin: {
         value: function _mjoin() {
             return this.value;
         }
+    },
+    apply: function _apply(ma) {
+        return this.map(ma.value);
     },
     of: {
         value: function _of(val, iterator, sortObj) {
@@ -203,5 +208,7 @@ var ordered_list_m = Object.create(ordered_list_f, {
         }
     }
 });
+
+ordered_list_m.ap = ordered_list_m.apply;
 
 export { List, _list_m, ordered_list_m };

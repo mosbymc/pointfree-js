@@ -47,4 +47,6 @@ var _identity_m = Object.create(_identity_f, {
     }
 });
 
+_identity_m.ap = _identity_m.apply;
+
 export { Identity, _identity_m };

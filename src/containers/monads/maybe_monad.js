@@ -42,4 +42,6 @@ var _maybe_m = Object.create(_maybe_f, {
     }
 });
 
+_maybe_m.ap = _maybe_m.apply;
+
 export { Maybe, _maybe_m };

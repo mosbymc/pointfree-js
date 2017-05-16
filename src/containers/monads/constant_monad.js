@@ -33,4 +33,6 @@ var _constant_m = Object.create(_constant_f, {
     }
 });
 
+_constant_m.ap =_constant_m.apply;
+
 export { Constant, _constant_m };
