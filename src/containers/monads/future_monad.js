@@ -22,6 +22,9 @@ var _future_m = Object.create(_future_f, {
             return this.value;
         }
     },
+    chain: function _chain(fn) {
+        return fn(this.value);
+    },
     apply: {
         value: function _apply(ma) {
             return this.map(ma.value);
@@ -35,5 +38,6 @@ var _future_m = Object.create(_future_f, {
 });
 
 _future_m.ap = _future_m.apply;
+_future_m.bind = _future_m.chain;
 
 export { Future, _future_m };

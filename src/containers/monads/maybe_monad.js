@@ -25,6 +25,9 @@ var _maybe_m = Object.create(_maybe_f, {
             return this.value;
         }
     },
+    chain: function _chain(fn) {
+        return fn(this.value);
+    },
     /**
      * @description:
      * @param: {monad} ma
@@ -43,5 +46,6 @@ var _maybe_m = Object.create(_maybe_f, {
 });
 
 _maybe_m.ap = _maybe_m.apply;
+_maybe_m.bind = _maybe_m.chain;
 
 export { Maybe, _maybe_m };

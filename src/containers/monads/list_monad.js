@@ -172,6 +172,9 @@ var _list_m = Object.create(_list_f, {
             return this.value;
         }
     },
+    chain: function _chain(fn) {
+        return fn(this.value);
+    },
     /**
      * @description: Applies a function contained in another functor to the source
      * of this List object instance's underlying source. A new List object instance
@@ -192,12 +195,16 @@ var _list_m = Object.create(_list_f, {
 });
 
 _list_m.ap =_list_m.apply;
+_list_m.bind = _list_m.chain;
 
 var ordered_list_m = Object.create(ordered_list_f, {
     mjoin: {
         value: function _mjoin() {
             return this.value;
         }
+    },
+    chain: function _chain(fn) {
+        return fn(this.value);
     },
     apply: function _apply(ma) {
         return this.map(ma.value);
@@ -210,5 +217,6 @@ var ordered_list_m = Object.create(ordered_list_f, {
 });
 
 ordered_list_m.ap = ordered_list_m.apply;
+ordered_list_m.bind = ordered_list_m.chain;
 
 export { List, _list_m, ordered_list_m };

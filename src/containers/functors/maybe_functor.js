@@ -81,14 +81,15 @@ var _maybe_f = {
     flatMap: function _flatMap(fn) {
         //return _maybe_f.isPrototypeOf(this.value) ? this.value.map(fn) : this.of(fn(this.value));
         if (Object.getPrototypeOf(this).isPrototypeOf(this.value)) return this.value.map(fn);
-        else if (null != this.value) return this.of(fn(this.value));
+        if (null != this.value) return this.of(fn(this.value));
         return this.of(null);
     },
     of: function _of(val) {
         return Maybe.of(val);
     },
     toString: function _toString() {
-        return `Maybe(${this.value})`;
+        //return `Maybe(${this.value})`;
+        return null == this.value ? `Nothing()` : `Just(${this.value})`;
     }
 };
 

@@ -30,6 +30,9 @@ var _identity_m = Object.create(_identity_f, {
             return this.value;
         }
     },
+    chain: function _chain(fn) {
+        return fn(this.value);
+    },
     /**
      * @description:
      * @param: {monad} ma
@@ -48,5 +51,6 @@ var _identity_m = Object.create(_identity_f, {
 });
 
 _identity_m.ap = _identity_m.apply;
+_identity_m.bind = _identity_m.chain;
 
 export { Identity, _identity_m };

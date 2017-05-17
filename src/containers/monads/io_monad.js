@@ -20,6 +20,9 @@ var _io_m = Object.create(_io_f, {
             return this.value;
         }
     },
+    chain: function _chain(fn) {
+        return fn(this.value);
+    },
     apply: {
         value: function _apply(ma) {
             return ma.map(this.value);
@@ -33,5 +36,6 @@ var _io_m = Object.create(_io_f, {
 });
 
 _io_m.ap =_io_m.apply;
+_io_m.bind = _io_m.chain;
 
 export { Io, _io_m };
