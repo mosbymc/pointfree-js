@@ -1,6 +1,13 @@
+import { noop, once } from '../../functionalHelpers';
+
+/**
+ * @description:
+ * @param: {function} fn
+ * @return: {@see _future_f}
+ */
 function Future(fn) {
     return Object.create(_future_f, {
-        _fork: {
+        _value: {
             value: fn,
             writable: false,
             configurable: false
@@ -8,13 +15,34 @@ function Future(fn) {
     });
 }
 
-Future.of = function _of(a) {
-    return 'function' === typeof a ? Future(a) :
+/**
+ * @description:
+ * @param: {function|*} val
+ * @return: {@see _future_f}
+ */
+Future.of = function _of(val) {
+    return 'function' === typeof val ? Future(val) :
         Future(function _runner(rej, res) {
-        return res(a)
+        return res(val)
     });
 };
 
+/**
+ * @description:
+ * @param: {*} val
+ * @return: {@see _future_f}
+ */
+Future.reject = function _reject(val) {
+    return Future(function _future(reject) {
+        reject(val);
+    });
+};
+
+/**
+ * @description:
+ * @param: {function} val
+ * @return: {*}
+ */
 Future.unit = function _unit(val) {
     var f = Future(val);
     return f.complete();
@@ -25,18 +53,19 @@ var _future_f = {
      * @description:
      * @return: {@see _future_f}
      */
-    get fork() {
-        return this._fork;
+    get value() {
+        return this._value;
     },
-    subscribers: [],
     map: function _map(fn) {
-        return this.of((function _futureMap(reject, resolve) {
-            return this.fork(function _rej(err) {
-                return reject(err);
-            }, function _res(val) {
-                return resolve(fn(val));
-            })
-        }).bind(this));
+        //TODO: replace 'reject' function with noop?
+        return this.of((reject, resolve) => {
+            return this.value(function _rej(err) {
+                reject(err);
+            },
+            function _res(val) {
+                resolve(val);
+            });
+        });
     },
     //TODO: probably need to compose here, not actually map over the value; this is a temporary fill-in until
     //TODO: I have time to finish working on the Future
@@ -44,11 +73,14 @@ var _future_f = {
         return _future_f.isPrototypeOf(this.value) ? this.value.map(fn) :
             this.of(fn(this.value));
     },
-    of: function _of(a) {
-        return Future.of(a);
+    fork: function _fork(reject, resolve) {
+        this.value(reject, resolve);
+    },
+    of: function _of(val) {
+        return Future.of(val);
     },
     toString: function _toString() {
-        return `Future${this.fork}`;
+        return `Future(${this.value})`;
     }
 };
 

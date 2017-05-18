@@ -28,6 +28,8 @@ var apply = curry(function _apply(ma, mb) {
     return mb.apply(ma);
 });
 
+var ap = apply;
+
 /**
  * @description:
  * @type: {function}
@@ -69,6 +71,8 @@ var fmap = map;
 var chain = curry(function _chain(f, m){
     return m.map(f).join(); // or compose(join, map(f))(m)
 });
+
+var bind = chain;
 
 /**
  * @description:

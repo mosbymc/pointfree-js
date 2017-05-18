@@ -1,5 +1,10 @@
 import { compose } from '../../functionalHelpers';
 
+/**
+ * @description:
+ * @param: {function} item
+ * @return: {@see _io_f}
+ */
 function Io(item) {
     return Object.create(_io_f, {
         _value: {
@@ -9,11 +14,26 @@ function Io(item) {
         }
     })
 }
+
+/**
+ * @description:
+ * @param: {function|*} item
+ * @return: {@see _io_f}
+ */
 Io.of = function _of(item) {
-    if ('function' !== typeof item) return Io(function _anon() { return item; });
-    return Io(item);
+    return 'function' === typeof item ? Io(item) : Io(function _anon() { return item; });
 };
 
+/**
+ * @description:
+ * @type {{
+ * value,
+ * map: {function} _io_f._map,
+ * flatMap: {function} _io_f._flatMap,
+ * of: {function} _io_f._of,
+ * toString: {function} _io_f._toString
+ * }}
+ */
 var _io_f = {
     get value() {
         return this._value;

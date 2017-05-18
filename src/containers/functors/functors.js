@@ -72,7 +72,7 @@ _future_f.mapToRight = _mapToRight;
 _identity_f.mapToConstant = _mapToConstant;
 _identity_f.mapToEither = _mapToEither;
 _identity_f.mapToFuture = _mapToFuture;
-_identity_f.maoToIo = _mapToIo;
+_identity_f.mapToIo = _mapToIo;
 _identity_f.mapToLeft = _mapToLeft;
 _identity_f.mapToList = _mapToList;
 _identity_f.mapToMaybe = _mapToMaybe;
@@ -90,7 +90,7 @@ _io_f.mapToRight = _mapToRight;
 list_functor_core.mapToConstant = _mapToConstant;
 list_functor_core.mapToEither = _mapToEither;
 list_functor_core.mapToFuture = _mapToFuture;
-list_functor_core.maoToIo = _mapToIo;
+list_functor_core.mapToIo = _mapToIo;
 list_functor_core.mapToIdentity = _mapToIdentity;
 list_functor_core.mapToLeft = _mapToLeft;
 list_functor_core.mapToMaybe = _mapToMaybe;
@@ -100,7 +100,7 @@ _maybe_f.mapToConstant = _mapToConstant;
 _maybe_f.mapToEither = _mapToEither;
 _maybe_f.mapToFuture = _mapToFuture;
 _maybe_f.mapToIdentity = _mapToIdentity;
-_maybe_f.maoToIo = _mapToIo;
+_maybe_f.mapToIo = _mapToIo;
 _maybe_f.mapToLeft = _mapToLeft;
 _maybe_f.mapToList = _mapToList;
 _maybe_f.mapToRight = _mapToRight;
@@ -111,8 +111,10 @@ var functors = {
     Future,
     Identity,
     Io,
+    Left,
     List,
-    Maybe
+    Maybe,
+    Right
 };
 
 

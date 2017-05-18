@@ -42,14 +42,14 @@ var _constant_f = {
      * @return: {@see _constant_f}
      */
     map: function _map() {
-        return Constant.of(this.value)
+        return this.of(this.value)
     },
     /**
      * @description:
      * @return: {@see _constant_f}
      */
     flatMap: function _flatMap() {
-        return Constant.of(this.value);
+        return this.of(this.value);
     },
     /**
      * @description:

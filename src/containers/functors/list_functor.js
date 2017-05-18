@@ -559,7 +559,7 @@ var ordered_list_f = Object.create(list_functor_core, {
 //TODO: tpircSavaJ
 //TODO: Junctional FavaScript
 
-var setValue = set('value'),
+var setValue = set('_value'),
     setIterator = set(Symbol.iterator),
     isIterator = apply(delegatesFrom(generatorProto)),
     create = ifElse(isSomething, createOrderedList, createList);

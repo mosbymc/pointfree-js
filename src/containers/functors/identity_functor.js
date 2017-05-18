@@ -41,7 +41,7 @@ var _identity_f = {
     /**
      * @description:
      * @param: {function} fn
-     * @return: {*}
+     * @return: {@see _identity_f}
      */
     flatMap: function _flatMap(fn) {
         return _identity_f.isPrototypeOf(this.value) ? fn(this.value) : this.of(fn(this.value));

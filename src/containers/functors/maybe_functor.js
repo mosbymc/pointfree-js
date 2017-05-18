@@ -1,3 +1,8 @@
+/**
+ * @description:
+ * @param: {*} val
+ * @return: {@see _maybe_f}
+ */
 function Maybe(val) {
     return Object.create(_maybe_f, {
         _value: {
@@ -8,6 +13,11 @@ function Maybe(val) {
     });
 }
 
+/**
+ * @description:
+ * @param: {*} val
+ * @return: {@see _maybe_f}
+ */
 Maybe.of = function _of(val) {
     return Object.create(_maybe_f, {
         _value: {
@@ -16,6 +26,22 @@ Maybe.of = function _of(val) {
             configurable: false
         }
     });
+};
+
+/**
+ * @description:
+ * @param {*} val
+ * @return: {@see _maybe_f}
+ * @type {function}
+ */
+Maybe.Just = Maybe.of;
+
+/**
+ * @description:
+ * @return: {@see _maybe_f}
+ */
+Maybe.Nothing =  function _nothing() {
+    return Maybe();
 };
 //Maybe.Just = Just;
 //Maybe.Nothing = Nothing;

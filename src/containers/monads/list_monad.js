@@ -2,7 +2,7 @@ import { _list_f, ordered_list_f, list_functor_core } from '../functors/list_fun
 import { ifElse, isSomething, delegatesFrom, set, when, wrap, apply } from '../../functionalHelpers';
 import { generatorProto } from '../../helpers';
 
-var setValue = set('value'),
+var setValue = set('_value'),
     setIterator = set(Symbol.iterator),
     isIterator = apply(delegatesFrom(generatorProto)),
     create = ifElse(isSomething, createOrderedList, createList);
@@ -172,8 +172,10 @@ var _list_m = Object.create(_list_f, {
             return this.value;
         }
     },
-    chain: function _chain(fn) {
-        return fn(this.value);
+    chain: {
+        value: function _chain(fn) {
+            return fn(this.value);
+        }
     },
     /**
      * @description: Applies a function contained in another functor to the source
@@ -203,11 +205,15 @@ var ordered_list_m = Object.create(ordered_list_f, {
             return this.value;
         }
     },
-    chain: function _chain(fn) {
-        return fn(this.value);
+    chain: {
+        value: function _chain(fn) {
+            return fn(this.value);
+        }
     },
-    apply: function _apply(ma) {
-        return this.map(ma.value);
+    apply: {
+        value: function _apply(ma) {
+            return this.map(ma.value);
+        }
     },
     of: {
         value: function _of(val, iterator, sortObj) {

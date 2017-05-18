@@ -25,8 +25,10 @@ var _maybe_m = Object.create(_maybe_f, {
             return this.value;
         }
     },
-    chain: function _chain(fn) {
-        return fn(this.value);
+    chain: {
+        value: function _chain(fn) {
+            return fn(this.value);
+        }
     },
     /**
      * @description:
