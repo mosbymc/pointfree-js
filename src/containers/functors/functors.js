@@ -8,102 +8,72 @@ import { Maybe, _maybe_f } from './maybe_functor';
 
 import { identity } from '../../functionalHelpers';
 
-function _mapToConstant(fn = identity) {
-    return Constant.of(fn(this.value));
+function toFunctorType(type) {
+    return function toType(fn = identity) {
+        return type.of(fn(this.value));
+    };
 }
 
-function _mapToEither(fn = identity, fork) {
-    return Either(fn(this.value), fork);
-}
+_constant_f.mapToEither = toFunctorType(Either);
+_constant_f.mapToFuture = toFunctorType(Future);
+_constant_f.mapToIdentity = toFunctorType(Identity);
+_constant_f.mapToIo = toFunctorType(Io);
+_constant_f.mapToLeft = toFunctorType(Left);
+_constant_f.mapToList = toFunctorType(List);
+_constant_f.mapToMaybe = toFunctorType(Maybe);
+_constant_f.mapToRight = toFunctorType(Right);
 
-function _mapToFuture(fn = identity) {
-    return Future.of(fn(this.value));
-}
+_either_f.mapToConstant = toFunctorType(Constant);
+_either_f.mapToFuture = toFunctorType(Future);
+_either_f.mapToIdentity = toFunctorType(Identity);
+_either_f.mapToIo = toFunctorType(Io);
+_either_f.mapToList = toFunctorType(List);
+_either_f.mapToMaybe = toFunctorType(Maybe);
 
-function _mapToIdentity(fn = identity) {
-    return Identity.of(fn(this.value));
-}
+_future_f.mapToConstant = toFunctorType(Constant);
+_future_f.mapToEither = toFunctorType(Either);
+_future_f.mapToIdentity = toFunctorType(Identity);
+_future_f.mapToIo = toFunctorType(Io);
+_future_f.mapToLeft = toFunctorType(Left);
+_future_f.mapToList = toFunctorType(List);
+_future_f.mapToMaybe = toFunctorType(Maybe);
+_future_f.mapToRight = toFunctorType(Right);
 
-function _mapToIo(fn = identity) {
-    return Io.of(fn(this.value));
-}
+_identity_f.mapToConstant = toFunctorType(Constant);
+_identity_f.mapToEither = toFunctorType(Either);
+_identity_f.mapToFuture = toFunctorType(Future);
+_identity_f.mapToIo = toFunctorType(Io);
+_identity_f.mapToLeft = toFunctorType(Left);
+_identity_f.mapToList = toFunctorType(List);
+_identity_f.mapToMaybe = toFunctorType(Maybe);
+_identity_f.mapToRight = toFunctorType(Right);
 
-function _mapToLeft(fn = identity) {
-    return Left(fn(this.value));
-}
+_io_f.mapToConstant = toFunctorType(Constant);
+_io_f.mapToEither = toFunctorType(Either);
+_io_f.mapToFuture = toFunctorType(Future);
+_io_f.mapToIdentity = toFunctorType(Identity);
+_io_f.mapToLeft = toFunctorType(Left);
+_io_f.mapToList = toFunctorType(List);
+_io_f.mapToMaybe = toFunctorType(Maybe);
+_io_f.mapToRight = toFunctorType(Right);
 
-function _mapToList(fn = identity) {
-    return List.from(fn(this.value));
-}
+list_functor_core.mapToConstant = toFunctorType(Constant);
+list_functor_core.mapToEither = toFunctorType(Either);
+list_functor_core.mapToFuture = toFunctorType(Future);
+list_functor_core.mapToIo = toFunctorType(Io);
+list_functor_core.mapToIdentity = toFunctorType(Identity);
+list_functor_core.mapToLeft = toFunctorType(Left);
+list_functor_core.mapToMaybe = toFunctorType(Maybe);
+list_functor_core.mapToRight = toFunctorType(Right);
 
-function _mapToMaybe(fn = identity) {
-    return Maybe.of(fn(this.value));
-}
-
-function _mapToRight(fn = identity) {
-    return Right(fn(this.value));
-}
-
-_constant_f.mapToEither = _mapToEither;
-_constant_f.mapToFuture = _mapToFuture;
-_constant_f.mapToIdentity = _mapToIdentity;
-_constant_f.mapToIo = _mapToIo;
-_constant_f.mapToLeft = _mapToLeft;
-_constant_f.mapToList = _mapToList;
-_constant_f.mapToMaybe = _mapToMaybe;
-_constant_f.mapToRight = _mapToRight;
-
-_either_f.mapToConstant = _mapToConstant;
-_either_f.mapToFuture = _mapToFuture;
-_either_f.mapToIdentity = _mapToIdentity;
-_either_f.mapToIo = _mapToIo;
-_either_f.mapToList = _mapToList;
-_either_f.mapToMaybe = _mapToMaybe;
-
-_future_f.mapToConstant = _mapToConstant;
-_future_f.mapToEither = _mapToEither;
-_future_f.mapToIdentity = _mapToIdentity;
-_future_f.mapToIo = _mapToIo;
-_future_f.mapToLeft = _mapToLeft;
-_future_f.mapToList = _mapToList;
-_future_f.mapToMaybe = _mapToMaybe;
-_future_f.mapToRight = _mapToRight;
-
-_identity_f.mapToConstant = _mapToConstant;
-_identity_f.mapToEither = _mapToEither;
-_identity_f.mapToFuture = _mapToFuture;
-_identity_f.mapToIo = _mapToIo;
-_identity_f.mapToLeft = _mapToLeft;
-_identity_f.mapToList = _mapToList;
-_identity_f.mapToMaybe = _mapToMaybe;
-_identity_f.mapToRight = _mapToRight;
-
-_io_f.mapToConstant = _mapToConstant;
-_io_f.mapToEither = _mapToEither;
-_io_f.mapToFuture = _mapToFuture;
-_io_f.mapToIdentity = _mapToIdentity;
-_io_f.mapToLeft = _mapToLeft;
-_io_f.mapToList = _mapToList;
-_io_f.mapToMaybe = _mapToMaybe;
-_io_f.mapToRight = _mapToRight;
-
-list_functor_core.mapToConstant = _mapToConstant;
-list_functor_core.mapToEither = _mapToEither;
-list_functor_core.mapToFuture = _mapToFuture;
-list_functor_core.mapToIo = _mapToIo;
-list_functor_core.mapToIdentity = _mapToIdentity;
-list_functor_core.mapToLeft = _mapToLeft;
-list_functor_core.mapToMaybe = _mapToMaybe;
-list_functor_core.mapToRight = _mapToRight;
-
-_maybe_f.mapToConstant = _mapToConstant;
-_maybe_f.mapToEither = _mapToEither;
-_maybe_f.mapToFuture = _mapToFuture;
-_maybe_f.mapToIdentity = _mapToIdentity;
-_maybe_f.mapToIo = _mapToIo;
-_maybe_f.mapToLeft = _mapToLeft;
-_maybe_f.mapToList = _mapToList;
-_maybe_f.mapToRight = _mapToRight;
+_maybe_f.mapToConstant = toFunctorType(Constant);
+_maybe_f.mapToEither = toFunctorType(Either);
+_maybe_f.mapToFuture = toFunctorType(Future);
+_maybe_f.mapToIdentity = toFunctorType(Identity);
+_maybe_f.mapToIo = toFunctorType(Io);
+_maybe_f.mapToLeft = toFunctorType(Left);
+_maybe_f.mapToList = toFunctorType(List);
+_maybe_f.mapToRight = toFunctorType(Right);
 
 var functors = {
     Constant,
