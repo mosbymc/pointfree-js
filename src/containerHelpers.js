@@ -1,4 +1,4 @@
-import { curry, compose } from './functionalHelpers';
+import { curry, compose, identity } from './functionalHelpers';
 import { Just, _just } from './just_monad/just';
 import { Identity, _identity } from './identity_monad/identity';
 import { Maybe, _maybe } from './maybe_monad/maybe';
@@ -145,6 +145,12 @@ function mjoin(ma) {
     return ma.join();
 }
 
+function toFunctorType(type) {
+    return function toType(fn = identity) {
+        return type.of(fn(this.value));
+    };
+}
+
 /**
  * @description:
  * @param: {functor} ma
@@ -243,4 +249,4 @@ var intersect = curry(function _intersect(enumerable, comparer, list) {
     return list.intersect(enumerable, comparer);
 });
 
-export { apply, fmap, map, mjoin };
+export { apply, fmap, map, lift2, lift3, lift4, liftN, mjoin, toFunctorType };

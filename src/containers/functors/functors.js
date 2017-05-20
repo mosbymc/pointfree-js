@@ -6,13 +6,7 @@ import { Io, _io_f } from './io_functor';
 import { List, list_functor_core } from './list_functor';
 import { Maybe, _maybe_f } from './maybe_functor';
 
-import { identity } from '../../functionalHelpers';
-
-function toFunctorType(type) {
-    return function toType(fn = identity) {
-        return type.of(fn(this.value));
-    };
-}
+import { toFunctorType } from '../../containerHelpers';
 
 _constant_f.mapToEither = toFunctorType(Either);
 _constant_f.mapToFuture = toFunctorType(Future);
