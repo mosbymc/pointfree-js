@@ -112,7 +112,7 @@ var list_functor_core = {
      * @return: {@see m_list}
      */
     flatMap: function _flatMap(fn) {
-        return list_functor_core.isPrototypeOf(this.value) ? this.value.map(fn) : this.of(this, flatMap(this, fn));
+        return this.of(flatMap(this, fn));
     },
 
     /**
