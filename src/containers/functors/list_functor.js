@@ -462,7 +462,7 @@ var list_functor_core = {
  * otherwise.
  */
 list_functor_core.contains.binary = function _binary(val, comparer) {
-    if (delegatesTo(source, ordered_list_a) && 'undefined' === typeof comparer)
+    if (delegatesTo(source, ordered_list_f) && 'undefined' === typeof comparer)
         return binarySearch(when(not(isArray), Array.from, source), val, comparer);
     return list_functor_core.contains(val, comparer);
 };
