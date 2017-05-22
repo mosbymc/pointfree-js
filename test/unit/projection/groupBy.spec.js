@@ -54,7 +54,6 @@ testData.dataSource.data.forEach(function _findUniqueStates(item) {
 describe('Test groupBy...', function testGroupBy() {
     describe('...using arrays', function testGroupByUsingArrays() {
         it('should group test data by state descending', function testGroupByOnStateDescending() {
-            console.log(createNewQueryableDelegator);
             var groupObj = [ { keySelector: stateSelector, comparer: comparer, direction: sortDirection.descending } ],
                 groupByIterable = groupBy(testData.dataSource.data, groupObj, createNewQueryableDelegator),
                 groupByRes = Array.from(groupByIterable());

@@ -21,7 +21,6 @@ internal_orderedQueryable.source = testData.dataSource.data;
 
 describe('Test orderedQueryable... ', function testOrderedQueryable() {
     it('should create a new queryable delegate', function testObjectDelegation() {
-        console.log(Object.getPrototypeOf(internal_orderedQueryable));
         var queryableAddFront = internal_orderedQueryable.addFront([1, 2, 3, 4, 5]),
             concatQueryable = internal_orderedQueryable.concat(testData.dataSource.data),
             exceptQueryable = internal_orderedQueryable.except(testData.dataSource.data),

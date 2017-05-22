@@ -1,5 +1,5 @@
 function Either(val, fork) {
-    Object.create(_either_f, {
+    return Object.create(_either_f, {
         _value: {
             value: val,
             writable: false,
@@ -54,7 +54,8 @@ var _either_f = {
         return Either.of(val);
     },
     toString: function _toString() {
-        return this.isLeft ? `Left(${this.value})` : `Right(${this.value})`;
+        var val = this.value && this.value.toString && 'function' === typeof this.value.toString ? this.value.toString() : JSON.stringify(this.value);
+        return this.isLeft ? `Left(${val})` : `Right(${val})`;
     }
 };
 

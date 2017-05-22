@@ -1,7 +1,7 @@
 import { Constant, _constant_f } from '../../../../src/containers/functors/constant_functor';
 
 describe('Constant functor tests', function _testConstantFunctor() {
-    describe('Constant object factory test', function _testConstantObjectFactory() {
+    describe('Constant object factory tests', function _testConstantObjectFactory() {
         it('should return a new constant functor regardless of data type', function testConstantFactoryObjectCreation() {
             var arr = [1, 2, 3],
                 obj = { a: 1, b: 2 },
@@ -133,11 +133,13 @@ describe('Constant functor tests', function _testConstantFunctor() {
         it('should print the correct container type + value when .toString() is invoked', function testConstantFunctorToString() {
             var c1 = Constant(1),
                 c2 = Constant(null),
-                c3 = Constant([1, 2, 3]);
+                c3 = Constant([1, 2, 3]),
+                c4 = Constant(Constant(Constant(5)));
 
             c1.toString().should.eql('Constant(1)');
             c2.toString().should.eql('Constant(null)');
             c3.toString().should.eql('Constant(1,2,3)');
+            c4.toString().should.eql('Constant(Constant(Constant(5)))');
         });
     });
 });

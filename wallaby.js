@@ -22,7 +22,10 @@ module.exports = function _wallaby(wallaby) {
          - instrument: Indicates to wallaby if coverage reporting (in the IDE and application) should be checked against the matched files
          */
         files: [
-            { pattern: 'node_modules/chai/chai.js', instrument: true },
+            { pattern: 'node_modules/chai/chai.js', instrument: false },
+            { pattern: 'node_modules/sinon/lib/sinon.js', instrument: false },
+            { pattern: 'node_modules/sinon-chai/lib/sinon-chai.js', instrument: false },
+            { pattern: 'node_modules/mocha-sinon/mocha-sinon.js', instrument: false },
             { pattern : 'src/**/*.js', load: true },
             { pattern: 'test/testData.js', load: true },
             '!test/**/*.spec.js',
@@ -67,6 +70,7 @@ module.exports = function _wallaby(wallaby) {
         setup: function _setup() {
             global.should = chai.should();
             global.expect = chai.expect;
+            global.sinon = require('sinon');
         }
     };
 };

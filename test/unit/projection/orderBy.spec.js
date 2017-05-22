@@ -80,7 +80,6 @@ describe('Test orderBy...', function testOrderBy() {
                         previousFieldsValues[2] = null;
                     }
                     else if (item.LastName !== previousFieldsValues[1]) {
-                        console.log(idx, previousFieldsValues[0], previousFieldsValues[1], previousFieldsValues[2]);
                         if (null !== previousFieldsValues[1]) {
                             item.LastName.should.be.at.least(previousFieldsValues[1]);
                         }
