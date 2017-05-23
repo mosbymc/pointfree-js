@@ -9,6 +9,12 @@ function Maybe(val) {
             value: null == val ? null : val,
             writable: false,
             configurable: false
+        },
+        isJust: {
+            value: null != val
+        },
+        isNothing: {
+            value: null == val
         }
     });
 }
@@ -24,6 +30,12 @@ Maybe.of = function _of(val) {
             value: val,
             writable: false,
             configurable: false
+        },
+        isJust: {
+            value: true
+        },
+        isNothing: {
+            value: false
         }
     });
 };
@@ -91,12 +103,6 @@ function Nothing() {
 Nothing.of = Nothing;
 
 var _maybe_f = {
-    isJust: function _isJust() {
-        return null != this.value;
-    },
-    isNothing: function _isNothing() {
-        return null == this.value;
-    },
     get value() {
         return this._value;
     },
@@ -126,20 +132,30 @@ var _just_f = Object.create(_maybe_f, {
     isNothing: {
         value: false
     },
-    get value() {
-        return this._value;
+    value: {
+        get: function _getValue() {
+            return this._value;
+        }
     },
-    map: function _map(fn) {
-        return Just(fn(this.value));
+    map: {
+        value: function _map(fn) {
+            return Just(fn(this.value));
+        }
     },
-    flatMap: function _flatMap(fn) {
-        return _maybe_f.isPrototypeOf(this.value) ? this.value.map(fn) : Just(fn(this.value));
+    flatMap: {
+        value: function _flatMap(fn) {
+            return _maybe_f.isPrototypeOf(this.value) ? this.value.map(fn) : Just(fn(this.value));
+        }
     },
-    of: function _of(val) {
-        return Just.of(val);
+    of: {
+        value: function _of(val) {
+            return Just.of(val);
+        }
     },
-    toString: function _toString() {
-        return `Maybe.Just(${this.value})`;
+    toString: {
+        value: function _toString() {
+            return `Maybe.Just(${this.value})`;
+        }
     }
 });
 
@@ -150,20 +166,30 @@ var _nothing_f = Object.create(_maybe_f, {
     isNothing: {
         value: true
     },
-    get value() {
-        return this._value;
+    value: {
+        value: function _getValue() {
+            return this._value;
+        }
     },
-    map: function _map() {
-        return Nothing();
+    map: {
+        value: function _map() {
+            return Nothing();
+        }
     },
-    flatMap: function _flatMap(fn) {
-        return _maybe_f.isPrototypeOf(this.value) ? this.value.map(fn) : Nothing();
+    flatMap: {
+        value: function _flatMap(fn) {
+            return _maybe_f.isPrototypeOf(this.value) ? this.value.map(fn) : Nothing();
+        }
     },
-    of: function _of() {
-        return Nothing();
+    of: {
+        value: function _of() {
+            return Nothing.of();
+        }
     },
-    toString: function _toString() {
-        return `Maybe.Nothing()`;
+    toString: {
+        value: function _toString() {
+            return `Maybe.Nothing()`;
+        }
     }
 });
 

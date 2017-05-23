@@ -562,7 +562,7 @@ var ordered_list_f = Object.create(list_functor_core, {
 var setValue = set('_value'),
     setIterator = set(Symbol.iterator),
     isIterator = apply(delegatesFrom(generatorProto)),
-    create = ifElse(isSomething, createOrderedList, createList);
+    listCreate = ifElse(isSomething, createOrderedList, createList);
 
 /**
  * @description:
@@ -615,12 +615,12 @@ function createGroupedList(val) {
                 return this._key;
             }
         }
-    })
+    });
 }
 
 /**
  * @description: Creator function for List delegate object instances. Creates a m_list delegator
- * if no sort object is passed, otherwise, it will create an ordered_m_list delegator. If no
+ * if no sort object is passed, otherwise, it will listCreate an ordered_m_list delegator. If no
  * iterator is passed, the delegator will fall back on the delegate's iterator.
  * @param: {*} value - Any value that should be used as the underlying source of the List. It the
  * value has an iterator it will be accepted as is, if not, it will be wrapped in an array.
@@ -631,7 +631,26 @@ function createGroupedList(val) {
  * @return: {@see list_core}
  */
 function createListDelegator(value, iterator, sortObj) {
-    return when(isIterator(iterator), setIterator(iterator), setValue(value, create(sortObj)));
+    var l = Object.create(_list_f, {
+        _value: {
+            value: value,
+            writable: false,
+            configurable: false
+        },
+        data: {
+            get: function _getData() {
+                return Array.from(this);
+            }
+        }
+    });
+
+    if (generatorProto.isPrototypeOf(iterator))
+        l[Symbol.iterator] = iterator;
+
+    if (sortObj) l._appliedSorts = sortObj;
+
+    return l;
+    //return when(isIterator(iterator), setIterator(iterator), setValue(value, listCreate(sortObj)));
 }
 
 /**
@@ -659,7 +678,7 @@ function List(source) {
 }
 
 /**
- * @description: Convenience function for create a new List instance; internally calls List.
+ * @description: Convenience function for listCreate a new List instance; internally calls List.
  * @see: List
  * @param: {*} source - Any type, any value; used as the underlying source of the List
  * @return: {@see _list_a} - A new List instance with the value provided as the underlying source.
@@ -719,5 +738,153 @@ List.extend = function _extend(propName, fn) {
     }
     return List;
 };
+
+/**
+ * @description: Creates a new list object delegate instance; list type is determined by
+ * the parameters passed to the function. If only the 'source' parameter is provided, a
+ * 'basic' _list_f delegate object instance is created. If the source and iterator parameters
+ * are passed as arguments, a 'basic' _list_f delegate object instance is created and the
+ * iterator provided is used as the new instance object's iterator rather than the default
+ * list iterator. If the source, iterator, and sortObj parameters are passed as arguments,
+ * an ordered_list_f delegate object instance is created. The provided iterator is set on
+ * the instance object to be used in lieu of the default iterator and the ._appliedSorts
+ * field is set as the 'sortObj' parameter. If all four of the function's arguments are
+ * provided (source, iterator, sortObj, and key), then a _list_f delegate object instance
+ * is created, setting the iterator for the object instance as the provided iterator, the
+ * ._appliedSorts field as the sortObj argument, and the ._key field as the 'key' parameter's
+ * value.
+ *
+ * The switch case inside the function only handles a subset of the possible bit flag values.
+ * Technically there could be as many as eight different scenarios to check, not including the
+ * default case. However, in practice, the only values received from the 'createBitMask' function
+ * will be odd. Thus, only odd values (plus the default case which covers a value of zero) need
+ * to be handled. A case of zero arises when only the 'source' argument is provided.
+ *
+ * @param: {*} source - The value to be used as the underlying source of the list functor; may be
+ * anything javascript object that has an iterator.
+ * @param: {generator} iterator - A generator function that is to be used on the new list delegate
+ * object instance's iterator.
+ * @param: {Array} sortObj - An array of the sort(s) (field and direction} to be used when the
+ * instance is evaluated.
+ * @param: {string} key - A string that denotes what value the new list delegate object instance
+ * was grouped on.
+ * @return: {@see list_functor_core}
+ */
+function tempListCreator(source, iterator, sortObj, key) {
+    switch(createBitMask(keyTest(key), sortObjectTest(sortObj), iteratorTest(iterator))) {
+        /**
+         * @description: case 1 = An iterator has been passed, but nothing else. Create a
+         * _list_f object instance and set the iterator as the version provided.
+         */
+        case 1:
+            return Object.create(_list_f, {
+                _value: {
+                    value: source,
+                    writable: false,
+                    configurable: false
+                },
+                data: {
+                    get: function _getData() {
+                        return Array.from(this);
+                    }
+                },
+                [Symbol.iterator]: {
+                    value: iterator
+                }
+            });
+        /**
+         * @description: case 3 = Both an iterator and a sort object were passed. Create an
+         * ordered_list_f object instance, setting the iterator to the version provided and
+         * the _appliedSorts field as the sortObj param.
+         */
+        case 3:
+            return Object.create(ordered_list_f, {
+                _value: {
+                    value: source,
+                    writable: false,
+                    configurable: false
+                },
+                data: {
+                    get: function _getData() {
+                        return Array.from(this);
+                    }
+                },
+                _appliedSorts: {
+                    value: sortObj,
+                    writable: false,
+                    configurable: false
+                },
+                [Symbol.iterator]: {
+                    value: iterator
+                }
+            });
+        /**
+         * @description: case 7 = An iterator, sort object, and a key were passed as arguments.
+         * Create a grouped _list_f and set the iterator as the version provided, the ._appliedSorts
+         * field as the sortObj param, and the ._key field as the key string argument.
+         */
+        case 7:
+            return Object.create(_list_f, {
+                data: {
+                    get: function _getData() {
+                        return Array.from(this);
+                    }
+                },
+                _key: {
+                    value: key,
+                    writable: false,
+                    configurable: false
+                },
+                key: {
+                    get: function _getKey() {
+                        return this._key;
+                    }
+                }
+            });
+        /**
+         * @description: default = Nothing beyond the 'source' param was passed to this
+         * function; results in a bitwise value of 00. Create a 'basic' _list_f object
+         * instance.
+         */
+        default:
+            return Object.create(_list_f, {
+                _value: {
+                    value: source,
+                    writable: false,
+                    configurable: false
+                },
+                data: {
+                    get: function _getData() {
+                        return Array.from(this);
+                    }
+                }
+            });
+    }
+
+    function createBitMask() {
+        var nMask = 0, nFlag = 0, nLen = arguments.length > 32 ? 32 : arguments.length;
+        for (nFlag; nFlag < nLen; nMask |= arguments[nFlag] << nFlag++);
+        return nMask;
+    }
+
+    function determineFlags(iterator, sortObj) {
+        var hasIterator = iteratorTest(iterator);
+        if (!hasIterator) return 0;
+        var isSortObject = sortObjectTest(sortObj);
+        return isSortObject ? 2 : 1;
+    }
+
+    function iteratorTest(iterator) {
+        return generatorProto.isPrototypeOf(iterator);
+    }
+
+    function sortObjectTest(sortObj) {
+        return sortObj && Array.isArray(sortObj);
+    }
+
+    function keyTest(key) {
+        return 'string' === typeof key;
+    }
+}
 
 export { List, list_functor_core, _list_f, ordered_list_f };

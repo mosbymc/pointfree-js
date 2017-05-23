@@ -42,9 +42,19 @@ var _either_f = {
     get value() {
         return this._value;
     },
+    /**
+     * @description:
+     * @param: {function|undefined} fn
+     * @return: {@see _either_f}
+     */
     map: function _map(fn) {
         return this.isRight ? Right(fn(this.value)) : Left(this.value);
     },
+    /**
+     * @description:
+     * @param: {function|undefined} fn
+     * @return: {@see _either_f}
+     */
     flatMap: function _flatMap(fn) {
         if (Object.getPrototypeOf(this).isPrototypeOf(this.value)) return this.value.map(fn);
         if (this.isRight) return Right(fn(this.value));

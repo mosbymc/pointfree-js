@@ -152,8 +152,8 @@ describe('Either functor tests', function _testEitherFunctor() {
             var e1 = Left(null),
                 e2 = Left('this is a test');
 
-            var e1_1 = e1.map(function _nothin() { return true; }),
-                e2_1 = e2.map(function _nothin2() { return false; });
+            var e1_1 = e1.map(),
+                e2_1 = e2.map();
 
             _either_f.isPrototypeOf(e1_1).should.be.true;
             _either_f.isPrototypeOf(e2_1).should.be.true;
@@ -200,15 +200,13 @@ describe('Either functor tests', function _testEitherFunctor() {
                 e2 = Left(Left([1, 2, 3])),
                 e3 = Left(1);
 
-            var e1_1 = e1.flatMap(function _changeNum() { return 10; }),
-                e2_1 = e2.flatMap(function _changeNums(item) { return item.map(function _changeNum(it) { return it * 5; }); }),
-                e3_1 = e3.flatMap(function _changeNum() { return 2; });
+            var e1_1 = e1.flatMap(),
+                e2_1 = e2.flatMap(),
+                e3_1 = e3.flatMap();
 
             _either_f.isPrototypeOf(e1_1).should.be.true;
             _either_f.isPrototypeOf(e2_1).should.be.true;
             _either_f.isPrototypeOf(e3_1).should.be.true;
-
-            console.log(e3_1.toString());
 
             e1_1.isLeft.should.be.true;
             e1_1.isRight.should.be.false;
