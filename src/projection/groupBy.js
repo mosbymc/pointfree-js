@@ -18,7 +18,7 @@ function nestLists(data, depth, key, queryableConstructor) {
         });
     }
     if (0 !== depth) {
-        data = queryableConstructor(data);
+        data = queryableConstructor(data, key);
         data.key = key;
     }
     return data;

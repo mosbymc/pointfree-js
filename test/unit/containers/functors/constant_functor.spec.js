@@ -106,6 +106,28 @@ describe('Constant functor tests', function _testConstantFunctor() {
             c.should.not.equal(d);
         });
 
+        it('should properly indicate equality when constant functors are indeed equal', function _testConstantFunctorEquality() {
+            var m1 = Constant(null),
+                m2 = Constant(null),
+                m3 = Constant(1),
+                m4 = Constant(1),
+                m5 = Constant(2);
+
+            m1.equals(m2).should.be.true;
+            m1.equals(m3).should.be.false;
+            m1.equals(m4).should.be.false;
+            m1.equals(m5).should.be.false;
+
+            m2.equals(m3).should.be.false;
+            m2.equals(m4).should.be.false;
+            m2.equals(m5).should.be.false;
+
+            m3.equals(m4).should.be.true;
+            m3.equals(m5).should.be.false;
+
+            m4.equals(m5).should.be.false;
+        });
+
         it('should return a new constant functor regardless of data type', function testConstantFactoryObjectCreation() {
             var arr = [1, 2, 3],
                 obj = { a: 1, b: 2 },

@@ -4,7 +4,7 @@ import { Future, _future_f } from './future_functor';
 import { Identity, _identity_f } from './identity_functor';
 import { Io, _io_f } from './io_functor';
 import { List, list_functor_core } from './list_functor';
-import { Maybe, _maybe_f } from './maybe_functor';
+import { Maybe, Just, Nothing, _maybe_f } from './maybe_functor';
 
 import { toFunctorType } from '../../containerHelpers';
 
@@ -75,9 +75,11 @@ var functors = {
     Future,
     Identity,
     Io,
+    Just,
     Left,
     List,
     Maybe,
+    Nothing,
     Right
 };
 

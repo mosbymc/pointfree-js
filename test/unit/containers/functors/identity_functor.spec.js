@@ -1,8 +1,11 @@
-import { Identity, _identity_f } from '../../../../src/containers/functors/identity_functor';
+import { functors } from '../../../../src/containers/functors/functors';
+import { _identity_f } from '../../../../src/containers/functors/identity_functor';
+
+var Identity = functors.Identity;
 
 describe('Identity functor test', function _testIdentityFunctor() {
     describe('Identity object factory tests', function _testIdentityObjectFactory() {
-        it('should return a new constant functor regardless of data type', function testIdentityFactoryObjectCreation() {
+        it('should return a new constant functor regardless of data type', function _testIdentityFactoryObjectCreation() {
             var arr = [1, 2, 3],
                 obj = { a: 1, b: 2 },
                 i1 = Identity(),
@@ -33,7 +36,7 @@ describe('Identity functor test', function _testIdentityFunctor() {
             expect(false).to.eql(i8.value);
         });
 
-        it('should return the same type/value when using the #of function', function testIdentityDotOf() {
+        it('should return the same type/value when using the #of function', function _testIdentityDotOf() {
             var arr = [1, 2, 3],
                 obj = { a: 1, b: 2 },
                 i1 = Identity.of(),
@@ -106,7 +109,29 @@ describe('Identity functor test', function _testIdentityFunctor() {
             i.should.not.equal(d);
         });
 
-        it('should return a new identity functor regardless of data type', function testIdentityFactoryObjectCreation() {
+        it('should properly indicate equality when constant functors are indeed equal', function _testIdentityFunctorEquality() {
+            var m1 = Identity(null),
+                m2 = Identity(null),
+                m3 = Identity(1),
+                m4 = Identity(1),
+                m5 = Identity(2);
+
+            m1.equals(m2).should.be.true;
+            m1.equals(m3).should.be.false;
+            m1.equals(m4).should.be.false;
+            m1.equals(m5).should.be.false;
+
+            m2.equals(m3).should.be.false;
+            m2.equals(m4).should.be.false;
+            m2.equals(m5).should.be.false;
+
+            m3.equals(m4).should.be.true;
+            m3.equals(m5).should.be.false;
+
+            m4.equals(m5).should.be.false;
+        });
+
+        it('should return a new identity functor regardless of data type', function _testIdentityFactoryObjectCreation() {
             var arr = [1, 2, 3],
                 obj = { a: 1, b: 2 },
                 i = Identity();
@@ -130,7 +155,43 @@ describe('Identity functor test', function _testIdentityFunctor() {
             expect(false).to.eql(i8.value);
         });
 
-        it('should print the correct container type + value when .toString() is invoked', function testIdentityFunctorToString() {
+        it('should transform an identity functor to the other functor types', function _testIdentityFunctorTransforms() {
+            var i = Identity(1);
+            var c = i.mapToConstant(),
+                e = i.mapToEither(),
+                f = i.mapToFuture(),
+                io = i.mapToIo(),
+                l = i.mapToList(),
+                left = i.mapToLeft(),
+                m = i.mapToMaybe(),
+                r = i.mapToRight();
+
+            c.should.be.an('object');
+            Object.getPrototypeOf(c).should.eql(Object.getPrototypeOf(functors.Constant()));
+
+            e.should.be.an('object');
+            Object.getPrototypeOf(e).should.eql(Object.getPrototypeOf(functors.Either()));
+
+            f.should.be.an('object');
+            Object.getPrototypeOf(f).should.eql(Object.getPrototypeOf(functors.Future()));
+
+            io.should.be.an('object');
+            Object.getPrototypeOf(io).should.eql(Object.getPrototypeOf(functors.Io()));
+
+            l.should.be.an('object');
+            Object.getPrototypeOf(l).should.eql(Object.getPrototypeOf(functors.List()));
+
+            left.should.be.an('object');
+            Object.getPrototypeOf(left).should.eql(Object.getPrototypeOf(functors.Left()));
+
+            m.should.be.an('object');
+            Object.getPrototypeOf(m).should.eql(Object.getPrototypeOf(functors.Maybe()));
+
+            r.should.be.an('object');
+            Object.getPrototypeOf(r).should.eql(Object.getPrototypeOf(functors.Right()));
+        });
+
+        it('should print the correct container type + value when .toString() is invoked', function _testIdentityFunctorToString() {
             var c1 = Identity(1),
                 c2 = Identity(null),
                 c3 = Identity([1, 2, 3]),

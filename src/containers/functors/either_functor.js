@@ -34,9 +34,17 @@ function Left(val) {
     return Either(val);
 }
 
+Left.of = function _of(val) {
+    return Either(val);
+};
+
 function Right(val) {
     return Either.of(val);
 }
+
+Right.of = function _of(val) {
+    return Either.of(val);
+};
 
 var _either_f = {
     get value() {
@@ -59,6 +67,15 @@ var _either_f = {
         if (Object.getPrototypeOf(this).isPrototypeOf(this.value)) return this.value.map(fn);
         if (this.isRight) return Right(fn(this.value));
         return Left(this.value);
+    },
+    /**
+     * @description:
+     * @param: {functor} ma
+     * @return: {boolean}
+     */
+    equals: function _equals(ma) {
+        return Object.getPrototypeOf(this).isPrototypeOf(ma) ?
+            (this.isLeft && ma.isLeft && this.value === ma.value) || this.isRight && ma.isRight && this.value === ma.value : false;
     },
     of: function _of(val) {
         return Either.of(val);

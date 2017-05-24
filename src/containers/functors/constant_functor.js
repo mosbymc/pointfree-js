@@ -61,6 +61,14 @@ var _constant_f = {
     },
     /**
      * @description:
+     * @param: {functor} ma
+     * @return: {boolean}
+     */
+    equals: function _equals(ma) {
+        return Object.getPrototypeOf(this).isPrototypeOf(ma) && this.value === ma.value;
+    },
+    /**
+     * @description:
      * @return: {string}
      */
     toString: function _toString() {

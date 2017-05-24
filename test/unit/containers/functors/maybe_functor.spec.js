@@ -220,6 +220,62 @@ describe('Maybe functor tests', function _testMaybeFunctor() {
             d1.value.should.eql(d2.value);
         });
 
+        it('should properly indicate equality when constant functors are indeed equal', function _testMaybeFunctorEquality() {
+            var m1 = Maybe(null),
+                m2 = Maybe(null),
+                m3 = Maybe(1),
+                m4 = Maybe(1),
+                m5 = Maybe(2),
+                m6 = Maybe.Nothing(),
+                m7 = Maybe.Nothing(1),
+                m8 = Maybe.Just(),
+                m9 = Maybe.Just(1);
+
+            m1.equals(m2).should.be.true;
+            m1.equals(m3).should.be.false;
+            m1.equals(m4).should.be.false;
+            m1.equals(m5).should.be.false;
+            m1.equals(m6).should.be.true;
+            m1.equals(m7).should.be.true;
+            m1.equals(m8).should.be.false;
+            m1.equals(m9).should.be.false;
+
+            m2.equals(m3).should.be.false;
+            m2.equals(m4).should.be.false;
+            m2.equals(m5).should.be.false;
+            m2.equals(m6).should.be.true;
+            m2.equals(m7).should.be.true;
+            m2.equals(m8).should.be.false;
+            m2.equals(m9).should.be.false;
+
+            m3.equals(m4).should.be.true;
+            m3.equals(m5).should.be.false;
+            m3.equals(m6).should.be.false;
+            m3.equals(m7).should.be.false;
+            m3.equals(m8).should.be.false;
+            m3.equals(m9).should.be.true;
+
+            m4.equals(m5).should.be.false;
+            m4.equals(m6).should.be.false;
+            m4.equals(m7).should.be.false;
+            m4.equals(m8).should.be.false;
+            m4.equals(m9).should.be.true;
+
+            m5.equals(m6).should.be.false;
+            m5.equals(m7).should.be.false;
+            m5.equals(m8).should.be.false;
+            m5.equals(m9).should.be.false;
+
+            m6.equals(m7).should.be.true;
+            m6.equals(m8).should.be.false;
+            m6.equals(m9).should.be.false;
+
+            m7.equals(m8).should.be.false;
+            m7.equals(m9).should.be.false;
+
+            m8.equals(m9).should.be.false;
+        });
+
         it('should return a new maybe functor regardless of data type', function testMaybeFactoryObjectCreation() {
             var arr = [1, 2, 3],
                 obj = { a: 1, b: 2 },

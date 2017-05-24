@@ -222,6 +222,62 @@ describe('Either functor tests', function _testEitherFunctor() {
             e3_1.value.should.eql(1);
         });
 
+        it('should properly indicate equality when constant functors are indeed equal', function _testEitherFunctorEquality() {
+            var m1 = Either(null),
+                m2 = Either(null),
+                m3 = Either(1),
+                m4 = Either(1),
+                m5 = Either(2),
+                m6 = Left(),
+                m7 = Left(1),
+                m8 = Right(),
+                m9 = Right(1);
+
+            m1.equals(m2).should.be.true;
+            m1.equals(m3).should.be.false;
+            m1.equals(m4).should.be.false;
+            m1.equals(m5).should.be.false;
+            m1.equals(m6).should.be.false;
+            m1.equals(m7).should.be.false;
+            m1.equals(m8).should.be.false;
+            m1.equals(m9).should.be.false;
+
+            m2.equals(m3).should.be.false;
+            m2.equals(m4).should.be.false;
+            m2.equals(m5).should.be.false;
+            m2.equals(m6).should.be.false;
+            m2.equals(m7).should.be.false;
+            m2.equals(m8).should.be.false;
+            m2.equals(m9).should.be.false;
+
+            m3.equals(m4).should.be.true;
+            m3.equals(m5).should.be.false;
+            m3.equals(m6).should.be.false;
+            m3.equals(m7).should.be.true;
+            m3.equals(m8).should.be.false;
+            m3.equals(m9).should.be.false;
+
+            m4.equals(m5).should.be.false;
+            m4.equals(m6).should.be.false;
+            m4.equals(m7).should.be.true;
+            m4.equals(m8).should.be.false;
+            m4.equals(m9).should.be.false;
+
+            m5.equals(m6).should.be.false;
+            m5.equals(m7).should.be.false;
+            m5.equals(m8).should.be.false;
+            m5.equals(m9).should.be.false;
+
+            m6.equals(m7).should.be.false;
+            m6.equals(m8).should.be.false;
+            m6.equals(m9).should.be.false;
+
+            m7.equals(m8).should.be.false;
+            m7.equals(m9).should.be.false;
+
+            m8.equals(m9).should.be.false;
+        });
+
         it('should return a new constant functor regardless of data type', function testConstantFactoryObjectCreation() {
             var arr = [1, 2, 3],
                 obj = { a: 1, b: 2 },

@@ -812,6 +812,130 @@ function curryN(arity, received, fn) {
     };
 }
 
+function mapping(mappingFunc) {
+    return function _mapping(reducingFunc) {
+        return function _mapping_(result, input) {
+            return reducingFunc(result, mappingFunc(input));
+        };
+    };
+}
+
+function filtering(predicate) {
+    return function _filtering(reducingFunc) {
+        return function _filtering_(result, input) {
+            return predicate(input) ? reducingFunc(result, input) : result;
+        };
+    };
+}
+
+function mapReducer (mapFn) {
+    return function _mapReducer(result, input) {
+        result[result.length] = input;
+        return result;
+    };
+}
+
+function filterReducer(predicate) {
+    return function _filterReducer(result, input) {
+        if (predicate(input)) result[result.length] = input;
+        return result;
+    };
+}
+
+var x = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
+    .reduce(mapping((x) => x + 1)((xs, x) => {
+        xs.push(x);
+        return xs;
+    }), [])
+    .reduce(filtering((x) => x % 2 === 0)((xs, x) => {
+        xs.push(x);
+        return xs;
+    }), []);
+
+var xs1 = compose(
+    mapping(function _mapFunc(x) {
+        return x + 1;
+    }),
+    filtering(function _filterFunc(x) {
+        return x % 2 === 0;
+    }));
+
+/*
+var g = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9].reduce(xs1(function _reduce(xs, xi) {
+    xs[xs.length] = xi;
+    return xs;
+}), []);
+*/
+
+function dropGate(skips) {
+    return function _dropGate(x) {
+        return --skips < 0;
+    };
+}
+
+function dropping1(skips) {
+    return filtering(dropGate(skips));
+    //return compose(filtering, dropGate)(skips);
+    //return filtering(function _f(x) { return --skips < 0; });
+}
+
+function dropping2(skips) {
+    return function _dropping2(reducingFunc) {
+        return function _dropping2_(acc, item) {
+            return --skips >= 0 ? acc : reducingFunc(acc, item);
+        };
+    };
+}
+
+//const reduce = (accFn, start, xs) => xs.reduce(accFn, start);
+var reduce = curry(function _reduce(accFunc, start, xs) {
+    /*
+     for (let item of xs) {
+        start = accFunc(start, item);
+     }
+     return start;
+    */
+
+    /*
+     for (let item of xs) {
+        let next = txf(acc, item);//we could also pass an index or xs, but K.I.S.S.
+        acc = next && next[reduce.stopper] || next;// {[reduce.stopper]:value} or just a value
+        if (next[reduce.stopper]) {
+            break;
+        }
+     }
+     return acc;
+
+     //goes outside reduce definition; or side by side with declaration:
+     //set reduce.stopper be a Symbol that only is only ever = to reduce.stopper itself
+     Object.defineProperty(reduce, 'stopper', {
+        enumerable: false,
+        configurable: false,
+        writable: false,
+        value: Symbol('stop reducing')//no possible computation could come up with this by accident
+     });
+     */
+    return xs.reduce(accFunc, start);
+});
+
+var t = reduce(dropping1(3)(concat),[],[1,2,3,4,5]);//-> [4,5]
+console.log(t);
+
+
+//const dropGate = skips => x => --skips>=0 ? false : true;
+
+//const dropping = skips => filtering(dropGate(skips));
+//or...                => compose(filtering, dropGate)(skips);
+//or...                => filtering(x => --skips>=0 ? false : true);
+//or....
+/*
+const dropping = skips => reducingFn => (acc, item) => {
+    return --skips >= 0 ? acc : reducingFn(acc, item);
+};*/
+
+//usage
+//reduce(dropping(3)(concat),[],[1,2,3,4,5]);//-> [4,5]
+
 export { noop, identity, constant, apply, once, kestrel, get, set, objectSet, arraySet, nth, compose, pipe, ifElse, ifThisThenThat,
         when, whenNot, wrap, type, isArray, isObject, isFunction, isNumber, isString, isBoolean, isSymbol, isNull,
         isUndefined, isNothing, isSomething, not, or, and, flip, truthy, falsey, add, subtract, divide, multiple, modulus, concat, negate,

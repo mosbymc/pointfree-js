@@ -48,6 +48,14 @@ var _identity_f = {
     },
     /**
      * @description:
+     * @param: {functor} ma
+     * @return: {boolean}
+     */
+    equals: function _equals(ma) {
+        return Object.getPrototypeOf(this).isPrototypeOf(ma) && this.value === ma.value;
+    },
+    /**
+     * @description:
      * @param: {*} item
      * @return: {@see _identity_f}
      */

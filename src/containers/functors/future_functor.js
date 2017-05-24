@@ -76,6 +76,9 @@ var _future_f = {
     fork: function _fork(reject, resolve) {
         this.value(reject, resolve);
     },
+    equals: function _equals(ma) {
+        return Object.getPrototypeOf(this).isPrototypeOf(ma);
+    },
     of: function _of(val) {
         return Future.of(val);
     },

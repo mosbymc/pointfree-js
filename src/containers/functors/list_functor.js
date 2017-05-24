@@ -58,14 +58,6 @@ var list_functor_core = {
     },
 
     /**
-     * @description: Setter for the underlying source object of the List
-     * @param: val
-     */
-    set value(val) {
-        this._value = val;
-    },
-
-    /**
      * @description:
      * @param: {@see list_core} ma
      * @param: {function} comparer
@@ -92,7 +84,7 @@ var list_functor_core = {
      */
     groupBy: function _groupBy(keySelector, comparer) {
         var groupObj = [{ keySelector: keySelector, comparer: comparer, direction: sortDirection.ascending }];
-        return this.of(this, groupBy(this, groupObj, createGroupedListDelegator));
+        return this.of(this, groupBy(this, groupObj, createGroupedListDelegate));
     },
 
     /**
@@ -103,7 +95,7 @@ var list_functor_core = {
      */
     groupByDescending: function _groupByDescending(keySelector, comparer) {
         var groupObj = [{ keySelector: keySelector, comparer: comparer, direction: sortDirection.descending }];
-        return this.of(this, groupBy(this, groupObj, createGroupedListDelegator));
+        return this.of(this, groupBy(this, groupObj, createGroupedListDelegate));
     },
 
     /**
@@ -404,11 +396,14 @@ var list_functor_core = {
 
     /**
      * @description:
-     * @param: {*} val
+     * @param: {*} source
+     * @param: {generator} iterator
+     * @param: {Array} sortObj
+     * @param: {string} key
      * @return: {@see m_list}
      */
-    of: function _of(val, iterator, sortObj) {
-        return createListDelegator(val, iterator, sortObj);
+    of: function _of(source, iterator, sortObj, key) {
+        return createListDelegateInstance(source, iterator, sortObj, key);
     },
 
     /**
@@ -559,16 +554,18 @@ var ordered_list_f = Object.create(list_functor_core, {
 //TODO: tpircSavaJ
 //TODO: Junctional FavaScript
 
+/*
 var setValue = set('_value'),
     setIterator = set(Symbol.iterator),
     isIterator = apply(delegatesFrom(generatorProto)),
     listCreate = ifElse(isSomething, createOrderedList, createList);
+*/
 
 /**
  * @description:
  * @return: {@see _list_a}
  */
-function createList() {
+/*function createList() {
     return Object.create(_list_f, {
         data: {
             get: function _getData() {
@@ -576,14 +573,14 @@ function createList() {
             }
         }
     });
-}
+}*/
 
 /**
  * @description:
  * @param: {Array} sorts
  * @return: {@see ordered_list_a}
  */
-function createOrderedList(sorts) {
+/*function createOrderedList(sorts) {
     return set('_appliedSorts', sorts, Object.create(ordered_list_f, {
         data: {
             get: function _getData() {
@@ -591,14 +588,14 @@ function createOrderedList(sorts) {
             }
         }
     }));
-}
+}*/
 
 /**
  * @description:
  * @param: {*} val
  * @return: {@see _list_a}
  */
-function createGroupedList(val) {
+/*function createGroupedList(val) {
     return Object.create(_list_f, {
         data: {
             get: function _getData() {
@@ -616,7 +613,7 @@ function createGroupedList(val) {
             }
         }
     });
-}
+}*/
 
 /**
  * @description: Creator function for List delegate object instances. Creates a m_list delegator
@@ -630,7 +627,7 @@ function createGroupedList(val) {
  * to utilize when sorting or grouping a List.
  * @return: {@see list_core}
  */
-function createListDelegator(value, iterator, sortObj) {
+/*function createListDelegator(value, iterator, sortObj) {
     var l = Object.create(_list_f, {
         _value: {
             value: value,
@@ -651,7 +648,7 @@ function createListDelegator(value, iterator, sortObj) {
 
     return l;
     //return when(isIterator(iterator), setIterator(iterator), setValue(value, listCreate(sortObj)));
-}
+}*/
 
 /**
  * @description:
@@ -660,9 +657,9 @@ function createListDelegator(value, iterator, sortObj) {
  * @param: {string} key
  * @return: {@see _list_a}
  */
-function createGroupedListDelegator(value, iterator, key) {
+/*function createGroupedListDelegator(value, iterator, key) {
     return when(isIterator(iterator), setIterator(iterator), setValue(value, createGroupedList(key)));
-}
+}*/
 
 /**
  * @description: Creator function for a new List object. Takes any value/type as a parameter
@@ -674,14 +671,14 @@ function createGroupedListDelegator(value, iterator, key) {
 function List(source) {
     //TODO: should I exclude strings from being used as a source directly, or allow it because
     //TODO: they have an iterator?
-    return createListDelegator(source && source[Symbol.iterator] ? source : wrap(source));
+    return createListDelegateInstance(source && source[Symbol.iterator] ? source : wrap(source));
 }
 
 /**
  * @description: Convenience function for listCreate a new List instance; internally calls List.
  * @see: List
  * @param: {*} source - Any type, any value; used as the underlying source of the List
- * @return: {@see _list_a} - A new List instance with the value provided as the underlying source.
+ * @return: {@see _list_f} - A new List instance with the value provided as the underlying source.
  */
 List.from = function _from(source) {
     return List(source);
@@ -733,7 +730,7 @@ List.of = List.from;
 List.extend = function _extend(propName, fn) {
     if (!(propName in _list_f) && !(propName in ordered_list_f)) {
         list_functor_core[propName] = function(...args) {
-            return createListDelegator(this, fn(this, ...args));
+            return createListDelegateInstance(this, fn(this, ...args));
         };
     }
     return List;
@@ -770,8 +767,8 @@ List.extend = function _extend(propName, fn) {
  * was grouped on.
  * @return: {@see list_functor_core}
  */
-function tempListCreator(source, iterator, sortObj, key) {
-    switch(createBitMask(keyTest(key), sortObjectTest(sortObj), iteratorTest(iterator))) {
+function createListDelegateInstance(source, iterator, sortObj, key) {
+    switch(createBitMask(iteratorTest(iterator), sortObjectTest(sortObj), keyTest(key))) {
         /**
          * @description: case 1 = An iterator has been passed, but nothing else. Create a
          * _list_f object instance and set the iterator as the version provided.
@@ -819,12 +816,17 @@ function tempListCreator(source, iterator, sortObj, key) {
                 }
             });
         /**
-         * @description: case 7 = An iterator, sort object, and a key were passed as arguments.
+         * @description: case 4 = An iterator, sort object, and a key were passed as arguments.
          * Create a grouped _list_f and set the iterator as the version provided, the ._appliedSorts
          * field as the sortObj param, and the ._key field as the key string argument.
          */
-        case 7:
+        case 4:
             return Object.create(_list_f, {
+                _value: {
+                    value: source,
+                    writable: false,
+                    configurable: false
+                },
                 data: {
                     get: function _getData() {
                         return Array.from(this);
@@ -867,13 +869,6 @@ function tempListCreator(source, iterator, sortObj, key) {
         return nMask;
     }
 
-    function determineFlags(iterator, sortObj) {
-        var hasIterator = iteratorTest(iterator);
-        if (!hasIterator) return 0;
-        var isSortObject = sortObjectTest(sortObj);
-        return isSortObject ? 2 : 1;
-    }
-
     function iteratorTest(iterator) {
         return generatorProto.isPrototypeOf(iterator);
     }
@@ -885,6 +880,10 @@ function tempListCreator(source, iterator, sortObj, key) {
     function keyTest(key) {
         return 'string' === typeof key;
     }
+}
+
+function createGroupedListDelegate(source, key) {
+    return createListDelegateInstance(source, undefined, undefined, key);
 }
 
 export { List, list_functor_core, _list_f, ordered_list_f };

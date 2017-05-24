@@ -5,8 +5,8 @@ import { sortData } from  '../projection/sortHelpers';
 /**
  * @description:
  * @param: {iterable} source
- * @param {iterable} enumerable
- * @return {generator}
+ * @param: {iterable} enumerable
+ * @return: {generator}
  */
 function addFront(source, enumerable) {
     return function *addFront() {
@@ -26,7 +26,7 @@ function addFront(source, enumerable) {
  * @param: {iterable} source
  * @param: {Array} enumerables
  * @param: {number} argsCount
- * @return {generator}
+ * @return: {generator}
  */
 function concat(source, enumerables, argsCount) {
     return function *concatIterator() {
@@ -36,7 +36,7 @@ function concat(source, enumerables, argsCount) {
 
         var enumerable;
         if (1 === argsCount) {
-            enumerable = when(not(isArray), Array.from, enumerables);
+            enumerable = enumerables[0];
             for (let item of enumerable) {
                 if (javaScriptTypes.undefined !== item) yield item;
             }
@@ -520,8 +520,7 @@ function nestLists(data, depth, key, queryableConstructor) {
         });
     }
     if (0 !== depth) {
-        data = queryableConstructor(data);
-        data.key = key;
+        data = queryableConstructor(data, key);
     }
     return data;
 }

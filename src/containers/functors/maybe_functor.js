@@ -68,7 +68,7 @@ Maybe.isNothing = function _isNothing(m) {
 //TODO: are not exposed, what benefit is derived from them? And if they are exposed (Just being Identity,
 //TODO: and Nothing being Constant(null)), then the maybe container has a direct dependency on the Identity
 //TODO: and Constant containers. This becomes an issue due to circular dependencies.
-
+/*
 function Just(val) {
     return null == val ? Nothing() :
         Object.create(_just_f, {
@@ -101,7 +101,31 @@ function Nothing() {
 }
 
 Nothing.of = Nothing;
+*/
 
+function Just(val) {
+    return Maybe.of(val);
+}
+
+Just.of = function _of(val) {
+    return Just(val);
+};
+
+function Nothing() {
+    return Maybe();
+}
+
+Nothing.of = function _of() {
+    return Nothing();
+};
+
+//TODO: Using this.of in order to create a new instance of a Maybe container (functor/monad) will
+//TODO: not work as it is implemented here in terms of creating a new maybe container with the
+//TODO: proper values for the '.isJust' and '.isNothing' fields. The problem is that the '.of'
+//TODO: function property will create a new maybe instance with whatever value it receives as
+//TODO: as argument and treat the new maybe container instance as a 'Just', regardless of the
+//TODO: actual underlying value. As 'null' and 'undefined' underlying values are traditionally
+//TODO: treated as 'Nothing' maybe values, this will cause a problem during mapping/flat-mapping/etc.
 var _maybe_f = {
     get value() {
         return this._value;
@@ -116,6 +140,9 @@ var _maybe_f = {
         if (null != this.value) return this.of(fn(this.value));
         return this.of(null);
     },
+    equals: function _equals(ma) {
+        return Object.getPrototypeOf(this).isPrototypeOf(ma) && this.value === ma.value;
+    },
     of: function _of(val) {
         return Maybe.of(val);
     },
@@ -125,6 +152,7 @@ var _maybe_f = {
     }
 };
 
+/*
 var _just_f = Object.create(_maybe_f, {
     isJust: {
         value: true
@@ -192,5 +220,6 @@ var _nothing_f = Object.create(_maybe_f, {
         }
     }
 });
+*/
 
-export { Maybe, _maybe_f };
+export { Maybe, Just, Nothing, _maybe_f };

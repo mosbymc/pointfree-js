@@ -44,6 +44,9 @@ var _io_f = {
     flatMap: function _flatMap(fn) {
         return _io_f.isPrototypeOf(this.value) ? this.value.map(fn) : this.of(compose(fn, this.value));
     },
+    equals: function _equals(ma) {
+        return Object.getPrototypeOf(this).isPrototypeOf(ma) && this.value === ma.value;
+    },
     of: function _of(item) {
         return Io.of(item);
     },
