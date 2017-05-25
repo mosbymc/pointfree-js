@@ -1,8 +1,13 @@
-import { Either, Left, Right, _either_f } from '../../../../src/containers/functors/either_functor';
+import { functors } from '../../../../src/containers/functors/functors';
+import { _either_f } from '../../../../src/containers/functors/either_functor';
+
+var Either = functors.Either,
+    Left = functors.Left,
+    Right = functors.Right;
 
 describe('Either functor tests', function _testEitherFunctor() {
     describe('Either object factory tests', function _testEitherObjectFactory() {
-        it('should return a new either functor with the correct side', function testEitherFactoryObjectCreation() {
+        it('should return a new either functor with the correct side', function _testEitherFactoryObjectCreation() {
             var arr = [1, 2, 3],
                 obj = { a: 1, b: 2 },
                 e1 = Either(),
@@ -25,7 +30,7 @@ describe('Either functor tests', function _testEitherFunctor() {
             e4.isRight.should.be.true;
         });
 
-        it('should return the same type/value when using the #of function', function testEitherDotOf() {
+        it('should return the same type/value when using the #of function', function _testEitherDotOf() {
             var arr = [1, 2, 3],
                 obj = { a: 1, b: 2 },
                 e1 = Either(),
@@ -278,7 +283,7 @@ describe('Either functor tests', function _testEitherFunctor() {
             m8.equals(m9).should.be.false;
         });
 
-        it('should return a new constant functor regardless of data type', function testConstantFactoryObjectCreation() {
+        it('should return a new constant functor regardless of data type', function _testEitherFactoryObjectCreation() {
             var arr = [1, 2, 3],
                 obj = { a: 1, b: 2 },
                 e = Either(),
@@ -302,7 +307,35 @@ describe('Either functor tests', function _testEitherFunctor() {
             e4.isRight.should.be.true;
         });
 
-        it('should print the correct container type + value when .toString() is invoked', function testConstantFunctorToString() {
+        it('should have a functioning iterator', function _testEitherFunctorIterator() {
+            var e1 = Either(10),
+                e2 = Either({ a: 1, b: 2 });
+
+            var e1Res = [...e1],
+                e2Res = [...e2];
+
+            e1Res.should.eql([e1.value]);
+            e2Res.should.eql([e2.value]);
+        });
+
+        it('should allow "expected" functionality of concatenation for strings and mathematical operators for numbers', function _testEitherFunctorValueOf() {
+            var e1 = Either('Mark'),
+                e2 = Either(10);
+
+            var str = 'Hello my name is: ' + e1,
+                num1 = 15 * e2,
+                num2 = 3 + e2,
+                num3 = e2 - 6,
+                num4 = e2 / 5;
+
+            str.should.eql('Hello my name is: Mark');
+            num1.should.eql(150);
+            num2.should.eql(13);
+            num3.should.eql(4);
+            num4.should.eql(2);
+        });
+
+        it('should print the correct container type + value when .toString() is invoked', function _testEitherFunctorToString() {
             var c1 = Either(1, 'right'),
                 c2 = Either(null),
                 c3 = Either([1, 2, 3], 'left'),
@@ -312,6 +345,10 @@ describe('Either functor tests', function _testEitherFunctor() {
             c2.toString().should.eql('Left(null)');
             c3.toString().should.eql('Left(1,2,3)');
             c4.toString().should.eql('Right(Left(Right(5)))');
+        });
+
+        it('should have a .constructor property that points to the factory function', function _testEitherFunctorIsStupidViaFantasyLandSpecCompliance() {
+            Either(null).constructor.should.eql(Either);
         });
     });
 });

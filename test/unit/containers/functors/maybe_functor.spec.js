@@ -1,8 +1,11 @@
-import { Maybe, _maybe_f } from '../../../../src/containers/functors/maybe_functor';
+import { functors } from '../../../../src/containers/functors/functors';
+import { _maybe_f } from '../../../../src/containers/functors/maybe_functor';
+
+var Maybe = functors.Maybe;
 
 describe('Maybe functor tests', function _testMaybeFunctor() {
     describe('Maybe object factory tests', function _testMaybeObjectFactory() {
-        it('should return a new constant functor regardless of data type', function testMaybeFactoryObjectCreation() {
+        it('should return a new constant functor regardless of data type', function _testMaybeFactoryObjectCreation() {
             var arr = [1, 2, 3],
                 obj = { a: 1, b: 2 },
                 i1 = Maybe(),
@@ -33,7 +36,7 @@ describe('Maybe functor tests', function _testMaybeFunctor() {
             expect(false).to.eql(i8.value);
         });
 
-        it('should return the same type/value when using the #of function', function testMaybeDotOf() {
+        it('should return the same type/value when using the #of function', function _testMaybeDotOf() {
             var arr = [1, 2, 3],
                 obj = { a: 1, b: 2 },
                 i1 = Maybe.of(),
@@ -64,7 +67,7 @@ describe('Maybe functor tests', function _testMaybeFunctor() {
             expect(false).to.eql(i8.value);
         });
 
-        it('should return the same type/value when using the #Just function', function testMaybeDotJust() {
+        it('should return the same type/value when using the #Just function', function _testMaybeDotJust() {
             var arr = [1, 2, 3],
                 obj = { a: 1, b: 2 },
                 i1 = Maybe.Just(),
@@ -95,7 +98,7 @@ describe('Maybe functor tests', function _testMaybeFunctor() {
             expect(false).to.eql(i8.value);
         });
 
-        it('should return the same type/value when using the #Nothing function', function testMaybeDotNothing() {
+        it('should return the same type/value when using the #Nothing function', function _testMaybeDotNothing() {
             var arr = [1, 2, 3],
                 obj = { a: 1, b: 2 },
                 i1 = Maybe.Nothing(),
@@ -198,11 +201,15 @@ describe('Maybe functor tests', function _testMaybeFunctor() {
         });
 
         it('should return a new maybe functor instance with the mapped value', function _testMaybeFunctorMap() {
-            var m = Maybe(1),
-                d = m.map(function _t() { return 2; });
+            var m1 = Maybe(1),
+                m2 = Maybe(),
+                d1 = m1.map(function _t() { return 2; }),
+                d2 = m2.map();
 
-            m.value.should.not.eql(d.value);
-            m.should.not.equal(d);
+            m1.value.should.not.eql(d1.value);
+            m1.should.not.equal(d1);
+
+            expect(m2.value).to.eql(d2.value);
         });
 
         it('should return a new maybe functor instance with the same underlying value when flat mapping', function _testMaybeFunctorFlatMap() {
@@ -276,7 +283,7 @@ describe('Maybe functor tests', function _testMaybeFunctor() {
             m8.equals(m9).should.be.false;
         });
 
-        it('should return a new maybe functor regardless of data type', function testMaybeFactoryObjectCreation() {
+        it('should return a new maybe functor regardless of data type', function _testMaybeFactoryObjectCreation() {
             var arr = [1, 2, 3],
                 obj = { a: 1, b: 2 },
                 m = Maybe();
@@ -300,7 +307,35 @@ describe('Maybe functor tests', function _testMaybeFunctor() {
             expect(false).to.eql(m8.value);
         });
 
-        it('should print the correct container type + value when .toString() is invoked', function testMaybeFunctorToString() {
+        it('should have a functioning iterator', function _testMaybeFunctorIterator() {
+            var m1 = Maybe(10),
+                m2 = Maybe({ a: 1, b: 2 });
+
+            var m1Res = [...m1],
+                m2Res = [...m2];
+
+            m1Res.should.eql([m1.value]);
+            m2Res.should.eql([m2.value]);
+        });
+
+        it('should allow "expected" functionality of concatenation for strings and mathematical operators for numbers', function _testMaybeFunctorValueOf() {
+            var m1 = Maybe('Mark'),
+                m2 = Maybe(10);
+
+            var str = 'Hello my name is: ' + m1,
+                num1 = 15 * m2,
+                num2 = 3 + m2,
+                num3 = m2 - 6,
+                num4 = m2 / 5;
+
+            str.should.eql('Hello my name is: Mark');
+            num1.should.eql(150);
+            num2.should.eql(13);
+            num3.should.eql(4);
+            num4.should.eql(2);
+        });
+
+        it('should print the correct container type + value when .toString() is invoked', function _testMaybeFunctorToString() {
             var c1 = Maybe(1),
                 c2 = Maybe(null),
                 c3 = Maybe([1, 2, 3]),
@@ -310,6 +345,10 @@ describe('Maybe functor tests', function _testMaybeFunctor() {
             c2.toString().should.eql('Nothing()');
             c3.toString().should.eql('Just(1,2,3)');
             c4.toString().should.eql('Just(Just(Just(5)))');
+        });
+
+        it('should have a .constructor property that points to the factory function', function _testMaybeFunctorIsStupidViaFantasyLandSpecCompliance() {
+            Maybe().constructor.should.eql(Maybe);
         });
     });
 });

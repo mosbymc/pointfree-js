@@ -132,13 +132,13 @@ var _maybe_f = {
     },
     map: function _map(fn) {
         //return this.of(fn(this.value));
-        return null == this.value ? this.of(null) : this.of(fn(this.value));
+        return null == this.value ? this.nothing() : this.of(fn(this.value));
     },
     flatMap: function _flatMap(fn) {
         //return _maybe_f.isPrototypeOf(this.value) ? this.value.map(fn) : this.of(fn(this.value));
         if (Object.getPrototypeOf(this).isPrototypeOf(this.value)) return this.value.map(fn);
         if (null != this.value) return this.of(fn(this.value));
-        return this.of(null);
+        return this.nothing();
     },
     equals: function _equals(ma) {
         return Object.getPrototypeOf(this).isPrototypeOf(ma) && this.value === ma.value;
@@ -146,10 +146,21 @@ var _maybe_f = {
     of: function _of(val) {
         return Maybe.of(val);
     },
+    nothing: function _nothing() {
+        return Maybe();
+    },
+    /**
+     * @description:
+     * @return: {*}
+     */
+    valueOf: function _valueOf() {
+        return this.value;
+    },
     toString: function _toString() {
         //return `Maybe(${this.value})`;
         return null == this.value ? `Nothing()` : `Just(${this.value})`;
-    }
+    },
+    constructor: Maybe
 };
 
 /*

@@ -6,7 +6,7 @@ import { Io, _io_f } from './io_functor';
 import { List, list_functor_core } from './list_functor';
 import { Maybe, Just, Nothing, _maybe_f } from './maybe_functor';
 
-import { toFunctorType } from '../../containerHelpers';
+import { toFunctorType, containerIterator } from '../../containerHelpers';
 
 _constant_f.mapToEither = toFunctorType(Either);
 _constant_f.mapToFuture = toFunctorType(Future);
@@ -16,6 +16,7 @@ _constant_f.mapToLeft = toFunctorType(Left);
 _constant_f.mapToList = toFunctorType(List);
 _constant_f.mapToMaybe = toFunctorType(Maybe);
 _constant_f.mapToRight = toFunctorType(Right);
+_constant_f[Symbol.iterator] = containerIterator;
 
 _either_f.mapToConstant = toFunctorType(Constant);
 _either_f.mapToFuture = toFunctorType(Future);
@@ -23,6 +24,7 @@ _either_f.mapToIdentity = toFunctorType(Identity);
 _either_f.mapToIo = toFunctorType(Io);
 _either_f.mapToList = toFunctorType(List);
 _either_f.mapToMaybe = toFunctorType(Maybe);
+_either_f[Symbol.iterator] = containerIterator;
 
 _future_f.mapToConstant = toFunctorType(Constant);
 _future_f.mapToEither = toFunctorType(Either);
@@ -32,6 +34,7 @@ _future_f.mapToLeft = toFunctorType(Left);
 _future_f.mapToList = toFunctorType(List);
 _future_f.mapToMaybe = toFunctorType(Maybe);
 _future_f.mapToRight = toFunctorType(Right);
+_future_f[Symbol.iterator] = containerIterator;
 
 _identity_f.mapToConstant = toFunctorType(Constant);
 _identity_f.mapToEither = toFunctorType(Either);
@@ -41,6 +44,7 @@ _identity_f.mapToLeft = toFunctorType(Left);
 _identity_f.mapToList = toFunctorType(List);
 _identity_f.mapToMaybe = toFunctorType(Maybe);
 _identity_f.mapToRight = toFunctorType(Right);
+_identity_f[Symbol.iterator] = containerIterator;
 
 _io_f.mapToConstant = toFunctorType(Constant);
 _io_f.mapToEither = toFunctorType(Either);
@@ -50,6 +54,7 @@ _io_f.mapToLeft = toFunctorType(Left);
 _io_f.mapToList = toFunctorType(List);
 _io_f.mapToMaybe = toFunctorType(Maybe);
 _io_f.mapToRight = toFunctorType(Right);
+_io_f[Symbol.iterator] = containerIterator;
 
 list_functor_core.mapToConstant = toFunctorType(Constant);
 list_functor_core.mapToEither = toFunctorType(Either);
@@ -68,6 +73,7 @@ _maybe_f.mapToIo = toFunctorType(Io);
 _maybe_f.mapToLeft = toFunctorType(Left);
 _maybe_f.mapToList = toFunctorType(List);
 _maybe_f.mapToRight = toFunctorType(Right);
+_maybe_f[Symbol.iterator] = containerIterator;
 
 var functors = {
     Constant,

@@ -64,11 +64,19 @@ var _identity_f = {
     },
     /**
      * @description:
+     * @return: {*}
+     */
+    valueOf: function _valueOf() {
+        return this.value;
+    },
+    /**
+     * @description:
      * @return: {string}
      */
     toString: function _toString() {
         return `Identity(${this.value})`;
-    }
+    },
+    constructor: Identity
 };
 
 export { Identity, _identity_f };

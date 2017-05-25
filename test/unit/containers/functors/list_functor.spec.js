@@ -1,9 +1,12 @@
-import { List, _list_f, ordered_list_f } from '../../../../src/containers/functors/list_functor';
+import { functors } from '../../../../src/containers/functors/functors';
+import { _list_f, ordered_list_f } from '../../../../src/containers/functors/list_functor';
 import { testData } from '../../../testData';
+
+var List = functors.List;
 
 describe('List functor test', function _testListFunctor() {
     describe('List object factory tests', function _testListObjectFactory() {
-        it('should return a new List functor regardless of data type', function testListFactoryObjectCreation() {
+        it('should return a new List functor regardless of data type', function _testListFactoryObjectCreation() {
             var arr = [1, 2, 3],
                 obj = { a: 1, b: 2 },
                 l1 = List(),
@@ -34,7 +37,7 @@ describe('List functor test', function _testListFunctor() {
             expect([false]).to.eql(l8.value);
         });
 
-        it('should return the same type/value when using the #of function', function testListDotOf() {
+        it('should return the same type/value when using the #of function', function _testListDotOf() {
             var arr = [1, 2, 3],
                 obj = { a: 1, b: 2 },
                 i1 = List.of(),
@@ -107,7 +110,7 @@ describe('List functor test', function _testListFunctor() {
             l.should.not.equal(d);
         });
 
-        it('should return a new List functor regardless of data type', function testListFactoryObjectCreation() {
+        it('should return a new List functor regardless of data type', function _testListFactoryObjectCreation() {
             var arr = [1, 2, 3],
                 obj = { a: 1, b: 2 },
                 l = List();
@@ -131,7 +134,47 @@ describe('List functor test', function _testListFunctor() {
             expect(false).to.eql(l8.value);
         });
 
-        it('should print the correct container type + value when .toString() is invoked', function testListFunctorToString() {
+        it('should transform an List functor to the other functor types', function _testListFunctorTransforms() {
+            var l = List(1);
+            var c = l.mapToConstant(),
+                e = l.mapToEither(),
+                f = l.mapToFuture(),
+                io = l.mapToIo(),
+                i = l.mapToIdentity(),
+                left = l.mapToLeft(),
+                m = l.mapToMaybe(),
+                r = l.mapToRight();
+
+            c.should.be.an('object');
+            Object.getPrototypeOf(c).should.eql(Object.getPrototypeOf(functors.Constant()));
+
+            e.should.be.an('object');
+            Object.getPrototypeOf(e).should.eql(Object.getPrototypeOf(functors.Either()));
+
+            f.should.be.an('object');
+            Object.getPrototypeOf(f).should.eql(Object.getPrototypeOf(functors.Future()));
+
+            io.should.be.an('object');
+            Object.getPrototypeOf(io).should.eql(Object.getPrototypeOf(functors.Io()));
+
+            i.should.be.an('object');
+            Object.getPrototypeOf(i).should.eql(Object.getPrototypeOf(functors.Identity()));
+
+            left.should.be.an('object');
+            Object.getPrototypeOf(left).should.eql(Object.getPrototypeOf(functors.Left()));
+
+            m.should.be.an('object');
+            Object.getPrototypeOf(m).should.eql(Object.getPrototypeOf(functors.Maybe()));
+
+            r.should.be.an('object');
+            Object.getPrototypeOf(r).should.eql(Object.getPrototypeOf(functors.Right()));
+        });
+
+        it('should allow "expected" functionality of concatenation for strings and mathematical operators for numbers', function _testListFunctorValueOf() {
+            ('Hello my name is: ' + List('Mark')).should.eql('Hello my name is: Mark');
+        });
+
+        it('should print the correct container type + value when .toString() is invoked', function _testListFunctorToString() {
             var c1 = List(1),
                 c2 = List(null),
                 c3 = List([1, 2, 3]),
@@ -141,6 +184,10 @@ describe('List functor test', function _testListFunctor() {
             c2.toString().should.eql('List()');
             c3.toString().should.eql('List(1,2,3)');
             c4.toString().should.eql('List(List(List(5)))');
+        });
+
+        it('should have a .constructor property that points to the factory function', function _testListFunctorIsStupidViaFantasyLandSpecCompliance() {
+            List(null).constructor.should.eql(List);
         });
     });
 

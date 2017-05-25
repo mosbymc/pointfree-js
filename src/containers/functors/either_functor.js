@@ -80,10 +80,18 @@ var _either_f = {
     of: function _of(val) {
         return Either.of(val);
     },
+    /**
+     * @description:
+     * @return: {*}
+     */
+    valueOf: function _valueOf() {
+        return this.value;
+    },
     toString: function _toString() {
         var val = this.value && this.value.toString && 'function' === typeof this.value.toString ? this.value.toString() : JSON.stringify(this.value);
         return this.isLeft ? `Left(${val})` : `Right(${val})`;
-    }
+    },
+    constructor: Either
 };
 
 export { Either, Left, Right, _either_f };

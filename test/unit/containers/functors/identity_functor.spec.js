@@ -191,6 +191,34 @@ describe('Identity functor test', function _testIdentityFunctor() {
             Object.getPrototypeOf(r).should.eql(Object.getPrototypeOf(functors.Right()));
         });
 
+        it('should have a functioning iterator', function _testIdentityFunctorIterator() {
+            var i1 = Identity(10),
+                i2 = Identity({ a: 1, b: 2 });
+
+            var i1Res = [...i1],
+                i2Res = [...i2];
+
+            i1Res.should.eql([i1.value]);
+            i2Res.should.eql([i2.value]);
+        });
+
+        it('should allow "expected" functionality of concatenation for strings and mathematical operators for numbers', function _testIdentityFunctorValueOf() {
+            var i1 = Identity('Mark'),
+                i2 = Identity(10);
+
+            var str = 'Hello my name is: ' + i1,
+                num1 = 15 * i2,
+                num2 = 3 + i2,
+                num3 = i2 - 6,
+                num4 = i2 / 5;
+
+            str.should.eql('Hello my name is: Mark');
+            num1.should.eql(150);
+            num2.should.eql(13);
+            num3.should.eql(4);
+            num4.should.eql(2);
+        });
+
         it('should print the correct container type + value when .toString() is invoked', function _testIdentityFunctorToString() {
             var c1 = Identity(1),
                 c2 = Identity(null),
@@ -201,6 +229,10 @@ describe('Identity functor test', function _testIdentityFunctor() {
             c2.toString().should.eql('Identity(null)');
             c3.toString().should.eql('Identity(1,2,3)');
             c4.toString().should.eql('Identity(Identity(Identity(5)))');
+        });
+
+        it('should have a .constructor property that points to the factory function', function _testIdentityFunctorIsStupidViaFantasyLandSpecCompliance() {
+            Identity(null).constructor.should.eql(Identity);
         });
     });
 });

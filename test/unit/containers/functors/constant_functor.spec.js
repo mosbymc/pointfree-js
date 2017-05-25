@@ -1,4 +1,7 @@
-import { Constant, _constant_f } from '../../../../src/containers/functors/constant_functor';
+import { functors } from '../../../../src/containers/functors/functors';
+import { _constant_f } from '../../../../src/containers/functors/constant_functor';
+
+var Constant = functors.Constant;
 
 describe('Constant functor tests', function _testConstantFunctor() {
     describe('Constant object factory tests', function _testConstantObjectFactory() {
@@ -92,7 +95,7 @@ describe('Constant functor tests', function _testConstantFunctor() {
 
         it('should return a new constant functor instance with the same underlying value when mapping', function _testConstantFunctorMap() {
             var c = Constant(1),
-                d = c.map(function _t() { return 2; });
+                d = c.map();
 
             c.value.should.eql(d.value);
             c.should.not.equal(d);
@@ -100,7 +103,7 @@ describe('Constant functor tests', function _testConstantFunctor() {
 
         it('should return a new constant functor instance with the same underlying value when flat mapping', function _testConstantFunctorFlatMap() {
             var c = Constant(1),
-                d = c.flatMap(function _t() { return 2; });
+                d = c.flatMap();
 
             c.value.should.eql(d.value);
             c.should.not.equal(d);
@@ -152,6 +155,70 @@ describe('Constant functor tests', function _testConstantFunctor() {
             expect(false).to.eql(c8.value);
         });
 
+        it('should transform an identity functor to the other functor types', function _testConstantFunctorTransforms() {
+            var i = Constant(1);
+            var c = i.mapToIdentity(),
+                e = i.mapToEither(),
+                f = i.mapToFuture(),
+                io = i.mapToIo(),
+                l = i.mapToList(),
+                left = i.mapToLeft(),
+                m = i.mapToMaybe(),
+                r = i.mapToRight();
+
+            c.should.be.an('object');
+            Object.getPrototypeOf(c).should.eql(Object.getPrototypeOf(functors.Identity()));
+
+            e.should.be.an('object');
+            Object.getPrototypeOf(e).should.eql(Object.getPrototypeOf(functors.Either()));
+
+            f.should.be.an('object');
+            Object.getPrototypeOf(f).should.eql(Object.getPrototypeOf(functors.Future()));
+
+            io.should.be.an('object');
+            Object.getPrototypeOf(io).should.eql(Object.getPrototypeOf(functors.Io()));
+
+            l.should.be.an('object');
+            Object.getPrototypeOf(l).should.eql(Object.getPrototypeOf(functors.List()));
+
+            left.should.be.an('object');
+            Object.getPrototypeOf(left).should.eql(Object.getPrototypeOf(functors.Left()));
+
+            m.should.be.an('object');
+            Object.getPrototypeOf(m).should.eql(Object.getPrototypeOf(functors.Maybe()));
+
+            r.should.be.an('object');
+            Object.getPrototypeOf(r).should.eql(Object.getPrototypeOf(functors.Right()));
+        });
+
+        it('should have a functioning iterator', function _testConstantFunctorIterator() {
+            var c1 = Constant(10),
+                c2 = Constant({ a: 1, b: 2 });
+
+            var c1Res = [...c1],
+                c2Res = [...c2];
+
+            c1Res.should.eql([c1.value]);
+            c2Res.should.eql([c2.value]);
+        });
+
+        it('should allow "expected" functionality of concatenation for strings and mathematical operators for numbers', function _testConstantFunctorValueOf() {
+            var c1 = Constant('Mark'),
+                c2 = Constant(10);
+
+            var str = 'Hello my name is: ' + c1,
+                num1 = 15 * c2,
+                num2 = 3 + c2,
+                num3 = c2 - 6,
+                num4 = c2 / 5;
+
+            str.should.eql('Hello my name is: Mark');
+            num1.should.eql(150);
+            num2.should.eql(13);
+            num3.should.eql(4);
+            num4.should.eql(2);
+        });
+
         it('should print the correct container type + value when .toString() is invoked', function testConstantFunctorToString() {
             var c1 = Constant(1),
                 c2 = Constant(null),
@@ -162,6 +229,10 @@ describe('Constant functor tests', function _testConstantFunctor() {
             c2.toString().should.eql('Constant(null)');
             c3.toString().should.eql('Constant(1,2,3)');
             c4.toString().should.eql('Constant(Constant(Constant(5)))');
+        });
+
+        it('should have a .constructor property that points to the factory function', function _testConstantFunctorIsStupidViaFantasyLandSpecCompliance() {
+            Constant(null).constructor.should.eql(Constant);
         });
     });
 });

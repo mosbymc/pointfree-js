@@ -145,9 +145,37 @@ function mjoin(ma) {
     return ma.join();
 }
 
+/**
+ * @description:
+ * @param: type
+ * @return: {function}
+ */
 function toFunctorType(type) {
     return function toType(fn = identity) {
         return type.of(fn(this.value));
+    };
+}
+
+/**
+ * @description:
+ * @return: {{next: _next}}
+ */
+function containerIterator() {
+    let first = true,
+        val = this.value;
+    return {
+        next: function _next() {
+            if (first) {
+                first = false;
+                return {
+                    done: false,
+                    value: val
+                };
+            }
+            return {
+                done: true
+            };
+        }
     };
 }
 
@@ -249,4 +277,4 @@ var intersect = curry(function _intersect(enumerable, comparer, list) {
     return list.intersect(enumerable, comparer);
 });
 
-export { apply, fmap, map, lift2, lift3, lift4, liftN, mjoin, toFunctorType };
+export { apply, fmap, map, lift2, lift3, lift4, liftN, mjoin, toFunctorType, containerIterator };

@@ -432,6 +432,14 @@ var list_functor_core = {
     },
 
     /**
+     * @description:
+     * @return: {*}
+     */
+    valueOf: function _valueOf() {
+        return this.value;
+    },
+
+    /**
      * @description: Returns a string representation of an instance of a List
      * delegator object. This function does not cause evaluation of the source,
      * but this also means the returned value only reflects the underlying
@@ -440,7 +448,12 @@ var list_functor_core = {
      */
     toString: function _toString() {
         return `List(${this.value})`;
-    }
+    },
+
+    /**
+     * @description:
+     */
+    constructor: List
 };
 
 /**

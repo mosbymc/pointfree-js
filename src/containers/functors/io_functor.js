@@ -50,9 +50,17 @@ var _io_f = {
     of: function _of(item) {
         return Io.of(item);
     },
+    /**
+     * @description:
+     * @return: {*}
+     */
+    valueOf: function _valueOf() {
+        return this.value;
+    },
     toString: function _toString() {
         return `Io(${this.value})`;
-    }
+    },
+    constructor: Io
 };
 
 export { Io, _io_f };

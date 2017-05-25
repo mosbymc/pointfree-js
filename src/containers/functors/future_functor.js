@@ -82,9 +82,17 @@ var _future_f = {
     of: function _of(val) {
         return Future.of(val);
     },
+    /**
+     * @description:
+     * @return: {*}
+     */
+    valueOf: function _valueOf() {
+        return this.value;
+    },
     toString: function _toString() {
         return `Future(${this.value})`;
-    }
+    },
+    constructor: Future
 };
 
 export { Future, _future_f };
