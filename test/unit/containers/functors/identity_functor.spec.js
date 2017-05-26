@@ -102,11 +102,16 @@ describe('Identity functor test', function _testIdentityFunctor() {
         });
 
         it('should return a new identity functor instance with the same underlying value when flat mapping', function _testIdentityFunctorFlatMap() {
-            var i = Identity(1),
-                d = i.flatMap(function _t() { return 2; });
+            var i1 = Identity(1),
+                i2 = Identity(Identity('1')),
+                d1 = i1.flatMap(function _t() { return 2; }),
+                d2 = i2.flatMap(function _t() { return '2'; });
 
-            i.value.should.not.eql(d.value);
-            i.should.not.equal(d);
+            i1.value.should.not.eql(d1.value);
+            i1.should.not.equal(d1);
+
+            i2.value.should.not.eql(d2.value);
+            i2.should.not.eql(d2);
         });
 
         it('should properly indicate equality when constant functors are indeed equal', function _testIdentityFunctorEquality() {

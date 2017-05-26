@@ -238,6 +238,9 @@ describe('Either functor tests', function _testEitherFunctor() {
                 m8 = Right(),
                 m9 = Right(1);
 
+            m1.equals(6).should.be.false;
+            m1.equals(functors.Maybe(true)).should.be.false;
+
             m1.equals(m2).should.be.true;
             m1.equals(m3).should.be.false;
             m1.equals(m4).should.be.false;

@@ -20,8 +20,27 @@ var _io_m = Object.create(_io_f, {
             return this.value;
         }
     },
-    chain: function _chain(fn) {
-        return fn(this.value);
+    chain: {
+        value: function _chain(fn) {
+            return fn(this.value);
+        }
+    },
+    fold: {
+        value: function _fold(fn, x) {
+            return fn(this.value, x);
+        }
+    },
+    traverse: {
+        value: function _traverse(fa, fn) {
+            return this.fold(function _reductioAdAbsurdum(xs, x) {
+                fn(x).map(function _map(x) {
+                    return function _map_(y) {
+                        return y.concat([x]);
+                    };
+                }).ap(xs);
+                return fa(this.empty);
+            });
+        }
     },
     apply: {
         value: function _apply(ma) {
@@ -32,10 +51,14 @@ var _io_m = Object.create(_io_f, {
         value: function _of(val) {
             return Io.of(val);
         }
+    },
+    constructor: {
+        value: Io
     }
 });
 
 _io_m.ap =_io_m.apply;
 _io_m.bind = _io_m.chain;
+_io_m.reduce = _io_m.fold;
 
 export { Io, _io_m };

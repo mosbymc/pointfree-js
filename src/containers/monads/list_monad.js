@@ -177,6 +177,23 @@ var _list_m = Object.create(_list_f, {
             return fn(this.value);
         }
     },
+    fold: {
+        value: function _fold(fn, x) {
+            return fn(this.value, x);
+        }
+    },
+    traverse: {
+        value: function _traverse(fa, fn) {
+            return this.fold(function _reductioAdAbsurdum(xs, x) {
+                fn(x).map(function _map(x) {
+                    return function _map_(y) {
+                        return y.concat([x]);
+                    };
+                }).ap(xs);
+                return fa(this.empty);
+            });
+        }
+    },
     /**
      * @description: Applies a function contained in another functor to the source
      * of this List object instance's underlying source. A new List object instance
@@ -210,6 +227,23 @@ var ordered_list_m = Object.create(ordered_list_f, {
             return fn(this.value);
         }
     },
+    fold: {
+        value: function _fold(fn, x) {
+            return fn(this.value, x);
+        }
+    },
+    traverse: {
+        value: function _traverse(fa, fn) {
+            return this.fold(function _reductioAdAbsurdum(xs, x) {
+                fn(x).map(function _map(x) {
+                    return function _map_(y) {
+                        return y.concat([x]);
+                    };
+                }).ap(xs);
+                return fa(this.empty);
+            });
+        }
+    },
     apply: {
         value: function _apply(ma) {
             return this.map(ma.value);
@@ -224,5 +258,6 @@ var ordered_list_m = Object.create(ordered_list_f, {
 
 ordered_list_m.ap = ordered_list_m.apply;
 ordered_list_m.bind = ordered_list_m.chain;
+//ordered_list_m.reduce = ordered_list_m.fold;
 
 export { List, _list_m, ordered_list_m };

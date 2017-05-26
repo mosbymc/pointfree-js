@@ -94,4 +94,101 @@ var _either_f = {
     constructor: Either
 };
 
+var right = {
+    get value() {
+        return this._value;
+    },
+    /**
+     * @description:
+     * @param: {function|undefined} fn
+     * @return: {@see _either_f}
+     */
+    map: function _map(fn) {
+        return this.isRight ? Right(fn(this.value)) : Left(this.value);
+    },
+    /**
+     * @description:
+     * @param: {function|undefined} fn
+     * @return: {@see _either_f}
+     */
+    flatMap: function _flatMap(fn) {
+        if (Object.getPrototypeOf(this).isPrototypeOf(this.value)) return this.value.map(fn);
+        if (this.isRight) return Right(fn(this.value));
+        return Left(this.value);
+    },
+    /**
+     * @description:
+     * @param: {functor} ma
+     * @return: {boolean}
+     */
+    equals: function _equals(ma) {
+        return Object.getPrototypeOf(this).isPrototypeOf(ma) ?
+            (this.isLeft && ma.isLeft && this.value === ma.value) || this.isRight && ma.isRight && this.value === ma.value : false;
+    },
+    of: function _of(val) {
+        return Either.of(val);
+    },
+    /**
+     * @description:
+     * @return: {*}
+     */
+    valueOf: function _valueOf() {
+        return this.value;
+    },
+    toString: function _toString() {
+        var val = this.value && this.value.toString && 'function' === typeof this.value.toString ? this.value.toString() : JSON.stringify(this.value);
+        return this.isLeft ? `Left(${val})` : `Right(${val})`;
+    },
+    constructor: Either
+};
+
+var left = {
+    get value() {
+        return this._value;
+    },
+    /**
+     * @description:
+     * @return: {@see _either_f}
+     */
+    map: function _map() {
+        return Left(this.value);
+    },
+    /**
+     * @description:
+     * @param: {function|undefined} fn
+     * @return: {@see _either_f}
+     */
+    flatMap: function _flatMap(fn) {
+        if (Object.getPrototypeOf(this).isPrototypeOf(this.value)) return this.value.map(fn);
+        return Left(this.value);
+    },
+    /**
+     * @description:
+     * @param: {functor} ma
+     * @return: {boolean}
+     */
+    equals: function _equals(ma) {
+        return Object.getPrototypeOf(this).isPrototypeOf(ma) && this.isLeft && ma.isLeft && this.value === ma.value;
+    },
+    of: function _of(val) {
+        return Either.of(val);
+    },
+    /**
+     * @description:
+     * @return: {*}
+     */
+    valueOf: function _valueOf() {
+        return this.value;
+    },
+    toString: function _toString() {
+        var val = this.value && this.value.toString && 'function' === typeof this.value.toString ? this.value.toString() : JSON.stringify(this.value);
+        return `Left(${val})`;
+    },
+    constructor: Either
+};
+
+function fromNullable(x) {
+    return null != x ? Right(x) : Left(x);
+}
+
 export { Either, Left, Right, _either_f };

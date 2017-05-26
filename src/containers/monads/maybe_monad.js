@@ -30,6 +30,23 @@ var _maybe_m = Object.create(_maybe_f, {
             return fn(this.value);
         }
     },
+    fold: {
+        value: function _fold(fn, x) {
+            return !this.isNothing ? fn(this.value, x) : this.of();
+        }
+    },
+    traverse: {
+        value: function _traverse(fa, fn) {
+            return !this.isNothing ? this.fold(function _reductioAdAbsurdum(xs, x) {
+                fn(x).map(function _map(x) {
+                    return function _map_(y) {
+                        return y.concat([x]);
+                    };
+                }).ap(xs);
+                return fa(this.empty);
+            }) : this.of();
+        }
+    },
     /**
      * @description:
      * @param: {monad} ma
@@ -44,10 +61,14 @@ var _maybe_m = Object.create(_maybe_f, {
         value: function _of(val) {
             return Maybe.of(val);
         }
+    },
+    constructor: {
+        value: Maybe
     }
 });
 
 _maybe_m.ap = _maybe_m.apply;
 _maybe_m.bind = _maybe_m.chain;
+_maybe_f.reduce = _maybe_f.fold;
 
 export { Maybe, _maybe_m };

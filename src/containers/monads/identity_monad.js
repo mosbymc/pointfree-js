@@ -30,8 +30,27 @@ var _identity_m = Object.create(_identity_f, {
             return this.value;
         }
     },
-    chain: function _chain(fn) {
-        return fn(this.value);
+    chain: {
+        value: function _chain(fn) {
+            return fn(this.value);
+        }
+    },
+    fold: {
+        value: function _fold(fn, x) {
+            return fn(this.value, x);
+        }
+    },
+    traverse: {
+        value: function _traverse(fa, fn) {
+            return this.fold(function _reductioAdAbsurdum(xs, x) {
+                fn(x).map(function _map(x) {
+                    return function _map_(y) {
+                        return y.concat([x]);
+                    };
+                }).ap(xs);
+                return fa(this.empty);
+            });
+        }
     },
     /**
      * @description:
@@ -47,10 +66,14 @@ var _identity_m = Object.create(_identity_f, {
         value: function _of(val) {
             return Identity.of(val);
         }
+    },
+    constructor: {
+        value: Identity
     }
 });
 
 _identity_m.ap = _identity_m.apply;
 _identity_m.bind = _identity_m.chain;
+_identity_m.reduce = _identity_m.fold;
 
 export { Identity, _identity_m };
