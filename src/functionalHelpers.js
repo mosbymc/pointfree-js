@@ -830,15 +830,13 @@ function filtering(predicate) {
 
 function mapReducer (mapFn) {
     return function _mapReducer(result, input) {
-        result[result.length] = input;
-        return result;
+        return result.concat(input);
     };
 }
 
 function filterReducer(predicate) {
     return function _filterReducer(result, input) {
-        if (predicate(input)) result[result.length] = input;
-        return result;
+        return predicate(input) ? result.concat(input) : result;
     };
 }
 

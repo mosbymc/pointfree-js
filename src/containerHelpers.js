@@ -277,4 +277,8 @@ var intersect = curry(function _intersect(enumerable, comparer, list) {
     return list.intersect(enumerable, comparer);
 });
 
+var except = curry(function _except(enumerable, comparer, list) {
+    return list.except(enumerable, comparer);
+});
+
 export { apply, fmap, map, lift2, lift3, lift4, liftN, mjoin, toFunctorType, containerIterator };
