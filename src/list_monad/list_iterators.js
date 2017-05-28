@@ -704,5 +704,37 @@ function reverse(source) {
     };
 }
 
+/**
+ * @description:
+ * @param: {number} idx
+ * @param: {number} start
+ * @param: {number} end
+ * @returns {generator}
+ */
+function copyWithin(idx, start, end, source) {
+    return function *copyWithinIterator() {
+        for (let item of when(not(isArray), toArray, source).copyWithin(idx, start, end)) yield item;
+    };
+}
+
+function fill(val, start, end, source) {
+    return function *fillIterator() {
+        for (let item of when(not(isArray), toArray, source).fill(val, start, end)) yield item;
+    };
+}
+
+function indexOf(callback, context, source) {
+    return function *indexOfIterator() {
+        for (let item of when(not(isArray), toArray, source).findIndex(callback, context)) yield item;
+    };
+}
+
+function lastIndexOf(val, idx, source) {
+    return function *lastIndexOfIterator() {
+        for (let item of when(not(isArray), toArray, source).lastIndexOf(val, idx)) yield item;
+    };
+}
+
 export { all, any, except, intersect, union, map, flatMap, groupBy, sortBy, addFront, concat, groupJoin, join, zip, filter,
-    contains, first, last, count, fold, distinct, ofType, binarySearch, equals, take, takeWhile, skip, skipWhile, reverse };
+    contains, first, last, count, fold, distinct, ofType, binarySearch, equals, take, takeWhile, skip, skipWhile, reverse,
+    copyWithin, fill, indexOf, lastIndexOf };

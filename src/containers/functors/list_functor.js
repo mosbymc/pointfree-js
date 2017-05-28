@@ -1,5 +1,6 @@
 import { all, any, except, intersect, union, map, flatMap, groupBy, sortBy, addFront, concat, groupJoin, join, zip, filter,
-    contains, first, last, count, fold, distinct, ofType, binarySearch, equals, take, takeWhile, skip, skipWhile, reverse } from '../../list_monad/list_iterators';
+    contains, first, last, count, fold, distinct, ofType, binarySearch, equals, take, takeWhile, skip, skipWhile, reverse,
+    copyWithin, fill, indexOf, lastIndexOf } from '../../list_monad/list_iterators';
 import { generatorProto, sortDirection } from '../../helpers';
 import { set, when, isSomething, apply, ifElse, wrap, delegatesFrom, defaultPredicate, delegatesTo, not, isArray } from '../../functionalHelpers';
 
@@ -24,7 +25,7 @@ import { set, when, isSomething, apply, ifElse, wrap, delegatesFrom, defaultPred
  * join: list_functor_core._join,
  * union: list_functor_core._union,
  * zip: list_functor_core._zip,
- * where: list_functor_core._where,
+ * filter: list_functor_core.filter,
  * ofType: list_functor_core._ofType,
  * distinct: list_functor_core._distinct,
  * take: list_functor_core._take,
@@ -233,7 +234,7 @@ var list_functor_core = {
      * @param: {function} predicate
      * @return: {@see m_list}
      */
-    filter: function _where(predicate) {
+    filter: function _filter(predicate) {
         return this.of(this, filter(this, predicate));
     },
 
@@ -359,6 +360,48 @@ var list_functor_core = {
      */
     reduce: function _reduce(fn, initial) {
         return fold(this, fn, initial);
+    },
+
+    /**
+     * @description:
+     * @param: {number} index
+     * @param: {number} start
+     * @param: {number} end
+     * @return: {@see _list_f}
+     */
+    copyWithin: function _copyWithin(index, start, end) {
+        return this.of(this, copyWithin(index, start, end, this));
+    },
+
+    /**
+     * @description:
+     * @param: {number} value
+     * @param: {number} start
+     * @param: {number} end
+     * @return: {@see _list_f}
+     */
+    fill: function _fill(value, start, end) {
+        return this.of(this, fill(value, start, end, this));
+    },
+
+    /**
+     * @description:
+     * @param: {function} callback
+     * @param: {*} context
+     * @return: {@see _list_f}
+     */
+    indexOf: function _indexOf(callback, context) {
+        return this.of(this, indexOf(callback, context, this));
+    },
+
+    /**
+     * @description:
+     * @param: {*} value
+     * @param: {number} index
+     * @return: {@see _list_f}
+     */
+    lastIndexOf: function _lastIndexOf(value, index) {
+        return this.of(this, lastIndexOf(value, index, this));
     },
 
     /**
@@ -887,7 +930,7 @@ function createListDelegateInstance(source, iterator, sortObj, key) {
     }
 
     function sortObjectTest(sortObj) {
-        return sortObj && Array.isArray(sortObj);
+        return Array.isArray(sortObj);
     }
 
     function keyTest(key) {
