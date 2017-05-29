@@ -1,8 +1,8 @@
 import { all, any, except, intersect, union, map, flatMap, groupBy, sortBy, addFront, concat, groupJoin, join, zip, filter,
-    contains, first, last, count, fold, distinct, ofType, binarySearch, equals, take, takeWhile, skip, skipWhile, reverse,
+    contains, first, last, count, fold, foldRight, distinct, ofType, binarySearch, equals, take, takeWhile, skip, skipWhile, reverse,
     copyWithin, fill, indexOf, lastIndexOf } from '../../list_monad/list_iterators';
 import { generatorProto, sortDirection } from '../../helpers';
-import { set, when, isSomething, apply, ifElse, wrap, delegatesFrom, defaultPredicate, delegatesTo, not, isArray } from '../../functionalHelpers';
+import { when, wrap, defaultPredicate, delegatesTo, not, isArray, isString } from '../../functionalHelpers';
 
 /**
  * @description: Object that contains the core functionality of a List; both the m_list and ordered_m_list
@@ -344,7 +344,7 @@ var list_functor_core = {
     /**
      * @description:
      * @param: {function} fn
-     * @param: initial
+     * @param: {*} initial
      * @return: {*}
      */
     fold: function _fold(fn, initial) {
@@ -360,6 +360,16 @@ var list_functor_core = {
      */
     reduce: function _reduce(fn, initial) {
         return fold(this, fn, initial);
+    },
+
+    /**
+     * @description:
+     * @param: {function} fn
+     * @param: {*} initial
+     * @return: {*}
+     */
+    reduceRight: function _reduceRight(fn, initial) {
+        return foldRight(this, fn, initial);
     },
 
     /**
@@ -824,7 +834,7 @@ List.extend = function _extend(propName, fn) {
  * @return: {@see list_functor_core}
  */
 function createListDelegateInstance(source, iterator, sortObj, key) {
-    switch(createBitMask(iteratorTest(iterator), sortObjectTest(sortObj), keyTest(key))) {
+    switch(createBitMask(delegatesTo(iterator, generatorProto), isArray(sortObj), isString(key))) {
         /**
          * @description: case 1 = An iterator has been passed, but nothing else. Create a
          * _list_f object instance and set the iterator as the version provided.
@@ -919,22 +929,10 @@ function createListDelegateInstance(source, iterator, sortObj, key) {
             });
     }
 
-    function createBitMask() {
-        var nMask = 0, nFlag = 0, nLen = arguments.length > 32 ? 32 : arguments.length;
-        for (nFlag; nFlag < nLen; nMask |= arguments[nFlag] << nFlag++);
-        return nMask;
-    }
-
-    function iteratorTest(iterator) {
-        return generatorProto.isPrototypeOf(iterator);
-    }
-
-    function sortObjectTest(sortObj) {
-        return Array.isArray(sortObj);
-    }
-
-    function keyTest(key) {
-        return 'string' === typeof key;
+    function createBitMask(...args) {
+        return args.reduce(function _reduce(curr, next, idx) {
+            return curr |= next << idx;
+        }, args[0]);
     }
 }
 

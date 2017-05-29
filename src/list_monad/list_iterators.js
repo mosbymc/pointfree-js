@@ -300,6 +300,17 @@ function fold(source, fn, initial = 0) {
 /**
  * @description:
  * @param: {iterable} source
+ * @param: {function} fn
+ * @param: {*} initial
+ * @return: {*}
+ */
+function foldRight(source, fn, initial = 0) {
+    return when(not(isArray), Array.from, source).reduceRight(fn, initial);
+}
+
+/**
+ * @description:
+ * @param: {iterable} source
  * @param: {function} predicate
  * @return: {*}
  */
@@ -736,5 +747,5 @@ function lastIndexOf(val, idx, source) {
 }
 
 export { all, any, except, intersect, union, map, flatMap, groupBy, sortBy, addFront, concat, groupJoin, join, zip, filter,
-    contains, first, last, count, fold, distinct, ofType, binarySearch, equals, take, takeWhile, skip, skipWhile, reverse,
+    contains, first, last, count, fold, foldRight, distinct, ofType, binarySearch, equals, take, takeWhile, skip, skipWhile, reverse,
     copyWithin, fill, indexOf, lastIndexOf };
