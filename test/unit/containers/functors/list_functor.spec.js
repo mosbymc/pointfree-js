@@ -98,7 +98,7 @@ describe('List functor test', function _testListFunctor() {
             var l = List(1),
                 d = l.map(function _t() { return 2; });
 
-            l.value.should.not.eql(d.value);
+            l.value.should.not.eql(d.data);
             l.should.not.equal(d);
         });
 
@@ -106,7 +106,7 @@ describe('List functor test', function _testListFunctor() {
             var l = List(1),
                 d = l.flatMap(function _t() { return 2; });
 
-            l.value.should.not.eql(d.value);
+            l.value.should.not.eql(d.data);
             l.should.not.equal(d);
         });
 

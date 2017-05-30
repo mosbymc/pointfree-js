@@ -1,5 +1,9 @@
 import { javaScriptTypes, shallowClone } from './helpers';
 
+var bindFunction = curry(function _bindFunction(context, fn) {
+    return fn.bind(context);
+});
+
 /**
  * @description: No-op function; used as default function in some cases when argument is optional
  * and consumer does not provide.
@@ -791,7 +795,13 @@ var adjust = curry(function _adjust(fn, idx, list) {
  */
 function curry(fn) {
     if (!fn.length || 1 === fn.length) return fn;
-    return curryN(fn.length, [], fn);
+    return curryN(this, fn.length, [], fn);
+}
+
+function curryRight(fn) {
+    return curryN(this, fn.length, [], function _wrapper(...args) {
+        return fn.call(this, ...args.reverse());
+    });
 }
 
 /**
@@ -803,30 +813,22 @@ function curry(fn) {
  * be applied before invocation, or will return the result of the function invocation
  * if the specified number of arguments have been received
  */
-function curryN(arity, received, fn) {
+function curryN(context, arity, received, fn) {
     return function _curryN(...rest) {
         var combined = received.concat(rest);
         if (arity > combined.length)
-            return curryN(arity, combined, fn);
-        return fn.call(this, ...combined);
+            return curryN(context, arity, combined, fn);
+        return fn.call(context, ...combined);
     };
 }
 
-function mapping(mappingFunc) {
-    return function _mapping(reducingFunc) {
-        return function _mapping_(result, input) {
-            return reducingFunc(result, mappingFunc(input));
-        };
-    };
-}
+var mapping = curry(function _mapping2(mapFn, reduceFn, result, input) {
+    return reduceFn(result, mapFn(input));
+});
 
-function filtering(predicate) {
-    return function _filtering(reducingFunc) {
-        return function _filtering_(result, input) {
-            return predicate(input) ? reducingFunc(result, input) : result;
-        };
-    };
-}
+var filtering = curry(function _filtering2(predicate, reduceFn, result, input) {
+    return predicate(input) ? reduceFn(result, input) : result;
+});
 
 function mapReducer (mapFn) {
     return function _mapReducer(result, input) {
@@ -933,6 +935,54 @@ const dropping = skips => reducingFn => (acc, item) => {
 
 //usage
 //reduce(dropping(3)(concat),[],[1,2,3,4,5]);//-> [4,5]
+
+var leftApply = curry(function _leftApply(fn, a, b) {
+    return fn(a, b);
+});
+
+var rightApply = curry(function _rightApply(fn, b, a) {
+    return fn(a, b);
+});
+
+var c = leftApply(leftApply, rightApply);
+
+var getWith = c(get);
+
+var before = curry(function _before(fn, decoration, ...args) {
+    decoration(...args);
+    return fn(...args);
+});
+
+var after = curry(function _after(fn, decoration, ...args) {
+    var ret = fn(...args);
+    decoration(...args);
+    return ret;
+});
+
+function guardBefore(...fns) {
+    return function waitForArgs(...args) {
+        if (fns.slice(1).every(function _functionRunner(fn) {
+            return fn(...args);
+            })) return fns[0](...args);
+    };
+}
+
+function guardAfter(...fns) {
+    return function waitForArgs(...args) {
+        if (fns.reverse().slice(1).every(function _functionRunner(fn) {
+                return fn(...args);
+            })) return fns[fns.length - 1](...args);
+    };
+}
+
+function fixedPoint(fn) {
+    function _fixedPoint(x) {
+        return fn(function _y_(v) {
+            x(x)(v);
+        });
+    }
+    return _fixedPoint(_fixedPoint);
+}
 
 export { noop, identity, constant, apply, once, kestrel, get, set, objectSet, arraySet, nth, compose, pipe, ifElse, ifThisThenThat,
         when, whenNot, wrap, type, isArray, isObject, isFunction, isNumber, isString, isBoolean, isSymbol, isNull,

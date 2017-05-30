@@ -5,7 +5,7 @@ var Identity = functors.Identity;
 
 describe('Identity functor test', function _testIdentityFunctor() {
     describe('Identity object factory tests', function _testIdentityObjectFactory() {
-        it('should return a new constant functor regardless of data type', function _testIdentityFactoryObjectCreation() {
+        it('should return a new identity functor regardless of data type', function _testIdentityFactoryObjectCreation() {
             var arr = [1, 2, 3],
                 obj = { a: 1, b: 2 },
                 i1 = Identity(),

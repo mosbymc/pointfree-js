@@ -59,7 +59,7 @@ var _identity_m = Object.create(_identity_f, {
      */
     apply: {
         value: function _apply(ma) {
-            return this.map(ma.value);
+            return ma.map(this.value);
         }
     },
     of: {

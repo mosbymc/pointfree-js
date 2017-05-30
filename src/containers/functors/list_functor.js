@@ -480,8 +480,10 @@ var list_functor_core = {
      * objectSet on the delegator at the time of creation.
      */
     [Symbol.iterator]: function *_iterator() {
-        for (let item of this.value)
+        var data = Array.from(this.value);
+        for (let item of data) {
             yield item;
+        }
     },
 
     /**

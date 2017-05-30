@@ -1,5 +1,5 @@
 import { _list_f, ordered_list_f, list_functor_core } from '../functors/list_functor';
-import { ifElse, isSomething, delegatesFrom, set, when, wrap, apply } from '../../functionalHelpers';
+import { ifElse, isSomething, delegatesFrom, set, when, wrap, apply, not, isArray } from '../../functionalHelpers';
 import { generatorProto } from '../../helpers';
 
 var setValue = set('_value'),
@@ -15,7 +15,7 @@ function createList() {
     return Object.create(_list_m, {
         data: {
             get: function _getData() {
-                return Array.from(this);
+                return when(not(isArray), when, this);
             }
         }
     });
@@ -74,6 +74,8 @@ function createGroupedList(val) {
  * @return: {@see list_core}
  */
 function createListDelegator(value, iterator, sortObj) {
+    //console.log(value, iterator);
+    //console.log(when(isIterator(iterator), setIterator(iterator), setValue(value, create(sortObj))));
     return when(isIterator(iterator), setIterator(iterator), setValue(value, create(sortObj)));
 }
 
@@ -208,6 +210,7 @@ var _list_m = Object.create(_list_f, {
     },
     of: {
         value: function _of(val, iterator, sortObj) {
+            //console.log(val, iterator);
             return createListDelegator(val, iterator, sortObj);
         }
     }

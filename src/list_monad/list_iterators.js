@@ -588,8 +588,16 @@ function findGroup(arr, field) {
  */
 function map(source, fn) {
     return function *mapIterator() {
+        if (Array.isArray(source.value) && source.value.length === 5) {
+            console.log(source.value);
+            console.log(Object.getPrototypeOf(source));
+        }
         for (let item of source) {
             let res = fn(item);
+            if (~[1, 2, 3, 4, 5].indexOf(item)) {
+                console.log(res);
+            }
+            else console.log(item, source);
             if (javaScriptTypes.undefined !== res) yield res;
         }
     };

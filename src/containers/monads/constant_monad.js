@@ -10,6 +10,15 @@ function Constant(val) {
     });
 }
 
+/**
+ * @description:
+ * @param: {*} item
+ * @return: {@see _constant_m}
+ */
+Constant.of = function _of(item) {
+    return Constant(item);
+};
+
 var _constant_m = Object.create(_constant_f, {
     mjoin: {
         value: function _mjoin() {

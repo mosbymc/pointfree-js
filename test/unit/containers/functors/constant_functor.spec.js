@@ -155,7 +155,7 @@ describe('Constant functor tests', function _testConstantFunctor() {
             expect(false).to.eql(c8.value);
         });
 
-        it('should transform an identity functor to the other functor types', function _testConstantFunctorTransforms() {
+        it('should transform an constant functor to the other functor types', function _testConstantFunctorTransforms() {
             var i = Constant(1);
             var c = i.mapToIdentity(),
                 e = i.mapToEither(),

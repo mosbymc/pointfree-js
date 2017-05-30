@@ -51,6 +51,7 @@ function Right(val) {
 var _either_m = Object.create(_either_f, {
     map: {
         value: function _map(fn) {
+            console.log(this.isRight, this.value);
             return this.isRight ? Right(fn(this.value)) : Left(this.value);
         }
     },
