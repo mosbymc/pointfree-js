@@ -92,7 +92,6 @@ describe('Identity monad test', function _testIdentityMonad() {
 
         it('should return the applied monad type after mapping the identity monad\'s underlying value', function _testIdentityMonadApply() {
             var i = Identity(function _identityMap(val) {
-                console.log(val);
                 return val ? val + 50 : 0;
             });
 
@@ -101,7 +100,8 @@ describe('Identity monad test', function _testIdentityMonad() {
                 e2 = monads.Either('error'),
                 l = monads.List([1, 2, 3, 4, 5]),
                 m1 = monads.Maybe(15),
-                m2 = monads.Maybe(null);
+                m2 = monads.Maybe(null),
+                m3 = monads.Maybe(false);
 
             //console.log(Object.getPrototypeOf(Object.getPrototypeOf(Object.getPrototypeOf(l))));
 
@@ -117,14 +117,21 @@ describe('Identity monad test', function _testIdentityMonad() {
                 e2Res = i.apply(e2),
                 lRes =  i.apply(l),
                 m1Res = i.apply(m1),
-                m2Res = i.apply(m2);
+                m2Res = i.apply(m2),
+                m3Res = i.apply(m3);
+
+            //console.log(lRes);
+            //console.log(lRes.toString());
+            //console.log(Object.getPrototypeOf(lRes));
+            //console.log(Object.getPrototypeOf(Object.getPrototypeOf(lRes)));
+            //console.log(Object.getPrototypeOf(Object.getPrototypeOf(Object.getPrototypeOf(lRes))));
 
             Object.getPrototypeOf(cRes).should.eql(monads.Constant());
+            Object.getPrototypeOf(e1Res).should.eql(monads.Either());
             Object.getPrototypeOf(e2Res).should.eql(monads.Either());
             Object.getPrototypeOf(m1Res).should.eql(monads.Maybe());
-
-            //console.log(cRes, e1Res, e2Res, lRes, m1Res, m2Res);
-            //console.log(lRes.data);
+            Object.getPrototypeOf(m2Res).should.eql(monads.Maybe());
+            Object.getPrototypeOf(m3Res).should.eql(monads.Maybe());
         });
     });
 });

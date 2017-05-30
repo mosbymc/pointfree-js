@@ -132,7 +132,7 @@ var _maybe_f = {
     },
     map: function _map(fn) {
         //return this.of(fn(this.value));
-        return null == this.value ? this.nothing() : this.of(fn(this.value));
+        return this.isNothing ? this.nothing() : this.of(fn(this.value));
     },
     flatMap: function _flatMap(fn) {
         //return _maybe_f.isPrototypeOf(this.value) ? this.value.map(fn) : this.of(fn(this.value));

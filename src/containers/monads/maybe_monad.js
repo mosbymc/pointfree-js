@@ -7,6 +7,13 @@ function Maybe(item) {
             writable: false,
             configurable: false
         }
+        ,
+        isJust: {
+            value: null != item
+        },
+        isNothing: {
+            value: null == item
+        }
     });
 }
 
@@ -16,7 +23,19 @@ function Maybe(item) {
  * @return: {@see _maybe_m}
  */
 Maybe.of = function _of(item) {
-    return Maybe(item);
+    return Object.create(_maybe_m, {
+        _value: {
+            value: item,
+            writable: false,
+            configurable: false
+        },
+        isJust: {
+            value: true
+        },
+        isNothing: {
+            value: false
+        }
+    });
 };
 
 var _maybe_m = Object.create(_maybe_f, {
@@ -55,6 +74,11 @@ var _maybe_m = Object.create(_maybe_f, {
     apply: {
         value: function _apply(ma) {
             return this.map(ma.value);
+        }
+    },
+    nothing: {
+        value: function _nothing() {
+            return Maybe();
         }
     },
     of: {

@@ -502,7 +502,22 @@ var list_functor_core = {
      * @return: {string}
      */
     toString: function _toString() {
-        return `List(${this.value})`;
+        //console.log(this.value);
+        //console.log(list_functor_core.isPrototypeOf(this.value), this.value.toString(), this.value);
+
+        /*if (list_functor_core.isPrototypeOf(this.value) || (Array.isArray(this.value) && this.value.length === 5)) {
+            console.log(list_functor_core.isPrototypeOf(this.value));
+            console.log(this);
+            console.log(this.value);
+
+            if (list_functor_core.isPrototypeOf(this.value)) {
+                console.log(this.value.toString());
+            }
+        }*/
+        var val = list_functor_core.isPrototypeOf(this.value) ? this.value.toString() : this.value;
+        console.log(val);
+        return `List(${val})`;
+        //return list_functor_core.isPrototypeOf(this.value) ? this.value.toString() : `List(${this.value})`;
     },
 
     /**
