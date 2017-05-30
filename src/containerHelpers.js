@@ -1,7 +1,4 @@
 import { curry, compose, identity } from './functionalHelpers';
-import { Just, _just } from './just_monad/just';
-import { Identity, _identity } from './identity_monad/identity';
-import { Maybe, _maybe } from './maybe_monad/maybe';
 import { List, list_core } from './list_monad/list';
 
 //TODO: I need to figure out how to structure this lib. I'd like to have several different types of containers...
@@ -194,7 +191,7 @@ function toList(ma) {
  * @return: {@see _maybe}
  */
 function toMaybe(ma) {
-    return Maybe(mjoin(ma));
+    //return Maybe(mjoin(ma));
 }
 
 /**
@@ -203,7 +200,7 @@ function toMaybe(ma) {
  * @return: {@see _future}
  */
 function toFuture(ma) {
-    return Future(mjoin(ma));
+    //return Future(mjoin(ma));
 }
 
 /**
@@ -212,7 +209,7 @@ function toFuture(ma) {
  * @return: {@see _identity}
  */
 function toIdentity(ma) {
-    return Identity(mjoin(ma));
+    //return Identity(mjoin(ma));
 }
 
 /**
@@ -221,7 +218,7 @@ function toIdentity(ma) {
  * @return: {@see _just}
  */
 function toJust(ma) {
-    return Just(mjoin(ma));
+    //return Just(mjoin(ma));
 }
 
 //===========================================================================================//
@@ -231,19 +228,19 @@ function toJust(ma) {
 //===========================================================================================//
 
 function _toIdentity() {
-    return Identity.from(this.value);
+    //return Identity.from(this.value);
 }
 
 function _toJust() {
-    return Just.from(this.value);
+    //return Just.from(this.value);
 }
 
 function _toList() {
-    return List.from(this.value);
+    //return List.from(this.value);
 }
 
 function _toMaybe() {
-    return Maybe.from(this.value);
+    //return Maybe.from(this.value);
 }
 
 
