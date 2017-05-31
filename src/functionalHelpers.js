@@ -816,8 +816,7 @@ function curryRight(fn) {
 function curryN(context, arity, received, fn) {
     return function _curryN(...rest) {
         var combined = received.concat(rest);
-        if (arity > combined.length)
-            return curryN(context, arity, combined, fn);
+        if (arity > combined.length) return curryN(context, arity, combined, fn);
         return fn.call(context, ...combined);
     };
 }

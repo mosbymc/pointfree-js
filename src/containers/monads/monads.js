@@ -74,7 +74,6 @@ _list_m.mapToIo = mapToIo;
 _list_m.mapToLeft = mapToLeft;
 _list_m.mapToMaybe = mapToMaybe;
 _list_m.mapToRight = mapToRight;
-_list_m[Symbol.iterator] = containerIterator;
 
 ordered_list_m.mapToConstant = mapToConstant;
 ordered_list_m.mapToEither = mapToEither;
@@ -84,7 +83,6 @@ ordered_list_m.mapToIo = mapToIo;
 ordered_list_m.mapToLeft = mapToLeft;
 ordered_list_m.mapToMaybe = mapToMaybe;
 ordered_list_m.mapToRight = mapToRight;
-ordered_list_m[Symbol.iterator] = containerIterator;
 
 _maybe_m.mapToConstant = mapToConstant;
 _maybe_m.mapToEither = mapToEither;

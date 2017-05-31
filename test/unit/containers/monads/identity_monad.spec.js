@@ -103,15 +103,6 @@ describe('Identity monad test', function _testIdentityMonad() {
                 m2 = monads.Maybe(null),
                 m3 = monads.Maybe(false);
 
-            //console.log(Object.getPrototypeOf(Object.getPrototypeOf(Object.getPrototypeOf(l))));
-
-            var x = monads.List([1, 2, 3, 4, 5]);
-            //console.log(x, x.data);
-            var ttt = x.map(function _test(val) {
-                return val * 10;
-            });
-            //console.log(ttt, ttt.data, Object.getPrototypeOf(Object.getPrototypeOf(Object.getPrototypeOf(ttt))));
-
             var cRes = i.apply(c),
                 e1Res = i.apply(e1),
                 e2Res = i.apply(e2),
@@ -120,18 +111,17 @@ describe('Identity monad test', function _testIdentityMonad() {
                 m2Res = i.apply(m2),
                 m3Res = i.apply(m3);
 
-            //console.log(lRes);
-            //console.log(lRes.toString());
-            //console.log(Object.getPrototypeOf(lRes));
-            //console.log(Object.getPrototypeOf(Object.getPrototypeOf(lRes)));
-            //console.log(Object.getPrototypeOf(Object.getPrototypeOf(Object.getPrototypeOf(lRes))));
-
+            Object.getPrototypeOf(lRes).should.eql(Object.getPrototypeOf(monads.List()));
             Object.getPrototypeOf(cRes).should.eql(monads.Constant());
             Object.getPrototypeOf(e1Res).should.eql(monads.Either());
             Object.getPrototypeOf(e2Res).should.eql(monads.Either());
             Object.getPrototypeOf(m1Res).should.eql(monads.Maybe());
             Object.getPrototypeOf(m2Res).should.eql(monads.Maybe());
             Object.getPrototypeOf(m3Res).should.eql(monads.Maybe());
+        });
+
+        it('should have a .constructor property that points to the factory function', function _testIdentityMonadIsStupidViaFantasyLandSpecCompliance() {
+            Identity(null).constructor.should.eql(Identity);
         });
     });
 });

@@ -515,7 +515,6 @@ var list_functor_core = {
             }
         }*/
         var val = list_functor_core.isPrototypeOf(this.value) ? this.value.toString() : this.value;
-        console.log(val);
         return `List(${val})`;
         //return list_functor_core.isPrototypeOf(this.value) ? this.value.toString() : `List(${this.value})`;
     },

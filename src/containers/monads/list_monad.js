@@ -15,7 +15,7 @@ function createList() {
     return Object.create(_list_m, {
         data: {
             get: function _getData() {
-                return when(not(isArray), when, this);
+                return Array.from(this);
             }
         }
     });
@@ -58,7 +58,7 @@ function createGroupedList(val) {
                 return this._key;
             }
         }
-    })
+    });
 }
 
 /**
