@@ -421,29 +421,53 @@ function not(fn) {
 }
 
 /**
- * or :: (*... -> Boolean) -> ((*... -> Boolean) -> ((*... -> Boolean)))
+ * @description:
+ * @param: {Array} fns - One or more comma separated function arguments
+ * @return: {function}
+ */
+function any(...fns) {
+    return function _any(...args) {
+        return fns.some(function _testAny(fn) {
+            return fn(...args);
+        });
+    };
+}
+
+/**
+ * @description:
+ * @param: {Array} fns - One or more comma separated function arguments
+ * @return: {function}
+ */
+function all(...fns) {
+    return function _all(...args) {
+        return fns.every(function _testAll(fn) {
+            return fn(...args);
+        });
+    };
+}
+
+/**
+ * or :: (*... -> a) -> ((*... -> b) -> ((*... -> Boolean)))
  * @description:
  * @type {function}
- * @param: {function} a
- * @param: {function} b
- * @param: {*} item
+ * @param: {*} a
+ * @param: {*} b
  * @return: {boolean}
  */
-var or = curry(function _or(a, b, item) {
-    return a(item) || b(item);
+var or = curry(function _or(a, b) {
+    return !!(a || b);
 });
 
 /**
- * and :: (*... -> Boolean) -> ((*... -> Boolean) -> ((*... -> Boolean)))
+ * and :: (*... -> a) -> ((*... -> b) -> ((*... -> Boolean)))
  * @description:
  * @type {function}
- * @param: {function} a
- * @param: {function} b
- * @param: {*}
+ * @param: {*} a
+ * @param: {*} b
  * @return: {boolean}
  */
-var and = curry(function _and(a, b, item) {
-    return a(item) && b(item);
+var and = curry(function _and(a, b) {
+    return !!(a && b);
 });
 
 /**
@@ -987,4 +1011,5 @@ export { noop, identity, constant, apply, once, kestrel, get, set, objectSet, ar
         when, whenNot, wrap, type, isArray, isObject, isFunction, isNumber, isString, isBoolean, isSymbol, isNull,
         isUndefined, isNothing, isSomething, not, or, and, flip, truthy, falsey, add, subtract, divide, multiple, modulus, concat, negate,
         equal, strictEqual, notEqual, strictNotEqual, greaterThan, greaterThanOrEqual, lessThan, lessThanOrEqual, delegatesTo, delegatesFrom,
-        arrayLens, objectLens, view, over, put, makeLenses, lensPath, mapped, adjust, curry, curryN, tap, fork, sequence, defaultPredicate };
+        arrayLens, objectLens, view, over, put, makeLenses, lensPath, mapped, adjust, curry, curryN, tap, fork, sequence, defaultPredicate,
+        any, all, mapReducer, filterReducer, leftApply, rightApply, before, after, guardBefore, guardAfter, fixedPoint };

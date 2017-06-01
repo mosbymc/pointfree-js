@@ -3,7 +3,7 @@ import { Either, Left, Right, _either_f } from './either_functor';
 import { Future, _future_f } from './future_functor';
 import { Identity, _identity_f } from './identity_functor';
 import { Io, _io_f } from './io_functor';
-import { List, list_functor_core } from './list_functor';
+import { List, list_core } from './list_functor';
 import { Maybe, Just, Nothing, _maybe_f } from './maybe_functor';
 
 import { toFunctorType, containerIterator } from '../../containerHelpers';
@@ -66,14 +66,14 @@ _io_f.mapToMaybe = mapToMaybe;
 _io_f.mapToRight = mapToRight;
 _io_f[Symbol.iterator] = containerIterator;
 
-list_functor_core.mapToConstant = mapToConstant;
-list_functor_core.mapToEither = mapToEither;
-list_functor_core.mapToFuture = mapToFuture;
-list_functor_core.mapToIdentity = mapToIdentity;
-list_functor_core.mapToIo = mapToIo;
-list_functor_core.mapToLeft = mapToLeft;
-list_functor_core.mapToMaybe = mapToMaybe;
-list_functor_core.mapToRight = mapToRight;
+list_core.mapToConstant = mapToConstant;
+list_core.mapToEither = mapToEither;
+list_core.mapToFuture = mapToFuture;
+list_core.mapToIdentity = mapToIdentity;
+list_core.mapToIo = mapToIo;
+list_core.mapToLeft = mapToLeft;
+list_core.mapToMaybe = mapToMaybe;
+list_core.mapToRight = mapToRight;
 
 _maybe_f.mapToConstant = mapToConstant;
 _maybe_f.mapToEither = mapToEither;

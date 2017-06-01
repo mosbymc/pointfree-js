@@ -1,113 +1,27 @@
-import { _list_f, ordered_list_f, list_functor_core } from '../functors/list_functor';
-import { ifElse, isSomething, delegatesFrom, set, when, wrap, apply, not, isArray } from '../../functionalHelpers';
-import { generatorProto } from '../../helpers';
-
-var setValue = set('_value'),
-    setIterator = set(Symbol.iterator),
-    isIterator = apply(delegatesFrom(generatorProto)),
-    create = ifElse(isSomething, createOrderedList, createList);
-
-/**
- * @description:
- * @return: {@see _list_m}
- */
-function createList() {
-    return Object.create(_list_m, {
-        data: {
-            get: function _getData() {
-                return Array.from(this);
-            }
-        }
-    });
-}
-
-/**
- * @description:
- * @param: {Array} sorts
- * @return: {@see ordered_list_m}
- */
-function createOrderedList(sorts) {
-    return set('_appliedSorts', sorts, Object.create(ordered_list_m, {
-        data: {
-            get: function _getData() {
-                return Array.from(this);
-            }
-        }
-    }));
-}
-
-/**
- * @description:
- * @param: {*} val
- * @return: {@see _list_m}
- */
-function createGroupedList(val) {
-    return Object.create(_list_m, {
-        data: {
-            get: function _getData() {
-                return Array.from(this);
-            }
-        },
-        _key: {
-            value: val,
-            writable: false,
-            configurable: false
-        },
-        key: {
-            get: function _getKey() {
-                return this._key;
-            }
-        }
-    });
-}
-
-/**
- * @description: Creator function for List delegate object instances. Creates a m_list delegator
- * if no sort object is passed, otherwise, it will create an ordered_m_list delegator. If no
- * iterator is passed, the delegator will fall back on the delegate's iterator.
- * @param: {*} value - Any value that should be used as the underlying source of the List. It the
- * value has an iterator it will be accepted as is, if not, it will be wrapped in an array.
- * @param: {generator} iterator - A generator function that should be used as the iterator for
- * the new List delegator instance.
- * @param: {m_list|ordered_m_list} sortObj - A 'sort object' that the ordered_m_list knows how
- * to utilize when sorting or grouping a List.
- * @return: {@see list_core}
- */
-function createListDelegator(value, iterator, sortObj) {
-    //console.log(value, iterator);
-    //console.log(when(isIterator(iterator), setIterator(iterator), setValue(value, create(sortObj))));
-    return when(isIterator(iterator), setIterator(iterator), setValue(value, create(sortObj)));
-}
-
-/**
- * @description:
- * @param: {*} value
- * @param: {function} iterator
- * @param: {string} key
- * @return: {@see _list_m}
- */
-function createGroupedListDelegator(value, iterator, key) {
-    return when(isIterator(iterator), setIterator(iterator), setValue(value, createGroupedList(key)));
-}
+import { list, ordered_list, list_core } from '../functors/list_functor';
+import { sortDirection } from '../../helpers';
+import { groupBy } from '../../list_monad/list_iterators';
+import { wrap } from '../../functionalHelpers';
+import { createListCreator } from '../list_helpers';
 
 /**
  * @description: Creator function for a new List object. Takes any value/type as a parameter
  * and, if it has an iterator defined, with set it as the underlying source of the List as is,
  * or, wrap the item in an array if there is no defined iterator.
  * @param: {*} source - Any type, any value; used as the underlying source of the List
- * @return: {@see _list_m} - A new List instance with the value provided as the underlying source.
+ * @return: {@see list_monad} - A new List instance with the value provided as the underlying source.
  */
 function List(source) {
     //TODO: should I exclude strings from being used as a source directly, or allow it because
     //TODO: they have an iterator?
-    return createListDelegator(source && source[Symbol.iterator] ? source : wrap(source));
+    return createListDelegateInstance(source && source[Symbol.iterator] ? source : wrap(source));
 }
 
 /**
  * @description: Convenience function for create a new List instance; internally calls List.
  * @see: List
  * @param: {*} source - Any type, any value; used as the underlying source of the List
- * @return: {@see _list_m} - A new List instance with the value provided as the underlying source.
+ * @return: {@see list_monad} - A new List instance with the value provided as the underlying source.
  */
 List.from = function _from(source) {
     return List(source);
@@ -118,7 +32,7 @@ List.from = function _from(source) {
  * @see: List.from
  * @type: {function}
  * @param: {*}
- * @return: {@see _list_m}
+ * @return: {@see list_monad}
  */
 List.of = List.from;
 
@@ -157,18 +71,30 @@ List.of = List.from;
  * above.
  */
 List.extend = function _extend(propName, fn) {
-    if (!(propName in _list_f) && !(propName in ordered_list_f)) {
+    if (!(propName in list) && !(propName in ordered_list)) {
         //TODO: this should probably be changed, other wise I am altering the applicative list in
         //TODO: addition to the monadic list. I'll also need to recreate the 'toEvaluatedList' function
         //TODO: since using it on a monadic list would result in a list_a, not a list_m.
-        list_functor_core[propName] = function(...args) {
-            return createListDelegator(this, fn(this, ...args));
+        list_core[propName] = function(...args) {
+            return createListDelegateInstance(this, fn(this, ...args));
         };
     }
     return List;
 };
 
-var _list_m = Object.create(_list_f, {
+var list_monad = Object.create(list, {
+    groupBy: {
+        value: function _groupBy(keySelector, comparer) {
+            var groupObj = [{ keySelector: keySelector, comparer: comparer, direction: sortDirection.ascending }];
+            return this.of(this, groupBy(this, groupObj, createGroupedListDelegate));
+        }
+    },
+    groupByDescending: {
+        value: function _groupByDescending(keySelector, comparer) {
+            var groupObj = [{ keySelector: keySelector, comparer: comparer, direction: sortDirection.descending }];
+            return this.of(this, groupBy(this, groupObj, createGroupedListDelegate));
+        },
+    },
     mjoin: {
         value: function _mjoin() {
             return this.value;
@@ -201,7 +127,7 @@ var _list_m = Object.create(_list_f, {
      * of this List object instance's underlying source. A new List object instance
      * is returned.
      * @param: {monad} ma
-     * @return: {@see _list_m}
+     * @return: {@see list_monad}
      */
     apply: {
         value: function _apply(ma) {
@@ -210,16 +136,27 @@ var _list_m = Object.create(_list_f, {
     },
     of: {
         value: function _of(val, iterator, sortObj) {
-            //console.log(val, iterator);
-            return createListDelegator(val, iterator, sortObj);
+            return createListDelegateInstance(val, iterator, sortObj);
         }
     }
 });
 
-_list_m.ap =_list_m.apply;
-_list_m.bind = _list_m.chain;
+list_monad.ap =list_monad.apply;
+list_monad.bind = list_monad.chain;
 
-var ordered_list_m = Object.create(ordered_list_f, {
+var ordered_list_monad = Object.create(ordered_list, {
+    groupBy: {
+        value: function _groupBy(keySelector, comparer) {
+            var groupObj = [{ keySelector: keySelector, comparer: comparer, direction: sortDirection.ascending }];
+            return this.of(this, groupBy(this, groupObj, createGroupedListDelegate));
+        }
+    },
+    groupByDescending: {
+        value: function _groupByDescending(keySelector, comparer) {
+            var groupObj = [{ keySelector: keySelector, comparer: comparer, direction: sortDirection.descending }];
+            return this.of(this, groupBy(this, groupObj, createGroupedListDelegate));
+        },
+    },
     mjoin: {
         value: function _mjoin() {
             return this.value;
@@ -254,13 +191,18 @@ var ordered_list_m = Object.create(ordered_list_f, {
     },
     of: {
         value: function _of(val, iterator, sortObj) {
-            return createListDelegator(val, iterator, sortObj);
+            return createListDelegateInstance(val, iterator, sortObj);
         }
     }
 });
 
-ordered_list_m.ap = ordered_list_m.apply;
-ordered_list_m.bind = ordered_list_m.chain;
-//ordered_list_m.reduce = ordered_list_m.fold;
+ordered_list_monad.ap = ordered_list_monad.apply;
+ordered_list_monad.bind = ordered_list_monad.chain;
+//ordered_list_monad.reduce = ordered_list_monad.fold;
 
-export { List, _list_m, ordered_list_m };
+function createGroupedListDelegate(source, key) {
+    return createListDelegateInstance(source, undefined, undefined, key);
+}
+var createListDelegateInstance = createListCreator(list_monad, ordered_list_monad, list_monad);
+
+export { List, list_monad, ordered_list_monad };

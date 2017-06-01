@@ -1,5 +1,5 @@
 import { functors } from '../../../../src/containers/functors/functors';
-import { _list_f, ordered_list_f } from '../../../../src/containers/functors/list_functor';
+import { list, ordered_list } from '../../../../src/containers/functors/list_functor';
 import { testData } from '../../../testData';
 
 var List = functors.List;
@@ -18,14 +18,14 @@ describe('List functor test', function _testListFunctor() {
                 l7 = List('testing constant'),
                 l8 = List(false);
 
-            _list_f.isPrototypeOf(l1).should.be.true;
-            _list_f.isPrototypeOf(l2).should.be.true;
-            _list_f.isPrototypeOf(l3).should.be.true;
-            _list_f.isPrototypeOf(l4).should.be.true;
-            _list_f.isPrototypeOf(l5).should.be.true;
-            _list_f.isPrototypeOf(l6).should.be.true;
-            _list_f.isPrototypeOf(l7).should.be.true;
-            _list_f.isPrototypeOf(l8).should.be.true;
+            list.isPrototypeOf(l1).should.be.true;
+            list.isPrototypeOf(l2).should.be.true;
+            list.isPrototypeOf(l3).should.be.true;
+            list.isPrototypeOf(l4).should.be.true;
+            list.isPrototypeOf(l5).should.be.true;
+            list.isPrototypeOf(l6).should.be.true;
+            list.isPrototypeOf(l7).should.be.true;
+            list.isPrototypeOf(l8).should.be.true;
 
             expect([undefined]).to.eql(l1.value);
             expect([null]).to.eql(l2.value);
@@ -49,14 +49,14 @@ describe('List functor test', function _testListFunctor() {
                 i7 = List.of('testing constant'),
                 i8 = List.of(false);
 
-            _list_f.isPrototypeOf(i1).should.be.true;
-            _list_f.isPrototypeOf(i2).should.be.true;
-            _list_f.isPrototypeOf(i3).should.be.true;
-            _list_f.isPrototypeOf(i4).should.be.true;
-            _list_f.isPrototypeOf(i5).should.be.true;
-            _list_f.isPrototypeOf(i6).should.be.true;
-            _list_f.isPrototypeOf(i7).should.be.true;
-            _list_f.isPrototypeOf(i8).should.be.true;
+            list.isPrototypeOf(i1).should.be.true;
+            list.isPrototypeOf(i2).should.be.true;
+            list.isPrototypeOf(i3).should.be.true;
+            list.isPrototypeOf(i4).should.be.true;
+            list.isPrototypeOf(i5).should.be.true;
+            list.isPrototypeOf(i6).should.be.true;
+            list.isPrototypeOf(i7).should.be.true;
+            list.isPrototypeOf(i8).should.be.true;
 
             expect([undefined]).to.eql(i1.value);
             expect([null]).to.eql(i2.value);

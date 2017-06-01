@@ -47,18 +47,10 @@ describe('identity', function testIdentity() {
 });
 
 describe('or', function testOr() {
-    function booleanFunctionOne() {
-        return true;
-    }
-
-    function booleanFunctionTwo() {
-        return false;
-    }
-
-    it('should return a value of true', function testOrWithSingleAndDoubleTruthyFunction() {
-        var firstOr = or(booleanFunctionOne, booleanFunctionTwo, []),
-            secondOr = or(booleanFunctionTwo, booleanFunctionOne, []),
-            thirdOr = or(booleanFunctionOne, booleanFunctionOne, []);
+    it('should return a value of true', function testOrWithSingleAndDoubleTruthyValues() {
+        var firstOr = or(true, 1),
+            secondOr = or({}, []),
+            thirdOr = or(2, 2);
 
         firstOr.should.be.a('boolean');
         firstOr.should.eql(true);
@@ -70,80 +62,24 @@ describe('or', function testOr() {
         thirdOr.should.eql(true);
     });
 
-    it('should return false when both functions return false', function testOrWithDoubleFalseyFunctions() {
-        var orResult = or(booleanFunctionTwo, booleanFunctionTwo, []);
+    it('should return false when both functions return false', function testOrWithDoubleFalseyValues() {
+        var orResult = or(false, 0);
         orResult.should.be.a('boolean');
         orResult.should.eql(false);
-    });
-
-    it('should return the first item', function testOrWithNonBooleanReturningFunctionsPartOne() {
-        function itemFunctionOne(item) {
-            item.testProp = 'testProp';
-            return item;
-        }
-
-        var firstOr = or(itemFunctionOne, booleanFunctionTwo, testData.dataSource.data),
-            secondOr = or(itemFunctionOne, itemFunctionOne, testData.dataSource.data),
-            thirdOr = or(itemFunctionOne, booleanFunctionOne, testData.dataSource.data);
-
-        firstOr.should.be.an('array');
-        firstOr.should.have.lengthOf(testData.dataSource.data.length);
-        firstOr.should.have.property('testProp', 'testProp');
-        firstOr.forEach(function testItemValues(item, idx) {
-            item.should.eql(testData.dataSource.data[idx]);
-        });
-
-        secondOr.should.be.an('array');
-        secondOr.should.have.lengthOf(testData.dataSource.data.length);
-        secondOr.should.have.property('testProp', 'testProp');
-        secondOr.forEach(function testItemValues(item, idx) {
-            item.should.eql(testData.dataSource.data[idx]);
-        });
-
-        thirdOr.should.be.an('array');
-        thirdOr.should.have.lengthOf(testData.dataSource.data.length);
-        thirdOr.should.have.property('testProp', 'testProp');
-        thirdOr.forEach(function testItemValues(item, idx) {
-            item.should.eql(testData.dataSource.data[idx]);
-        });
-    });
-
-    it('should return the second item', function testOrWithNonBooleanReturningFunctionsPartTwo() {
-        function itemFunctionOne(item) {
-            item.testProp = 'testProp';
-            return item;
-        }
-
-        var firstOr = or(booleanFunctionTwo, itemFunctionOne, testData.dataSource.data);
-
-        firstOr.should.be.an('array');
-        firstOr.should.have.lengthOf(testData.dataSource.data.length);
-        firstOr.should.have.property('testProp', 'testProp');
-        firstOr.forEach(function testItemValues(item, idx) {
-            item.should.eql(testData.dataSource.data[idx]);
-        });
     });
 });
 
 describe('and', function testAnd() {
-    function booleanFunctionOne() {
-        return true;
-    }
-
-    function booleanFunctionTwo() {
-        return false;
-    }
-
-    it('should return a value of true', function testAndWithDoubleTrueReturningFunctions() {
-        var andResult = and(booleanFunctionOne, booleanFunctionOne, []);
+    it('should return a value of true', function testAndWithDoubleTrueValues() {
+        var andResult = and(true, true);
         andResult.should.be.a('boolean');
         andResult.should.eql(true);
     });
 
-    it('should return a value of false', function testAndWithDoubleAndSingleFalseReturningFunctions() {
-        var firstAnd = and(booleanFunctionOne, booleanFunctionTwo, []),
-            secondAnd = and(booleanFunctionTwo, booleanFunctionOne, []),
-            thirdAnd = and(booleanFunctionTwo, booleanFunctionTwo, []);
+    it('should return a value of false', function testAndWithDoubleAndSingleFalseValues() {
+        var firstAnd = and(false, true),
+            secondAnd = and(1, 0),
+            thirdAnd = and(null, true);
 
         firstAnd.should.be.a('boolean');
         firstAnd.should.eql(false);
@@ -155,23 +91,13 @@ describe('and', function testAnd() {
         thirdAnd.should.eql(false);
     });
 
-    it('should return the first item', function testAndWithTruthyFunctions() {
-        function itemFunctionOne(item) {
-            item.testProp = 'testProp';
-            return item;
-        }
-
-        var firstAnd = and(itemFunctionOne, booleanFunctionOne, testData.dataSource.data),
-            secondAnd = and(booleanFunctionOne, itemFunctionOne, testData.dataSource.data);
+    it('should return the first item', function testAndWithTruthyValues() {
+        var firstAnd = and(true, true),
+            secondAnd = and(1, {});
 
         firstAnd.should.be.a('boolean');
         firstAnd.should.eql(true);
-
-        secondAnd.should.be.an('array');
-        secondAnd.should.have.property('testProp', 'testProp');
-        secondAnd.forEach(function testItemValues(item, idx) {
-            item.should.eql(testData.dataSource.data[idx]);
-        });
+        secondAnd.should.be.a('boolean');
     });
 });
 

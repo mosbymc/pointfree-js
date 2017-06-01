@@ -1,8 +1,9 @@
 import { all, any, except, intersect, union, map, flatMap, groupBy, sortBy, addFront, concat, groupJoin, join, zip, filter,
     contains, first, last, count, fold, foldRight, distinct, ofType, binarySearch, equals, take, takeWhile, skip, skipWhile, reverse,
     copyWithin, fill, indexOf, lastIndexOf } from '../../list_monad/list_iterators';
-import { generatorProto, sortDirection } from '../../helpers';
-import { when, wrap, defaultPredicate, delegatesTo, not, isArray, isString } from '../../functionalHelpers';
+import { sortDirection } from '../../helpers';
+import { when, wrap, defaultPredicate, delegatesTo, not, isArray } from '../../functionalHelpers';
+import { createListCreator } from '../list_helpers';
 
 /**
  * @description: Object that contains the core functionality of a List; both the m_list and ordered_m_list
@@ -13,39 +14,39 @@ import { when, wrap, defaultPredicate, delegatesTo, not, isArray, isString } fro
  * @type {{
  * value,
  * value,
- * map: list_functor_core._map,
- * groupBy: list_functor_core._groupBy,
- * groupByDescending: list_functor_core._groupByDescending,
- * flatMap: list_functor_core._flatMap,
- * addFront: list_functor_core._addFront,
- * concat: list_functor_core._concat,
- * except: list_functor_core._except,
- * groupJoin: list_functor_core._groupJoin,
- * intersect: list_functor_core._intersect,
- * join: list_functor_core._join,
- * union: list_functor_core._union,
- * zip: list_functor_core._zip,
- * filter: list_functor_core.filter,
- * ofType: list_functor_core._ofType,
- * distinct: list_functor_core._distinct,
- * take: list_functor_core._take,
- * takeWhile: list_functor_core._takeWhile,
- * skip: list_functor_core._skip,
- * skipWhile: list_functor_core._skipWhile,
- * any: list_functor_core._any,
- * all: list_functor_core._all,
- * contains: list_functor_core._contains,
- * first: list_functor_core._first,
- * fold: list_functor_core._fold,
- * last: list_functor_core._last,
- * count: list_functor_core._count,
- * toArray: list_functor_core._toArray,
- * toSet: list_functor_core._toSet,
- * reverse: list_functor_core._reverse,
- * [Symbol.iterator]: list_functor_core._iterator
+ * map: list_core._map,
+ * groupBy: list_core._groupBy,
+ * groupByDescending: list_core._groupByDescending,
+ * flatMap: list_core._flatMap,
+ * addFront: list_core._addFront,
+ * concat: list_core._concat,
+ * except: list_core._except,
+ * groupJoin: list_core._groupJoin,
+ * intersect: list_core._intersect,
+ * join: list_core._join,
+ * union: list_core._union,
+ * zip: list_core._zip,
+ * filter: list_core.filter,
+ * ofType: list_core._ofType,
+ * distinct: list_core._distinct,
+ * take: list_core._take,
+ * takeWhile: list_core._takeWhile,
+ * skip: list_core._skip,
+ * skipWhile: list_core._skipWhile,
+ * any: list_core._any,
+ * all: list_core._all,
+ * contains: list_core._contains,
+ * first: list_core._first,
+ * fold: list_core._fold,
+ * last: list_core._last,
+ * count: list_core._count,
+ * toArray: list_core._toArray,
+ * toSet: list_core._toSet,
+ * reverse: list_core._reverse,
+ * [Symbol.iterator]: list_core._iterator
  * }}
  */
-var list_functor_core = {
+var list_core = {
     //Using getters for these properties because there's a chance the setting and/or getting
     //functionality could change; this will allow for a consistent interface while the
     //logic beneath changes
@@ -65,7 +66,7 @@ var list_functor_core = {
      * @return: {boolean}
      */
     equals: function _equals(ma, comparer) {
-        return list_functor_core.isPrototypeOf(ma) && equals(this, ma, comparer);
+        return list_core.isPrototypeOf(ma) && equals(this, ma, comparer);
     },
 
     /**
@@ -377,7 +378,7 @@ var list_functor_core = {
      * @param: {number} index
      * @param: {number} start
      * @param: {number} end
-     * @return: {@see _list_f}
+     * @return: {@see list}
      */
     copyWithin: function _copyWithin(index, start, end) {
         return this.of(this, copyWithin(index, start, end, this));
@@ -388,7 +389,7 @@ var list_functor_core = {
      * @param: {number} value
      * @param: {number} start
      * @param: {number} end
-     * @return: {@see _list_f}
+     * @return: {@see list}
      */
     fill: function _fill(value, start, end) {
         return this.of(this, fill(value, start, end, this));
@@ -398,7 +399,7 @@ var list_functor_core = {
      * @description:
      * @param: {function} callback
      * @param: {*} context
-     * @return: {@see _list_f}
+     * @return: {@see list}
      */
     indexOf: function _indexOf(callback, context) {
         return this.of(this, indexOf(callback, context, this));
@@ -408,7 +409,7 @@ var list_functor_core = {
      * @description:
      * @param: {*} value
      * @param: {number} index
-     * @return: {@see _list_f}
+     * @return: {@see list}
      */
     lastIndexOf: function _lastIndexOf(value, index) {
         return this.of(this, lastIndexOf(value, index, this));
@@ -503,20 +504,20 @@ var list_functor_core = {
      */
     toString: function _toString() {
         //console.log(this.value);
-        //console.log(list_functor_core.isPrototypeOf(this.value), this.value.toString(), this.value);
+        //console.log(list_core.isPrototypeOf(this.value), this.value.toString(), this.value);
 
-        /*if (list_functor_core.isPrototypeOf(this.value) || (Array.isArray(this.value) && this.value.length === 5)) {
-            console.log(list_functor_core.isPrototypeOf(this.value));
+        /*if (list_core.isPrototypeOf(this.value) || (Array.isArray(this.value) && this.value.length === 5)) {
+            console.log(list_core.isPrototypeOf(this.value));
             console.log(this);
             console.log(this.value);
 
-            if (list_functor_core.isPrototypeOf(this.value)) {
+            if (list_core.isPrototypeOf(this.value)) {
                 console.log(this.value.toString());
             }
         }*/
-        var val = list_functor_core.isPrototypeOf(this.value) ? this.value.toString() : this.value;
+        var val = list_core.isPrototypeOf(this.value) ? this.value.toString() : this.value;
         return `List(${val})`;
-        //return list_functor_core.isPrototypeOf(this.value) ? this.value.toString() : `List(${this.value})`;
+        //return list_core.isPrototypeOf(this.value) ? this.value.toString() : `List(${this.value})`;
     },
 
     /**
@@ -538,10 +539,10 @@ var list_functor_core = {
  * @return {boolean} - Returns true if the List contains the searched for value, false
  * otherwise.
  */
-list_functor_core.contains.binary = function _binary(val, comparer) {
-    if (delegatesTo(source, ordered_list_f) && 'undefined' === typeof comparer)
+list_core.contains.binary = function _binary(val, comparer) {
+    if (delegatesTo(source, ordered_list) && 'undefined' === typeof comparer)
         return binarySearch(when(not(isArray), Array.from, source), val, comparer);
-    return list_functor_core.contains(val, comparer);
+    return list_core.contains(val, comparer);
 };
 
 /**
@@ -551,7 +552,7 @@ list_functor_core.contains.binary = function _binary(val, comparer) {
  * a given key.
  * @type: {list_core}
  */
-var _list_f = Object.create(list_functor_core, {
+var list = Object.create(list_core, {
     /**
      * @description:
      * @param: {function} keySelector
@@ -584,7 +585,7 @@ var _list_f = Object.create(list_functor_core, {
  * functions. These functions allow a consumer to sort more on than a single column.
  * @type: {list_core}
  */
-var ordered_list_f = Object.create(list_functor_core, {
+var ordered_list = Object.create(list_core, {
     _appliedSorts: {
         value: []
     },
@@ -636,113 +637,6 @@ var ordered_list_f = Object.create(list_functor_core, {
 //TODO: tpircSavaJ
 //TODO: Junctional FavaScript
 
-/*
-var setValue = set('_value'),
-    setIterator = set(Symbol.iterator),
-    isIterator = apply(delegatesFrom(generatorProto)),
-    listCreate = ifElse(isSomething, createOrderedList, createList);
-*/
-
-/**
- * @description:
- * @return: {@see _list_a}
- */
-/*function createList() {
-    return Object.create(_list_f, {
-        data: {
-            get: function _getData() {
-                return Array.from(this);
-            }
-        }
-    });
-}*/
-
-/**
- * @description:
- * @param: {Array} sorts
- * @return: {@see ordered_list_a}
- */
-/*function createOrderedList(sorts) {
-    return set('_appliedSorts', sorts, Object.create(ordered_list_f, {
-        data: {
-            get: function _getData() {
-                return Array.from(this);
-            }
-        }
-    }));
-}*/
-
-/**
- * @description:
- * @param: {*} val
- * @return: {@see _list_a}
- */
-/*function createGroupedList(val) {
-    return Object.create(_list_f, {
-        data: {
-            get: function _getData() {
-                return Array.from(this);
-            }
-        },
-        _key: {
-            value: val,
-            writable: false,
-            configurable: false
-        },
-        key: {
-            get: function _getKey() {
-                return this._key;
-            }
-        }
-    });
-}*/
-
-/**
- * @description: Creator function for List delegate object instances. Creates a m_list delegator
- * if no sort object is passed, otherwise, it will listCreate an ordered_m_list delegator. If no
- * iterator is passed, the delegator will fall back on the delegate's iterator.
- * @param: {*} value - Any value that should be used as the underlying source of the List. It the
- * value has an iterator it will be accepted as is, if not, it will be wrapped in an array.
- * @param: {generator} iterator - A generator function that should be used as the iterator for
- * the new List delegator instance.
- * @param: {m_list|ordered_m_list} sortObj - A 'sort object' that the ordered_m_list knows how
- * to utilize when sorting or grouping a List.
- * @return: {@see list_core}
- */
-/*function createListDelegator(value, iterator, sortObj) {
-    var l = Object.create(_list_f, {
-        _value: {
-            value: value,
-            writable: false,
-            configurable: false
-        },
-        data: {
-            get: function _getData() {
-                return Array.from(this);
-            }
-        }
-    });
-
-    if (generatorProto.isPrototypeOf(iterator))
-        l[Symbol.iterator] = iterator;
-
-    if (sortObj) l._appliedSorts = sortObj;
-
-    return l;
-    //return when(isIterator(iterator), setIterator(iterator), setValue(value, listCreate(sortObj)));
-}*/
-
-/**
- * @description:
- * @param: {*} value
- * @param: {function} iterator
- * @param: {string} key
- * @return: {@see _list_a}
- */
-/*function createGroupedListDelegator(value, iterator, key) {
-    return when(isIterator(iterator), setIterator(iterator), setValue(value, createGroupedList(key)));
-}*/
-
 /**
  * @description: Creator function for a new List object. Takes any value/type as a parameter
  * and, if it has an iterator defined, with set it as the underlying source of the List as is,
@@ -760,7 +654,7 @@ function List(source) {
  * @description: Convenience function for listCreate a new List instance; internally calls List.
  * @see: List
  * @param: {*} source - Any type, any value; used as the underlying source of the List
- * @return: {@see _list_f} - A new List instance with the value provided as the underlying source.
+ * @return: {@see list} - A new List instance with the value provided as the underlying source.
  */
 List.from = function _from(source) {
     return List(source);
@@ -810,25 +704,29 @@ List.of = List.from;
  * above.
  */
 List.extend = function _extend(propName, fn) {
-    if (!(propName in _list_f) && !(propName in ordered_list_f)) {
-        list_functor_core[propName] = function(...args) {
+    if (!(propName in list) && !(propName in ordered_list)) {
+        list_core[propName] = function(...args) {
             return createListDelegateInstance(this, fn(this, ...args));
         };
     }
     return List;
 };
 
+function createGroupedListDelegate(source, key) {
+    return createListDelegateInstance(source, undefined, undefined, key);
+}
+
 /**
  * @description: Creates a new list object delegate instance; list type is determined by
  * the parameters passed to the function. If only the 'source' parameter is provided, a
- * 'basic' _list_f delegate object instance is created. If the source and iterator parameters
- * are passed as arguments, a 'basic' _list_f delegate object instance is created and the
+ * 'basic' list delegate object instance is created. If the source and iterator parameters
+ * are passed as arguments, a 'basic' list delegate object instance is created and the
  * iterator provided is used as the new instance object's iterator rather than the default
  * list iterator. If the source, iterator, and sortObj parameters are passed as arguments,
- * an ordered_list_f delegate object instance is created. The provided iterator is set on
+ * an ordered_list delegate object instance is created. The provided iterator is set on
  * the instance object to be used in lieu of the default iterator and the ._appliedSorts
  * field is set as the 'sortObj' parameter. If all four of the function's arguments are
- * provided (source, iterator, sortObj, and key), then a _list_f delegate object instance
+ * provided (source, iterator, sortObj, and key), then a list delegate object instance
  * is created, setting the iterator for the object instance as the provided iterator, the
  * ._appliedSorts field as the sortObj argument, and the ._key field as the 'key' parameter's
  * value.
@@ -847,113 +745,8 @@ List.extend = function _extend(propName, fn) {
  * instance is evaluated.
  * @param: {string} key - A string that denotes what value the new list delegate object instance
  * was grouped on.
- * @return: {@see list_functor_core}
+ * @return: {@see list_core}
  */
-function createListDelegateInstance(source, iterator, sortObj, key) {
-    switch(createBitMask(delegatesTo(iterator, generatorProto), isArray(sortObj), isString(key))) {
-        /**
-         * @description: case 1 = An iterator has been passed, but nothing else. Create a
-         * _list_f object instance and set the iterator as the version provided.
-         */
-        case 1:
-            return Object.create(_list_f, {
-                _value: {
-                    value: source,
-                    writable: false,
-                    configurable: false
-                },
-                data: {
-                    get: function _getData() {
-                        return Array.from(this);
-                    }
-                },
-                [Symbol.iterator]: {
-                    value: iterator
-                }
-            });
-        /**
-         * @description: case 3 = Both an iterator and a sort object were passed. Create an
-         * ordered_list_f object instance, setting the iterator to the version provided and
-         * the _appliedSorts field as the sortObj param.
-         */
-        case 3:
-            return Object.create(ordered_list_f, {
-                _value: {
-                    value: source,
-                    writable: false,
-                    configurable: false
-                },
-                data: {
-                    get: function _getData() {
-                        return Array.from(this);
-                    }
-                },
-                _appliedSorts: {
-                    value: sortObj,
-                    writable: false,
-                    configurable: false
-                },
-                [Symbol.iterator]: {
-                    value: iterator
-                }
-            });
-        /**
-         * @description: case 4 = An iterator, sort object, and a key were passed as arguments.
-         * Create a grouped _list_f and set the iterator as the version provided, the ._appliedSorts
-         * field as the sortObj param, and the ._key field as the key string argument.
-         */
-        case 4:
-            return Object.create(_list_f, {
-                _value: {
-                    value: source,
-                    writable: false,
-                    configurable: false
-                },
-                data: {
-                    get: function _getData() {
-                        return Array.from(this);
-                    }
-                },
-                _key: {
-                    value: key,
-                    writable: false,
-                    configurable: false
-                },
-                key: {
-                    get: function _getKey() {
-                        return this._key;
-                    }
-                }
-            });
-        /**
-         * @description: default = Nothing beyond the 'source' param was passed to this
-         * function; results in a bitwise value of 00. Create a 'basic' _list_f object
-         * instance.
-         */
-        default:
-            return Object.create(_list_f, {
-                _value: {
-                    value: source,
-                    writable: false,
-                    configurable: false
-                },
-                data: {
-                    get: function _getData() {
-                        return Array.from(this);
-                    }
-                }
-            });
-    }
+var createListDelegateInstance = createListCreator(list, ordered_list, list);
 
-    function createBitMask(...args) {
-        return args.reduce(function _reduce(curr, next, idx) {
-            return curr |= next << idx;
-        }, args[0]);
-    }
-}
-
-function createGroupedListDelegate(source, key) {
-    return createListDelegateInstance(source, undefined, undefined, key);
-}
-
-export { List, list_functor_core, _list_f, ordered_list_f };
+export { List, list_core, list, ordered_list };

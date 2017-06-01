@@ -3,7 +3,7 @@ import { Either, Left, Right, _either_m } from './either_monad';
 import { Future, _future_m } from './future_monad';
 import { Identity, _identity_m } from './identity_monad';
 import { Io, _io_m } from './io_monad';
-import { List, _list_m, ordered_list_m } from './list_monad';
+import { List, list_monad, ordered_list_monad } from './list_monad';
 import { Maybe, _maybe_m } from './maybe_monad';
 
 import { toFunctorType, containerIterator } from '../../containerHelpers';
@@ -66,23 +66,23 @@ _io_m.mapToMaybe = mapToMaybe;
 _io_m.mapToRight = mapToRight;
 _io_m[Symbol.iterator] = containerIterator;
 
-_list_m.mapToConstant = mapToConstant;
-_list_m.mapToEither = mapToEither;
-_list_m.mapToFuture = mapToFuture;
-_list_m.mapToIdentity = mapToIdentity;
-_list_m.mapToIo = mapToIo;
-_list_m.mapToLeft = mapToLeft;
-_list_m.mapToMaybe = mapToMaybe;
-_list_m.mapToRight = mapToRight;
+list_monad.mapToConstant = mapToConstant;
+list_monad.mapToEither = mapToEither;
+list_monad.mapToFuture = mapToFuture;
+list_monad.mapToIdentity = mapToIdentity;
+list_monad.mapToIo = mapToIo;
+list_monad.mapToLeft = mapToLeft;
+list_monad.mapToMaybe = mapToMaybe;
+list_monad.mapToRight = mapToRight;
 
-ordered_list_m.mapToConstant = mapToConstant;
-ordered_list_m.mapToEither = mapToEither;
-ordered_list_m.mapToFuture = mapToFuture;
-ordered_list_m.mapToIdentity = mapToIdentity;
-ordered_list_m.mapToIo = mapToIo;
-ordered_list_m.mapToLeft = mapToLeft;
-ordered_list_m.mapToMaybe = mapToMaybe;
-ordered_list_m.mapToRight = mapToRight;
+ordered_list_monad.mapToConstant = mapToConstant;
+ordered_list_monad.mapToEither = mapToEither;
+ordered_list_monad.mapToFuture = mapToFuture;
+ordered_list_monad.mapToIdentity = mapToIdentity;
+ordered_list_monad.mapToIo = mapToIo;
+ordered_list_monad.mapToLeft = mapToLeft;
+ordered_list_monad.mapToMaybe = mapToMaybe;
+ordered_list_monad.mapToRight = mapToRight;
 
 _maybe_m.mapToConstant = mapToConstant;
 _maybe_m.mapToEither = mapToEither;
