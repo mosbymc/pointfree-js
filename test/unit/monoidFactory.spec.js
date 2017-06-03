@@ -1,5 +1,5 @@
 import { monoidFactory } from '../../src/monoidFactory';
-import { compose } from '../../src/functionalHelpers';
+import { pipe } from '../../src/functionalHelpers';
 
 describe('monoidFactory tests', function _testMonoidFactory() {
     describe('mathematical monoids', function _testMathematicalMonoids() {
@@ -559,7 +559,7 @@ describe('monoidFactory tests', function _testMonoidFactory() {
             function func4(val) { return 15 + val; }
 
             var functionMonoid = monoidFactory(function _functionMonoid(f) {
-                return functionMonoid(compose(this.value, f));
+                return functionMonoid(pipe(this.value, f.value));
             }, 'Function');
 
             var f1 = functionMonoid(func1),
@@ -575,7 +575,38 @@ describe('monoidFactory tests', function _testMonoidFactory() {
                 f1ConcatF5 = f1.concat(f5),
                 f1ConcatF6 = f1.concat(f6);
 
-            console.log(f1ConcatF2.value)
+            f1ConcatF2.value(1).should.eql(5);
+            f1ConcatF3.value(1).should.eql(0.6);
+            f1ConcatF4.value(1).should.eql(20);
+            f1ConcatF5.value(1).should.eql(5);
+            f1ConcatF6.value(1).should.eql(5);
+
+            var f2ConcatF3 = f2.concat(f3),
+                f2ConcatF4 = f2.concat(f4),
+                f2ConcatF5 = f2.concat(f5),
+                f2ConcatF6 = f2.concat(f6);
+
+            f2ConcatF3.value(1).should.eql(0.3333333333333333);
+            f2ConcatF4.value(1).should.eql(24);
+            f2ConcatF5.value(1).should.eql(9);
+            f2ConcatF6.value(1).should.eql(9);
+
+            var f3ConcatF4 = f3.concat(f4),
+                f3ConcatF5 = f3.concat(f5),
+                f3ConcatF6 = f3.concat(f6);
+
+            f3ConcatF4.value(1).should.eql(18);
+            f3ConcatF5.value(1).should.eql(3);
+            f3ConcatF6.value(1).should.eql(3);
+
+            var f4ConcatF5 = f4.concat(f5),
+                f4ConcatF6 = f4.concat(f6);
+
+            f4ConcatF5.value(1).should.eql(16);
+            f4ConcatF6.value(1).should.eql(16);
+
+            f1.concat(f2).concat(f3).concat(f4).concat(f5).concat(f6).value(1)
+                .should.eql(f1.concat(f2.concat(f3.concat(f4.concat(f5.concat(f6))))).value(1));
         });
     });
 });
