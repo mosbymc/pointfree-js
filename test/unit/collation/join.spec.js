@@ -1,24 +1,23 @@
 import { join } from '../../../src/collation/join';
 import { testData } from '../../testData';
 
-var joinTestData = new Array(54);
-joinTestData = joinTestData.fill(1).map(function _mapTestData(item, idx) {
+var joinTestData = new Array(54).fill(1).map(function _mapTestData(item, idx) {
     return item * idx * idx;
 });
 
-var duplicateFirstNames = Array.prototype.concat.apply([],testData.dataSource.data.map(function _findDupes(item) {
+var duplicateFirstNames = Array.prototype.concat.apply([], testData.dataSource.data.map(function _findDupes(item) {
     return Array.prototype.concat.apply([], testData.dataSource.data.filter(function _innerDupes(it) {
         return item.FirstName === it.FirstName;
     }));
 }));
 
-var duplicateFullNames = Array.prototype.concat.apply([],testData.dataSource.data.map(function _findDupes(item) {
+var duplicateFullNames = Array.prototype.concat.apply([], testData.dataSource.data.map(function _findDupes(item) {
     return Array.prototype.concat.apply([], testData.dataSource.data.filter(function _innerDupes(it) {
         return item.FirstName === it.FirstName && item.LastName === it.LastName;
     }));
 }));
 
-var duplicateLocations = Array.prototype.concat.apply([],testData.dataSource.data.map(function _findDupes(item) {
+var duplicateLocations = Array.prototype.concat.apply([], testData.dataSource.data.map(function _findDupes(item) {
     return Array.prototype.concat.apply([], testData.dataSource.data.filter(function _innerDupes(it) {
         return item.City === it.City && item.State === it.State;
     }));
@@ -88,7 +87,7 @@ describe('Test join...', function testJoin() {
     describe('...using default equality comparer', function testJoinWithArrays() {
         it('should return all test data items that share the same name', function testJoinOnFirstName() {
             var joinIterable = join(testData.dataSource.data, testData.dataSource.data, selector, selector, projector),
-                joinRes = Array.from(joinIterable());
+                joinRes = Array.from(joinIterable(1));
 
             joinRes.should.have.lengthOf(duplicateFirstNames.length);
             joinRes.forEach(function _validateResults(item) {

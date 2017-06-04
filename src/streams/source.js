@@ -145,7 +145,7 @@ function dr(elem, evt, handler, gen, next, error, done) {
 
 function handler(item) {
     return new Promise(function _promise(resolve, reject) {
-        if (item.screenX > 500 && item.screenY > 500)
+        if (500 < item.screenX && 500 < item.screenY)
             resolve({ x: item.screenX, y: item.screenY });
         else reject("Error: screenX: " + item.screenX + " screenY: " + item.screenY);
     });

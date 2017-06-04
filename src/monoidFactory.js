@@ -23,7 +23,7 @@ function monoidFactory(concatFn, type) {
             },
             /**
              * @description:
-             * @return: 
+             * @return:
              */
             value: {
                 get: function _getValue() {
@@ -111,7 +111,7 @@ function structure(obj) {
             Object.getOwnPropertyNames(obj).map(function _map(key) {
                 return {
                     key: key,
-                    value: obj[key].concat(other.obj[key]).x != null ? obj[key].concat(other.obj[key]).x : obj[key].concat(other.obj[key])
+                    value: null != obj[key].concat(other.obj[key]).x ? obj[key].concat(other.obj[key]).x : obj[key].concat(other.obj[key])
                 };
             }).forEach(function _map(item) {
                 newStructure[item.key] = item.value;

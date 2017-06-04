@@ -145,5 +145,5 @@ function shallowClone(obj) {
 });
 */
 
-export { javaScriptTypes, sortDirection, observableStatus, sortComparer, cacher,
-    deepClone, deepCopy, shallowClone, generatorProto };
+export { javaScriptTypes, sortDirection, observableStatus, sortComparer, cacher, memoizer,
+            deepClone, deepCopy, shallowClone, generatorProto };

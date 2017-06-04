@@ -276,7 +276,7 @@ var whenNot = curry(function _whenNot(predicate, transform, data) {
  * @return: {*}
  */
 var nth = curry(function nth(offset, list) {
-    var idx = offset < 0 ? list.length + offset : offset;
+    var idx = 0 > offset ? list.length + offset : offset;
     return 'string' === typeof list ? list.charAt(idx) : list[idx];
 });
 
@@ -805,7 +805,7 @@ var adjust = curry(function _adjust(fn, idx, list) {
     if (idx >= list.length || idx < -list.length) {
         return list;
     }
-    var _idx = idx < 0 ? list.length + idx : idx,
+    var _idx = 0 > idx ? list.length + idx : idx,
         _list = list.map(identity);
     _list[_idx] = fn(list[_idx]);
     return _list;
@@ -855,7 +855,7 @@ var filtering = curry(function _filtering2(predicate, reduceFn, result, input) {
 
 function mapReducer (mapFn) {
     return function _mapReducer(result, input) {
-        return result.concat(input);
+        return result.concat(mapFn(input));
     };
 }
 
@@ -870,7 +870,7 @@ var x = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
         xs.push(x);
         return xs;
     }), [])
-    .reduce(filtering((x) => x % 2 === 0)((xs, x) => {
+    .reduce(filtering((x) => 0 === x % 2)((xs, x) => {
         xs.push(x);
         return xs;
     }), []);
@@ -880,7 +880,7 @@ var xs1 = compose(
         return x + 1;
     }),
     filtering(function _filterFunc(x) {
-        return x % 2 === 0;
+        return 0 === x % 2;
     }));
 
 /*
@@ -892,7 +892,7 @@ var g = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9].reduce(xs1(function _reduce(xs, xi) {
 
 function dropGate(skips) {
     return function _dropGate(x) {
-        return --skips < 0;
+        return 0 > --skips;
     };
 }
 
@@ -905,7 +905,7 @@ function dropping1(skips) {
 function dropping2(skips) {
     return function _dropping2(reducingFunc) {
         return function _dropping2_(acc, item) {
-            return --skips >= 0 ? acc : reducingFunc(acc, item);
+            return 0 <= --skips ? acc : reducingFunc(acc, item);
         };
     };
 }
