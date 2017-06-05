@@ -1,10 +1,10 @@
 /**
  * @description:
  * @param: {*} item
- * @return: {@see _identity_f}
+ * @return: {@see identity_functor}
  */
 function Identity(item) {
-    return Object.create(_identity_f, {
+    return Object.create(identity_functor, {
         _value: {
             value: item,
             writable: false,
@@ -16,16 +16,16 @@ function Identity(item) {
 /**
  * @description:
  * @param: {*} item
- * @return: {@see _identity_f}
+ * @return: {@see identity_functor}
  */
 Identity.of = function _of(item) {
     return Identity(item);
 };
 
-var _identity_f = {
+var identity_functor = {
     /**
      * @description:
-     * @return: {@see _identity_f}
+     * @return: {@see identity_functor}
      */
     get value() {
         return this._value;
@@ -33,7 +33,7 @@ var _identity_f = {
     /**
      * @description:
      * @param: {function} fn
-     * @return: {@see _identity_f}
+     * @return: {@see identity_functor}
      */
     map: function _map(fn) {
         return this.of(fn(this.value));
@@ -41,10 +41,10 @@ var _identity_f = {
     /**
      * @description:
      * @param: {function} fn
-     * @return: {@see _identity_f}
+     * @return: {@see identity_functor}
      */
     flatMap: function _flatMap(fn) {
-        return _identity_f.isPrototypeOf(this.value) ? this.value.map(fn) : this.of(fn(this.value));
+        return identity_functor.isPrototypeOf(this.value) ? this.value.map(fn) : this.of(fn(this.value));
     },
     /**
      * @description:
@@ -57,7 +57,7 @@ var _identity_f = {
     /**
      * @description:
      * @param: {*} item
-     * @return: {@see _identity_f}
+     * @return: {@see identity_functor}
      */
     of: function _of(item) {
         return Identity.of(item);
@@ -79,4 +79,4 @@ var _identity_f = {
     constructor: Identity
 };
 
-export { Identity, _identity_f };
+export { Identity, identity_functor };

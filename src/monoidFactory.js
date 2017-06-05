@@ -1,3 +1,5 @@
+var emptyObj = Object.create({});
+
 /**
  * @description: Takes a function that can perform the desired type of concatenation and an optional
  * string that describes the type of monoid that is being created. The 'type' parameter is used in
@@ -9,15 +11,14 @@
  * @returns {_monoid}
  */
 function monoidFactory(concatFn, type) {
-    var emptyObj = Object.create({});
-
     /**
      * @description:
-     * @param: {*} x
+     * @param: {*} x - The initial value of the new semigroup/monoid
+     * @param: {functor|monad|undefined} m - A container object on which to added concatenation functionality.
      * @return: {Object}
      */
-    function _monoid(x) {
-        return Object.create({}, {
+    function _monoid(x, m) {
+        return Object.create('object' === typeof m ? m : {}, {
             _value: {
                 value: x
             },
@@ -100,6 +101,31 @@ function monoidFactory(concatFn, type) {
     return _monoid;
 }
 
+function monadMonoid(concatFn, m) {
+    Object.defineProperties(m, {
+        isEmpty: {
+            get: function _getIsEmpty() {
+                return null == this.value;
+            }
+        },
+        concat: {
+            value: function _concat(other) {
+                return this.isEmpty ? _monoid(other._value)
+                    : other.isEmpty ? _monoid(this._value) : concatFn.call(this, other);
+            }
+        },
+        concatAll: {
+            value: function _concatAll(...others) {
+                return others.filter(function _filterEmpty(m) {
+                    return !m.isEmpty;
+                }).reduce(function _concatAll(curr, next) {
+                    return curr.concat(next);
+                }, this);
+            }
+        }
+    })
+}
+
 // p1 = { name: first('Nico'), isPaid: all2(true), points: sum(10), friends: ['Franklin'] },
   //  p2 = { name: first('Nico'), isPaid: all2(false), points: sum(2), friends: ['Gatsby'] };
 
@@ -123,5 +149,34 @@ function structure(obj) {
         }
     };
 }
+
+var monoid = {
+    /**
+     * @description:
+     * @return: {undefined|*}
+     */
+    get value() {
+        return this.isEmpty ? undefined : this._value;
+    },
+    /**
+     * @description:
+     * @param: {Array} others
+     * @return:
+     */
+    concatAll: function _concatAll(...others) {
+        return others.filter(function _filterEmpty(m) {
+            return !m.isEmpty;
+        }).reduce(function _concatAll(curr, next) {
+            return curr.concat(next);
+        }, this);
+    },
+    /**
+     * @description:
+     * @return: {string}
+     */
+    toString: function _toString() {
+        return `${type}(${toString.call(this)})`;
+    }
+};
 
 export { monoidFactory };

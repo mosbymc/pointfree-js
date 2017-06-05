@@ -1,10 +1,10 @@
 /**
  * @description:
  * @param: {*} val
- * @return: {@see _maybe_f}
+ * @return: {@see maybe_functor}
  */
 function Maybe(val) {
-    return Object.create(_maybe_f, {
+    return Object.create(maybe_functor, {
         _value: {
             value: null == val ? null : val,
             writable: false,
@@ -22,10 +22,10 @@ function Maybe(val) {
 /**
  * @description:
  * @param: {*} val
- * @return: {@see _maybe_f}
+ * @return: {@see maybe_functor}
  */
 Maybe.of = function _of(val) {
-    return Object.create(_maybe_f, {
+    return Object.create(maybe_functor, {
         _value: {
             value: val,
             writable: false,
@@ -43,14 +43,14 @@ Maybe.of = function _of(val) {
 /**
  * @description:
  * @param {*} val
- * @return: {@see _maybe_f}
+ * @return: {@see maybe_functor}
  * @type {function}
  */
 Maybe.Just = Maybe.of;
 
 /**
  * @description:
- * @return: {@see _maybe_f}
+ * @return: {@see maybe_functor}
  */
 Maybe.Nothing =  function _nothing() {
     return Maybe();
@@ -58,10 +58,10 @@ Maybe.Nothing =  function _nothing() {
 //Maybe.Just = Just;
 //Maybe.Nothing = Nothing;
 Maybe.isJust = function _isJust(m) {
-    return _maybe_f.isPrototypeOf(m) && null != m.value;
+    return maybe_functor.isPrototypeOf(m) && null != m.value;
 };
 Maybe.isNothing = function _isNothing(m) {
-    return _maybe_f.isPrototypeOf(m) && null == m.value;
+    return maybe_functor.isPrototypeOf(m) && null == m.value;
 };
 
 //TODO: determine if there is any purpose in splitting a maybe into two types... if those sub-types
@@ -126,7 +126,7 @@ Nothing.of = function _of() {
 //TODO: as argument and treat the new maybe container instance as a 'Just', regardless of the
 //TODO: actual underlying value. As 'null' and 'undefined' underlying values are traditionally
 //TODO: treated as 'Nothing' maybe values, this will cause a problem during mapping/flat-mapping/etc.
-var _maybe_f = {
+var maybe_functor = {
     get value() {
         return this._value;
     },
@@ -135,7 +135,7 @@ var _maybe_f = {
         return this.isNothing ? this.nothing() : this.of(fn(this.value));
     },
     flatMap: function _flatMap(fn) {
-        //return _maybe_f.isPrototypeOf(this.value) ? this.value.map(fn) : this.of(fn(this.value));
+        //return maybe_functor.isPrototypeOf(this.value) ? this.value.map(fn) : this.of(fn(this.value));
         if (Object.getPrototypeOf(this).isPrototypeOf(this.value)) return this.value.map(fn);
         if (null != this.value) return this.of(fn(this.value));
         return this.nothing();
@@ -164,7 +164,7 @@ var _maybe_f = {
 };
 
 /*
-var _just_f = Object.create(_maybe_f, {
+var _just_f = Object.create(maybe_functor, {
     isJust: {
         value: true
     },
@@ -183,7 +183,7 @@ var _just_f = Object.create(_maybe_f, {
     },
     flatMap: {
         value: function _flatMap(fn) {
-            return _maybe_f.isPrototypeOf(this.value) ? this.value.map(fn) : Just(fn(this.value));
+            return maybe_functor.isPrototypeOf(this.value) ? this.value.map(fn) : Just(fn(this.value));
         }
     },
     of: {
@@ -198,7 +198,7 @@ var _just_f = Object.create(_maybe_f, {
     }
 });
 
-var _nothing_f = Object.create(_maybe_f, {
+var _nothing_f = Object.create(maybe_functor, {
     isJust: {
         value: false
     },
@@ -217,7 +217,7 @@ var _nothing_f = Object.create(_maybe_f, {
     },
     flatMap: {
         value: function _flatMap(fn) {
-            return _maybe_f.isPrototypeOf(this.value) ? this.value.map(fn) : Nothing();
+            return maybe_functor.isPrototypeOf(this.value) ? this.value.map(fn) : Nothing();
         }
     },
     of: {
@@ -233,4 +233,4 @@ var _nothing_f = Object.create(_maybe_f, {
 });
 */
 
-export { Maybe, Just, Nothing, _maybe_f };
+export { Maybe, Just, Nothing, maybe_functor };

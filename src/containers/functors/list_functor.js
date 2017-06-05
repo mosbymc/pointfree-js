@@ -277,8 +277,8 @@ var list_core = {
 
     /**
      * @description: Skips over a specified number of items in the source and returns the
-     * remaining items. If no amount is specified, an empty list is returned;
-     * Otherwise, a list containing the items collected from the source is
+     * remaining items. If no amount is specified, an empty list_functor is returned;
+     * Otherwise, a list_functor containing the items collected from the source is
      * returned.
      * @param: {number} amt - The number of items in the source to skip before
      * returning the remainder.
@@ -540,7 +540,7 @@ var list_core = {
  * otherwise.
  */
 list_core.contains.binary = function _binary(val, comparer) {
-    if (delegatesTo(source, ordered_list) && 'undefined' === typeof comparer)
+    if (delegatesTo(source, ordered_list_functor) && 'undefined' === typeof comparer)
         return binarySearch(when(not(isArray), Array.from, source), val, comparer);
     return list_core.contains(val, comparer);
 };
@@ -552,7 +552,7 @@ list_core.contains.binary = function _binary(val, comparer) {
  * a given key.
  * @type: {list_core}
  */
-var list = Object.create(list_core, {
+var list_functor = Object.create(list_core, {
     /**
      * @description:
      * @param: {function} keySelector
@@ -585,7 +585,7 @@ var list = Object.create(list_core, {
  * functions. These functions allow a consumer to sort more on than a single column.
  * @type: {list_core}
  */
-var ordered_list = Object.create(list_core, {
+var ordered_list_functor = Object.create(list_core, {
     _appliedSorts: {
         value: []
     },
@@ -704,7 +704,7 @@ List.of = List.from;
  * above.
  */
 List.extend = function _extend(propName, fn) {
-    if (!(propName in list) && !(propName in ordered_list)) {
+    if (!(propName in list_functor) && !(propName in ordered_list_functor)) {
         list_core[propName] = function(...args) {
             return createListDelegateInstance(this, fn(this, ...args));
         };
@@ -717,16 +717,16 @@ function createGroupedListDelegate(source, key) {
 }
 
 /**
- * @description: Creates a new list object delegate instance; list type is determined by
+ * @description: Creates a new list_functor object delegate instance; list_functor type is determined by
  * the parameters passed to the function. If only the 'source' parameter is provided, a
- * 'basic' list delegate object instance is created. If the source and iterator parameters
- * are passed as arguments, a 'basic' list delegate object instance is created and the
+ * 'basic' list_functor delegate object instance is created. If the source and iterator parameters
+ * are passed as arguments, a 'basic' list_functor delegate object instance is created and the
  * iterator provided is used as the new instance object's iterator rather than the default
- * list iterator. If the source, iterator, and sortObj parameters are passed as arguments,
- * an ordered_list delegate object instance is created. The provided iterator is set on
+ * list_functor iterator. If the source, iterator, and sortObj parameters are passed as arguments,
+ * an ordered_list_functor delegate object instance is created. The provided iterator is set on
  * the instance object to be used in lieu of the default iterator and the ._appliedSorts
  * field is set as the 'sortObj' parameter. If all four of the function's arguments are
- * provided (source, iterator, sortObj, and key), then a list delegate object instance
+ * provided (source, iterator, sortObj, and key), then a list_functor delegate object instance
  * is created, setting the iterator for the object instance as the provided iterator, the
  * ._appliedSorts field as the sortObj argument, and the ._key field as the 'key' parameter's
  * value.
@@ -737,16 +737,16 @@ function createGroupedListDelegate(source, key) {
  * will be odd. Thus, only odd values (plus the default case which covers a value of zero) need
  * to be handled. A case of zero arises when only the 'source' argument is provided.
  *
- * @param: {*} source - The value to be used as the underlying source of the list functor; may be
+ * @param: {*} source - The value to be used as the underlying source of the list_functor functor; may be
  * anything javascript object that has an iterator.
- * @param: {generator} iterator - A generator function that is to be used on the new list delegate
+ * @param: {generator} iterator - A generator function that is to be used on the new list_functor delegate
  * object instance's iterator.
  * @param: {Array} sortObj - An array of the sort(s) (field and direction} to be used when the
  * instance is evaluated.
- * @param: {string} key - A string that denotes what value the new list delegate object instance
+ * @param: {string} key - A string that denotes what value the new list_functor delegate object instance
  * was grouped on.
  * @return: {@see list_core}
  */
-var createListDelegateInstance = createListCreator(list, ordered_list, list);
+var createListDelegateInstance = createListCreator(list_functor, ordered_list_functor, list_functor);
 
-export { List, list_core, list, ordered_list };
+export { List, list_core, list_functor, ordered_list_functor };

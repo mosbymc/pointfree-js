@@ -306,8 +306,8 @@ var list_core = {
 
     /**
      * @description: Skips over a specified number of items in the source and returns the
-     * remaining items. If no amount is specified, an empty list is returned;
-     * Otherwise, a list containing the items collected from the source is
+     * remaining items. If no amount is specified, an empty list_functor is returned;
+     * Otherwise, a list_functor containing the items collected from the source is
      * returned.
      * @param: {number} amt - The number of items in the source to skip before
      * returning the remainder.

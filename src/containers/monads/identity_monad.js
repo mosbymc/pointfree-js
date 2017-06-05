@@ -1,12 +1,12 @@
-import { _identity_f } from '../functors/identity_functor';
+import { identity_functor } from '../functors/identity_functor';
 
 /**
  * @description:
  * @param: {*} item
- * @return: {@see _identity_m}
+ * @return: {@see identity_monad}
  */
 function Identity(item) {
-    return Object.create(_identity_m, {
+    return Object.create(identity_monad, {
         _value: {
             value: item,
             writable: false,
@@ -18,13 +18,13 @@ function Identity(item) {
 /**
  * @description:
  * @param: {*} item
- * @return: {@see _identity_m}
+ * @return: {@see identity_monad}
  */
 Identity.of = function _of(item) {
     return Identity(item);
 };
 
-var _identity_m = Object.create(_identity_f, {
+var identity_monad = Object.create(identity_functor, {
     mjoin: {
         value: function _mjoin() {
             return this.value;
@@ -72,8 +72,8 @@ var _identity_m = Object.create(_identity_f, {
     }
 });
 
-_identity_m.ap = _identity_m.apply;
-_identity_m.bind = _identity_m.chain;
-_identity_m.reduce = _identity_m.fold;
+identity_monad.ap = identity_monad.apply;
+identity_monad.bind = identity_monad.chain;
+identity_monad.reduce = identity_monad.fold;
 
-export { Identity, _identity_m };
+export { Identity, identity_monad };

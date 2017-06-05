@@ -3,14 +3,18 @@ import { noop, once } from '../../functionalHelpers';
 /**
  * @description:
  * @param: {function} fn
- * @return: {@see _future_f}
+ * @return: {@see future_functor}
  */
 function Future(fn) {
-    return Object.create(_future_f, {
+    return Object.create(future_functor, {
         _value: {
-            value: fn,
+            value: once(fn),
             writable: false,
             configurable: false
+        },
+        _fork: {
+            value: once(fn),
+            writable: false
         }
     });
 }
@@ -18,19 +22,19 @@ function Future(fn) {
 /**
  * @description:
  * @param: {function|*} val
- * @return: {@see _future_f}
+ * @return: {@see future_functor}
  */
 Future.of = function _of(val) {
     return 'function' === typeof val ? Future(val) :
         Future(function _runner(rej, res) {
-        return res(val)
-    });
+            return res(val)
+        });
 };
 
 /**
  * @description:
  * @param: {*} val
- * @return: {@see _future_f}
+ * @return: {@see future_functor}
  */
 Future.reject = function _reject(val) {
     return Future(function _future(reject) {
@@ -48,33 +52,41 @@ Future.unit = function _unit(val) {
     return f.complete();
 };
 
-var _future_f = {
+/**
+ * @description:
+ * @return: {@see future_functor}
+ */
+Future.empty = function _empty() {
+    return Future(noop);
+};
+
+var future_functor = {
     /**
      * @description:
-     * @return: {@see _future_f}
+     * @return: {@see future_functor}
      */
     get value() {
         return this._value;
     },
     map: function _map(fn) {
         //TODO: replace 'reject' function with noop?
-        return this.of((reject, resolve) => {
-            return this.value(function _rej(err) {
-                reject(err);
-            },
-            function _res(val) {
-                resolve(val);
-            });
-        });
+        return this.of((function _mapFunc(reject, resolve) {
+            return this._fork(function _rej(err) {
+                    reject(err);
+                },
+                function _res(val) {
+                    resolve(fn(val));
+                });
+        }).bind(this));
     },
     //TODO: probably need to compose here, not actually map over the value; this is a temporary fill-in until
     //TODO: I have time to finish working on the Future
     flatMap: function _flatMap(fn) {
-        return _future_f.isPrototypeOf(this.value) ? this.value.map(fn) :
+        return future_functor.isPrototypeOf(this.value) ? this.value.map(fn) :
             this.of(fn(this.value));
     },
     fork: function _fork(reject, resolve) {
-        this.value(reject, resolve);
+        this._fork(reject, resolve);
     },
     equals: function _equals(ma) {
         return Object.getPrototypeOf(this).isPrototypeOf(ma);
@@ -89,10 +101,14 @@ var _future_f = {
     valueOf: function _valueOf() {
         return this.value;
     },
+    /**
+     * @description:
+     * @return: {string}
+     */
     toString: function _toString() {
         return `Future(${this.value})`;
     },
     constructor: Future
 };
 
-export { Future, _future_f };
+export { Future, future_functor };

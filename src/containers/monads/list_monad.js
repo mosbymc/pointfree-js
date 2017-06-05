@@ -1,4 +1,4 @@
-import { list, ordered_list, list_core } from '../functors/list_functor';
+import { list_functor, ordered_list_functor, list_core } from '../functors/list_functor';
 import { sortDirection } from '../../helpers';
 import { groupBy } from '../../list_monad/list_iterators';
 import { wrap } from '../../functionalHelpers';
@@ -71,10 +71,10 @@ List.of = List.from;
  * above.
  */
 List.extend = function _extend(propName, fn) {
-    if (!(propName in list) && !(propName in ordered_list)) {
-        //TODO: this should probably be changed, other wise I am altering the applicative list in
-        //TODO: addition to the monadic list. I'll also need to recreate the 'toEvaluatedList' function
-        //TODO: since using it on a monadic list would result in a list_a, not a list_m.
+    if (!(propName in list_functor) && !(propName in ordered_list_functor)) {
+        //TODO: this should probably be changed, other wise I am altering the applicative list_functor in
+        //TODO: addition to the monadic list_functor. I'll also need to recreate the 'toEvaluatedList' function
+        //TODO: since using it on a monadic list_functor would result in a list_a, not a list_m.
         list_core[propName] = function(...args) {
             return createListDelegateInstance(this, fn(this, ...args));
         };
@@ -82,7 +82,7 @@ List.extend = function _extend(propName, fn) {
     return List;
 };
 
-var list_monad = Object.create(list, {
+var list_monad = Object.create(list_functor, {
     groupBy: {
         value: function _groupBy(keySelector, comparer) {
             var groupObj = [{ keySelector: keySelector, comparer: comparer, direction: sortDirection.ascending }];
@@ -144,7 +144,7 @@ var list_monad = Object.create(list, {
 list_monad.ap =list_monad.apply;
 list_monad.bind = list_monad.chain;
 
-var ordered_list_monad = Object.create(ordered_list, {
+var ordered_list_monad = Object.create(ordered_list_functor, {
     groupBy: {
         value: function _groupBy(keySelector, comparer) {
             var groupObj = [{ keySelector: keySelector, comparer: comparer, direction: sortDirection.ascending }];

@@ -1,7 +1,7 @@
-import { _future_f } from '../functors/future_functor';
+import { future_functor } from '../functors/future_functor';
 
 function Future(f) {
-    return Object.create(_future_m, {
+    return Object.create(future_monad, {
         _value: {
             value: f,
             writable: false,
@@ -20,7 +20,7 @@ Future.of = function _of(a) {
 /**
  * @description:
  * @param: {function|*} val
- * @return: {@see _future_f}
+ * @return: {@see future_functor}
  */
 Future.of = function _of(val) {
     return 'function' === typeof val ? Future(val) :
@@ -32,7 +32,7 @@ Future.of = function _of(val) {
 /**
  * @description:
  * @param: {*} val
- * @return: {@see _future_f}
+ * @return: {@see future_functor}
  */
 Future.reject = function _reject(val) {
     return Future(function _future(reject) {
@@ -45,7 +45,7 @@ Future.unit = function _unit(val) {
     return f.complete();
 };
 
-var _future_m = Object.create(_future_f, {
+var future_monad = Object.create(future_functor, {
     mjoin: {
         value: function _mjoin() {
             return this.value;
@@ -90,8 +90,8 @@ var _future_m = Object.create(_future_f, {
     }
 });
 
-_future_m.ap = _future_m.apply;
-_future_m.bind = _future_m.chain;
-_future_m.reduce = _future_m.fold;
+future_monad.ap = future_monad.apply;
+future_monad.bind = future_monad.chain;
+future_monad.reduce = future_monad.fold;
 
-export { Future, _future_m };
+export { Future, future_monad };

@@ -1,10 +1,10 @@
-import { Constant, _constant_m } from './constant_monad';
-import { Either, Left, Right, _either_m } from './either_monad';
-import { Future, _future_m } from './future_monad';
-import { Identity, _identity_m } from './identity_monad';
-import { Io, _io_m } from './io_monad';
+import { Constant, constant_monad } from './constant_monad';
+import { Either, Left, Right, either_monad } from './either_monad';
+import { Future, future_monad } from './future_monad';
+import { Identity, identity_monad } from './identity_monad';
+import { Io, io_monad } from './io_monad';
 import { List, list_monad, ordered_list_monad } from './list_monad';
-import { Maybe, _maybe_m } from './maybe_monad';
+import { Maybe, maybe_monad } from './maybe_monad';
 
 import { toFunctorType, containerIterator } from '../../containerHelpers';
 
@@ -18,53 +18,53 @@ var mapToConstant = toFunctorType(Constant),
     mapToMaybe = toFunctorType(Maybe),
     mapToRight = toFunctorType(Right);
 
-_constant_m.mapToEither = mapToEither;
-_constant_m.mapToFuture = mapToFuture;
-_constant_m.mapToIdentity = mapToIdentity;
-_constant_m.mapToIo = mapToIo;
-_constant_m.mapToLeft = mapToLeft;
-_constant_m.mapToList = mapToList;
-_constant_m.mapToMaybe = mapToMaybe;
-_constant_m.mapToRight = mapToRight;
-_constant_m[Symbol.iterator] = containerIterator;
+constant_monad.mapToEither = mapToEither;
+constant_monad.mapToFuture = mapToFuture;
+constant_monad.mapToIdentity = mapToIdentity;
+constant_monad.mapToIo = mapToIo;
+constant_monad.mapToLeft = mapToLeft;
+constant_monad.mapToList = mapToList;
+constant_monad.mapToMaybe = mapToMaybe;
+constant_monad.mapToRight = mapToRight;
+constant_monad[Symbol.iterator] = containerIterator;
 
-_either_m.mapToConstant = mapToConstant;
-_either_m.mapToFuture = mapToFuture;
-_either_m.mapToIdentity = mapToIdentity;
-_either_m.mapToIo = mapToIo;
-_either_m.mapToList = mapToList;
-_either_m.mapToMaybe = mapToMaybe;
-_either_m[Symbol.iterator] = containerIterator;
+either_monad.mapToConstant = mapToConstant;
+either_monad.mapToFuture = mapToFuture;
+either_monad.mapToIdentity = mapToIdentity;
+either_monad.mapToIo = mapToIo;
+either_monad.mapToList = mapToList;
+either_monad.mapToMaybe = mapToMaybe;
+either_monad[Symbol.iterator] = containerIterator;
 
-_future_m.mapToConstant = mapToConstant;
-_future_m.mapToEither = mapToEither;
-_future_m.mapToIdentity = mapToIdentity;
-_future_m.mapToIo = mapToIo;
-_future_m.mapToLeft = mapToLeft;
-_future_m.mapToList = mapToList;
-_future_m.mapToMaybe = mapToMaybe;
-_future_m.mapToRight = mapToRight;
-_future_m[Symbol.iterator] = containerIterator;
+future_monad.mapToConstant = mapToConstant;
+future_monad.mapToEither = mapToEither;
+future_monad.mapToIdentity = mapToIdentity;
+future_monad.mapToIo = mapToIo;
+future_monad.mapToLeft = mapToLeft;
+future_monad.mapToList = mapToList;
+future_monad.mapToMaybe = mapToMaybe;
+future_monad.mapToRight = mapToRight;
+future_monad[Symbol.iterator] = containerIterator;
 
-_identity_m.mapToConstant = mapToConstant;
-_identity_m.mapToEither = mapToEither;
-_identity_m.mapToFuture = mapToFuture;
-_identity_m.mapToIo = mapToIo;
-_identity_m.mapToLeft = mapToLeft;
-_identity_m.mapToList = mapToList;
-_identity_m.mapToMaybe = mapToMaybe;
-_identity_m.mapToRight = mapToRight;
-_identity_m[Symbol.iterator] = containerIterator;
+identity_monad.mapToConstant = mapToConstant;
+identity_monad.mapToEither = mapToEither;
+identity_monad.mapToFuture = mapToFuture;
+identity_monad.mapToIo = mapToIo;
+identity_monad.mapToLeft = mapToLeft;
+identity_monad.mapToList = mapToList;
+identity_monad.mapToMaybe = mapToMaybe;
+identity_monad.mapToRight = mapToRight;
+identity_monad[Symbol.iterator] = containerIterator;
 
-_io_m.mapToConstant = mapToConstant;
-_io_m.mapToEither = mapToEither;
-_io_m.mapToFuture = mapToFuture;
-_io_m.mapToIdentity = mapToIdentity;
-_io_m.mapToLeft = mapToLeft;
-_io_m.mapToList = mapToList;
-_io_m.mapToMaybe = mapToMaybe;
-_io_m.mapToRight = mapToRight;
-_io_m[Symbol.iterator] = containerIterator;
+io_monad.mapToConstant = mapToConstant;
+io_monad.mapToEither = mapToEither;
+io_monad.mapToFuture = mapToFuture;
+io_monad.mapToIdentity = mapToIdentity;
+io_monad.mapToLeft = mapToLeft;
+io_monad.mapToList = mapToList;
+io_monad.mapToMaybe = mapToMaybe;
+io_monad.mapToRight = mapToRight;
+io_monad[Symbol.iterator] = containerIterator;
 
 list_monad.mapToConstant = mapToConstant;
 list_monad.mapToEither = mapToEither;
@@ -84,15 +84,15 @@ ordered_list_monad.mapToLeft = mapToLeft;
 ordered_list_monad.mapToMaybe = mapToMaybe;
 ordered_list_monad.mapToRight = mapToRight;
 
-_maybe_m.mapToConstant = mapToConstant;
-_maybe_m.mapToEither = mapToEither;
-_maybe_m.mapToFuture = mapToFuture;
-_maybe_m.mapToIdentity = mapToIdentity;
-_maybe_m.mapToIo = mapToIo;
-_maybe_m.mapToLeft = mapToLeft;
-_maybe_m.mapToList = mapToList;
-_maybe_m.mapToRight = mapToRight;
-_maybe_m[Symbol.iterator] = containerIterator;
+maybe_monad.mapToConstant = mapToConstant;
+maybe_monad.mapToEither = mapToEither;
+maybe_monad.mapToFuture = mapToFuture;
+maybe_monad.mapToIdentity = mapToIdentity;
+maybe_monad.mapToIo = mapToIo;
+maybe_monad.mapToLeft = mapToLeft;
+maybe_monad.mapToList = mapToList;
+maybe_monad.mapToRight = mapToRight;
+maybe_monad[Symbol.iterator] = containerIterator;
 
 var monads = {
     Constant,

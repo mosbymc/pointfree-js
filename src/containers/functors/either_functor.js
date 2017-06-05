@@ -1,5 +1,5 @@
 function Either(val, fork) {
-    return Object.create(_either_f, {
+    return Object.create(either_functor, {
         _value: {
             value: val,
             writable: false,
@@ -46,14 +46,14 @@ Right.of = function _of(val) {
     return Either.of(val);
 };
 
-var _either_f = {
+var either_functor = {
     get value() {
         return this._value;
     },
     /**
      * @description:
      * @param: {function|undefined} fn
-     * @return: {@see _either_f}
+     * @return: {@see either_functor}
      */
     map: function _map(fn) {
         return this.isRight ? Right(fn(this.value)) : Left(this.value);
@@ -61,7 +61,7 @@ var _either_f = {
     /**
      * @description:
      * @param: {function|undefined} fn
-     * @return: {@see _either_f}
+     * @return: {@see either_functor}
      */
     flatMap: function _flatMap(fn) {
         if (Object.getPrototypeOf(this).isPrototypeOf(this.value)) return this.value.map(fn);
@@ -101,7 +101,7 @@ var right = {
     /**
      * @description:
      * @param: {function|undefined} fn
-     * @return: {@see _either_f}
+     * @return: {@see either_functor}
      */
     map: function _map(fn) {
         return this.isRight ? Right(fn(this.value)) : Left(this.value);
@@ -109,7 +109,7 @@ var right = {
     /**
      * @description:
      * @param: {function|undefined} fn
-     * @return: {@see _either_f}
+     * @return: {@see either_functor}
      */
     flatMap: function _flatMap(fn) {
         if (Object.getPrototypeOf(this).isPrototypeOf(this.value)) return this.value.map(fn);
@@ -148,7 +148,7 @@ var left = {
     },
     /**
      * @description:
-     * @return: {@see _either_f}
+     * @return: {@see either_functor}
      */
     map: function _map() {
         return Left(this.value);
@@ -156,7 +156,7 @@ var left = {
     /**
      * @description:
      * @param: {function|undefined} fn
-     * @return: {@see _either_f}
+     * @return: {@see either_functor}
      */
     flatMap: function _flatMap(fn) {
         if (Object.getPrototypeOf(this).isPrototypeOf(this.value)) return this.value.map(fn);
@@ -191,4 +191,4 @@ function fromNullable(x) {
     return null != x ? Right(x) : Left(x);
 }
 
-export { Either, Left, Right, _either_f };
+export { Either, Left, Right, either_functor };

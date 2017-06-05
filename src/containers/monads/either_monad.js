@@ -1,7 +1,7 @@
-import { _either_f } from '../functors/either_functor';
+import { either_functor } from '../functors/either_functor';
 
 function Either(val, fork) {
-    return Object.create(_either_m, {
+    return Object.create(either_monad, {
         _value: {
             value: val,
             writable: false,
@@ -48,7 +48,7 @@ function Right(val) {
     return Either(val, 'right');
 }
 
-var _either_m = Object.create(_either_f, {
+var either_monad = Object.create(either_functor, {
     map: {
         value: function _map(fn) {
             return this.isRight ? Right(fn(this.value)) : Left(this.value);
@@ -103,8 +103,8 @@ var _either_m = Object.create(_either_f, {
     }
 });
 
-_either_m.ap = _either_m.apply;
-_either_m.bind = _either_m.chain;
-_either_m.reduce = _either_m.fold;
+either_monad.ap = either_monad.apply;
+either_monad.bind = either_monad.chain;
+either_monad.reduce = either_monad.fold;
 
-export { Either, Left, Right, _either_m };
+export { Either, Left, Right, either_monad };

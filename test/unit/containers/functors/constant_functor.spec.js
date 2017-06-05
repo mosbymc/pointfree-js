@@ -1,5 +1,5 @@
 import { functors } from '../../../../src/containers/functors/functors';
-import { _constant_f } from '../../../../src/containers/functors/constant_functor';
+import { constant_functor } from '../../../../src/containers/functors/constant_functor';
 
 var Constant = functors.Constant;
 
@@ -17,14 +17,14 @@ describe('Constant functor tests', function _testConstantFunctor() {
                 c7 = Constant('testing constant'),
                 c8 = Constant(false);
 
-            _constant_f.isPrototypeOf(c1).should.be.true;
-            _constant_f.isPrototypeOf(c2).should.be.true;
-            _constant_f.isPrototypeOf(c3).should.be.true;
-            _constant_f.isPrototypeOf(c4).should.be.true;
-            _constant_f.isPrototypeOf(c5).should.be.true;
-            _constant_f.isPrototypeOf(c6).should.be.true;
-            _constant_f.isPrototypeOf(c7).should.be.true;
-            _constant_f.isPrototypeOf(c8).should.be.true;
+            constant_functor.isPrototypeOf(c1).should.be.true;
+            constant_functor.isPrototypeOf(c2).should.be.true;
+            constant_functor.isPrototypeOf(c3).should.be.true;
+            constant_functor.isPrototypeOf(c4).should.be.true;
+            constant_functor.isPrototypeOf(c5).should.be.true;
+            constant_functor.isPrototypeOf(c6).should.be.true;
+            constant_functor.isPrototypeOf(c7).should.be.true;
+            constant_functor.isPrototypeOf(c8).should.be.true;
 
             expect(undefined).to.eql(c1.value);
             expect(null).to.eql(c2.value);
@@ -48,14 +48,14 @@ describe('Constant functor tests', function _testConstantFunctor() {
                 c7 = Constant.of('testing constant'),
                 c8 = Constant.of(false);
 
-            _constant_f.isPrototypeOf(c1).should.be.true;
-            _constant_f.isPrototypeOf(c2).should.be.true;
-            _constant_f.isPrototypeOf(c3).should.be.true;
-            _constant_f.isPrototypeOf(c4).should.be.true;
-            _constant_f.isPrototypeOf(c5).should.be.true;
-            _constant_f.isPrototypeOf(c6).should.be.true;
-            _constant_f.isPrototypeOf(c7).should.be.true;
-            _constant_f.isPrototypeOf(c8).should.be.true;
+            constant_functor.isPrototypeOf(c1).should.be.true;
+            constant_functor.isPrototypeOf(c2).should.be.true;
+            constant_functor.isPrototypeOf(c3).should.be.true;
+            constant_functor.isPrototypeOf(c4).should.be.true;
+            constant_functor.isPrototypeOf(c5).should.be.true;
+            constant_functor.isPrototypeOf(c6).should.be.true;
+            constant_functor.isPrototypeOf(c7).should.be.true;
+            constant_functor.isPrototypeOf(c8).should.be.true;
 
             expect(undefined).to.eql(c1.value);
             expect(null).to.eql(c2.value);

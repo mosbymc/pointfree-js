@@ -1,7 +1,7 @@
-import { _constant_f } from '../functors/constant_functor';
+import { constant_functor } from '../functors/constant_functor';
 
 function Constant(val) {
-    return Object.create(_constant_m, {
+    return Object.create(constant_monad, {
         _value: {
             value: val,
             writable: false,
@@ -13,13 +13,13 @@ function Constant(val) {
 /**
  * @description:
  * @param: {*} item
- * @return: {@see _constant_m}
+ * @return: {@see constant_monad}
  */
 Constant.of = function _of(item) {
     return Constant(item);
 };
 
-var _constant_m = Object.create(_constant_f, {
+var constant_monad = Object.create(constant_functor, {
     mjoin: {
         value: function _mjoin() {
             return this;
@@ -67,8 +67,8 @@ var _constant_m = Object.create(_constant_f, {
     }
 });
 
-_constant_m.ap =_constant_m.apply;
-_constant_m.bind = _constant_m.chain;
-_constant_m.reduce = _constant_m.fold;
+constant_monad.ap =constant_monad.apply;
+constant_monad.bind = constant_monad.chain;
+constant_monad.reduce = constant_monad.fold;
 
-export { Constant, _constant_m };
+export { Constant, constant_monad };

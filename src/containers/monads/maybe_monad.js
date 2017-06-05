@@ -1,7 +1,7 @@
-import { _maybe_f } from '../functors/maybe_functor';
+import { maybe_functor } from '../functors/maybe_functor';
 
 function Maybe(item) {
-    return Object.create(_maybe_m, {
+    return Object.create(maybe_monad, {
         _value: {
             value: item,
             writable: false,
@@ -20,10 +20,10 @@ function Maybe(item) {
 /**
  * @description:
  * @param: {*} item
- * @return: {@see _maybe_m}
+ * @return: {@see maybe_monad}
  */
 Maybe.of = function _of(item) {
-    return Object.create(_maybe_m, {
+    return Object.create(maybe_monad, {
         _value: {
             value: item,
             writable: false,
@@ -38,7 +38,7 @@ Maybe.of = function _of(item) {
     });
 };
 
-var _maybe_m = Object.create(_maybe_f, {
+var maybe_monad = Object.create(maybe_functor, {
     mjoin: {
         value: function _mjoin() {
             return this.value;
@@ -91,8 +91,8 @@ var _maybe_m = Object.create(_maybe_f, {
     }
 });
 
-_maybe_m.ap = _maybe_m.apply;
-_maybe_m.bind = _maybe_m.chain;
-_maybe_f.reduce = _maybe_f.fold;
+maybe_monad.ap = maybe_monad.apply;
+maybe_monad.bind = maybe_monad.chain;
+maybe_functor.reduce = maybe_functor.fold;
 
-export { Maybe, _maybe_m };
+export { Maybe, maybe_monad };

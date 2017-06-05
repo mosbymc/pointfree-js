@@ -1,10 +1,10 @@
 /**
  * @description:
  * @param: {*} item
- * @return: {@see _constant_f}
+ * @return: {@see constant_functor}
  */
 function Constant(item) {
-    return Object.create(_constant_f, {
+    return Object.create(constant_functor, {
         _value: {
             value: item,
             writable: false,
@@ -16,7 +16,7 @@ function Constant(item) {
 /**
  * @description:
  * @param: {*} item
- * @return: {@see _constant_f}
+ * @return: {@see constant_functor}
  */
 Constant.of = function _of(item) {
     return Constant(item);
@@ -25,28 +25,28 @@ Constant.of = function _of(item) {
 /**
  * @description:
  * @type {{
- * map: {function} _constant_f._map,
- * apply: {function} _constant_f._apply,
- * flatMap: {function} _constant_f._flatMap,
- * mjoin: {function} _constant_f._mjoin,
- * of: {function} _constant_f._of,
- * toString: {function} _constant_f._toString
+ * map: {function} constant_functor._map,
+ * apply: {function} constant_functor._apply,
+ * flatMap: {function} constant_functor._flatMap,
+ * mjoin: {function} constant_functor._mjoin,
+ * of: {function} constant_functor._of,
+ * toString: {function} constant_functor._toString
  * }}
  */
-var _constant_f = {
+var constant_functor = {
     get value() {
         return this._value;
     },
     /**
      * @description:
-     * @return: {@see _constant_f}
+     * @return: {@see constant_functor}
      */
     map: function _map() {
         return this.of(this.value)
     },
     /**
      * @description:
-     * @return: {@see _constant_f}
+     * @return: {@see constant_functor}
      */
     flatMap: function _flatMap() {
         return this.of(this.value);
@@ -54,7 +54,7 @@ var _constant_f = {
     /**
      * @description:
      * @param: {*} item
-     * @return: {@see _constant_f}
+     * @return: {@see constant_functor}
      */
     of: function _of(item) {
         return Constant.of(item);
@@ -100,4 +100,4 @@ var _constant_f = {
     constructor: Constant
 };
 
-export { Constant, _constant_f };
+export { Constant, constant_functor };

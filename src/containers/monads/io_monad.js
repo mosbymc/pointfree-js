@@ -1,7 +1,7 @@
-import { _io_f } from '../functors/io_functor';
+import { io_functor } from '../functors/io_functor';
 
 function Io(val) {
-    return Object.create(_io_m, {
+    return Object.create(io_monad, {
         _value: {
             value: val,
             writable: false,
@@ -14,7 +14,7 @@ Io.of = function _of(val) {
     return 'function' === typeof val ? Io(val) : Io(function _wrapper() { return val; });
 };
 
-var _io_m = Object.create(_io_f, {
+var io_monad = Object.create(io_functor, {
     mjoin: {
         value: function _mjoin() {
             return this.value;
@@ -57,8 +57,8 @@ var _io_m = Object.create(_io_f, {
     }
 });
 
-_io_m.ap =_io_m.apply;
-_io_m.bind = _io_m.chain;
-_io_m.reduce = _io_m.fold;
+io_monad.ap =io_monad.apply;
+io_monad.bind = io_monad.chain;
+io_monad.reduce = io_monad.fold;
 
-export { Io, _io_m };
+export { Io, io_monad };

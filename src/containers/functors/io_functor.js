@@ -3,10 +3,10 @@ import { compose } from '../../functionalHelpers';
 /**
  * @description:
  * @param: {function} item
- * @return: {@see _io_f}
+ * @return: {@see io_functor}
  */
 function Io(item) {
-    return Object.create(_io_f, {
+    return Object.create(io_functor, {
         _value: {
             value: item,
             writable: false,
@@ -18,7 +18,7 @@ function Io(item) {
 /**
  * @description:
  * @param: {function|*} item
- * @return: {@see _io_f}
+ * @return: {@see io_functor}
  */
 Io.of = function _of(item) {
     return 'function' === typeof item ? Io(item) : Io(function _anon() { return item; });
@@ -28,13 +28,13 @@ Io.of = function _of(item) {
  * @description:
  * @type {{
  * value,
- * map: {function} _io_f._map,
- * flatMap: {function} _io_f._flatMap,
- * of: {function} _io_f._of,
- * toString: {function} _io_f._toString
+ * map: {function} io_functor._map,
+ * flatMap: {function} io_functor._flatMap,
+ * of: {function} io_functor._of,
+ * toString: {function} io_functor._toString
  * }}
  */
-var _io_f = {
+var io_functor = {
     get value() {
         return this._value;
     },
@@ -42,7 +42,7 @@ var _io_f = {
         return this.of(compose(fn, this.value));
     },
     flatMap: function _flatMap(fn) {
-        return _io_f.isPrototypeOf(this.value) ? this.value.map(fn) : this.of(compose(fn, this.value));
+        return io_functor.isPrototypeOf(this.value) ? this.value.map(fn) : this.of(compose(fn, this.value));
     },
     equals: function _equals(ma) {
         return Object.getPrototypeOf(this).isPrototypeOf(ma) && this.value === ma.value;
@@ -63,4 +63,4 @@ var _io_f = {
     constructor: Io
 };
 
-export { Io, _io_f };
+export { Io, io_functor };

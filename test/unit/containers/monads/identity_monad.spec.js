@@ -1,5 +1,5 @@
 import { monads } from '../../../../src/containers/monads/monads';
-import { _identity_m } from '../../../../src/containers/monads/identity_monad';
+import { identity_monad } from '../../../../src/containers/monads/identity_monad';
 
 var Identity = monads.Identity;
 
@@ -17,14 +17,14 @@ describe('Identity monad test', function _testIdentityMonad() {
                 i7 = Identity('testing constant'),
                 i8 = Identity(false);
 
-            _identity_m.isPrototypeOf(i1).should.be.true;
-            _identity_m.isPrototypeOf(i2).should.be.true;
-            _identity_m.isPrototypeOf(i3).should.be.true;
-            _identity_m.isPrototypeOf(i4).should.be.true;
-            _identity_m.isPrototypeOf(i5).should.be.true;
-            _identity_m.isPrototypeOf(i6).should.be.true;
-            _identity_m.isPrototypeOf(i7).should.be.true;
-            _identity_m.isPrototypeOf(i8).should.be.true;
+            identity_monad.isPrototypeOf(i1).should.be.true;
+            identity_monad.isPrototypeOf(i2).should.be.true;
+            identity_monad.isPrototypeOf(i3).should.be.true;
+            identity_monad.isPrototypeOf(i4).should.be.true;
+            identity_monad.isPrototypeOf(i5).should.be.true;
+            identity_monad.isPrototypeOf(i6).should.be.true;
+            identity_monad.isPrototypeOf(i7).should.be.true;
+            identity_monad.isPrototypeOf(i8).should.be.true;
 
             expect(undefined).to.eql(i1.value);
             expect(null).to.eql(i2.value);
@@ -48,14 +48,14 @@ describe('Identity monad test', function _testIdentityMonad() {
                 i7 = Identity.of('testing constant'),
                 i8 = Identity.of(false);
 
-            _identity_m.isPrototypeOf(i1).should.be.true;
-            _identity_m.isPrototypeOf(i2).should.be.true;
-            _identity_m.isPrototypeOf(i3).should.be.true;
-            _identity_m.isPrototypeOf(i4).should.be.true;
-            _identity_m.isPrototypeOf(i5).should.be.true;
-            _identity_m.isPrototypeOf(i6).should.be.true;
-            _identity_m.isPrototypeOf(i7).should.be.true;
-            _identity_m.isPrototypeOf(i8).should.be.true;
+            identity_monad.isPrototypeOf(i1).should.be.true;
+            identity_monad.isPrototypeOf(i2).should.be.true;
+            identity_monad.isPrototypeOf(i3).should.be.true;
+            identity_monad.isPrototypeOf(i4).should.be.true;
+            identity_monad.isPrototypeOf(i5).should.be.true;
+            identity_monad.isPrototypeOf(i6).should.be.true;
+            identity_monad.isPrototypeOf(i7).should.be.true;
+            identity_monad.isPrototypeOf(i8).should.be.true;
 
             expect(undefined).to.eql(i1.value);
             expect(null).to.eql(i2.value);

@@ -29,7 +29,7 @@
 //TODO:           of each queryable along the pipeline. If I evaluate a prior queryable during the evaluation of the 'final' queryable, but fail to 'save'
 //TODO:           that evaluation in the prior queryable object, then, if that prior queryable is ever iterated again, I'll have to perform the work all
 //TODO:           over again. So, I probably need to pass some context into each of the queryable's function iterators so they can 'save' the evaluated
-//TODO:           data in that queryable object should it be iterated again at some future point (this assumes a non-streaming context). This would also
+//TODO:           data in that queryable object should it be iterated again at some future_functor point (this assumes a non-streaming context). This would also
 //TODO:           mean that I'd need to check to see if the current queryable has been evaluated within the iterator before performing the evaluation.
 //TODO:
 //TODO:         - Again, if the evaluation of a queryable causes all prior queryable's in the pipeline to also be evaluated, how do I handle a split
@@ -89,7 +89,7 @@
 
 //TODO: Ok. I think I finally get it. Took me ~9 months, but containers are starting to make sense. Linq is a functor, and, were it not for a couple
 //TODO: of methods that it is "missing", it would be a monad; same goes for Rx. I had no idea that containers and linq/Rx were one in the same thing.
-//TODO: Granted, linq is not Just a generic monad, it's a monad<List>. So if you wanted a Maybe, or a future, or an IO, you'd still need to implement
+//TODO: Granted, linq is not Just a generic monad, it's a monad<List>. So if you wanted a Maybe, or a future_functor, or an IO, you'd still need to implement
 //TODO: those data structures in C#. Essentially, if C# had given us IFunctor instead of IEnumerable, we could have created any tricked out functor
 //TODO: implementation by overriding some base methods, like a Maybe's null check before apply a fn to it's underlying. In other words, Rx and Linq
 //TODO: screwed us! Not really, but that's kinda my feeling. Granted, if it hand't taken me so long to understand "why containers", then Maybe I
@@ -4141,7 +4141,7 @@ attachListener('click');
         }
         /**
          * Schedules this action on its parent Scheduler for execution. May be passed
-         * some context object, `state`. May happen at some point in the future,
+         * some context object, `state`. May happen at some point in the future_functor,
          * according to the `delay` parameter, if specified.
          * @param {T} [state] Some contextual data that the `work` function uses when
          * called by the Scheduler.
@@ -4313,7 +4313,7 @@ attachListener('click');
         }
         /**
          * Schedules a function, `work`, for execution. May happen at some point in
-         * the future, according to the `delay` parameter, if specified. May be passed
+         * the future_functor, according to the `delay` parameter, if specified. May be passed
          * some context object, `state`, which will be passed to the `work` function.
          *
          * The given arguments will be processed an stored as an Action object in a
@@ -8239,9 +8239,9 @@ attachListener('click');
      * var delayedClicks = clicks.delay(1000); // each click emitted after 1 second
      * delayedClicks.subscribe(x => console.log(x));
      *
-     * @example <caption>Delay all clicks until a future date happens</caption>
+     * @example <caption>Delay all clicks until a future_functor date happens</caption>
      * var clicks = Rx.Observable.fromEvent(document, 'click');
-     * var date = new Date('March 15, 2050 12:00:00'); // in the future
+     * var date = new Date('March 15, 2050 12:00:00'); // in the future_functor
      * var delayedClicks = clicks.delay(date); // click emitted only after that date
      * delayedClicks.subscribe(x => console.log(x));
      *

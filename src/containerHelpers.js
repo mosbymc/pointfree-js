@@ -3,7 +3,7 @@ import { List, list_core } from './list_monad/list';
 
 //TODO: I need to figure out how to structure this lib. I'd like to have several different types of containers...
 //TODO: ...specifically, functors (pointed), monads, and maybe one other type. In addition, each container type
-//TODO: would have several implementations: maybe, option, constant, identity, future, io, etc. It would make sense
+//TODO: would have several implementations: maybe, option, constant, identity, future_functor, io, etc. It would make sense
 //TODO: to let the "higher" level containers delegate to the "lower" level implementations since they share all the
 //TODO: functionality of the "lower" containers and add to them. In addition, a lot of the containers will have the
 //TODO: same map, flatMap, chain, apply, etc functionality; it would be nice to share this functionality as well.
@@ -255,7 +255,7 @@ function _toMaybe() {
  * @description:
  * @type: {function}
  * @param: {function} predicate
- * @param: {Array} list
+ * @param: {Array} list_functor
  * @return: {Array}
  */
 var filter = curry(function _filter(predicate, list) {
@@ -267,7 +267,7 @@ var filter = curry(function _filter(predicate, list) {
  * @type: {function}
  * @param: {Array} enumerable
  * @param: {function} comparer
- * @param: {Array} list
+ * @param: {Array} list_functor
  * @return: {Array}
  */
 var intersect = curry(function _intersect(enumerable, comparer, list) {

@@ -1,5 +1,5 @@
 import { functors } from '../../../../src/containers/functors/functors';
-import { _identity_f } from '../../../../src/containers/functors/identity_functor';
+import { identity_functor } from '../../../../src/containers/functors/identity_functor';
 
 var Identity = functors.Identity;
 
@@ -17,14 +17,14 @@ describe('Identity functor test', function _testIdentityFunctor() {
                 i7 = Identity('testing constant'),
                 i8 = Identity(false);
 
-            _identity_f.isPrototypeOf(i1).should.be.true;
-            _identity_f.isPrototypeOf(i2).should.be.true;
-            _identity_f.isPrototypeOf(i3).should.be.true;
-            _identity_f.isPrototypeOf(i4).should.be.true;
-            _identity_f.isPrototypeOf(i5).should.be.true;
-            _identity_f.isPrototypeOf(i6).should.be.true;
-            _identity_f.isPrototypeOf(i7).should.be.true;
-            _identity_f.isPrototypeOf(i8).should.be.true;
+            identity_functor.isPrototypeOf(i1).should.be.true;
+            identity_functor.isPrototypeOf(i2).should.be.true;
+            identity_functor.isPrototypeOf(i3).should.be.true;
+            identity_functor.isPrototypeOf(i4).should.be.true;
+            identity_functor.isPrototypeOf(i5).should.be.true;
+            identity_functor.isPrototypeOf(i6).should.be.true;
+            identity_functor.isPrototypeOf(i7).should.be.true;
+            identity_functor.isPrototypeOf(i8).should.be.true;
 
             expect(undefined).to.eql(i1.value);
             expect(null).to.eql(i2.value);
@@ -48,14 +48,14 @@ describe('Identity functor test', function _testIdentityFunctor() {
                 i7 = Identity.of('testing constant'),
                 i8 = Identity.of(false);
 
-            _identity_f.isPrototypeOf(i1).should.be.true;
-            _identity_f.isPrototypeOf(i2).should.be.true;
-            _identity_f.isPrototypeOf(i3).should.be.true;
-            _identity_f.isPrototypeOf(i4).should.be.true;
-            _identity_f.isPrototypeOf(i5).should.be.true;
-            _identity_f.isPrototypeOf(i6).should.be.true;
-            _identity_f.isPrototypeOf(i7).should.be.true;
-            _identity_f.isPrototypeOf(i8).should.be.true;
+            identity_functor.isPrototypeOf(i1).should.be.true;
+            identity_functor.isPrototypeOf(i2).should.be.true;
+            identity_functor.isPrototypeOf(i3).should.be.true;
+            identity_functor.isPrototypeOf(i4).should.be.true;
+            identity_functor.isPrototypeOf(i5).should.be.true;
+            identity_functor.isPrototypeOf(i6).should.be.true;
+            identity_functor.isPrototypeOf(i7).should.be.true;
+            identity_functor.isPrototypeOf(i8).should.be.true;
 
             expect(undefined).to.eql(i1.value);
             expect(null).to.eql(i2.value);
