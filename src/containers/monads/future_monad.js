@@ -53,14 +53,29 @@ var future_monad = Object.create(future_functor, {
     },
     chain: {
         value: function _chain(fn) {
-            return Future(next => this.value(function _next(a) {
-                return next(fn(a));
-            }));
+            this.of((function _chainFn(reject, resolve) {
+                return this._fork(function rej(a) {
+                    return reject(a);
+                },
+                function res(b) {
+                    return fn(b)._fork(reject, resolve);
+                })
+            }).bind(this));
         }
     },
     fold: {
-        value: function _fold(fn, x) {
-            return fn(this.value, x);
+        value: function _fold(f, g) {
+            //return fn(this.value, x);
+            return this.of(
+                (function(reject, resolve) {
+                    return this._fork(function _f1(a) {
+                        return resolve(f(a));
+                    },
+                    function _f2(b) {
+                        return resolve(g(b));
+                    });
+                }).bind(this)
+            );
         }
     },
     traverse: {

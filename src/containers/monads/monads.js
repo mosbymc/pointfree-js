@@ -5,6 +5,7 @@ import { Identity, identity_monad } from './identity_monad';
 import { Io, io_monad } from './io_monad';
 import { List, list_monad, ordered_list_monad } from './list_monad';
 import { Maybe, maybe_monad } from './maybe_monad';
+import { Validation, validation_monad } from './validation_monad';
 
 import { toFunctorType, containerIterator } from '../../containerHelpers';
 
@@ -16,7 +17,8 @@ var mapToConstant = toFunctorType(Constant),
     mapToLeft = toFunctorType(Left),
     mapToList = toFunctorType(List),
     mapToMaybe = toFunctorType(Maybe),
-    mapToRight = toFunctorType(Right);
+    mapToRight = toFunctorType(Right),
+    mapToValidation = toFunctorType(Validation);
 
 constant_monad.mapToEither = mapToEither;
 constant_monad.mapToFuture = mapToFuture;
@@ -26,6 +28,7 @@ constant_monad.mapToLeft = mapToLeft;
 constant_monad.mapToList = mapToList;
 constant_monad.mapToMaybe = mapToMaybe;
 constant_monad.mapToRight = mapToRight;
+constant_monad.mapToValidation = mapToValidation;
 constant_monad[Symbol.iterator] = containerIterator;
 
 either_monad.mapToConstant = mapToConstant;
@@ -34,6 +37,7 @@ either_monad.mapToIdentity = mapToIdentity;
 either_monad.mapToIo = mapToIo;
 either_monad.mapToList = mapToList;
 either_monad.mapToMaybe = mapToMaybe;
+either_monad.mapToValidation = mapToValidation;
 either_monad[Symbol.iterator] = containerIterator;
 
 future_monad.mapToConstant = mapToConstant;
@@ -44,6 +48,7 @@ future_monad.mapToLeft = mapToLeft;
 future_monad.mapToList = mapToList;
 future_monad.mapToMaybe = mapToMaybe;
 future_monad.mapToRight = mapToRight;
+future_monad.mapToValidation = mapToValidation;
 future_monad[Symbol.iterator] = containerIterator;
 
 identity_monad.mapToConstant = mapToConstant;
@@ -54,6 +59,7 @@ identity_monad.mapToLeft = mapToLeft;
 identity_monad.mapToList = mapToList;
 identity_monad.mapToMaybe = mapToMaybe;
 identity_monad.mapToRight = mapToRight;
+identity_monad.mapToValidation = mapToValidation;
 identity_monad[Symbol.iterator] = containerIterator;
 
 io_monad.mapToConstant = mapToConstant;
@@ -64,6 +70,7 @@ io_monad.mapToLeft = mapToLeft;
 io_monad.mapToList = mapToList;
 io_monad.mapToMaybe = mapToMaybe;
 io_monad.mapToRight = mapToRight;
+io_monad.mapToValidation = mapToValidation;
 io_monad[Symbol.iterator] = containerIterator;
 
 list_monad.mapToConstant = mapToConstant;
@@ -74,6 +81,7 @@ list_monad.mapToIo = mapToIo;
 list_monad.mapToLeft = mapToLeft;
 list_monad.mapToMaybe = mapToMaybe;
 list_monad.mapToRight = mapToRight;
+list_monad.mapToValidation = mapToValidation;
 
 ordered_list_monad.mapToConstant = mapToConstant;
 ordered_list_monad.mapToEither = mapToEither;
@@ -83,6 +91,7 @@ ordered_list_monad.mapToIo = mapToIo;
 ordered_list_monad.mapToLeft = mapToLeft;
 ordered_list_monad.mapToMaybe = mapToMaybe;
 ordered_list_monad.mapToRight = mapToRight;
+ordered_list_monad.mapToValidation = mapToValidation;
 
 maybe_monad.mapToConstant = mapToConstant;
 maybe_monad.mapToEither = mapToEither;
@@ -92,7 +101,19 @@ maybe_monad.mapToIo = mapToIo;
 maybe_monad.mapToLeft = mapToLeft;
 maybe_monad.mapToList = mapToList;
 maybe_monad.mapToRight = mapToRight;
+maybe_monad.mapToValidation = mapToValidation;
 maybe_monad[Symbol.iterator] = containerIterator;
+
+validation_monad.mapToConstant = mapToConstant;
+validation_monad.mapToEither = mapToEither;
+validation_monad.mapToFuture = mapToFuture;
+validation_monad.mapToIdentity = mapToIdentity;
+validation_monad.mapToIo = mapToIo;
+validation_monad.mapToLeft = mapToLeft;
+validation_monad.mapToList = mapToList;
+validation_monad.mapToMaybe = mapToMaybe;
+validation_monad.mapToRight = mapToRight;
+validation_monad[Symbol.iterator] = containerIterator;
 
 var monads = {
     Constant,
@@ -103,7 +124,8 @@ var monads = {
     Left,
     List,
     Maybe,
-    Right
+    Right,
+    Validation
 };
 
 export { monads };

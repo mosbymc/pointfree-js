@@ -5,6 +5,7 @@ import { Identity, identity_functor } from './identity_functor';
 import { Io, io_functor } from './io_functor';
 import { List, list_core } from './list_functor';
 import { Maybe, Just, Nothing, maybe_functor } from './maybe_functor';
+import { Validation, validation_functor } from './validation_functor';
 
 import { toFunctorType, containerIterator } from '../../containerHelpers';
 
@@ -16,7 +17,8 @@ var mapToConstant = toFunctorType(Constant),
     mapToLeft = toFunctorType(Left),
     mapToList = toFunctorType(List),
     mapToMaybe = toFunctorType(Maybe),
-    mapToRight = toFunctorType(Right);
+    mapToRight = toFunctorType(Right),
+    mapToValidation = toFunctorType(Validation);
 
 constant_functor.mapToEither = mapToEither;
 constant_functor.mapToFuture = mapToFuture;
@@ -26,6 +28,7 @@ constant_functor.mapToLeft = mapToLeft;
 constant_functor.mapToList = mapToList;
 constant_functor.mapToMaybe = mapToMaybe;
 constant_functor.mapToRight = mapToRight;
+constant_functor.mapToValidation = mapToValidation;
 constant_functor[Symbol.iterator] = containerIterator;
 
 either_functor.mapToConstant = mapToConstant;
@@ -34,6 +37,7 @@ either_functor.mapToIdentity = mapToIdentity;
 either_functor.mapToIo = mapToIo;
 either_functor.mapToList = mapToList;
 either_functor.mapToMaybe = mapToMaybe;
+either_functor.mapToValidation = mapToValidation;
 either_functor[Symbol.iterator] = containerIterator;
 
 future_functor.mapToConstant = mapToConstant;
@@ -44,6 +48,7 @@ future_functor.mapToLeft = mapToLeft;
 future_functor.mapToList = mapToList;
 future_functor.mapToMaybe = mapToMaybe;
 future_functor.mapToRight = mapToRight;
+future_functor.mapToValidation = mapToValidation;
 future_functor[Symbol.iterator] = containerIterator;
 
 identity_functor.mapToConstant = mapToConstant;
@@ -54,6 +59,7 @@ identity_functor.mapToLeft = mapToLeft;
 identity_functor.mapToList = mapToList;
 identity_functor.mapToMaybe = mapToMaybe;
 identity_functor.mapToRight = mapToRight;
+identity_functor.mapToValidation = mapToValidation;
 identity_functor[Symbol.iterator] = containerIterator;
 
 io_functor.mapToConstant = mapToConstant;
@@ -64,6 +70,7 @@ io_functor.mapToLeft = mapToLeft;
 io_functor.mapToList = mapToList;
 io_functor.mapToMaybe = mapToMaybe;
 io_functor.mapToRight = mapToRight;
+io_functor.mapToValidation = mapToValidation;
 io_functor[Symbol.iterator] = containerIterator;
 
 list_core.mapToConstant = mapToConstant;
@@ -74,6 +81,7 @@ list_core.mapToIo = mapToIo;
 list_core.mapToLeft = mapToLeft;
 list_core.mapToMaybe = mapToMaybe;
 list_core.mapToRight = mapToRight;
+list_core.mapToValidation = mapToValidation;
 
 maybe_functor.mapToConstant = mapToConstant;
 maybe_functor.mapToEither = mapToEither;
@@ -83,7 +91,19 @@ maybe_functor.mapToIo = mapToIo;
 maybe_functor.mapToLeft = mapToLeft;
 maybe_functor.mapToList = mapToList;
 maybe_functor.mapToRight = mapToRight;
+maybe_functor.mapToValidation = mapToValidation;
 maybe_functor[Symbol.iterator] = containerIterator;
+
+validation_functor.mapToConstant = mapToConstant;
+validation_functor.mapToEither = mapToEither;
+validation_functor.mapToFuture = mapToFuture;
+validation_functor.mapToIdentity = mapToIdentity;
+validation_functor.mapToIo = mapToIo;
+validation_functor.mapToLeft = mapToLeft;
+validation_functor.mapToList = mapToList;
+validation_functor.mapToMaybe = mapToMaybe;
+validation_functor.mapToRight = mapToRight;
+validation_functor[Symbol.iterator] = containerIterator;
 
 var functors = {
     Constant,
@@ -96,7 +116,8 @@ var functors = {
     List,
     Maybe,
     Nothing,
-    Right
+    Right,
+    Validation
 };
 
 
