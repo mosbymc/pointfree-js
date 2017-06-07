@@ -102,14 +102,6 @@ describe('List functor test', function _testListFunctor() {
             l.should.not.equal(d);
         });
 
-        it('should return a new List functor instance with the same underlying value when flat mapping', function _testListFunctorFlatMap() {
-            var l = List(1),
-                d = l.flatMap(function _t() { return 2; });
-
-            l.value.should.not.eql(d.data);
-            l.should.not.equal(d);
-        });
-
         it('should return a new List functor regardless of data type', function _testListFactoryObjectCreation() {
             var arr = [1, 2, 3],
                 obj = { a: 1, b: 2 },

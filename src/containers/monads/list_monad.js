@@ -1,6 +1,6 @@
 import { list_functor, ordered_list_functor, list_core } from '../functors/list_functor';
 import { sortDirection } from '../../helpers';
-import { groupBy } from '../../list_monad/list_iterators';
+import { groupBy, flatMap } from '../../list_monad/list_iterators';
 import { wrap } from '../../functionalHelpers';
 import { createListCreator } from '../list_helpers';
 
@@ -83,6 +83,16 @@ List.extend = function _extend(propName, fn) {
 };
 
 var list_monad = Object.create(list_functor, {
+    flatMap: {
+        /**
+         * @description:
+         * @param: {function} fn
+         * @return: {@see m_list}
+         */
+        value: function _flatMap(fn) {
+            return this.of(flatMap(this, fn));
+        }
+    },
     groupBy: {
         value: function _groupBy(keySelector, comparer) {
             var groupObj = [{ keySelector: keySelector, comparer: comparer, direction: sortDirection.ascending }];
@@ -98,11 +108,6 @@ var list_monad = Object.create(list_functor, {
     mjoin: {
         value: function _mjoin() {
             return this.value;
-        }
-    },
-    chain: {
-        value: function _chain(fn) {
-            return fn(this.value);
         }
     },
     fold: {
@@ -138,13 +143,28 @@ var list_monad = Object.create(list_functor, {
         value: function _of(val, iterator, sortObj) {
             return createListDelegateInstance(val, iterator, sortObj);
         }
+    },
+    factory: {
+        value: List
     }
 });
 
 list_monad.ap =list_monad.apply;
-list_monad.bind = list_monad.chain;
+list_monad.fmap = list_monad.flatMap;
+list_monad.chain = list_monad.flatMap;
+list_monad.bind = list_monad.flatMap;
 
 var ordered_list_monad = Object.create(ordered_list_functor, {
+    flatMap: {
+        /**
+         * @description:
+         * @param: {function} fn
+         * @return: {@see m_list}
+         */
+        value: function _flatMap(fn) {
+            return this.of(flatMap(this, fn));
+        }
+    },
     groupBy: {
         value: function _groupBy(keySelector, comparer) {
             var groupObj = [{ keySelector: keySelector, comparer: comparer, direction: sortDirection.ascending }];
@@ -160,11 +180,6 @@ var ordered_list_monad = Object.create(ordered_list_functor, {
     mjoin: {
         value: function _mjoin() {
             return this.value;
-        }
-    },
-    chain: {
-        value: function _chain(fn) {
-            return fn(this.value);
         }
     },
     fold: {
@@ -193,16 +208,36 @@ var ordered_list_monad = Object.create(ordered_list_functor, {
         value: function _of(val, iterator, sortObj) {
             return createListDelegateInstance(val, iterator, sortObj);
         }
+    },
+    factory: {
+        value: List
     }
 });
 
 ordered_list_monad.ap = ordered_list_monad.apply;
-ordered_list_monad.bind = ordered_list_monad.chain;
+ordered_list_monad.fmap = ordered_list_monad.flatMap;
+ordered_list_monad.chain = ordered_list_monad.flatMap;
+ordered_list_monad.bind = ordered_list_monad.flatMap;
 //ordered_list_monad.reduce = ordered_list_monad.fold;
 
 function createGroupedListDelegate(source, key) {
     return createListDelegateInstance(source, undefined, undefined, key);
 }
 var createListDelegateInstance = createListCreator(list_monad, ordered_list_monad, list_monad);
+
+
+
+//Since FantasyLand is the defacto standard for JavaScript algebraic data structures, and I want to maintain
+//compliance with the standard, a .constructor property must be on the container delegators. In this case, its
+//just an alias for the true .factory property, which points to the delegator factory. I am isolating this from
+//the actual delegator itself as it encourages poor JavaScript development patterns and ... the myth of Javascript
+//classes and inheritance. I do not recommend using the .constructor property at all since that just encourages
+//FantasyLand and others to continue either not learning how JavaScript actually works, or refusing to use it
+//as it was intended... you know, like Douglas Crockford and his "good parts", which is really just another
+//way of saying: "your too dumb to understand how JavaScript works, and I either don't know myself, or don't
+//care to know, so just stick with what I tell you to use."
+list_monad.constructor = list_monad.factory;
+ordered_list_monad.constructor = ordered_list_monad.factory;
+
 
 export { List, list_monad, ordered_list_monad };

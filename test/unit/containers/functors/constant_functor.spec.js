@@ -101,14 +101,6 @@ describe('Constant functor tests', function _testConstantFunctor() {
             c.should.not.equal(d);
         });
 
-        it('should return a new constant functor instance with the same underlying value when flat mapping', function _testConstantFunctorFlatMap() {
-            var c = Constant(1),
-                d = c.flatMap();
-
-            c.value.should.eql(d.value);
-            c.should.not.equal(d);
-        });
-
         it('should properly indicate equality when constant functors are indeed equal', function _testConstantFunctorEquality() {
             var m1 = Constant(null),
                 m2 = Constant(null),

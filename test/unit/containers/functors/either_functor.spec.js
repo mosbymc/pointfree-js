@@ -173,60 +173,6 @@ describe('Either functor tests', function _testEitherFunctor() {
             e2_1.value.should.eql(e2.value);
         });
 
-        it('should return a new either instance with a new value when flat mapping a nested right either', function _testRightEitherFlatMapping() {
-            var e1 = Right(Right(1)),
-                e2 = Right(Right([1, 2, 3])),
-                e3 = Right(1);
-
-            var e1_1 = e1.flatMap(function _changeNum() { return 10; }),
-                e2_1 = e2.flatMap(function _changeNums(item) { return item.map(function _changeNum(it) { return it * 5; }); }),
-                e3_1 = e3.flatMap(function _changeNum() { return 2; });
-
-            either_functor.isPrototypeOf(e1_1).should.be.true;
-            either_functor.isPrototypeOf(e2_1).should.be.true;
-            either_functor.isPrototypeOf(e3_1).should.be.true;
-
-            e1_1.isLeft.should.be.false;
-            e1_1.isRight.should.be.true;
-
-            e2_1.isLeft.should.be.false;
-            e2_1.isRight.should.be.true;
-
-            e3_1.isLeft.should.be.false;
-            e3_1.isRight.should.be.true;
-
-            e1_1.value.should.eql(10);
-            e2_1.value.should.eql([5, 10, 15]);
-            e3_1.value.should.eql(2);
-        });
-
-        it('should return a new either instance with the same value when flat mapping a nest left either', function _testLeftEitherFlatMapping() {
-            var e1 = Left(Left(1)),
-                e2 = Left(Left([1, 2, 3])),
-                e3 = Left(1);
-
-            var e1_1 = e1.flatMap(),
-                e2_1 = e2.flatMap(),
-                e3_1 = e3.flatMap();
-
-            either_functor.isPrototypeOf(e1_1).should.be.true;
-            either_functor.isPrototypeOf(e2_1).should.be.true;
-            either_functor.isPrototypeOf(e3_1).should.be.true;
-
-            e1_1.isLeft.should.be.true;
-            e1_1.isRight.should.be.false;
-
-            e2_1.isLeft.should.be.true;
-            e2_1.isRight.should.be.false;
-
-            e3_1.isLeft.should.be.true;
-            e3_1.isRight.should.be.false;
-
-            e1_1.value.should.eql(1);
-            e2_1.value.should.eql([1, 2, 3]);
-            e3_1.value.should.eql(1);
-        });
-
         it('should properly indicate equality when constant functors are indeed equal', function _testEitherFunctorEquality() {
             var m1 = Either(null),
                 m2 = Either(null),

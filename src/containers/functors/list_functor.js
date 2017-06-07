@@ -17,7 +17,6 @@ import { createListCreator } from '../list_helpers';
  * map: list_core._map,
  * groupBy: list_core._groupBy,
  * groupByDescending: list_core._groupByDescending,
- * flatMap: list_core._flatMap,
  * addFront: list_core._addFront,
  * concat: list_core._concat,
  * except: list_core._except,
@@ -98,15 +97,6 @@ var list_core = {
     groupByDescending: function _groupByDescending(keySelector, comparer) {
         var groupObj = [{ keySelector: keySelector, comparer: comparer, direction: sortDirection.descending }];
         return this.of(this, groupBy(this, groupObj, createGroupedListDelegate));
-    },
-
-    /**
-     * @description:
-     * @param: {function} fn
-     * @return: {@see m_list}
-     */
-    flatMap: function _flatMap(fn) {
-        return this.of(flatMap(this, fn));
     },
 
     /**
@@ -523,7 +513,7 @@ var list_core = {
     /**
      * @description:
      */
-    constructor: List
+    factory: List
 };
 
 /**
@@ -748,5 +738,20 @@ function createGroupedListDelegate(source, key) {
  * @return: {@see list_core}
  */
 var createListDelegateInstance = createListCreator(list_functor, ordered_list_functor, list_functor);
+
+
+
+
+//Since FantasyLand is the defacto standard for JavaScript algebraic data structures, and I want to maintain
+//compliance with the standard, a .constructor property must be on the container delegators. In this case, its
+//just an alias for the true .factory property, which points to the delegator factory. I am isolating this from
+//the actual delegator itself as it encourages poor JavaScript development patterns and ... the myth of Javascript
+//classes and inheritance. I do not recommend using the .constructor property at all since that just encourages
+//FantasyLand and others to continue either not learning how JavaScript actually works, or refusing to use it
+//as it was intended... you know, like Douglas Crockford and his "good parts", which is really just another
+//way of saying: "your too dumb to understand how JavaScript works, and I either don't know myself, or don't
+//care to know, so just stick with what I tell you to use."
+list_core.constructor = list_core.factory;
+
 
 export { List, list_core, list_functor, ordered_list_functor };

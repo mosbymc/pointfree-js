@@ -35,48 +35,63 @@ var identity_functor = {
      * @param: {function} fn
      * @return: {@see identity_functor}
      */
-    map: function _map(fn) {
-        return this.of(fn(this.value));
-    },
-    /**
-     * @description:
-     * @param: {function} fn
-     * @return: {@see identity_functor}
-     */
-    flatMap: function _flatMap(fn) {
-        return identity_functor.isPrototypeOf(this.value) ? this.value.map(fn) : this.of(fn(this.value));
-    },
+    map: _map,
     /**
      * @description:
      * @param: {functor} ma
      * @return: {boolean}
      */
-    equals: function _equals(ma) {
-        return Object.getPrototypeOf(this).isPrototypeOf(ma) && this.value === ma.value;
-    },
+    equals: _equals,
     /**
      * @description:
      * @param: {*} item
      * @return: {@see identity_functor}
      */
-    of: function _of(item) {
-        return Identity.of(item);
-    },
+    of: _of,
     /**
      * @description:
      * @return: {*}
      */
-    valueOf: function _valueOf() {
-        return this.value;
-    },
+    valueOf: _valueOf,
     /**
      * @description:
      * @return: {string}
      */
-    toString: function _toString() {
-        return `Identity(${this.value})`;
-    },
-    constructor: Identity
+    toString: _toString,
+    factory: Identity
 };
+
+function _map(fn) {
+    return this.of(fn(this.value));
+}
+
+function _equals(ma) {
+    return Object.getPrototypeOf(this).isPrototypeOf(ma) && this.value === ma.value;
+}
+
+function _of(item) {
+    return Identity.of(item);
+}
+
+function _valueOf() {
+    return this.value;
+}
+
+function _toString() {
+    return `Identity(${this.value})`;
+}
+
+
+//Since FantasyLand is the defacto standard for JavaScript algebraic data structures, and I want to maintain
+//compliance with the standard, a .constructor property must be on the container delegators. In this case, its
+//just an alias for the true .factory property, which points to the delegator factory. I am isolating this from
+//the actual delegator itself as it encourages poor JavaScript development patterns and ... the myth of Javascript
+//classes and inheritance. I do not recommend using the .constructor property at all since that just encourages
+//FantasyLand and others to continue either not learning how JavaScript actually works, or refusing to use it
+//as it was intended... you know, like Douglas Crockford and his "good parts", which is really just another
+//way of saying: "you're too dumb to understand how JavaScript works, and I either don't know myself, or don't
+//care to know, so just stick with what I tell you to use."
+identity_functor.constructor = identity_functor.factory;
+
 
 export { Identity, identity_functor };

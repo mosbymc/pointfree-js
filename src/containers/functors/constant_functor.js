@@ -41,46 +41,29 @@ var constant_functor = {
      * @description:
      * @return: {@see constant_functor}
      */
-    map: function _map() {
-        return this.of(this.value)
-    },
-    /**
-     * @description:
-     * @return: {@see constant_functor}
-     */
-    flatMap: function _flatMap() {
-        return this.of(this.value);
-    },
+    map: _map,
     /**
      * @description:
      * @param: {*} item
      * @return: {@see constant_functor}
      */
-    of: function _of(item) {
-        return Constant.of(item);
-    },
+    of: _of,
     /**
      * @description:
      * @param: {functor} ma
      * @return: {boolean}
      */
-    equals: function _equals(ma) {
-        return Object.getPrototypeOf(this).isPrototypeOf(ma) && this.value === ma.value;
-    },
+    equals: _equals,
     /**
      * @description:
      * @return: {*}
      */
-    valueOf: function _valueOf() {
-        return this.value;
-    },
+    valueOf: _valueOf,
     /**
      * @description:
      * @return: {string}
      */
-    toString: function _toString() {
-        return `Constant(${this.value})`;
-    },
+    toString: _toString,
     /**
      * @description: sigh.... awesome spec ya got there fantasy-land. Yup, good thing you guys understand
      * JS and aren't treating it like a static, strongly-typed, class-based language with inheritance...
@@ -100,4 +83,24 @@ var constant_functor = {
     constructor: Constant
 };
 
-export { Constant, constant_functor };
+function _map() {
+    return this.of(this.value);
+}
+
+function _of(item) {
+    return Constant.of(item);
+}
+
+function _equals(ma) {
+    return Object.getPrototypeOf(this).isPrototypeOf(ma) && this.value === ma.value;
+}
+
+function _valueOf() {
+    return this.value;
+}
+
+function _toString() {
+    return `Constant(${this.value})`;
+}
+
+    export { Constant, constant_functor };

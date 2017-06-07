@@ -1,5 +1,6 @@
 import { monads } from '../../../../src/containers/monads/monads';
 import { identity_monad } from '../../../../src/containers/monads/identity_monad';
+import { identity } from '../../../../src/functionalHelpers';
 
 var Identity = monads.Identity;
 
@@ -78,16 +79,21 @@ describe('Identity monad test', function _testIdentityMonad() {
         });
 
         it('should apply a mutating function to the underlying value and return the new value unwrapped in an Identity when chain is called', function _testIdentityMonadChain() {
-            var i1 = Identity(10),
-                i2 = Identity({ a: 1, b: 2 });
+            var i1 = Identity(Identity(10)),
+                i2 = Identity(Identity({ a: 1, b: 2 })),
+                i3 = Identity(25);
 
-            i1.chain(function _chain(val) {
+            i1.flatMap(function _flatMap(val) {
                 return 5 * val;
-            }).should.eql(50);
+            }).value.should.eql(50);
 
-            i2.chain(function _chain(val) {
+            i2.flatMap(function _flatMap(val) {
                 return val.a + val.b;
-            }).should.eql(3);
+            }).value.should.eql(3);
+
+            i3.flatMap(function _flatMap(val) {
+                return val + 2;
+            }).value.should.eql(27);
         });
 
         it('should return the applied monad type after mapping the identity monad\'s underlying value', function _testIdentityMonadApply() {
@@ -118,6 +124,45 @@ describe('Identity monad test', function _testIdentityMonad() {
             Object.getPrototypeOf(m1Res).should.eql(monads.Maybe());
             Object.getPrototypeOf(m2Res).should.eql(monads.Maybe());
             Object.getPrototypeOf(m3Res).should.eql(monads.Maybe());
+        });
+
+        it('should have a proper algebraic properties apply', function _testIdentityMonadAlgebraicProperties() {
+            function _i(val) { return  val + 2; }
+            var x = 2;
+            function t(f) {
+                console.log(f);
+                return function _f(g) {
+                    console.log(g);
+                    return function _g(x) {
+                        console.log(x);
+                        return f(g(x));
+                    };
+                };
+            }
+
+            var Ii = Identity(identity);
+
+            //console.log(Ii.apply(Ii).apply(Ii).value);
+
+            console.log(Ii.map(t).value.toString());
+
+            console.log(Ii.apply(Ii.map(t)).value.toString());
+
+            //console.log(Ii.apply(Ii.apply(Ii.apply(Ii.map(t)))).value());
+
+            //console.log(Ii.apply(Ii.apply(Ii.apply(Ii.apply(Ii.map(t))))).value());
+
+            //Composition
+            //console.log(Ii.apply(Ii.apply(Ii.apply(Ii.map(t))).value));
+
+            //Identity
+            Ii.apply(Ii).value.should.eql(Ii.value);
+
+            //Homomorphism
+            Identity.of(_i).apply(Identity.of(x)).value.should.eql(Identity.of(_i(x)).value);
+
+            //Ii.apply(Identity(2)).value.should.eql(Identity(2).apply(Identity.of(f => f(y))).value);
+
         });
 
         it('should have a .constructor property that points to the factory function', function _testIdentityMonadIsStupidViaFantasyLandSpecCompliance() {

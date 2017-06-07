@@ -130,38 +130,44 @@ var maybe_functor = {
     get value() {
         return this._value;
     },
-    map: function _map(fn) {
-        //return this.of(fn(this.value));
-        return this.isNothing ? this.nothing() : this.of(fn(this.value));
-    },
-    flatMap: function _flatMap(fn) {
-        //return maybe_functor.isPrototypeOf(this.value) ? this.value.map(fn) : this.of(fn(this.value));
-        if (Object.getPrototypeOf(this).isPrototypeOf(this.value)) return this.value.map(fn);
-        if (null != this.value) return this.of(fn(this.value));
-        return this.nothing();
-    },
-    equals: function _equals(ma) {
-        return Object.getPrototypeOf(this).isPrototypeOf(ma) && this.value === ma.value;
-    },
-    of: function _of(val) {
-        return Maybe.of(val);
-    },
-    nothing: function _nothing() {
-        return Maybe();
-    },
+    map: _map,
+    equals: _equals,
+    of: _of,
+    nothing: _nothing,
     /**
      * @description:
      * @return: {*}
      */
-    valueOf: function _valueOf() {
-        return this.value;
-    },
-    toString: function _toString() {
-        //return `Maybe(${this.value})`;
-        return null == this.value ? `Nothing()` : `Just(${this.value})`;
-    },
-    constructor: Maybe
+    valueOf: _valueOf,
+    toString: _toString,
+    factory: Maybe
 };
+
+function _map(fn) {
+    //return this.of(fn(this.value));
+    return this.isNothing ? this.nothing() : this.of(fn(this.value));
+}
+
+function _equals(ma) {
+    return Object.getPrototypeOf(this).isPrototypeOf(ma) && this.value === ma.value;
+}
+
+function _of(val) {
+    return Maybe.of(val);
+}
+
+function _nothing() {
+    return Maybe();
+}
+
+function _valueOf() {
+    return this.value;
+}
+
+function _toString() {
+    //return `Maybe(${this.value})`;
+    return null == this.value ? `Nothing()` : `Just(${this.value})`;
+}
 
 /*
 var _just_f = Object.create(maybe_functor, {
@@ -232,5 +238,18 @@ var _nothing_f = Object.create(maybe_functor, {
     }
 });
 */
+
+
+
+//Since FantasyLand is the defacto standard for JavaScript algebraic data structures, and I want to maintain
+//compliance with the standard, a .constructor property must be on the container delegators. In this case, its
+//just an alias for the true .factory property, which points to the delegator factory. I am isolating this from
+//the actual delegator itself as it encourages poor JavaScript development patterns and ... the myth of Javascript
+//classes and inheritance. I do not recommend using the .constructor property at all since that just encourages
+//FantasyLand and others to continue either not learning how JavaScript actually works, or refusing to use it
+//as it was intended... you know, like Douglas Crockford and his "good parts", which is really just another
+//way of saying: "your too dumb to understand how JavaScript works, and I either don't know myself, or don't
+//care to know, so just stick with what I tell you to use."
+maybe_functor.constructor = maybe_functor.factory;
 
 export { Maybe, Just, Nothing, maybe_functor };

@@ -233,28 +233,6 @@ describe('Maybe functor tests', function _testMaybeFunctor() {
             expect(m2.value).to.eql(d2.value);
         });
 
-        it('should return a new maybe functor instance with the same underlying value when flat mapping', function _testMaybeFunctorFlatMap() {
-            var m1 = Maybe(1),
-                m2 = Maybe(Maybe(1)),
-                m3 = Maybe(),
-                d1 = m1.flatMap(function _t() { return 2; }),
-                d2 = m2.flatMap(function _t() { return 2; }),
-                d3 = m3.flatMap();
-
-            m1.value.should.not.eql(d1.value);
-            m1.should.not.equal(d1);
-
-            m2.value.value.should.not.eql(d2.value);
-            m2.should.not.equal(d2);
-
-           expect(m3.value).to.eql(d3.value);
-           m3.should.eql(d3);
-
-            d1.value.should.eql(d2.value);
-            d1.value.should.not.eql(d3.value);
-            d2.value.should.not.eql(d3.value);
-        });
-
         it('should properly indicate equality when constant functors are indeed equal', function _testMaybeFunctorEquality() {
             var m1 = Maybe(null),
                 m2 = Maybe(null),

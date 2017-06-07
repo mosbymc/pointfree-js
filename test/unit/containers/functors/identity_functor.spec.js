@@ -101,19 +101,6 @@ describe('Identity functor test', function _testIdentityFunctor() {
             i.should.not.equal(d);
         });
 
-        it('should return a new identity functor instance with the same underlying value when flat mapping', function _testIdentityFunctorFlatMap() {
-            var i1 = Identity(1),
-                i2 = Identity(Identity('1')),
-                d1 = i1.flatMap(function _t() { return 2; }),
-                d2 = i2.flatMap(function _t() { return '2'; });
-
-            i1.value.should.not.eql(d1.value);
-            i1.should.not.equal(d1);
-
-            i2.value.should.not.eql(d2.value);
-            i2.should.not.eql(d2);
-        });
-
         it('should properly indicate equality when constant functors are indeed equal', function _testIdentityFunctorEquality() {
             var m1 = Identity(null),
                 m2 = Identity(null),
@@ -236,7 +223,8 @@ describe('Identity functor test', function _testIdentityFunctor() {
             c4.toString().should.eql('Identity(Identity(Identity(5)))');
         });
 
-        it('should have a .constructor property that points to the factory function', function _testIdentityFunctorIsStupidViaFantasyLandSpecCompliance() {
+        it('should have a .factory property that points to the factory function', function _testIdentityFunctorIsStupidViaFantasyLandSpecCompliance() {
+            Identity(null).factory.should.eql(Identity);
             Identity(null).constructor.should.eql(Identity);
         });
     });
