@@ -1,4 +1,6 @@
-import { identity, ifElse, wrap, isArray, isObject, isFunction, not, or, and, curry } from '../../src/functionalHelpers';
+import { wrap, isArray, isObject, isFunction, or, and } from '../../src/functionalHelpers';
+import { identity, curry, ifElse } from '../../src/combinators';
+import { not } from '../../src/decorators';
 import { testData } from '../testData';
 
 var testDataFirstNames = testData.dataSource.data.map(function _retrieveFirstNames(item) {

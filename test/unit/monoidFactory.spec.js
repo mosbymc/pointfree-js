@@ -1,5 +1,5 @@
 import { monoidFactory } from '../../src/monoidFactory';
-import { pipe } from '../../src/functionalHelpers';
+import { pipe } from '../../src/combinators';
 
 describe('monoidFactory tests', function _testMonoidFactory() {
     describe('mathematical monoids', function _testMathematicalMonoids() {

@@ -1,4 +1,4 @@
-import { compose } from '../../functionalHelpers';
+import { compose } from '../../combinators';
 
 /**
  * @description:

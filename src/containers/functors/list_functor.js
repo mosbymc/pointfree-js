@@ -2,7 +2,8 @@ import { all, any, except, intersect, union, map, flatMap, groupBy, sortBy, addF
     contains, first, last, count, fold, foldRight, distinct, ofType, binarySearch, equals, take, takeWhile, skip, skipWhile, reverse,
     copyWithin, fill, indexOf, lastIndexOf } from '../../list_monad/list_iterators';
 import { sortDirection } from '../../helpers';
-import { when, wrap, defaultPredicate, delegatesTo, not, isArray } from '../../functionalHelpers';
+import { wrap, defaultPredicate, delegatesTo, isArray } from '../../functionalHelpers';
+import { when, not } from '../../combinators';
 import { createListCreator } from '../list_helpers';
 
 /**

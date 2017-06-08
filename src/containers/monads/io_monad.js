@@ -1,5 +1,5 @@
 import { io_functor } from '../functors/io_functor';
-import { compose } from '../../functionalHelpers';
+import { compose } from '../../combinators';
 
 function Io(val) {
     return Object.create(io_monad, {

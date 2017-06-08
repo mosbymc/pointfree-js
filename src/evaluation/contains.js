@@ -1,6 +1,8 @@
 //TODO: see if there is any real performance increase by just using .includes when a comparer hasn't been passed
 //import { defaultEqualityComparer } from '../helpers';
-import { when, not, isArray, delegatesTo } from '../functionalHelpers';
+import { isArray, delegatesTo } from '../functionalHelpers';
+import { when } from '../combinators';
+import { not } from '../decorators';
 import { javaScriptTypes } from '../helpers';
 import { ordered_m_list } from '../list_monad/list';
 

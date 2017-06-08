@@ -10,7 +10,7 @@ function nameProjector(item) {
 }
 
 function namePredicate(item) {
-    return item.FirstName.length > 5;
+    return 5 < item.FirstName.length;
 }
 
 function comparer(a, b) {

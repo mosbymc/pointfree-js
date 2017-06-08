@@ -1,7 +1,9 @@
 import { all, any, except, intersect, union, map, flatMap, groupBy, sortBy, addFront, concat, groupJoin, join, zip, filter,
     contains, first, last, count, fold, distinct, ofType, binarySearch, equals, take, takeWhile, skip, skipWhile, reverse } from './list_iterators';
 import { generatorProto, sortDirection } from '../helpers';
-import { set, when, isSomething, apply, ifElse, wrap, delegatesFrom, defaultPredicate, delegatesTo, not, isArray } from '../functionalHelpers';
+import { ifElse, when } from '../combinators';
+import { set, isSomething, wrap, delegatesFrom, defaultPredicate, delegatesTo, isArray } from '../functionalHelpers';
+import { apply, not } from '../decorators';
 
 //import { Maybe } from '../maybe_monad/maybe';
 //import { Just } from '../just_monad/just';

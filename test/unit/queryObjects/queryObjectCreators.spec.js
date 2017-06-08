@@ -13,7 +13,7 @@ function nameProjector(item) {
 }
 
 function namePredicate(item) {
-    return item.FirstName.length > 5;
+    return 5 < item.FirstName.length;
 }
 
 function comparer(a, b) {
@@ -170,19 +170,19 @@ describe('createNewQueryableDelegator', function testQueryableDelegatorObjectCre
     it('should return a non-queryable object in all cases', function testNonQueryableReturningFunctions() {
         var baseDelegate = createNewQueryableDelegator(testData.dataSource.data),
             take = baseDelegate.take(5),
-            takeWhile = baseDelegate.takeWhile(function _predicate(item) { return item.drillDownData.length > 4; }),
+            takeWhile = baseDelegate.takeWhile(function _predicate(item) { return 4 < item.drillDownData.length; }),
             skip = baseDelegate.skip(40),
-            skipWhile = baseDelegate.skipWhile(function _predicate(item) { return item.drillDownData.length > 5; }),
+            skipWhile = baseDelegate.skipWhile(function _predicate(item) { return 5 < item.drillDownData.length; }),
             any1 = baseDelegate.any(),
-            any2 = baseDelegate.any(function _predicate(item) { return item.FirstName === 'Mike'; }),
+            any2 = baseDelegate.any(function _predicate(item) { return 'Mike' === item.FirstName; }),
             all1 = baseDelegate.all(),
             all2 = baseDelegate.all(function _predicate(item) { return item.drillDownData.length; }),
             contains = baseDelegate.contains(testData.dataSource.data[0]),
             first1 = baseDelegate.first(),
-            first2 = baseDelegate.first(function _predicate(item) { return item.FirstName === 'Phillip J.'; }),
+            first2 = baseDelegate.first(function _predicate(item) { return 'Phillip J.' === item.FirstName; }),
             fold = baseDelegate.fold(function _fold(val, cur, idx){ return val + idx}, 0),
             last1 = baseDelegate.last(),
-            last2 = baseDelegate.last(function _predicate(item) { return item.FirstName === 'Mark'; }),
+            last2 = baseDelegate.last(function _predicate(item) { return 'Mark' === item.FirstName; }),
             length = baseDelegate.count(),
             toArray = baseDelegate.toArray(),
             toSet = baseDelegate.toSet(),
@@ -372,19 +372,19 @@ describe('createNewOrderedQueryableDelegator', function testCreateNewQueryableDe
     it('should return a non-queryable object in all cases', function testNonQueryableReturningFunctions() {
         var basedOrderedDelegate = createNewOrderedQueryableDelegator(testData.dataSource.data, orderBy(testData.dataSource.data, sortObj), sortObj),
             take = basedOrderedDelegate.take(5),
-            takeWhile = basedOrderedDelegate.takeWhile(function _predicate(item) { return item.drillDownData.length > 4; }),
+            takeWhile = basedOrderedDelegate.takeWhile(function _predicate(item) { return 4 < item.drillDownData.length; }),
             skip = basedOrderedDelegate.skip(40),
-            skipWhile = basedOrderedDelegate.skipWhile(function _predicate(item) { return item.drillDownData.length > 5; }),
+            skipWhile = basedOrderedDelegate.skipWhile(function _predicate(item) { return 5 < item.drillDownData.length; }),
             any1 = basedOrderedDelegate.any(),
-            any2 = basedOrderedDelegate.any(function _predicate(item) { return item.FirstName === 'Mike'; }),
+            any2 = basedOrderedDelegate.any(function _predicate(item) { return 'Mike' === item.FirstName; }),
             all1 = basedOrderedDelegate.all(),
             all2 = basedOrderedDelegate.all(function _predicate(item) { return item.drillDownData.length; }),
             contains = basedOrderedDelegate.contains(testData.dataSource.data[0], function _c(a, b) { return a.FirstName === b.FirstName; }),
             first1 = basedOrderedDelegate.first(),
-            first2 = basedOrderedDelegate.first(function _predicate(item) { return item.FirstName === 'Phillip J.'; }),
+            first2 = basedOrderedDelegate.first(function _predicate(item) { return 'Phillip J.' === item.FirstName; }),
             fold = basedOrderedDelegate.fold(function _fold(val, cur, idx){ return val + idx}, 0),
             last1 = basedOrderedDelegate.last(),
-            last2 = basedOrderedDelegate.last(function _predicate(item) { return item.FirstName === 'Mark'; }),
+            last2 = basedOrderedDelegate.last(function _predicate(item) { return 'Mark' === item.FirstName; }),
             length = basedOrderedDelegate.count(),
             toArray = basedOrderedDelegate.toArray(),
             toSet = basedOrderedDelegate.toSet(),

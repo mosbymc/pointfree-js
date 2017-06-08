@@ -1,4 +1,5 @@
-import { curry, isArray } from '../functionalHelpers';
+import { isArray } from '../functionalHelpers';
+import { curry } from '../combinators';
 
 var observableStatus = {
     inactive: 0,

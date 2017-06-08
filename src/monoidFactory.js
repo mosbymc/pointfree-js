@@ -14,11 +14,10 @@ function monoidFactory(concatFn, type) {
     /**
      * @description:
      * @param: {*} x - The initial value of the new semigroup/monoid
-     * @param: {functor|monad|undefined} m - A container object on which to added concatenation functionality.
      * @return: {Object}
      */
-    function _monoid(x, m) {
-        return Object.create('object' === typeof m ? m : {}, {
+    function _monoid(x) {
+        return Object.create({}, {
             _value: {
                 value: x
             },
@@ -59,6 +58,9 @@ function monoidFactory(concatFn, type) {
             /**
              * @description:
              */
+            factory: {
+                value: _monoid
+            },
             constructor: {
                 value: _monoid
             },

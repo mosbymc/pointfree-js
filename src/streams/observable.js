@@ -2,7 +2,8 @@ import { observableStatus } from '../helpers';
 import { subscriber } from './subscribers/subscriber';
 import { debounceOperator, deepMapOperator, filterOperator, groupByOperator, itemBufferOperator, mapOperator, mergeOperator, timeBufferOperator } from './streamOperators/operators';
 import { generatorProto } from '../helpers';
-import { compose, and, wrap, noop } from '../functionalHelpers';
+import { and, wrap, noop } from '../functionalHelpers';
+import { compose } from '../combinators';
 
 //TODO: I thinking about implementing an 'observable watcher' functionality. the concept would be
 //TODO: that you have an observable that is registered to watch one or more other observables. When

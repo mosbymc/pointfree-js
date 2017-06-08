@@ -1,5 +1,7 @@
 import { cacher } from '../helpers';
-import { when, not, isArray, strictEqual } from '../functionalHelpers';
+import { isArray, strictEqual } from '../functionalHelpers';
+import { when } from '../combinators';
+import { not } from '../decorators';
 
 function union(source, enumerable, comparer = strictEqual) {
     var isInCache = cacher(comparer);

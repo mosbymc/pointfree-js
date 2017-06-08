@@ -1,4 +1,6 @@
-import { when, isArray, not } from '../functionalHelpers';
+import { isArray } from '../functionalHelpers';
+import { when } from '../combinators';
+import { not } from '../decorators';
 import { sortData } from  './sortHelpers';
 
 

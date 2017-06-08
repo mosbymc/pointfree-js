@@ -1,4 +1,5 @@
-import { curry, get, set, compose, identity, arraySet, objectSet, kestrel } from './functionalHelpers';
+import { arraySet, objectSet } from './functionalHelpers';
+import { curry, compose, identity, kestrel } from './combinators';
 
 /**
  * @description:

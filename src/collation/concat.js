@@ -1,4 +1,6 @@
-import { when, not, isArray } from '../functionalHelpers';
+import { isArray } from '../functionalHelpers';
+import { when } from '../combinators';
+import { not } from '../decorators';
 import { javaScriptTypes } from '../helpers';
 
 function concat(source, enumerables, argsCount) {

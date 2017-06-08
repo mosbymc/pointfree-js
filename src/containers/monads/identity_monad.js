@@ -43,14 +43,24 @@ var identity_monad = Object.create(identity_functor, {
     },
     traverse: {
         value: function _traverse(fa, fn) {
-            return this.fold(function _reductioAdAbsurdum(xs, x) {
+            //return this.reduce((ys, x) =>
+            //f(x).map(x => y => y.concat([x])).ap(ys), point(this.empty))
+            //
+            return this.fold(function _fold(ys, x) {
+                return fn(x).map(function _map(x) {
+                    return function _map_(y) {
+                        return y.concat([x]).ap(ys), fa(this.empty);
+                    };
+                });
+            });
+            /*return this.fold(function _reductioAdAbsurdum(xs, x) {
                 fn(x).map(function _map(x) {
                     return function _map_(y) {
                         return y.concat([x]);
                     };
                 }).ap(xs);
                 return fa(this.empty);
-            });
+            });*/
         }
     },
     /**

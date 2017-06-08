@@ -1,4 +1,6 @@
-import { when, not, isArray, strictEqual, delegatesTo, isObject, ifElse } from '../functionalHelpers';
+import { isArray, strictEqual, delegatesTo, isObject } from '../functionalHelpers';
+import { not } from '../decorators';
+import { when, ifElse } from '../combinators';
 import { javaScriptTypes, cacher } from '../helpers';
 import { sortData } from  '../projection/sortHelpers';
 

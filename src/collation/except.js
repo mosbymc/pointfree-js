@@ -1,4 +1,6 @@
-import { when, not, isArray, strictEqual } from '../functionalHelpers';
+import { isArray, strictEqual } from '../functionalHelpers';
+import { when } from '../combinators';
+import { not } from '../decorators';
 
 function except(source, enumerable, comparer = strictEqual) {
     return function *exceptIterator() {

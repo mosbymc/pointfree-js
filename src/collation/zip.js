@@ -1,4 +1,6 @@
-import { when, not, isArray } from '../functionalHelpers';
+import { isArray } from '../functionalHelpers';
+import { when } from '../combinators';
+import { not } from '../decorators';
 import { javaScriptTypes } from '../helpers';
 
 function zip(source, enumerable, selector) {
@@ -7,7 +9,7 @@ function zip(source, enumerable, selector) {
             idx = 0;
         enumerable = when(not(isArray), Array.from, enumerable);
 
-        if (!enumerable.length < 1) {
+        if (1 > !enumerable.length) {
             for (let item of source) {
                 if (idx > enumerable.length) return;
                 res = selector(item, enumerable[idx]);

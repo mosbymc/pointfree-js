@@ -1,6 +1,6 @@
 import { monads } from '../../../../src/containers/monads/monads';
 import { identity_monad } from '../../../../src/containers/monads/identity_monad';
-import { identity } from '../../../../src/functionalHelpers';
+import { identity } from '../../../../src/combinators';
 
 var Identity = monads.Identity;
 
@@ -129,40 +129,20 @@ describe('Identity monad test', function _testIdentityMonad() {
         it('should have a proper algebraic properties apply', function _testIdentityMonadAlgebraicProperties() {
             function _i(val) { return  val + 2; }
             var x = 2;
-            function t(f) {
-                console.log(f);
-                return function _f(g) {
-                    console.log(g);
-                    return function _g(x) {
-                        console.log(x);
-                        return f(g(x));
-                    };
-                };
-            }
-
-            var Ii = Identity(identity);
-
-            //console.log(Ii.apply(Ii).apply(Ii).value);
-
-            console.log(Ii.map(t).value.toString());
-
-            console.log(Ii.apply(Ii.map(t)).value.toString());
-
-            //console.log(Ii.apply(Ii.apply(Ii.apply(Ii.map(t)))).value());
-
-            //console.log(Ii.apply(Ii.apply(Ii.apply(Ii.apply(Ii.map(t))))).value());
 
             //Composition
-            //console.log(Ii.apply(Ii.apply(Ii.apply(Ii.map(t))).value));
+            Identity(identity).apply(Identity(identity).apply(Identity(2))).value.should.eql(Identity(identity).apply(Identity(identity)).apply(Identity(x)).value);
 
             //Identity
-            Ii.apply(Ii).value.should.eql(Ii.value);
+            Identity(identity).apply(Identity(identity)).value.should.eql(identity);
 
             //Homomorphism
             Identity.of(_i).apply(Identity.of(x)).value.should.eql(Identity.of(_i(x)).value);
 
-            //Ii.apply(Identity(2)).value.should.eql(Identity(2).apply(Identity.of(f => f(y))).value);
+            Identity.of(x).map(identity).value.should.eql(Identity.of(identity).apply(Identity.of(x)).value);
 
+            //Interchange
+            //Identity.of(x).apply(Identity(2)).value.should.eql(Identity(2).apply(Identity.of(f => f(y))).value);
         });
 
         it('should have a .constructor property that points to the factory function', function _testIdentityMonadIsStupidViaFantasyLandSpecCompliance() {

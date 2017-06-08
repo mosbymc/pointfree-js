@@ -1,5 +1,7 @@
 import { javaScriptTypes } from '../helpers';
-import { when, not, isArray, strictEqual } from '../functionalHelpers';
+import { isArray, strictEqual } from '../functionalHelpers';
+import { when } from '../combinators';
+import { not } from '../decorators';
 
 function intersect(source, enumerable, comparer = strictEqual) {
     return function *intersectIterator() {
