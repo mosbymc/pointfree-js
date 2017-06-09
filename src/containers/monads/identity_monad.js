@@ -1,4 +1,5 @@
 import { identity_functor } from '../functors/identity_functor';
+import { emptyObject } from '../../helpers';
 
 /**
  * @description:
@@ -22,6 +23,14 @@ function Identity(item) {
  */
 Identity.of = function _of(item) {
     return Identity(item);
+};
+
+/**
+ * @description:
+ * @return {@see identity_monad}
+ */
+Identity.empty = function _empty() {
+    return this.of(Object.create(emptyObject));
 };
 
 var identity_monad = Object.create(identity_functor, {
@@ -78,6 +87,16 @@ var identity_monad = Object.create(identity_functor, {
     of: {
         value: function _of(val) {
             return Identity.of(val);
+        }
+    },
+    empty: {
+        value: function _empty() {
+            return this.of(Object.create(emptyObject));
+        }
+    },
+    isEmpty: {
+        get: function _getIsEmpty() {
+            return emptyObject.isPrototypeOf(this.value);
         }
     },
     factory: {

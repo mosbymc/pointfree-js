@@ -20,6 +20,21 @@ var mapToConstant = toFunctorType(Constant),
     mapToRight = toFunctorType(Right),
     mapToValidation = toFunctorType(Validation);
 
+function toConstant() { return this.mapToConstant(); }
+function toEither() { return this.mapToEither(); }
+function toFuture() { return this.mapToFuture(); }
+function toIdentity() { return this.mapToIdentity(); }
+function toIo() { return this.mapToIo(); }
+function toLeft() { return this.mapToLeft(); }
+function toList() { return this.mapToList(); }
+function toMaybe() { return this.mapToMaybe(); }
+function toRight() { return this.mapToRight(); }
+function toValidation() { return this.mapToValidation(); }
+
+//Natural Transformations (nt):
+//.fold(f) -> f = functor type factory
+//nt(x)map(fn) === nt(x.map(fn))
+
 constant_functor.mapToEither = mapToEither;
 constant_functor.mapToFuture = mapToFuture;
 constant_functor.mapToIdentity = mapToIdentity;
@@ -119,6 +134,12 @@ var functors = {
     Right,
     Validation
 };
+
+Object.defineProperties(constant_functor, {
+    toEither: {
+        get: toEither
+    }
+});
 
 
 export { functors };
