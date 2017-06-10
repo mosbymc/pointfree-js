@@ -50,6 +50,11 @@ var identity_monad = Object.create(identity_functor, {
             return fn(this.value, x);
         }
     },
+    foldMap: {
+        value: function _foldMap(fn, empty) {
+            
+        }
+    },
     traverse: {
         value: function _traverse(fa, fn) {
             //return this.reduce((ys, x) =>

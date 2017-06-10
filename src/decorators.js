@@ -46,7 +46,7 @@ var before = curry(function _before(fn, decoration, ...args) {
  * @return: {function}
  */
 function binary(fn) {
-    return curryN(this, 2, 0, fn);
+    return curryN(this, 2, [], fn);
 }
 
 /**

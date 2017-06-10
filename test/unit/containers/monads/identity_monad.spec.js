@@ -126,6 +126,18 @@ describe('Identity monad test', function _testIdentityMonad() {
             Object.getPrototypeOf(m3Res).should.eql(monads.Maybe());
         });
 
+        it('should have a .constructor property that points to the factory function', function _testIdentityMonadIsStupidViaFantasyLandSpecCompliance() {
+            Identity(null).constructor.should.eql(Identity);
+        });
+    });
+
+    describe('Identity laws test', function _testIdentityFunctorLaws() {
+        it('should obey the identity law', function _testIdentityFunctorIdentityLaw() {
+            var v = Identity(2);
+
+            Identity(identity).ap(v).value.should.eql(v.value);
+        });
+
         it('should have a proper algebraic properties apply', function _testIdentityMonadAlgebraicProperties() {
             function _i(val) { return  val + 2; }
             var x = 2;
@@ -143,10 +155,6 @@ describe('Identity monad test', function _testIdentityMonad() {
 
             //Interchange
             //Identity.of(x).apply(Identity(2)).value.should.eql(Identity(2).apply(Identity.of(f => f(y))).value);
-        });
-
-        it('should have a .constructor property that points to the factory function', function _testIdentityMonadIsStupidViaFantasyLandSpecCompliance() {
-            Identity(null).constructor.should.eql(Identity);
         });
     });
 });
