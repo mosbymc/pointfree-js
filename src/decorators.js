@@ -19,13 +19,7 @@ var after = curry(function _after(fn, decoration, ...args) {
  * @param: {function} fn
  * @return: {function}
  */
-function apply(fn) {
-    return function _apply(...args) {
-        return function _apply_() {
-            return fn(...args);
-        }
-    };
-}
+var apply = fn => (...args) => () => fn(...args);
 
 /**
  * @description:
@@ -45,9 +39,7 @@ var before = curry(function _before(fn, decoration, ...args) {
  * @param: {function} fn
  * @return: {function}
  */
-function binary(fn) {
-    return curryN(this, 2, [], fn);
-}
+var binary = fn => curryN(this, 2, [], fn);
 
 /**
  * @description:
@@ -92,11 +84,7 @@ function guardBefore(...fns) {
  * @param: {function} fn
  * @return: {function}
  */
-function leftApply(fn) {
-    return function _leftApply(...args) {
-        return fn(...args);
-    };
-}
+var leftApply = fn => (...args) => fn(...args);
 
 /**
  * not :: () -> !()
@@ -109,11 +97,7 @@ function leftApply(fn) {
  * @param: {function} fn
  * @return: {*}
  */
-function not(fn) {
-    return function _not(...args) {
-        return !fn(...args);
-    };
-}
+var not = fn => (...args) => !fn(...args);
 
 /**
  * @description:
@@ -144,11 +128,7 @@ var repeat = curry(function _repeat(num, fn) {
  * @param: {function} fn
  * @return: {function}
  */
-function rightApply(fn) {
-    return function _rightApply(...args) {
-        return fn(...args.reverse());
-    };
-}
+var rightApply = fn => (...args) => fn(...args.reverse());
 
 //TODO: need to add a try/catch function here, and see about renaming the existing 'safe' function
 //TODO: as that seems more along the lines of a try/catch function, rather than a 'maybe' function.
@@ -181,9 +161,7 @@ var tap = curry(function _tap(fn, arg) {
  * @param: {function} fn
  * @return: {function}
  */
-function ternary(fn) {
-    return curryN(this, 3, [], fn);
-}
+var ternary = fn => curryN(this, 3, [], fn);
 
 /**
  * @description:
@@ -208,9 +186,7 @@ var tryCatch = curry(function _tryCatch(catcher, tryer) {
  * @param: {function} fn
  * @return: {function}
  */
-function unary(fn) {
-    return curryN(this, 1, [], fn);
-}
+var unary = fn => curryN(this, 1, [], fn);
 
 
 /*

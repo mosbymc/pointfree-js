@@ -52,7 +52,7 @@ var identity_monad = Object.create(identity_functor, {
     },
     foldMap: {
         value: function _foldMap(fn, empty) {
-            
+
         }
     },
     traverse: {
@@ -83,7 +83,8 @@ var identity_monad = Object.create(identity_functor, {
      * @return: {monad}
      */
     apply: {
-        value: function _apply(ma) {
+        value: //ma => ma.map(this.value)
+            function _apply(ma) {
             //console.log(Object.getPrototypeOf(ma), ma.map);
             //return this.flatMap(function _apply(f) { return ma.map(f); });
             return ma.map(this.value);
