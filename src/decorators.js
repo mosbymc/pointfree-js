@@ -86,6 +86,11 @@ function guardBefore(...fns) {
  */
 var leftApply = fn => (...args) => fn(...args);
 
+var maybe = (fn) =>
+    function _maybe(...args) {
+        return null != args ? fn.call(this, ...args) : null;
+    };
+
 /**
  * not :: () -> !()
  *
@@ -188,11 +193,18 @@ var tryCatch = curry(function _tryCatch(catcher, tryer) {
  */
 var unary = fn => curryN(this, 1, [], fn);
 
+/**
+ * @description:
+ * @param: {function} fn
+ * @return:
+ */
+var voidFn = fn => (...args) => void fn(...args);
+
 
 /*
  var c = leftApply(leftApply, rightApply);
 
- var getWith = c(get);
+ var getWith = c(getWith);
  */
 
 

@@ -189,7 +189,7 @@ var _just_f = Object.create(maybe_functor, {
     },
     flatMap: {
         value: function _flatMap(fn) {
-            return maybe_functor.isPrototypeOf(this.value) ? this.value.map(fn) : Just(fn(this.value));
+            return maybe_functor.isPrototypeOf(this.value) ? this.value.mapWith(fn) : Just(fn(this.value));
         }
     },
     of: {
@@ -223,7 +223,7 @@ var _nothing_f = Object.create(maybe_functor, {
     },
     flatMap: {
         value: function _flatMap(fn) {
-            return maybe_functor.isPrototypeOf(this.value) ? this.value.map(fn) : Nothing();
+            return maybe_functor.isPrototypeOf(this.value) ? this.value.mapWith(fn) : Nothing();
         }
     },
     of: {

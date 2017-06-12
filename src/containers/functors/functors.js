@@ -33,7 +33,7 @@ function toValidation() { return this.mapToValidation(); }
 
 //Natural Transformations (nt):
 //.fold(f) -> f = functor type factory
-//nt(x)map(fn) === nt(x.map(fn))
+//nt(x)mapWith(fn) === nt(x.mapWith(fn))
 
 constant_functor.mapToEither = mapToEither;
 constant_functor.mapToFuture = mapToFuture;

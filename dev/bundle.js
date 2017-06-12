@@ -1644,7 +1644,7 @@ var _functionalHelpers = require('../functionalHelpers');
  * @type {{
  * value,
  * value,
- * map: list_core._map,
+ * mapWith: list_core._map,
  * groupBy: list_core._groupBy,
  * groupByDescending: list_core._groupByDescending,
  * flatten: list_core._flatten,
@@ -2279,7 +2279,7 @@ list.of = list.from;
  * If the function's evaluation should be deferred it needs to work a bit differently.
  * In this case, the function should accept one or more arguments, the first and only
  * required argument being the underlying source of the List object. This underlying
- * source can be anything with an iterator (generator, array, map, set, another queryable).
+ * source can be anything with an iterator (generator, array, mapWith, set, another queryable).
  * Any additional arguments that the function needs should be specified in the signature.
  * The return value of the function should be a generator that knows how to iterate the
  * underlying source. If the generator should operate like most List functions, i.e.
@@ -2581,7 +2581,7 @@ var _flatten = require('./flatten');
 
 var _groupBy = require('./groupBy');
 
-var _map = require('./map');
+var _map = require('./mapWith');
 
 var _orderBy = require('./orderBy');
 
@@ -2806,7 +2806,7 @@ var _functionalHelpers = require('../functionalHelpers');
  * @type {{
  * source,
  * source,
- * map: queryable_core._map,
+ * mapWith: queryable_core._map,
  * groupBy: queryable_core._groupBy,
  * groupByDescending: queryable_core._groupByDescending,
  * flatten: queryable_core._flatten,
@@ -3365,7 +3365,7 @@ mlist.from = function _from(source) {
  * If the function's evaluation should be deferred it needs to work a bit differently.
  * In this case, the function should accept one or more arguments, the first and only
  * required argument being the underlying source of the queryable object. This underlying
- * source can be anything with an iterator (generator, array, map, set, another queryable).
+ * source can be anything with an iterator (generator, array, mapWith, set, another queryable).
  * Any additional arguments that the function needs should be specified in the signature.
  * The return value of the function should be a generator that knows how to iterate the
  * underlying source. If the generator should operate like most queryable functions, i.e.
@@ -4453,7 +4453,7 @@ var timeBufferSubscriber = Object.create(_subscriber.subscriber, {
 
             function _interval() {
                 if (this.buffer.length) {
-                    //the map is needed here because, due to the asychronous nature of subscribers and the subsequent
+                    //the mapWith is needed here because, due to the asychronous nature of subscribers and the subsequent
                     //clearing of the buffer, the subscriber#next argument would be nullified before it had a chance
                     //to act on it.
                     this.subscriber.next(this.buffer.map(function _mapBuffer(item) {
@@ -4483,4 +4483,4 @@ exports.timeBufferSubscriber = timeBufferSubscriber;
 
 },{"./subscriber":53}]},{},[20])
 
-//# sourceMappingURL=index.js.map
+//# sourceMappingURL=index.js.mapWith

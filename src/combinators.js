@@ -124,6 +124,8 @@ function filterReducer(predicate) {
     };
 }
 
+var first = constant;
+
 /**
  * @description:
  * @param: {function} fn
@@ -340,6 +342,8 @@ var reduce = curry(function _reduce(accFunc, start, xs) {
     return xs.reduce(accFunc, start);
 });
 
+var second = constant(identity);
+
 /**
  * @description:
  * @param: {Array} fns
@@ -475,5 +479,5 @@ var xs1 = compose(
 //usage
 //reduce(dropping(3)(concat),[],[1,2,3,4,5]);//-> [4,5]
 
-export { all, any, c, compose, constant, curry, curryN, curryRight, filtering, filterReducer, fixedPoint, fork, identity,
-          ifElse, ifThisThenThat, kestrel, m, mapped, mapping, mapReducer, pipe, o, q, reduce, sequence, u, w, when, whenNot, y };
+export { all, any, c, compose, constant, curry, curryN, curryRight, filtering, filterReducer, first, fixedPoint, fork, identity,
+          ifElse, ifThisThenThat, kestrel, m, mapped, mapping, mapReducer, pipe, o, q, reduce, second, sequence, u, w, when, whenNot, y };

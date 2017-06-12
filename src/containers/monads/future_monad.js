@@ -52,7 +52,7 @@ var future_monad = Object.create(future_functor, {
         }
     },
     flapMap: {
-        //TODO: probably need to compose here, not actually map over the value; this is a temporary fill-in until
+        //TODO: probably need to compose here, not actually mapWith over the value; this is a temporary fill-in until
         //TODO: I have time to finish working on the Future
         value: function _flatMap(fn) {
             return this.of((function _chainFn(reject, resolve) {

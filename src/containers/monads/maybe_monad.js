@@ -41,7 +41,7 @@ Maybe.of = function _of(item) {
 var maybe_monad = Object.create(maybe_functor, {
     flatMap: {
         value: function _flatMap(fn) {
-            //return maybe_functor.isPrototypeOf(this.value) ? this.value.map(fn) : this.of(fn(this.value));
+            //return maybe_functor.isPrototypeOf(this.value) ? this.value.mapWith(fn) : this.of(fn(this.value));
             if (Object.getPrototypeOf(this).isPrototypeOf(this.value)) return this.value.map(fn);
             if (null != this.value) return this.of(fn(this.value));
             return this.nothing();

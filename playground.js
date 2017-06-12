@@ -87,13 +87,13 @@
 //TODO:    otherwise, should be accepted. An object without an iterator, although enumerable, should not be accepted as a valid parameter. In light of this,
 //TODO:    I should probably change the 'collection' parameter in all collation 'methods' to 'enumerable' or something similar.
 
-//TODO: Ok. I think I finally get it. Took me ~9 months, but containers are starting to make sense. Linq is a functor, and, were it not for a couple
+//TODO: Ok. I think I finally getWith it. Took me ~9 months, but containers are starting to make sense. Linq is a functor, and, were it not for a couple
 //TODO: of methods that it is "missing", it would be a monad; same goes for Rx. I had no idea that containers and linq/Rx were one in the same thing.
 //TODO: Granted, linq is not Just a generic monad, it's a monad<List>. So if you wanted a Maybe, or a future_functor, or an IO, you'd still need to implement
 //TODO: those data structures in C#. Essentially, if C# had given us IFunctor instead of IEnumerable, we could have created any tricked out functor
 //TODO: implementation by overriding some base methods, like a Maybe's null check before apply a fn to it's underlying. In other words, Rx and Linq
 //TODO: screwed us! Not really, but that's kinda my feeling. Granted, if it hand't taken me so long to understand "why containers", then Maybe I
-//TODO: wouldn't be as critical, but still, I could have an interface for a tricked out monad(functor), but instead I get a single implementation
+//TODO: wouldn't be as critical, but still, I could have an interface for a tricked out monad(functor), but instead I getWith a single implementation
 //TODO: of a monad and have to create all other versions myself since both Rx and linq basically "expect" to be sitting on top of a List.
 
 
@@ -171,35 +171,35 @@ function sort(item, source, keySelector) {
     internal abstract int CompareKeys(int index1, int index2);
     internal int[] Sort(TElement[] elements, int count) {
         ComputeKeys(elements, count);
-        int[] map = new int[count];
-        for (int i = 0; i < count; i++) map[i] = i;
-        QuickSort(map, 0, count - 1);
-        return map;
+        int[] mapWith = new int[count];
+        for (int i = 0; i < count; i++) mapWith[i] = i;
+        QuickSort(mapWith, 0, count - 1);
+        return mapWith;
     }
 
-    void QuickSort(int[] map, int left, int right) {
+    void QuickSort(int[] mapWith, int left, int right) {
         do {
             int i = left;
             int j = right;
-            int x = map[i + ((j - i) >> 1)];
+            int x = mapWith[i + ((j - i) >> 1)];
             do {
-                while (i < map.Length && CompareKeys(x, map[i]) > 0) i++;
-                while (j >= 0 && CompareKeys(x, map[j]) < 0) j--;
+                while (i < mapWith.Length && CompareKeys(x, mapWith[i]) > 0) i++;
+                while (j >= 0 && CompareKeys(x, mapWith[j]) < 0) j--;
                 if (i > j) break;
                 if (i < j) {
-                    int temp = map[i];
-                    map[i] = map[j];
-                    map[j] = temp;
+                    int temp = mapWith[i];
+                    mapWith[i] = mapWith[j];
+                    mapWith[j] = temp;
                 }
                 i++;
                 j--;
             } while (i <= j);
             if (j - left <= right - i) {
-                if (left < j) QuickSort(map, left, j);
+                if (left < j) QuickSort(mapWith, left, j);
                 left = i;
             }
             else {
-                if (i < right) QuickSort(map, i, right);
+                if (i < right) QuickSort(mapWith, i, right);
                     right = j;
                 }
             } while (left < right);
@@ -749,7 +749,7 @@ attachListener('click');
     /**
      * Implements the {@link Observer} interface and extends the
      * {@link Subscription} class. While the {@link Observer} is the public API for
-     * consuming the values of an {@link Observable}, all Observers get converted to
+     * consuming the values of an {@link Observable}, all Observers getWith converted to
      * a Subscriber, in order to provide Subscription-like capabilities such as
      * `unsubscribe`. Subscriber is a common type in RxJS, and crucial for
      * implementing operators, but it is rarely used as a public API.
@@ -1753,7 +1753,7 @@ attachListener('click');
          * is falsy, it still won't appear in array emitted by Observable or in selector function.
          *
          *
-         * @example <caption>Read a file from the filesystem and get the data as an Observable</caption>
+         * @example <caption>Read a file from the filesystem and getWith the data as an Observable</caption>
          * import * as fs from 'fs';
          * var readFileAsObservable = Rx.Observable.bindNodeCallback(fs.readFile);
          * var result = readFileAsObservable('./roadNames.txt', 'utf8');
@@ -2527,7 +2527,7 @@ attachListener('click');
      *
      *
      * @example <caption>Combine an array of Observables</caption>
-     * const observables = [1, 5, 10].map(
+     * const observables = [1, 5, 10].mapWith(
      *   n => Rx.Observable.of(n).delay(n * 1000).startWith(0) // emit 0 and then emit n after n seconds
      * );
      * const combined = Rx.Observable.combineLatest(observables);
@@ -2610,13 +2610,13 @@ attachListener('click');
      *
      * @example <caption>Spawn a new interval Observable for each click event, and blend their outputs as one Observable</caption>
      * var clicks = Rx.Observable.fromEvent(document, 'click');
-     * var higherOrder = clicks.map((ev) => Rx.Observable.interval(1000));
+     * var higherOrder = clicks.mapWith((ev) => Rx.Observable.interval(1000));
      * var firstOrder = higherOrder.mergeAll();
      * firstOrder.subscribe(x => console.log(x));
      *
      * @example <caption>Count from 0 to 9 every second for each click, but only allow 2 concurrent timers</caption>
      * var clicks = Rx.Observable.fromEvent(document, 'click');
-     * var higherOrder = clicks.map((ev) => Rx.Observable.interval(1000).take(10));
+     * var higherOrder = clicks.mapWith((ev) => Rx.Observable.interval(1000).take(10));
      * var firstOrder = higherOrder.mergeAll(2);
      * firstOrder.subscribe(x => console.log(x));
      *
@@ -5549,19 +5549,19 @@ attachListener('click');
      * Applies a given `project` function to each value emitted by the source
      * Observable, and emits the resulting values as an Observable.
      *
-     * <span class="informal">Like [Array.prototype.map()](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/map),
-     * it passes each source value through a transformation function to get
+     * <span class="informal">Like [Array.prototype.mapWith()](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/map),
+     * it passes each source value through a transformation function to getWith
      * corresponding output values.</span>
      *
-     * <img src="./img/map.png" width="100%">
+     * <img src="./img/mapWith.png" width="100%">
      *
-     * Similar to the well known `Array.prototype.map` function, this operator
+     * Similar to the well known `Array.prototype.mapWith` function, this operator
      * applies a projection to each value and emits that projection in the output
      * Observable.
      *
      * @example <caption>Map every every click to the clientX position of that click</caption>
      * var clicks = Rx.Observable.fromEvent(document, 'click');
-     * var positions = clicks.map(ev => ev.clientX);
+     * var positions = clicks.mapWith(ev => ev.clientX);
      * positions.subscribe(x => console.log(x));
      *
      * @see {@link mapTo}
@@ -5575,7 +5575,7 @@ attachListener('click');
      * `project` function.
      * @return {Observable<R>} An Observable that emits the values from the source
      * Observable transformed by the given `project` function.
-     * @method map
+     * @method mapWith
      * @owner Observable
      */
     function map(project, thisArg) {
@@ -6843,7 +6843,7 @@ attachListener('click');
      *
      * <span class="informal">Collects values from the past as an array. Starts
      * collecting only when `opening` emits, and calls the `closingSelector`
-     * function to get an Observable that tells when to close the buffer.</span>
+     * function to getWith an Observable that tells when to close the buffer.</span>
      *
      * <img src="./img/bufferToggle.png" width="100%">
      *
@@ -7101,7 +7101,7 @@ attachListener('click');
      * @example <caption>Continues with a different Observable when there's an error</caption>
      *
      * Observable.of(1, 2, 3, 4, 5)
-     *   .map(n => {
+     *   .mapWith(n => {
  * 	   if (n == 4) {
  * 	     throw 'four!';
  *     }
@@ -7114,7 +7114,7 @@ attachListener('click');
      * @example <caption>Retries the caught source Observable again in case of error, similar to retry() operator</caption>
      *
      * Observable.of(1, 2, 3, 4, 5)
-     *   .map(n => {
+     *   .mapWith(n => {
  * 	   if (n === 4) {
  * 	     throw 'four!';
  *     }
@@ -7128,7 +7128,7 @@ attachListener('click');
      * @example <caption>Throws a new error when the source Observable throws an error</caption>
      *
      * Observable.of(1, 2, 3, 4, 5)
-     *   .map(n => {
+     *   .mapWith(n => {
  *     if (n == 4) {
  *       throw 'four!';
  *     }
@@ -7226,7 +7226,7 @@ attachListener('click');
      *
      * @example <caption>Map two click events to a finite interval Observable, then apply combineAll</caption>
      * var clicks = Rx.Observable.fromEvent(document, 'click');
-     * var higherOrder = clicks.map(ev =>
+     * var higherOrder = clicks.mapWith(ev =>
      *   Rx.Observable.interval(Math.random()*2000).take(3)
      * ).take(2);
      * var result = higherOrder.combineAll();
@@ -7235,7 +7235,7 @@ attachListener('click');
      * @see {@link combineLatest}
      * @see {@link mergeAll}
      *
-     * @param {function} [project] An optional function to map the most recent
+     * @param {function} [project] An optional function to mapWith the most recent
      * values from each inner Observable into a new result. Takes each of the most
      * recent values from each collected inner Observable as arguments, in order.
      * @return {Observable} An Observable of projected results or arrays of recent
@@ -7278,7 +7278,7 @@ attachListener('click');
      *
      * @example <caption>For each click event, tick every second from 0 to 3, with no concurrency</caption>
      * var clicks = Rx.Observable.fromEvent(document, 'click');
-     * var higherOrder = clicks.map(ev => Rx.Observable.interval(1000).take(4));
+     * var higherOrder = clicks.mapWith(ev => Rx.Observable.interval(1000).take(4));
      * var firstOrder = higherOrder.concatAll();
      * firstOrder.subscribe(x => console.log(x));
      *
@@ -7326,7 +7326,7 @@ attachListener('click');
      * @example <caption>Map and flatten each letter to an Observable ticking every 1 second</caption>
      * var letters = Rx.Observable.of('a', 'b', 'c');
      * var result = letters.mergeMap(x =>
-     *   Rx.Observable.interval(1000).map(i => x+i)
+     *   Rx.Observable.interval(1000).mapWith(i => x+i)
      * );
      * result.subscribe(x => console.log(x));
      *
@@ -8863,7 +8863,7 @@ attachListener('click');
      * var clicks = Rx.Observable.fromEvent(document, 'click');
      * var positions = clicks
      *   .do(ev => console.log(ev))
-     *   .map(ev => ev.clientX);
+     *   .mapWith(ev => ev.clientX);
      * positions.subscribe(x => console.log(x));
      *
      * @see {@link map}
@@ -8962,7 +8962,7 @@ attachListener('click');
      *
      * @example <caption>Run a finite timer for each click, only if there is no currently active timer</caption>
      * var clicks = Rx.Observable.fromEvent(document, 'click');
-     * var higherOrder = clicks.map((ev) => Rx.Observable.interval(1000));
+     * var higherOrder = clicks.mapWith((ev) => Rx.Observable.interval(1000));
      * var result = higherOrder.exhaust();
      * result.subscribe(x => console.log(x));
      *
@@ -10631,7 +10631,7 @@ attachListener('click');
      *
      * @see {@link map}
      *
-     * @param {any} value The value to map each source value to.
+     * @param {any} value The value to mapWith each source value to.
      * @return {Observable} An Observable that emits the given `value` every time
      * the source Observable emits something.
      * @method mapTo
@@ -10692,7 +10692,7 @@ attachListener('click');
      *
      * @example <caption>Convert a faulty Observable to an Observable of Notifications</caption>
      * var letters = Rx.Observable.of('a', 'b', 13, 'd');
-     * var upperCase = letters.map(x => x.toUpperCase());
+     * var upperCase = letters.mapWith(x => x.toUpperCase());
      * var materialized = upperCase.materialize();
      * materialized.subscribe(x => console.log(x));
      *
@@ -10700,7 +10700,7 @@ attachListener('click');
      * // - Notification {kind: "N", value: "A", error: undefined, hasValue: true}
      * // - Notification {kind: "N", value: "B", error: undefined, hasValue: true}
      * // - Notification {kind: "E", value: undefined, error: TypeError:
- * //   x.toUpperCase is not a function at MapSubscriber.letters.map.x
+ * //   x.toUpperCase is not a function at MapSubscriber.letters.mapWith.x
  * //   [as project] (http://1â€¦, hasValue: false}
      *
      * @see {@link Notification}
@@ -10878,7 +10878,7 @@ attachListener('click');
      *   .max()
      *   .subscribe(x => console.log(x)); // -> 8
      *
-     * @example <caption>Use a comparer function to get the maximal item</caption>
+     * @example <caption>Use a comparer function to getWith the maximal item</caption>
      * interface Person {
  *   age: number,
  *   name: string
@@ -11046,7 +11046,7 @@ attachListener('click');
      *   .min()
      *   .subscribe(x => console.log(x)); // -> 2
      *
-     * @example <caption>Use a comparer function to get the minimal item</caption>
+     * @example <caption>Use a comparer function to getWith the minimal item</caption>
      * interface Person {
  *   age: number,
  *   name: string
@@ -11303,7 +11303,7 @@ attachListener('click');
      * @example <caption>On every click (starting from the second), emit the relative distance to the previous click</caption>
      * var clicks = Rx.Observable.fromEvent(document, 'click');
      * var pairs = clicks.pairwise();
-     * var distance = pairs.map(pair => {
+     * var distance = pairs.mapWith(pair => {
  *   var x0 = pair[0].clientX;
  *   var y0 = pair[0].clientY;
  *   var x1 = pair[1].clientX;
@@ -12196,7 +12196,7 @@ attachListener('click');
      * ]);
      *
      * var keys = Rx.Observable.fromEvent(document, 'keyup')
-     *  .map(e => e.code);
+     *  .mapWith(e => e.code);
      * var matches = keys.bufferCount(11, 1)
      *  .mergeMap(
      *    last11 =>
@@ -12649,7 +12649,7 @@ attachListener('click');
                 this.nextHandle = 1;
                 this.tasksByHandle = {};
                 this.currentlyRunningATask = false;
-                // Don't get fooled by e.g. browserify environments.
+                // Don't getWith fooled by e.g. browserify environments.
                 if (this.canUseProcessNextTick()) {
                     // For Node.js before 0.9
                     this.setImmediate = this.createProcessNextTickSetImmediate();
@@ -13042,7 +13042,7 @@ attachListener('click');
      * @example <caption>Rerun an interval Observable on every click event</caption>
      * var clicks = Rx.Observable.fromEvent(document, 'click');
      * // Each click event is mapped to an Observable that ticks every second
-     * var higherOrder = clicks.map((ev) => Rx.Observable.interval(1000));
+     * var higherOrder = clicks.mapWith((ev) => Rx.Observable.interval(1000));
      * var switched = higherOrder.switch();
      * // The outcome is that `switched` is essentially a timer that restarts
      * // on every click. The interval Observables from older clicks do not merge
@@ -14331,7 +14331,7 @@ attachListener('click');
      * var clicks = Rx.Observable.fromEvent(document, 'click');
      * var interval = Rx.Observable.interval(1000);
      * var result = clicks.window(interval)
-     *   .map(win => win.take(2)) // each window has at most 2 emissions
+     *   .mapWith(win => win.take(2)) // each window has at most 2 emissions
      *   .mergeAll(); // flatten the Observable-of-Observables
      * result.subscribe(x => console.log(x));
      *
@@ -14435,7 +14435,7 @@ attachListener('click');
      * @example <caption>Ignore every 3rd click event, starting from the first one</caption>
      * var clicks = Rx.Observable.fromEvent(document, 'click');
      * var result = clicks.windowCount(3)
-     *   .map(win => win.skip(1)) // skip first of every 3 clicks
+     *   .mapWith(win => win.skip(1)) // skip first of every 3 clicks
      *   .mergeAll(); // flatten the Observable-of-Observables
      * result.subscribe(x => console.log(x));
      *
@@ -14878,7 +14878,7 @@ attachListener('click');
      * var clicks = Rx.Observable.fromEvent(document, 'click');
      * var result = clicks
      *   .windowWhen(() => Rx.Observable.interval(1000 + Math.random() * 4000))
-     *   .map(win => win.take(2)) // each window has at most 2 emissions
+     *   .mapWith(win => win.take(2)) // each window has at most 2 emissions
      *   .mergeAll(); // flatten the Observable-of-Observables
      * result.subscribe(x => console.log(x));
      *

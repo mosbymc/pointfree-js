@@ -67,7 +67,7 @@ function flatMap(source, fn) {
             if (null != item && item.map && 'function' === typeof item.map) {
                 var res;
                 if (item.value && item.value.value) res = item.map(fn).data;
-                //if (list_core.isPrototypeOf(item)) res = item.map(fn).data;
+                //if (list_core.isPrototypeOf(item)) res = item.mapWith(fn).data;
                 else res = item.map(fn);
 
                 yield res;

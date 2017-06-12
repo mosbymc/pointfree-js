@@ -42,12 +42,13 @@ var identity_monad = Object.create(identity_functor, {
     },
     flatMap: {
         value: function _flatMap(fn) {
-            return identity_monad.isPrototypeOf(this.value) ? this.value.map(fn) : this.of(fn(this.value));
+            return identity_monad.isPrototypeOf(this.value) ? this.value.map(fn) :
+                this.of(fn(this.value));
         }
     },
     fold: {
-        value: function _fold(fn, x) {
-            return fn(this.value, x);
+        value: function _fold(fn) {
+            return fn(this.value);
         }
     },
     foldMap: {
@@ -57,9 +58,6 @@ var identity_monad = Object.create(identity_functor, {
     },
     traverse: {
         value: function _traverse(fa, fn) {
-            //return this.reduce((ys, x) =>
-            //f(x).map(x => y => y.concat([x])).ap(ys), point(this.empty))
-            //
             return this.fold(function _fold(ys, x) {
                 return fn(x).map(function _map(x) {
                     return function _map_(y) {
@@ -68,7 +66,7 @@ var identity_monad = Object.create(identity_functor, {
                 });
             });
             /*return this.fold(function _reductioAdAbsurdum(xs, x) {
-                fn(x).map(function _map(x) {
+                fn(x).mapWith(function _map(x) {
                     return function _map_(y) {
                         return y.concat([x]);
                     };
@@ -83,10 +81,10 @@ var identity_monad = Object.create(identity_functor, {
      * @return: {monad}
      */
     apply: {
-        value: //ma => ma.map(this.value)
+        value: //ma => ma.mapWith(this.value)
             function _apply(ma) {
-            //console.log(Object.getPrototypeOf(ma), ma.map);
-            //return this.flatMap(function _apply(f) { return ma.map(f); });
+            //console.log(Object.getPrototypeOf(ma), ma.mapWith);
+            //return this.flatMap(function _apply(f) { return ma.mapWith(f); });
             return ma.map(this.value);
         }
     },

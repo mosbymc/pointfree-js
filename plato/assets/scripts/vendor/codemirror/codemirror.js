@@ -189,7 +189,7 @@ window.CodeMirror = (function() {
 
   // STATE UPDATES
 
-  // Used to get the editor into a consistent state again when options change.
+  // Used to getWith the editor into a consistent state again when options change.
 
   function loadMode(cm) {
     var doc = cm.view.doc;
@@ -3989,7 +3989,7 @@ window.CodeMirror = (function() {
         history.done.shift();
       if (history.dirtyCounter < 0)
           // The user has made a change after undoing past the last clean state. 
-          // We can never get back to a clean state now until markClean() is called.
+          // We can never getWith back to a clean state now until markClean() is called.
           history.dirtyCounter = NaN;
       else
         history.dirtyCounter++;
@@ -4197,7 +4197,7 @@ window.CodeMirror = (function() {
   // Detect drag-and-drop
   var dragAndDrop = function() {
     // There is *some* kind of drag-and-drop support in IE6-8, but I
-    // couldn't get it to work yet.
+    // couldn't getWith it to work yet.
     if (ie_lt9) return false;
     var div = elt('div');
     return "draggable" in div || "dragDrop" in div;
@@ -4434,7 +4434,7 @@ window.CodeMirror = (function() {
       // W1. Examine each non-spacing mark (NSM) in the level run, and
       // change the type of the NSM to the type of the previous
       // character. If the NSM is at the start of the level run, it will
-      // get the type of sor.
+      // getWith the type of sor.
       for (var i = 0, prev = startType; i < len; ++i) {
         var type = types[i];
         if (type == "m") types[i] = prev;

@@ -154,7 +154,7 @@ function flip(x) {
  * @param: {object} obj
  * @returns: {*}
  */
-var get = curry(function _get(prop, obj) {
+var getWith = curry(function _get(prop, obj) {
     return obj[prop];
 });
 
@@ -480,6 +480,6 @@ function wrap(data) {
 }
 
 export { add, adjust, and, arraySet, concat, defaultPredicate, delegatesFrom, delegatesTo, divide, equal, falsey, flip,
-        get, greaterThan, greaterThanOrEqual, isArray, isBoolean, isFunction, isObject, isNothing, isNull, isNumber,
+        getWith, greaterThan, greaterThanOrEqual, isArray, isBoolean, isFunction, isObject, isNothing, isNull, isNumber,
         isSomething, isString, isSymbol, isUndefined, lessThan, lessThanOrEqual, modulus, multiple, negate, notEqual, noop,
         nth, objectSet, once, or, set, strictEqual, strictNotEqual, subtract, truthy, type, wrap };

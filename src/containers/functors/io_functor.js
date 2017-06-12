@@ -29,7 +29,6 @@ Io.of = function _of(item) {
  * @type {{
  * value,
  * map: {function} io_functor._map,
- * flatMap: {function} io_functor._flatMap,
  * of: {function} io_functor._of,
  * toString: {function} io_functor._toString
  * }}

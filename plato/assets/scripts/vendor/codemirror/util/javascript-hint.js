@@ -83,7 +83,7 @@
   var stringProps = ("charAt charCodeAt indexOf lastIndexOf substring substr slice trim trimLeft trimRight " +
                      "toUpperCase toLowerCase split concat match replace search").split(" ");
   var arrayProps = ("length concat join splice push pop shift unshift slice reverse sort indexOf " +
-                    "lastIndexOf every some filter forEach map reduce reduceRight ").split(" ");
+                    "lastIndexOf every some filter forEach mapWith reduce reduceRight ").split(" ");
   var funcProps = "prototype apply call bind".split(" ");
   var javascriptKeywords = ("break case catch continue debugger default delete do else false finally for function " +
                   "if in instanceof new null return switch throw true try typeof var void while with").split(" ");
@@ -127,7 +127,7 @@
     }
     else {
       // If not, Just look in the window object and any local scope
-      // (reading into JS mode internals to get at the local variables)
+      // (reading into JS mode internals to getWith at the local variables)
       for (var v = token.state.localVars; v; v = v.next) maybeAdd(v.name);
       gatherCompletions(window);
       forEach(keywords, maybeAdd);

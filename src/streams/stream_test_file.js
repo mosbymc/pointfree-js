@@ -302,9 +302,9 @@ mapSubscriber.init = function _init(subscriber, transform) {
     return this;
 };
 
-//TODO: need to see how to handle a deep map (as well as flatten); should I return entire
+//TODO: need to see how to handle a deep mapWith (as well as flatten); should I return entire
 //TODO: collection at once? Or one item at a time? And if the latter, when does each item
-//TODO: get returned?
+//TODO: getWith returned?
 var deepMapSubscriber = Object.create(subscriber);
 deepMapSubscriber.next = function _next(item) {
     var mappedResult;
@@ -398,7 +398,7 @@ timeBufferSubscriber.init = function _init(subscriber, interval) {
 
     function _interval() {
         if (this.buffer.length) {
-            //the map is needed here because, due to the asychronous nature of subscribers and the subsequent
+            //the mapWith is needed here because, due to the asychronous nature of subscribers and the subsequent
             //clearing of the buffer, the subscriber#next argument would be nullified before it had a chance
             //to act on it.
             this.subscriber.next(this.buffer.map(function _mapBuffer(item) { return item; }));

@@ -24,6 +24,12 @@ function keySelector(item) { return item.State; }
 function lessThanComparer(a, b) { return a < b; }
 var sortObj = [{ keySelector: keySelector, direction: sortDirection.ascending }];
 
+var backupData = testData.dataSource.data.map(function _i(val) { return val; });
+
+afterEach(function setSource() {
+    testData.dataSource.data = backupData;
+});
+
 describe('createNewQueryableDelegator', function testQueryableDelegatorObjectCreation() {
     it('should create a new queryable object delegator with actual pipeline array', function testSuccessfulCreation() {
         var queryDelegator = createNewQueryableDelegator(testData.dataSource.data);

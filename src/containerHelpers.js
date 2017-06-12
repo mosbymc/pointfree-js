@@ -1,4 +1,5 @@
 import { curry, compose, identity } from './combinators';
+import { getWith } from './functionalHelpers';
 import { List, list_core } from './list_monad/list';
 
 //TODO: I need to figure out how to structure this lib. I'd like to have several different types of containers...
@@ -6,7 +7,7 @@ import { List, list_core } from './list_monad/list';
 //TODO: would have several implementations: maybe, option, constant, identity, future_functor, io, etc. It would make sense
 //TODO: to let the "higher" level containers delegate to the "lower" level implementations since they share all the
 //TODO: functionality of the "lower" containers and add to them. In addition, a lot of the containers will have the
-//TODO: same map, flatMap, chain, apply, etc functionality; it would be nice to share this functionality as well.
+//TODO: same mapWith, flatMap, chain, apply, etc functionality; it would be nice to share this functionality as well.
 //TODO: Finally, I'd like to have each container in a category be capable of converting their underlying value to
 //TODO: another container of the same category without the use of 'apply', more in the manner of 'toContainerX'.
 //TODO: However, this means that each container in a given category has a dependency on all the other containers in
@@ -45,18 +46,20 @@ var flatMap = curry(function _flatMap(fn, m) {
  * @param: {functor} m
  * @return:
  */
-var map = curry(function _map(fn, m) {
+var mapWith = curry(function _map(fn, m) {
     return m.map(fn);
 });
 
+var pluckWith = compose(mapWith, getWith);
+
 /**
  * @description:
- * @type {function} @see map
+ * @type {function} @see mapWith
  * @param: {function} fn
  * @param: {functor} m
  * @return:
  */
-var fmap = map;
+var fmap = mapWith;
 
 /**
  * @description:
@@ -66,7 +69,7 @@ var fmap = map;
  * @return:
  */
 var chain = curry(function _chain(f, m){
-    return m.map(f).join(); // or compose(join, map(f))(m)
+    return m.map(f).join(); // or compose(join, mapWith(f))(m)
 });
 
 var bind = chain;
@@ -278,5 +281,5 @@ var except = curry(function _except(enumerable, comparer, list) {
     return list.except(enumerable, comparer);
 });
 
-export { apply, ap, fmap, map, flatMap, lift2, lift3, lift4, liftN, mjoin, toFunctorType, containerIterator, chain, bind, mcompose,
+export { apply, ap, fmap, mapWith, flatMap, lift2, lift3, lift4, liftN, mjoin, toFunctorType, containerIterator, chain, bind, mcompose,
             filter, intersect, except };
