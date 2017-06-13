@@ -627,6 +627,8 @@ var ordered_list_functor = Object.create(list_core, {
 //TODO: danom
 //TODO: tpircSavaJ
 //TODO: Junctional FavaScript
+//TODO: Algebraic Data Structures
+//TODO: ADS
 
 /**
  * @description: Creator function for a new List object. Takes any value/type as a parameter
