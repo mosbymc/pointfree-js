@@ -208,5 +208,5 @@ var voidFn = fn => (...args) => void fn(...args);
  */
 
 
-export { after, apply, before, binary, bindFunction, guardAfter, guardBefore, leftApply, not, once, repeat, rightApply,
-        safe, tap, ternary, tryCatch, unary };
+export { after, apply, before, binary, bindFunction, guardAfter, guardBefore, leftApply, maybe, not, once, repeat, rightApply,
+        safe, tap, ternary, tryCatch, unary, voidFn };

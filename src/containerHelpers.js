@@ -281,5 +281,5 @@ var except = curry(function _except(enumerable, comparer, list) {
     return list.except(enumerable, comparer);
 });
 
-export { apply, ap, fmap, mapWith, flatMap, lift2, lift3, lift4, liftN, mjoin, toFunctorType, containerIterator, chain, bind, mcompose,
-            filter, intersect, except };
+export { apply, ap, fmap, mapWith, flatMap, lift2, lift3, lift4, liftN, mjoin, pluckWith, toFunctorType,
+            containerIterator, chain, bind, mcompose, filter, intersect, except };
