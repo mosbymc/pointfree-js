@@ -1,9 +1,10 @@
 import { all, any, except, intersect, union, map, flatMap, groupBy, sortBy, addFront, concat, groupJoin, join, zip, filter,
     contains, first, last, count, fold, foldRight, distinct, ofType, binarySearch, equals, take, takeWhile, skip, skipWhile, reverse,
-    copyWithin, fill, indexOf, lastIndexOf } from '../../list_monad/list_iterators';
+    copyWithin, fill, indexOf, lastIndexOf, repeat } from '../../list_monad/list_iterators';
 import { sortDirection } from '../../helpers';
 import { wrap, defaultPredicate, delegatesTo, isArray } from '../../functionalHelpers';
-import { when, not } from '../../combinators';
+import { when } from '../../combinators';
+import { not } from '../../decorators';
 import { createListCreator } from '../list_helpers';
 
 /**
@@ -647,7 +648,7 @@ function List(source) {
  * @description: Convenience function for listCreate a new List instance; internally calls List.
  * @see: List
  * @param: {*} source - Any type, any value; used as the underlying source of the List
- * @return: {@see list} - A new List instance with the value provided as the underlying source.
+ * @return: {@see list_core} - A new List instance with the value provided as the underlying source.
  */
 List.from = function _from(source) {
     return List(source);
@@ -658,9 +659,19 @@ List.from = function _from(source) {
  * @see: List.from
  * @type: {function}
  * @param: {*}
- * @return: {@see _list_a}
+ * @return: {@see list_core}
  */
 List.of = List.from;
+
+/**
+ * Generates a new list with the specified item repeated the specified number of times
+ * @param: {*} item
+ * @param: {number} count
+ * @return: {@see list_core}
+ */
+List.repeat = function _repeat(item, count) {
+    return List(repeat(item, count));
+};
 
 /**
  * @description: Extension function that allows new functionality to be applied to

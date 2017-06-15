@@ -717,6 +717,14 @@ function reverse(source) {
     };
 }
 
+function repeat(item, count) {
+    return function *repeatIterator() {
+        for (let i = 0; i < count; ++i) {
+            yield item;
+        }
+    };
+}
+
 /**
  * @description:
  * @param: {number} idx
@@ -750,4 +758,4 @@ function lastIndexOf(val, idx, source) {
 
 export { all, any, except, intersect, union, map, flatMap, groupBy, sortBy, addFront, concat, groupJoin, join, zip, filter,
     contains, first, last, count, fold, foldRight, distinct, ofType, binarySearch, equals, take, takeWhile, skip, skipWhile, reverse,
-    copyWithin, fill, indexOf, lastIndexOf };
+    copyWithin, fill, indexOf, lastIndexOf, repeat };
