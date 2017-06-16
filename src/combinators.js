@@ -360,6 +360,19 @@ function sequence(fns) {
 /**
  * @description:
  * @type: {function}
+ * @param: {*} x
+ * @param: {function} f
+ * @return: {*}
+ */
+var t = curry(function _t(x, f) {
+    return f(x);
+});
+
+var thrush = t;
+
+/**
+ * @description:
+ * @type: {function}
  * @param: {function} a
  * @param: {function} b
  * @return: {*}
@@ -480,4 +493,4 @@ var xs1 = compose(
 //reduce(dropping(3)(concat),[],[1,2,3,4,5]);//-> [4,5]
 
 export { all, any, c, compose, constant, curry, curryN, curryRight, filtering, filterReducer, first, fixedPoint, fork, identity,
-          ifElse, ifThisThenThat, kestrel, m, mapped, mapping, mapReducer, pipe, o, q, reduce, second, sequence, u, w, when, whenNot, y };
+          ifElse, ifThisThenThat, kestrel, m, mapped, mapping, mapReducer, pipe, o, q, reduce, second, sequence, t, thrush, u, w, when, whenNot, y };

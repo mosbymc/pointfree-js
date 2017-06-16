@@ -70,6 +70,16 @@ var identity_monad = Object.create(identity_functor, {
             });*/
         }
     },
+    traverse2: {
+        value: function _traverse2(f, p) {
+            return f(this.x).map(Identity.of);
+        }
+    },
+    traverse3: {
+        value: function _traverse3(p, f) {
+            return this.apply(f(this.value));
+        }
+    },
     /**
      * @description:
      * @param: {monad} ma

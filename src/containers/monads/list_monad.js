@@ -125,6 +125,23 @@ var list_monad = Object.create(list_functor, {
                 }).ap(xs);
                 return fa(this.empty);
             });
+
+            //TODO: this exists inside the traverse function. Function should take a typeRep + fn
+            /*
+             var xs = this;
+             function go(idx, n) {
+                 switch (n) {
+                     case 0: return of(typeRep, []);
+                     case 2: return lift2(pair, f(xs[idx]), f(xs[idx + 1]));
+                     default:
+                         var m = Math.floor(n / 4) * 2;
+                         return lift2(concat_, go(idx, m), go(idx + m, n - m));
+                }
+             }
+             return this.length % 2 === 1 ?
+                 lift2(concat_, map(Array$of, f(this[0])), go(1, this.length - 1)) :
+                 go(0, this.length);
+             */
         }
     },
     /**

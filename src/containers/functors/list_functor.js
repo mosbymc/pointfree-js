@@ -618,7 +618,11 @@ var ordered_list_functor = Object.create(list_core, {
 //TODO: FP
 //TODO: monad
 //TODO: functor
-//TODO: container
+//TODO: monoid
+//TODO: semigroup
+//TODO: decorator
+//TODO: combinator
+//TODO: transducer
 //TODO: JavaScript
 //TODO: JS
 //TODO: JunctionalS
@@ -626,10 +630,17 @@ var ordered_list_functor = Object.create(list_core, {
 //TODO: lanoitcunf
 //TODO: rotcnuf
 //TODO: danom
+//TODO: dionom
+//TODO: puorgimes
+//TODO: rotaroced
+//TODO: rotanibmoc
+//TODO: recudsnart
 //TODO: tpircSavaJ
 //TODO: Junctional FavaScript
 //TODO: Algebraic Data Structures
 //TODO: ADS
+//TODO: Algebraic JavaScript - AJS
+//TODO: Lambda
 
 /**
  * @description: Creator function for a new List object. Takes any value/type as a parameter
