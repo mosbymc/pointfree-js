@@ -1,5 +1,6 @@
 import { identity_functor } from '../functors/identity_functor';
 import { emptyObject } from '../../helpers';
+import { identity } from '../../combinators';
 
 /**
  * @description:
@@ -51,6 +52,11 @@ var identity_monad = Object.create(identity_functor, {
             return fn(this.value);
         }
     },
+    sequence: {
+        value: function _sequence(p) {
+            return this.traverse(identity, p);
+        }
+    },
     traverse: {
         value: function _traverse(fa, fn) {
             return this.fold(function _fold(ys, x) {
@@ -71,12 +77,12 @@ var identity_monad = Object.create(identity_functor, {
         }
     },
     traverse2: {
-        value: function _traverse2(f, p) {
-            return f(this.x).map(Identity.of);
+        value: function _traverse2(a, f) {
+            return f(this.x).map(this.of);
         }
     },
     traverse3: {
-        value: function _traverse3(p, f) {
+        value: function _traverse3(a, f) {
             return this.apply(f(this.value));
         }
     },

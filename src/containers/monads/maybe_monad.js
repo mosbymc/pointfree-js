@@ -1,4 +1,5 @@
 import { maybe_functor } from '../functors/maybe_functor';
+import { identity } from '../../combinators';
 
 function Maybe(item) {
     return Object.create(maybe_monad, {
@@ -6,8 +7,7 @@ function Maybe(item) {
             value: item,
             writable: false,
             configurable: false
-        }
-        ,
+        },
         isJust: {
             value: null != item
         },
@@ -57,16 +57,14 @@ var maybe_monad = Object.create(maybe_functor, {
             return !this.isNothing ? fn(this.value, x) : this.of();
         }
     },
+    sequence: {
+        value: function _sequence(a) {
+            return this.traverse(identity, a);
+        }
+    },
     traverse: {
-        value: function _traverse(fa, fn) {
-            return !this.isNothing ? this.fold(function _reductioAdAbsurdum(xs, x) {
-                fn(x).map(function _map(x) {
-                    return function _map_(y) {
-                        return y.concat([x]);
-                    };
-                }).ap(xs);
-                return fa(this.empty);
-            }) : this.of();
+        value: function _traverse(a, f) {
+            return this.isNothing ? a.of(Maybe.Nothing) : f(this.value).map(Maybe.of);
         }
     },
     /**

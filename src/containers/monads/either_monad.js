@@ -1,4 +1,5 @@
 import { either_functor } from '../functors/either_functor';
+import { identity } from '../../combinators';
 
 function Either(val, fork) {
     return Object.create(either_monad, {
@@ -76,16 +77,14 @@ var either_monad = Object.create(either_functor, {
             return this.isRight ? fn(this.value, x) : this.value;
         }
     },
+    sequence: {
+        value: function _sequence(a) {
+            return this.traverse(identity, a);
+        }
+    },
     traverse: {
-        value: function _traverse(fa, fn) {
-            return this.isRight ? this.fold(function _reductioAdAbsurdum(xs, x) {
-                fn(x).map(function _map(x) {
-                    return function _map_(y) {
-                        return y.concat([x]);
-                    };
-                }).ap(xs);
-                return fa(this.empty);
-            }) : this.value;
+        value: function _traverse(a, f) {
+            return this.isRight ? f(this.value).map(Either.of) : a.of(Either.Left(this.value));
         }
     },
     apply: {

@@ -34,15 +34,8 @@ var constant_monad = Object.create(constant_functor, {
         }
     },
     traverse: {
-        value: function _traverse(fa, fn) {
-            return this.fold(function _reductioAdAbsurdum(xs, x) {
-                fn(x).map(function _map(x) {
-                    return function _map_(y) {
-                        return y.concat([x]);
-                    };
-                }).ap(xs);
-                return fa(this.empty);
-            });
+        value: function _traverse(a, f) {
+            return f(this.value).map(this.of);
         }
     },
     /**
