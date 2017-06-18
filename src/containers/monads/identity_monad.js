@@ -43,13 +43,13 @@ var identity_monad = Object.create(identity_functor, {
     },
     flatMap: {
         value: function _flatMap(fn) {
-            return identity_monad.isPrototypeOf(this.value) ? this.value.map(fn) :
-                this.of(fn(this.value));
+            var val = fn(this.value);
+            return identity_monad.isPrototypeOf(val) ? val : this.of(val);
         }
     },
     fold: {
-        value: function _fold(fn) {
-            return fn(this.value);
+        value: function _fold(fn, acc) {
+            return fn(acc, this.value);
         }
     },
     sequence: {
@@ -58,14 +58,15 @@ var identity_monad = Object.create(identity_functor, {
         }
     },
     traverse: {
-        value: function _traverse(fa, fn) {
-            return this.fold(function _fold(ys, x) {
+        value: function _traverse(a, f) {
+            return f(this.value).map(this.of);
+            /*return this.fold(function _fold(ys, x) {
                 return fn(x).map(function _map(x) {
                     return function _map_(y) {
                         return y.concat([x]).ap(ys), fa(this.empty);
                     };
                 });
-            });
+            });*/
             /*return this.fold(function _reductioAdAbsurdum(xs, x) {
                 fn(x).mapWith(function _map(x) {
                     return function _map_(y) {
@@ -78,7 +79,7 @@ var identity_monad = Object.create(identity_functor, {
     },
     traverse2: {
         value: function _traverse2(a, f) {
-            return f(this.x).map(this.of);
+            return f(this.value).map(this.of);
         }
     },
     traverse3: {

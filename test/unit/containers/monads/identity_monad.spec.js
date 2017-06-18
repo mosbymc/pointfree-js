@@ -79,16 +79,18 @@ describe('Identity monad test', function _testIdentityMonad() {
         });
 
         it('should apply a mutating function to the underlying value and return the new value unwrapped in an Identity when chain is called', function _testIdentityMonadChain() {
-            var i1 = Identity(Identity(10)),
+            var i1 = Identity(10),
                 i2 = Identity(Identity({ a: 1, b: 2 })),
                 i3 = Identity(25);
 
             i1.flatMap(function _flatMap(val) {
-                return 5 * val;
+                return Identity.of(5 * val);
             }).value.should.eql(50);
 
-            i2.flatMap(function _flatMap(val) {
-                return val.a + val.b;
+            i2.flatMap(function _flatMap(ma) {
+                return ma.map(function _innerMap(val) {
+                    return val.a + val.b;
+                });
             }).value.should.eql(3);
 
             i3.flatMap(function _flatMap(val) {
@@ -135,12 +137,13 @@ describe('Identity monad test', function _testIdentityMonad() {
         it('should obey the identity law', function _testIdentityFunctorIdentityLaw() {
             var v = Identity(2);
 
-            Identity(identity).ap(v).value.should.eql(v.value);
+            Identity(identity).ap(v).value.should.eql(v.mjoin());
         });
 
         it('should have a proper algebraic properties apply', function _testIdentityMonadAlgebraicProperties() {
             function _i(val) { return  val + 2; }
             var x = 2;
+            var t = f => f(identity);
 
             //Composition
             Identity(identity).apply(Identity(identity).apply(Identity(2))).value.should.eql(Identity(identity).apply(Identity(identity)).apply(Identity(x)).value);
@@ -154,7 +157,37 @@ describe('Identity monad test', function _testIdentityMonad() {
             Identity.of(x).map(identity).value.should.eql(Identity.of(identity).apply(Identity.of(x)).value);
 
             //Interchange
-            //Identity.of(x).apply(Identity(2)).value.should.eql(Identity(2).apply(Identity.of(f => f(y))).value);
+            var u = Identity(t);
+            Identity.of(t).apply(u).value.should.eql(u.apply(Identity.of(t)).value);
+
+            var m = Identity(identity),
+                g = Identity(11);
+
+            function f(val) {
+                return Identity(val);
+            }
+
+            function h(val) {
+                return Identity(val + 7);
+            }
+
+            //Associativity
+            m.chain(f).chain(h).value.should.eql(m.chain(x => f(x).chain(h)).value);
+
+            function tr(val) {
+                return monads.Maybe(val);
+            }
+
+            tr(Identity(monads.Maybe(identity)).traverse(monads.Maybe, identity));
+            Identity(monads.Maybe(identity)).traverse(monads.List, tr);
+
+            console.log(tr(Identity(monads.Maybe(2)).traverse(monads.Maybe, identity)).toString());
+            console.log(Identity(monads.Maybe(2)).traverse(monads.List, tr).toString());
+            /*
+             > t(u.traverse(F, x => x)) is equivalent to u.traverse(G, t) for any t such that t(a).map(f) is equivalent to t(a.map(f)) (naturality)
+             > u.traverse(F, F.of) is equivalent to F.of(u) for any Applicative F (identity)
+             > u.traverse(Compose, x => new Compose(x)) === new Compose(u.traverse(F, x => x).map(x => x.traverse(G, x => x))) for Compose defined below and any Applicatives F and G (composition)
+             */
         });
     });
 });
