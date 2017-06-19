@@ -2,6 +2,7 @@ import { list_functor, ordered_list_functor, list_core } from '../functors/list_
 import { sortDirection } from '../../helpers';
 import { groupBy, flatMap } from '../../list_monad/list_iterators';
 import { wrap } from '../../functionalHelpers';
+import { identity } from '../../combinators';
 import { createListCreator } from '../list_helpers';
 
 /**
@@ -115,8 +116,18 @@ var list_monad = Object.create(list_functor, {
             return fn(this.value, x);
         }
     },
+    sequence: {
+        value: function _sequence(p) {
+            return this.traverse(p, identity);
+        }
+    },
     traverse: {
         value: function _traverse(fa, fn) {
+            return this.value.reduce(function _reduce(xs, x) {
+                fn(x).map(x => y => y.concat([x])).apply(xs);
+            }, fa.of(List.of()));
+
+            /*
             return this.fold(function _reductioAdAbsurdum(xs, x) {
                 fn(x).map(function _map(x) {
                     return function _map_(y) {
@@ -124,7 +135,7 @@ var list_monad = Object.create(list_functor, {
                     };
                 }).ap(xs);
                 return fa(this.empty);
-            });
+            });*/
 
             //TODO: this exists inside the traverse function. Function should take a typeRep + fn
             /*
@@ -204,16 +215,16 @@ var ordered_list_monad = Object.create(ordered_list_functor, {
             return fn(this.value, x);
         }
     },
+    sequence: {
+        value: function _sequence(p) {
+            return this.traverse(p, identity);
+        }
+    },
     traverse: {
         value: function _traverse(fa, fn) {
-            return this.fold(function _reductioAdAbsurdum(xs, x) {
-                fn(x).map(function _map(x) {
-                    return function _map_(y) {
-                        return y.concat([x]);
-                    };
-                }).ap(xs);
-                return fa(this.empty);
-            });
+            return this.value.reduce(function _reduce(xs, x) {
+                fn(x).map(x => y => y.concat([x])).apply(xs);
+            }, fa.of(List.of()));
         }
     },
     apply: {

@@ -174,19 +174,34 @@ describe('Identity monad test', function _testIdentityMonad() {
             //Associativity
             m.chain(f).chain(h).value.should.eql(m.chain(x => f(x).chain(h)).value);
 
-            function tr(val) {
-                return monads.Maybe(val);
+            //Traversable Identity
+            Identity(2).traverse(monads.Maybe, monads.Maybe.of).toString().should.eql(monads.Maybe.of(Identity(2)).toString());
+
+            function test(val) {
+                return monads.Maybe(5 + val);
             }
 
-            tr(Identity(monads.Maybe(identity)).traverse(monads.Maybe, identity));
-            Identity(monads.Maybe(identity)).traverse(monads.List, tr);
+            var wq = Identity(10);
 
-            console.log(tr(Identity(monads.Maybe(2)).traverse(monads.Maybe, identity)).toString());
-            console.log(Identity(monads.Maybe(2)).traverse(monads.List, tr).toString());
+            console.log(wq.traverse(monads.Maybe, test).toString());
+
+            function test2(val) {
+                return monads.Maybe(val.value + 5);
+            }
+
+            var bpb = Identity(monads.Maybe(10));
+
+            console.log(bpb.traverse(monads.Maybe, test2).toString());
+
+            //var yy = mona.of(identity(10));
+            //var gg = yy.traverse(test);
+
+
             /*
              > t(u.traverse(F, x => x)) is equivalent to u.traverse(G, t) for any t such that t(a).map(f) is equivalent to t(a.map(f)) (naturality)
              > u.traverse(F, F.of) is equivalent to F.of(u) for any Applicative F (identity)
-             > u.traverse(Compose, x => new Compose(x)) === new Compose(u.traverse(F, x => x).map(x => x.traverse(G, x => x))) for Compose defined below and any Applicatives F and G (composition)
+             > u.traverse(Compose, x => new Compose(x)) === new Compose(u.traverse(F, x => x).map(x => x.traverse(G, x => x)))
+                    for Compose defined below and any Applicatives F and G (composition)
              */
         });
     });

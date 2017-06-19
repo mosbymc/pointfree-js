@@ -64,7 +64,7 @@ var maybe_monad = Object.create(maybe_functor, {
     },
     traverse: {
         value: function _traverse(a, f) {
-            return this.isNothing ? a.of(Maybe.Nothing) : f(this.value).map(Maybe.of);
+            return this.isNothing ? a.of(Maybe.Nothing) : f(this.value).map(this.of);
         }
     },
     /**

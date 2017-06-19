@@ -33,9 +33,14 @@ var constant_monad = Object.create(constant_functor, {
             return this.value;
         }
     },
+    sequence: {
+        value: function _sequence(p) {
+            return this.of(this.value);
+        }
+    },
     traverse: {
         value: function _traverse(a, f) {
-            return f(this.value).map(this.of);
+            return this.of(this.value);
         }
     },
     /**

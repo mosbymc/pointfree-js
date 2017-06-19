@@ -40,7 +40,8 @@ import { toFunctorType, containerIterator } from '../../containerHelpers';
         > A value that implements the Traversable specification must also implement the Functor and Foldable specifications.
         > t(u.traverse(F, x => x)) is equivalent to u.traverse(G, t) for any t such that t(a).map(f) is equivalent to t(a.map(f)) (naturality)
         > u.traverse(F, F.of) is equivalent to F.of(u) for any Applicative F (identity)
-        > u.traverse(Compose, x => new Compose(x)) === new Compose(u.traverse(F, x => x).map(x => x.traverse(G, x => x))) for Compose defined below and any Applicatives F and G (composition)
+        > u.traverse(Compose, x => new Compose(x)) === new Compose(u.traverse(F, x => x).map(x => x.traverse(G, x => x)))
+                for Compose defined below and any Applicatives F and G (composition)
 
     - Chain:
         > A value that implements the Chain specification must also implement the Apply specification.
