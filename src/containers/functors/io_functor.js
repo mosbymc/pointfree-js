@@ -38,6 +38,9 @@ var io_functor = {
         return this._value;
     },
     map: _map,
+    runIo: function _runIo(...args) {
+        return this.value(...args);
+    },
     equals: _equals,
     of: _of,
     /**

@@ -86,6 +86,11 @@ function guardBefore(...fns) {
  */
 var leftApply = fn => (...args) => fn(...args);
 
+/**
+ * @description:
+ * @param: {function} fn
+ * @return: {*}
+ */
 var maybe = (fn) =>
     function _maybe(...args) {
         return null != args ? fn.call(this, ...args) : null;

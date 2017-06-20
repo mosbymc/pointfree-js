@@ -4,7 +4,7 @@
  * @return: {@see maybe_functor}
  */
 function Maybe(val) {
-    return Object.create(maybe_functor, {
+    /*return Object.create(maybe_functor, {
         _value: {
             value: null == val ? null : val,
             writable: false,
@@ -16,7 +16,30 @@ function Maybe(val) {
         isNothing: {
             value: null == val
         }
-    });
+    });*/
+    return null == val ?
+        Object.create(nothing_functor, {
+            _value: {
+                value: null
+            },
+            isJust: {
+                value: false
+            },
+            isNothing: {
+                value: true
+            }
+        }) :
+        Object.create(just_functor, {
+            _value: {
+                value: val
+            },
+            isJust: {
+                value: true
+            },
+            isNothing: {
+                value: false
+            }
+        });
 }
 
 /**
@@ -25,7 +48,7 @@ function Maybe(val) {
  * @return: {@see maybe_functor}
  */
 Maybe.of = function _of(val) {
-    return Object.create(maybe_functor, {
+    return Object.create(just_functor, {
         _value: {
             value: val,
             writable: false,
@@ -58,66 +81,65 @@ Maybe.Nothing =  function _nothing() {
 //Maybe.Just = Just;
 //Maybe.Nothing = Nothing;
 Maybe.isJust = function _isJust(m) {
-    return maybe_functor.isPrototypeOf(m) && null != m.value;
+    return m.isJust;
 };
 Maybe.isNothing = function _isNothing(m) {
-    return maybe_functor.isPrototypeOf(m) && null == m.value;
+    return m.isNothing;
 };
 
 //TODO: determine if there is any purpose in splitting a maybe into two types... if those sub-types
 //TODO: are not exposed, what benefit is derived from them? And if they are exposed (Just being Identity,
 //TODO: and Nothing being Constant(null)), then the maybe container has a direct dependency on the Identity
 //TODO: and Constant containers. This becomes an issue due to circular dependencies.
-/*
 function Just(val) {
-    return null == val ? Nothing() :
-        Object.create(_just_f, {
+    return Object.create(just_functor, {
             _value: {
                 value: val,
                 writable: false,
                 configurable: false
+            },
+            isJust: {
+                value: true
+            },
+            isNothing: {
+                value: false
             }
         });
 }
 
 Just.of = function _of(val) {
-    return Object.create(_just_f, {
+    return Object.create(just_functor, {
         _value: {
             value: val,
             writable: false,
             configurable: false
+        },
+        isJust: {
+            value: true
+        },
+        isNothing: {
+            value: false
         }
     });
 };
 
 function Nothing() {
-    return Object.create(_nothing_f, {
+    return Object.create(nothing_functor, {
         _value: {
             value: null,
             writable: false,
             configurable: false
+        },
+        isJust: {
+            value: false
+        },
+        isNothing: {
+            value: true
         }
     });
 }
 
 Nothing.of = Nothing;
-*/
-
-function Just(val) {
-    return Maybe.of(val);
-}
-
-Just.of = function _of(val) {
-    return Just(val);
-};
-
-function Nothing() {
-    return Maybe();
-}
-
-Nothing.of = function _of() {
-    return Nothing();
-};
 
 //TODO: Using this.of in order to create a new instance of a Maybe container (functor/monad) will
 //TODO: not work as it is implemented here in terms of creating a new maybe container with the
@@ -169,76 +191,49 @@ function _toString() {
     return null == this.value ? `Nothing()` : `Just(${this.value})`;
 }
 
-/*
-var _just_f = Object.create(maybe_functor, {
-    isJust: {
-        value: true
+var just_functor = {
+    get value() {
+        return this._value;
     },
-    isNothing: {
-        value: false
+    map: function _map(fn) {
+        return this.of(fn(this.value));
     },
-    value: {
-        get: function _getValue() {
-            return this._value;
-        }
+    equals: function _equals(ma) {
+        return Object.getPrototypeOf(this).isPrototypeOf(ma) && ma.isJust && this.value === ma.value;
     },
-    map: {
-        value: function _map(fn) {
-            return Just(fn(this.value));
-        }
+    of: function _of(val) {
+        return Just.of(val);
     },
-    flatMap: {
-        value: function _flatMap(fn) {
-            return maybe_functor.isPrototypeOf(this.value) ? this.value.mapWith(fn) : Just(fn(this.value));
-        }
+    valueOf: function _valueOf() {
+        return this.value;
     },
-    of: {
-        value: function _of(val) {
-            return Just.of(val);
-        }
+    toString: function _toString() {
+        return `Just(${this.value})`;
     },
-    toString: {
-        value: function _toString() {
-            return `Maybe.Just(${this.value})`;
-        }
-    }
-});
+    factory: Just
+};
 
-var _nothing_f = Object.create(maybe_functor, {
-    isJust: {
-        value: false
+var nothing_functor = {
+    get value() {
+        return this._value;
     },
-    isNothing: {
-        value: true
+    map: function _map() {
+        return this.of();
     },
-    value: {
-        value: function _getValue() {
-            return this._value;
-        }
+    equals: function _equals(ma) {
+        return Object.getPrototypeOf(this).isPrototypeOf(ma) && ma.isNothing;
     },
-    map: {
-        value: function _map() {
-            return Nothing();
-        }
+    of: function _of() {
+        return Nothing.of();
     },
-    flatMap: {
-        value: function _flatMap(fn) {
-            return maybe_functor.isPrototypeOf(this.value) ? this.value.mapWith(fn) : Nothing();
-        }
+    valueOf: function _valueOf() {
+        return this.value;
     },
-    of: {
-        value: function _of() {
-            return Nothing.of();
-        }
+    toString: function _toString() {
+        return `Nothing()`;
     },
-    toString: {
-        value: function _toString() {
-            return `Maybe.Nothing()`;
-        }
-    }
-});
-*/
-
+    factory: Nothing
+};
 
 
 //Since FantasyLand is the defacto standard for JavaScript algebraic data structures, and I want to maintain
@@ -250,6 +245,8 @@ var _nothing_f = Object.create(maybe_functor, {
 //as it was intended... you know, like Douglas Crockford and his "good parts", which is really just another
 //way of saying: "your too dumb to understand how JavaScript works, and I either don't know myself, or don't
 //care to know, so just stick with what I tell you to use."
-maybe_functor.constructor = maybe_functor.factory;
+//maybe_functor.constructor = maybe_functor.factory;
+just_functor.constructor = just_functor.factory;
+nothing_functor.constructor = nothing_functor.factory;
 
-export { Maybe, Just, Nothing, maybe_functor };
+export { Maybe, Just, Nothing, just_functor, nothing_functor };

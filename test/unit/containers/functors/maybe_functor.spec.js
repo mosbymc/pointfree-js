@@ -1,5 +1,5 @@
 import { functors } from '../../../../src/containers/functors/functors';
-import { maybe_functor } from '../../../../src/containers/functors/maybe_functor';
+import { just_functor, nothing_functor } from '../../../../src/containers/functors/maybe_functor';
 
 var Maybe = functors.Maybe,
     Just = functors.Just,
@@ -19,14 +19,14 @@ describe('Maybe functor tests', function _testMaybeFunctor() {
                 i7 = Maybe('testing constant'),
                 i8 = Maybe(false);
 
-            maybe_functor.isPrototypeOf(i1).should.be.true;
-            maybe_functor.isPrototypeOf(i2).should.be.true;
-            maybe_functor.isPrototypeOf(i3).should.be.true;
-            maybe_functor.isPrototypeOf(i4).should.be.true;
-            maybe_functor.isPrototypeOf(i5).should.be.true;
-            maybe_functor.isPrototypeOf(i6).should.be.true;
-            maybe_functor.isPrototypeOf(i7).should.be.true;
-            maybe_functor.isPrototypeOf(i8).should.be.true;
+            nothing_functor.isPrototypeOf(i1).should.be.true;
+            nothing_functor.isPrototypeOf(i2).should.be.true;
+            just_functor.isPrototypeOf(i3).should.be.true;
+            just_functor.isPrototypeOf(i4).should.be.true;
+            just_functor.isPrototypeOf(i5).should.be.true;
+            just_functor.isPrototypeOf(i6).should.be.true;
+            just_functor.isPrototypeOf(i7).should.be.true;
+            just_functor.isPrototypeOf(i8).should.be.true;
 
             expect(null).to.eql(i1.value);
             expect(null).to.eql(i2.value);
@@ -50,14 +50,14 @@ describe('Maybe functor tests', function _testMaybeFunctor() {
                 i7 = Maybe.of('testing constant'),
                 i8 = Maybe.of(false);
 
-            maybe_functor.isPrototypeOf(i1).should.be.true;
-            maybe_functor.isPrototypeOf(i2).should.be.true;
-            maybe_functor.isPrototypeOf(i3).should.be.true;
-            maybe_functor.isPrototypeOf(i4).should.be.true;
-            maybe_functor.isPrototypeOf(i5).should.be.true;
-            maybe_functor.isPrototypeOf(i6).should.be.true;
-            maybe_functor.isPrototypeOf(i7).should.be.true;
-            maybe_functor.isPrototypeOf(i8).should.be.true;
+            just_functor.isPrototypeOf(i1).should.be.true;
+            just_functor.isPrototypeOf(i2).should.be.true;
+            just_functor.isPrototypeOf(i3).should.be.true;
+            just_functor.isPrototypeOf(i4).should.be.true;
+            just_functor.isPrototypeOf(i5).should.be.true;
+            just_functor.isPrototypeOf(i6).should.be.true;
+            just_functor.isPrototypeOf(i7).should.be.true;
+            just_functor.isPrototypeOf(i8).should.be.true;
 
             expect(undefined).to.eql(i1.value);
             expect(null).to.eql(i2.value);
@@ -81,14 +81,14 @@ describe('Maybe functor tests', function _testMaybeFunctor() {
                 i7 = Maybe.Just('testing constant'),
                 i8 = Maybe.Just(false);
 
-            maybe_functor.isPrototypeOf(i1).should.be.true;
-            maybe_functor.isPrototypeOf(i2).should.be.true;
-            maybe_functor.isPrototypeOf(i3).should.be.true;
-            maybe_functor.isPrototypeOf(i4).should.be.true;
-            maybe_functor.isPrototypeOf(i5).should.be.true;
-            maybe_functor.isPrototypeOf(i6).should.be.true;
-            maybe_functor.isPrototypeOf(i7).should.be.true;
-            maybe_functor.isPrototypeOf(i8).should.be.true;
+            just_functor.isPrototypeOf(i1).should.be.true;
+            just_functor.isPrototypeOf(i2).should.be.true;
+            just_functor.isPrototypeOf(i3).should.be.true;
+            just_functor.isPrototypeOf(i4).should.be.true;
+            just_functor.isPrototypeOf(i5).should.be.true;
+            just_functor.isPrototypeOf(i6).should.be.true;
+            just_functor.isPrototypeOf(i7).should.be.true;
+            just_functor.isPrototypeOf(i8).should.be.true;
 
             expect(undefined).to.eql(i1.value);
             expect(null).to.eql(i2.value);
@@ -112,14 +112,14 @@ describe('Maybe functor tests', function _testMaybeFunctor() {
                 i7 = Maybe.Nothing('testing constant'),
                 i8 = Maybe.Nothing(false);
 
-            maybe_functor.isPrototypeOf(i1).should.be.true;
-            maybe_functor.isPrototypeOf(i2).should.be.true;
-            maybe_functor.isPrototypeOf(i3).should.be.true;
-            maybe_functor.isPrototypeOf(i4).should.be.true;
-            maybe_functor.isPrototypeOf(i5).should.be.true;
-            maybe_functor.isPrototypeOf(i6).should.be.true;
-            maybe_functor.isPrototypeOf(i7).should.be.true;
-            maybe_functor.isPrototypeOf(i8).should.be.true;
+            nothing_functor.isPrototypeOf(i1).should.be.true;
+            nothing_functor.isPrototypeOf(i2).should.be.true;
+            nothing_functor.isPrototypeOf(i3).should.be.true;
+            nothing_functor.isPrototypeOf(i4).should.be.true;
+            nothing_functor.isPrototypeOf(i5).should.be.true;
+            nothing_functor.isPrototypeOf(i6).should.be.true;
+            nothing_functor.isPrototypeOf(i7).should.be.true;
+            nothing_functor.isPrototypeOf(i8).should.be.true;
 
             expect(null).to.eql(i1.value);
             expect(null).to.eql(i2.value);
@@ -159,16 +159,16 @@ describe('Maybe functor tests', function _testMaybeFunctor() {
                 n1 = Nothing(),
                 n2 = Nothing.of(10);
 
-            Object.getPrototypeOf(j1).should.eql(maybe_functor);
+            Object.getPrototypeOf(j1).should.eql(just_functor);
             j1.value.should.eql(1);
 
-            Object.getPrototypeOf(j2).should.eql(maybe_functor);
+            Object.getPrototypeOf(j2).should.eql(just_functor);
             expect(j2.value).to.eql(null);
 
-            Object.getPrototypeOf(n1).should.eql(maybe_functor);
+            Object.getPrototypeOf(n1).should.eql(nothing_functor);
             expect(n1.value).to.eql(null);
 
-            Object.getPrototypeOf(n2).should.eql(maybe_functor);
+            Object.getPrototypeOf(n2).should.eql(nothing_functor);
             expect(n2.value).to.eql(null);
         });
     });
@@ -303,14 +303,14 @@ describe('Maybe functor tests', function _testMaybeFunctor() {
                 m7 = m.of('testing constant'),
                 m8 = m.of(false);
 
-            expect(undefined).to.eql(m1.value);
+            expect(null).to.eql(m1.value);
             expect(null).to.eql(m2.value);
-            expect(1).to.eql(m3.value);
-            expect(arr).to.eql(m4.value);
-            expect(obj).to.eql(m5.value);
-            expect('symbol').to.eql(typeof m6.value);
-            expect('testing constant').to.eql(m7.value);
-            expect(false).to.eql(m8.value);
+            expect(null).to.eql(m3.value);
+            expect(null).to.eql(m4.value);
+            expect(null).to.eql(m5.value);
+            expect(null).to.eql(m6.value);
+            expect(null).to.eql(m7.value);
+            expect(null).to.eql(m8.value);
         });
 
         it('should have a functioning iterator', function _testMaybeFunctorIterator() {
@@ -354,7 +354,8 @@ describe('Maybe functor tests', function _testMaybeFunctor() {
         });
 
         it('should have a .constructor property that points to the factory function', function _testMaybeFunctorIsStupidViaFantasyLandSpecCompliance() {
-            Maybe().constructor.should.eql(Maybe);
+            Just(1).constructor.should.eql(Just);
+            Nothing().constructor.should.eql(Nothing);
         });
     });
 });

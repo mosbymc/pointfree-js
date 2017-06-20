@@ -20,12 +20,9 @@ function join(outer, inner, outerSelector, innerSelector, projector, comparer = 
 }*/
 
 function join(outer, inner, outerSelector, innerSelector, projector, comparer = strictEqual) {
-    return function *join2Iterator(flag) {
-        var groupedInner = groupData(when(not(isArray), Array.from, inner), innerSelector, flag),
+    return function *join2Iterator() {
+        var groupedInner = groupData(when(not(isArray), Array.from, inner), innerSelector),
             grp;
-
-        if (flag) console.log(groupedInner);
-
         for (let outerItem of outer) {
             for (let group of groupedInner) {
                 if (comparer(outerSelector(outerItem), group.key)) {

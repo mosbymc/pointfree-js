@@ -1,8 +1,9 @@
-import { maybe_functor } from '../functors/maybe_functor';
+import { just_functor, nothing_functor } from '../functors/maybe_functor';
 import { identity } from '../../combinators';
 
 function Maybe(item) {
-    return Object.create(maybe_monad, {
+    return null != item ? Maybe.Just(item) : Maybe.Nothing();
+    /*return Object.create(maybe_monad, {
         _value: {
             value: item,
             writable: false,
@@ -14,7 +15,7 @@ function Maybe(item) {
         isNothing: {
             value: null == item
         }
-    });
+    });*/
 }
 
 /**
@@ -23,7 +24,7 @@ function Maybe(item) {
  * @return: {@see maybe_monad}
  */
 Maybe.of = function _of(item) {
-    return Object.create(maybe_monad, {
+    return Object.create(just_monad, {
         _value: {
             value: item,
             writable: false,
@@ -38,6 +39,63 @@ Maybe.of = function _of(item) {
     });
 };
 
+Maybe.Just = function _just(item) {
+    return Maybe.of(item);
+};
+
+Maybe.Nothing = function _nothing() {
+    return Object.create(nothing_monad, {
+        _value: {
+            value: null,
+            writable: false,
+            configurable: false
+        },
+        isJust: {
+            value: false
+        },
+        isNothing: {
+            value: true
+        }
+    });
+};
+
+function Just(val) {
+    return Object.create(just_monad, {
+        _value: {
+            value: val,
+            writable: false,
+            configurable: false
+        },
+        isJust: {
+            value: true
+        },
+        isNothing: {
+            value: false
+        }
+    });
+}
+
+Just.of = Just;
+
+function Nothing() {
+    return Object.create(nothing_monad, {
+        _value: {
+            value: null,
+            writable: false,
+            configurable: false
+        },
+        isJust: {
+            value: false
+        },
+        isNothing: {
+            value: true
+        }
+    });
+}
+
+Nothing.of = Nothing;
+
+/*
 var maybe_monad = Object.create(maybe_functor, {
     flatMap: {
         value: function _flatMap(fn) {
@@ -67,11 +125,6 @@ var maybe_monad = Object.create(maybe_functor, {
             return this.isNothing ? a.of(Maybe.Nothing) : f(this.value).map(this.of);
         }
     },
-    /**
-     * @description:
-     * @param: {monad} ma
-     * @return: {monad}
-     */
     apply: {
         value: function _apply(ma) {
             return this.map(ma.value);
@@ -96,7 +149,124 @@ maybe_monad.ap = maybe_monad.apply;
 maybe_monad.fmap = maybe_monad.flatMap;
 maybe_monad.chain = maybe_monad.flatMap;
 maybe_monad.bind = maybe_monad.flapMap;
-maybe_functor.reduce = maybe_functor.fold;
+maybe_monad.reduce = maybe_monad.fold;*/
+
+var just_monad = Object.create(just_functor, {
+    flatMap: {
+        value: function _flatMap(fn) {
+            var val = fn(this.value);
+            return just_monad.isPrototypeOf(val) ? val : this.of(val);
+        }
+    },
+    mjoin: {
+        value: function _mjoin() {
+            return this.value;
+        }
+    },
+    fold: {
+        value: function _fold(fn, acc) {
+            return fn(acc, this.value);
+        }
+    },
+    sequence: {
+        value: function _sequence(p) {
+            return this.traverse(identity, p);
+        }
+    },
+    traverse: {
+        value: function _traverse(a, f, g) {
+            return f(this.value).map(this.of);
+        }
+    },
+    /**
+     * @description:
+     * @param: {monad} ma
+     * @return: {monad}
+     */
+    apply: {
+        value: function _apply(ma) {
+            return ma.map(this.value);
+        }
+    },
+    nothing: {
+        value: function _nothing() {
+            return Nothing();
+        }
+    },
+    of: {
+        value: function _of(val) {
+            if (null == val) return 'test';
+            return Just.of(val);
+        }
+    },
+    factory: {
+        value: Just
+    }
+});
+
+var nothing_monad = Object.create(nothing_functor, {
+    flatMap: {
+        value: function _flatMap() {
+            return this.nothing();
+        }
+    },
+    mjoin: {
+        value: function _mjoin() {
+            return this.value;
+        }
+    },
+    fold: {
+        value: function _fold(fn, x) {
+            return this.of();
+        }
+    },
+    sequence: {
+        value: function _sequence(a) {
+            return this.traverse(identity, a);
+        }
+    },
+    traverse: {
+        value: function _traverse(a, f) {
+            return a.of(Maybe.Nothing);
+        }
+    },
+    /**
+     * @description:
+     * @param: {monad} ma
+     * @return: {monad}
+     */
+    apply: {
+        value: function _apply(ma) {
+            return this.map(ma.value);
+        }
+    },
+    nothing: {
+        value: function _nothing() {
+            return Nothing();
+        }
+    },
+    of: {
+        value: function _of() {
+            return Maybe.of();
+        }
+    },
+    factory: {
+        value: Nothing
+    }
+});
+
+
+just_monad.ap = just_monad.apply;
+just_monad.fmap = just_monad.flatMap;
+just_monad.chain = just_monad.flatMap;
+just_monad.bind = just_monad.flapMap;
+just_monad.reduce = just_monad.fold;
+
+nothing_monad.ap = nothing_monad.apply;
+nothing_monad.fmap = nothing_monad.flatMap;
+nothing_monad.chain = nothing_monad.flatMap;
+nothing_monad.bind = nothing_monad.flapMap;
+nothing_monad.reduce = nothing_monad.fold;
 
 
 
@@ -109,7 +279,8 @@ maybe_functor.reduce = maybe_functor.fold;
 //as it was intended... you know, like Douglas Crockford and his "good parts", which is really just another
 //way of saying: "your too dumb to understand how JavaScript works, and I either don't know myself, or don't
 //care to know, so just stick with what I tell you to use."
-maybe_monad.constructor = maybe_monad.factory;
+just_monad.constructor = just_monad.factory;
+nothing_monad.constructor = nothing_monad.factory;
 
 
-export { Maybe, maybe_monad };
+export { Maybe, Just, Nothing, just_monad, nothing_monad };

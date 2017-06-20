@@ -23,7 +23,11 @@ var io_monad = Object.create(io_functor, {
     },
     flatMap: {
         value: function _flatMap(fn) {
-            return io_monad.isPrototypeOf(this.value) ? this.value.map(fn) : this.of(compose(fn, this.value));
+            var fMapIo = (function _flatMapIo(...args) {
+                return fn(this.value(...args)).value(...args);
+            }).bind(this);
+
+            return Io(fMapIo);
         }
     },
     fold: {

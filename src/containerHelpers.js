@@ -150,7 +150,7 @@ function mjoin(ma) {
  * @param: type
  * @return: {function}
  */
-function toFunctorType(type) {
+function toContainerType(type) {
     return function toType(fn = identity) {
         return type.of(fn(this.value));
     };
@@ -281,5 +281,5 @@ var except = curry(function _except(enumerable, comparer, list) {
     return list.except(enumerable, comparer);
 });
 
-export { apply, ap, fmap, mapWith, flatMap, lift2, lift3, lift4, liftN, mjoin, pluckWith, toFunctorType,
+export { apply, ap, fmap, mapWith, flatMap, lift2, lift3, lift4, liftN, mjoin, pluckWith, toContainerType,
             containerIterator, chain, bind, mcompose, filter, intersect, except };

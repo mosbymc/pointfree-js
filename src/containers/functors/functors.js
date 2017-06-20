@@ -4,21 +4,21 @@ import { Future, future_functor } from './future_functor';
 import { Identity, identity_functor } from './identity_functor';
 import { Io, io_functor } from './io_functor';
 import { List, list_core } from './list_functor';
-import { Maybe, Just, Nothing, maybe_functor } from './maybe_functor';
+import { Maybe, Just, Nothing, just_functor, nothing_functor } from './maybe_functor';
 import { Validation, validation_functor } from './validation_functor';
 
-import { toFunctorType, containerIterator } from '../../containerHelpers';
+import { toContainerType, containerIterator } from '../../containerHelpers';
 
-var mapToConstant = toFunctorType(Constant),
-    mapToEither = toFunctorType(Either),
-    mapToFuture = toFunctorType(Future),
-    mapToIdentity = toFunctorType(Identity),
-    mapToIo = toFunctorType(Io),
-    mapToLeft = toFunctorType(Left),
-    mapToList = toFunctorType(List),
-    mapToMaybe = toFunctorType(Maybe),
-    mapToRight = toFunctorType(Right),
-    mapToValidation = toFunctorType(Validation);
+var mapToConstant = toContainerType(Constant),
+    mapToEither = toContainerType(Either),
+    mapToFuture = toContainerType(Future),
+    mapToIdentity = toContainerType(Identity),
+    mapToIo = toContainerType(Io),
+    mapToLeft = toContainerType(Left),
+    mapToList = toContainerType(List),
+    mapToMaybe = toContainerType(Maybe),
+    mapToRight = toContainerType(Right),
+    mapToValidation = toContainerType(Validation);
 
 function toConstant() { return this.mapToConstant(); }
 function toEither() { return this.mapToEither(); }
@@ -88,6 +88,15 @@ io_functor.mapToRight = mapToRight;
 io_functor.mapToValidation = mapToValidation;
 io_functor[Symbol.iterator] = containerIterator;
 
+just_functor.mapToConstant = mapToConstant;
+just_functor.mapToEither = mapToEither;
+just_functor.mapToFuture = mapToFuture;
+just_functor.mapToIdentity = mapToIdentity;
+just_functor.mapToIo = mapToIo;
+just_functor.mapToList = mapToList;
+just_functor.mapToValidation = mapToValidation;
+just_functor[Symbol.iterator] = containerIterator;
+
 list_core.mapToConstant = mapToConstant;
 list_core.mapToEither = mapToEither;
 list_core.mapToFuture = mapToFuture;
@@ -98,16 +107,16 @@ list_core.mapToMaybe = mapToMaybe;
 list_core.mapToRight = mapToRight;
 list_core.mapToValidation = mapToValidation;
 
-maybe_functor.mapToConstant = mapToConstant;
-maybe_functor.mapToEither = mapToEither;
-maybe_functor.mapToFuture = mapToFuture;
-maybe_functor.mapToIdentity = mapToIdentity;
-maybe_functor.mapToIo = mapToIo;
-maybe_functor.mapToLeft = mapToLeft;
-maybe_functor.mapToList = mapToList;
-maybe_functor.mapToRight = mapToRight;
-maybe_functor.mapToValidation = mapToValidation;
-maybe_functor[Symbol.iterator] = containerIterator;
+nothing_functor.mapToConstant = mapToConstant;
+nothing_functor.mapToEither = mapToEither;
+nothing_functor.mapToFuture = mapToFuture;
+nothing_functor.mapToIdentity = mapToIdentity;
+nothing_functor.mapToIo = mapToIo;
+nothing_functor.mapToLeft = mapToLeft;
+nothing_functor.mapToList = mapToList;
+nothing_functor.mapToRight = mapToRight;
+nothing_functor.mapToValidation = mapToValidation;
+nothing_functor[Symbol.iterator] = containerIterator;
 
 validation_functor.mapToConstant = mapToConstant;
 validation_functor.mapToEither = mapToEither;

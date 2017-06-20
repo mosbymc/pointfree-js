@@ -87,7 +87,7 @@ describe('Test join...', function testJoin() {
     describe('...using default equality comparer', function testJoinWithArrays() {
         it('should return all test data items that share the same name', function testJoinOnFirstName() {
             var joinIterable = join(testData.dataSource.data, testData.dataSource.data, selector, selector, projector),
-                joinRes = Array.from(joinIterable(1));
+                joinRes = Array.from(joinIterable());
 
             joinRes.should.have.lengthOf(duplicateFirstNames.length);
             joinRes.forEach(function _validateResults(item) {
