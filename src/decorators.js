@@ -39,7 +39,7 @@ var before = curry(function _before(fn, decoration, ...args) {
  * @param: {function} fn
  * @return: {function}
  */
-var binary = fn => curryN(this, 2, [], fn);
+var binary = fn => curryN(this, 2, fn);
 
 /**
  * @description:
@@ -109,6 +109,15 @@ var maybe = (fn) =>
  */
 var not = fn => (...args) => !fn(...args);
 
+var not2point0 = curry(function _n(fn, ...args) {
+    if (args.length < fn.length) {
+        return curryN(this, (fn.length - args.length), function _not(...a) {
+            return !fn(...a);
+        }, args);
+    }
+    return !fn(...args);
+});
+
 /**
  * @description:
  * @param: {function} fn
@@ -171,7 +180,7 @@ var tap = curry(function _tap(fn, arg) {
  * @param: {function} fn
  * @return: {function}
  */
-var ternary = fn => curryN(this, 3, [], fn);
+var ternary = fn => curryN(this, 3, fn);
 
 /**
  * @description:
@@ -181,7 +190,7 @@ var ternary = fn => curryN(this, 3, [], fn);
  * @return: {function}
  */
 var tryCatch = curry(function _tryCatch(catcher, tryer) {
-    return curryN(this, tryer.length, [], function _tryCatch_(...args) {
+    return curryN(this, tryer.length, function _tryCatch_(...args) {
         try {
             return tryer(...args);
         }
@@ -196,7 +205,7 @@ var tryCatch = curry(function _tryCatch(catcher, tryer) {
  * @param: {function} fn
  * @return: {function}
  */
-var unary = fn => curryN(this, 1, [], fn);
+var unary = fn => curryN(this, 1, fn);
 
 /**
  * @description:

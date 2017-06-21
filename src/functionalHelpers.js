@@ -34,9 +34,7 @@ var adjust = curry(function _adjust(fn, idx, list) {
  * @param: {number} y
  * @return: {number}
  */
-var add = curry(function _add(x, y) {
-    return x + y;
-});
+var add = curry((x, y) => x + y);
 
 /**
  * and :: (*... -> a) -> ((*... -> b) -> ((*... -> Boolean)))
@@ -46,9 +44,7 @@ var add = curry(function _add(x, y) {
  * @param: {*} b
  * @return: {boolean}
  */
-var and = curry(function _and(a, b) {
-    return !!(a && b);
-});
+var and = curry((a, b) => !!(a && b));
 
 /**
  * @description: Updates the value at a specified index of an array by first creating a shallow copy
@@ -92,9 +88,7 @@ var defaultPredicate = constant(true);
  * @param: {object} delegator
  * @returns: {boolean}
  */
-var delegatesFrom = curry(function _delegatesFrom(delegate, delegator) {
-    return delegate.isPrototypeOf(delegator);
-});
+var delegatesFrom = curry((delegate, delegator) => delegate.isPrototypeOf(delegator));
 
 /**
  * @description:
@@ -103,9 +97,7 @@ var delegatesFrom = curry(function _delegatesFrom(delegate, delegator) {
  * @param: {object} delegate
  * @returns: {boolean}
  */
-var delegatesTo = curry(function _delegatesTo(delegator, delegate) {
-    return delegate.isPrototypeOf(delegator);
-});
+var delegatesTo = curry((delegator, delegate) => delegate.isPrototypeOf(delegator));
 
 /**
  * @description:
@@ -114,9 +106,7 @@ var delegatesTo = curry(function _delegatesTo(delegator, delegate) {
  * @param: {number} y
  * @return: {number}
  */
-var divide = curry(function _divide(x, y) {
-    return x / y;
-});
+var divide = curry((x, y) => x / y);
 
 /**
  * @description:
@@ -125,9 +115,7 @@ var divide = curry(function _divide(x, y) {
  * @param: {*} y
  * @return: {boolean}
  */
-var equal = curry(function _curry(x, y) {
-    return x == y;
-});
+var equal = curry((x, y) => x == y);
 
 /**
  * @description:
@@ -143,9 +131,7 @@ var falsey = flip;
  * @param: {*} x
  * @return: {boolean}
  */
-function flip(x) {
-    return !x;
-}
+var flip = x => !x;
 
 /**
  * @description:
@@ -154,9 +140,7 @@ function flip(x) {
  * @param: {object} obj
  * @returns: {*}
  */
-var getWith = curry(function _get(prop, obj) {
-    return obj[prop];
-});
+var getWith = curry((prop, obj) => obj[prop]);
 
 /**
  * @description:
@@ -165,9 +149,7 @@ var getWith = curry(function _get(prop, obj) {
  * @param: {number | string} y
  * @return: {boolean}
  */
-var greaterThan = curry(function _greaterThan(x, y) {
-    return x > y;
-});
+var greaterThan = curry((x, y) => x > y);
 
 /**
  * @description:
@@ -176,9 +158,7 @@ var greaterThan = curry(function _greaterThan(x, y) {
  * @param: {string | number} y
  * @return: {boolean}
  */
-var greaterThanOrEqual = curry(function _greaterThanOrEqual(x, y) {
-    return x >= y;
-});
+var greaterThanOrEqual = curry((x, y) => x >= y);
 
 /**
  * isArray :: a -> Boolean
@@ -186,18 +166,14 @@ var greaterThanOrEqual = curry(function _greaterThanOrEqual(x, y) {
  * @param: data
  * @return: {boolean}
  */
-function isArray(data) {
-    return Array.isArray(data);
-}
+var isArray = data => Array.isArray(data);
 
 /**
  * @description:
  * @param: {boolean} bool
  * @return: {boolean}
  */
-function isBoolean(bool) {
-    return javaScriptTypes.boolean === type(bool);
-}
+var isBoolean = bool => javaScriptTypes.boolean === type(bool);
 
 /**
  * isFunction :: a -> Boolean
@@ -205,9 +181,7 @@ function isBoolean(bool) {
  * @param: {function} fn
  * @return: {boolean}
  */
-function isFunction(fn) {
-    return javaScriptTypes.function === type(fn);
-}
+var isFunction = fn => javaScriptTypes.function === type(fn);
 
 /**
  * isObject :: a -> Boolean
@@ -215,72 +189,56 @@ function isFunction(fn) {
  * @param: item
  * @return: {boolean}
  */
-function isObject(item) {
-    return javaScriptTypes.object === type(item) && null !==  item;
-}
+var isObject = item => javaScriptTypes.object === type(item) && null !== item;
 
 /**
  * @description:
  * @param: {*} x
  * @return: {boolean}
  */
-function isNothing(x) {
-    return null == x;
-}
+var isNothing = x => null == x;
 
 /**
  * @description:
  * @param: {*} n
  * @return: {string|boolean}
  */
-function isNull(n) {
-    return type(n) && null === n;
-}
+var isNull = n => type(n) && null === n;
 
 /**
  * @description:
  * @param: {number} num
  * @return: {boolean}
  */
-function isNumber(num) {
-    return javaScriptTypes.number === type(num);
-}
+var isNumber = num => javaScriptTypes.number == type(num);
 
 /**
  * @description:
  * @param: {*} x
  * @return: {boolean}
  */
-function isSomething(x) {
-    return null != x;
-}
+var isSomething = x => null != x;
 
 /**
  * @description:
  * @param: {string} str
  * @return: {boolean}
  */
-function isString(str) {
-    return javaScriptTypes.string === type(str);
-}
+var isString = str => javaScriptTypes.string === type(str);
 
 /**
  * @description:
  * @param: {Symbol} sym
  * @return: {boolean}
  */
-function isSymbol(sym) {
-    return javaScriptTypes.symbol === type(sym);
-}
+var isSymbol = sym => javaScriptTypes.symbol === type(sym);
 
 /**
  * @description:
  * @param: {*} u
  * @return: {boolean}
  */
-function isUndefined(u) {
-    return javaScriptTypes.undefined === type(u);
-}
+var isUndefined = u => javaScriptTypes.undefined === type(u);
 
 /**
  * @description:
@@ -289,9 +247,7 @@ function isUndefined(u) {
  * @param: {string | number} y
  * @return: {boolean}
  */
-var lessThan = curry(function _lessThan(x, y) {
-    return x < y;
-});
+var lessThan = curry((x, y) => x < y);
 
 /**
  * @description:
@@ -300,9 +256,7 @@ var lessThan = curry(function _lessThan(x, y) {
  * @param: {string | number} y
  * @return: {boolean}
  */
-var lessThanOrEqual = curry(function _lessThanOrEqual(x, y) {
-    return x <= y;
-});
+var lessThanOrEqual = curry((x, y) => x <= y);
 
 /**
  * @description:
@@ -311,9 +265,7 @@ var lessThanOrEqual = curry(function _lessThanOrEqual(x, y) {
  * @param: {number} y
  * @return: {number}
  */
-var modulus = curry(function _modulus(x, y) {
-    return x % y;
-});
+var modulus = curry((x, y) => x % y);
 
 /**
  * @description:
@@ -322,18 +274,14 @@ var modulus = curry(function _modulus(x, y) {
  * @param: {number} y
  * @return: {number}
  */
-var multiple = curry(function _multiple(x, y) {
-    return x * y;
-});
+var multiple = curry((x, y) => x * y);
 
 /**
  * @description:
  * @param: {number} x
  * @return: {number}
  */
-function negate(x) {
-    return -x;
-}
+var negate = x => -x;
 
 /**
  * @description:
@@ -342,9 +290,7 @@ function negate(x) {
  * @param: {*}
  * @return: {boolean}
  */
-var notEqual = curry(function _notEqual(x, y) {
-    return x != y;
-});
+var notEqual = curry((x, y) => x != y);
 
 /**
  * @description: No-op function; used as default function in some cases when argument is optional
@@ -386,9 +332,7 @@ var objectSet = curry(function _objectSet(prop, val, obj) {
  */
 function once(fn) {
     var invoked = false;
-    return function _once(...args) {
-        return invoked ? undefined : fn(...args);
-    };
+    return (...args) => invoked ? undefined : fn(...args);
 }
 
 /**
@@ -399,9 +343,7 @@ function once(fn) {
  * @param: {*} b
  * @return: {boolean}
  */
-var or = curry(function _or(a, b) {
-    return !!(a || b);
-});
+var or = curry((a, b) => !!(a || b));
 
 /**
  * @description:
@@ -423,9 +365,7 @@ var set = curry(function _set(prop, val, obj) {
  * @param: {*} y
  * @return: {boolean}
  */
-var strictEqual = curry(function _strictEqual(x, y) {
-    return x === y;
-});
+var strictEqual = curry((x, y) => x === y);
 
 /**
  * @description:
@@ -434,9 +374,7 @@ var strictEqual = curry(function _strictEqual(x, y) {
  * @param: {*} y
  * @return: {boolean}
  */
-var strictNotEqual = curry(function _strictNotEqual(x, y) {
-    return x !== y;
-});
+var strictNotEqual = curry((x, y) => x !== y);
 
 /**
  * @description:
@@ -445,27 +383,21 @@ var strictNotEqual = curry(function _strictNotEqual(x, y) {
  * @param: {number} y
  * @return: {number}
  */
-var subtract = curry(function _subtract(x, y) {
-    return x - y;
-});
+var subtract = curry((x, y) => x - y);
 
 /**
  * @description:
  * @param: {*} x
  * @return: {boolean}
  */
-function truthy(x) {
-    return flip(falsey(x));
-}
+var truthy = x => flip(falsey(x));
 
 /**
  * @description:
  * @param: {*} a
  * @return: {string}
  */
-function type(a) {
-    return typeof a;
-}
+var type = a => typeof a;
 
 /**
  * wrap :: a -> [a]
@@ -475,9 +407,7 @@ function type(a) {
  * @param: {*} data - Any value, any type
  * @return: {[*]} - Returns an array of any value, any type
  */
-function wrap(data) {
-    return [data];
-}
+var wrap = data => [data];
 
 export { add, adjust, and, arraySet, concat, defaultPredicate, delegatesFrom, delegatesTo, divide, equal, falsey, flip,
         getWith, greaterThan, greaterThanOrEqual, isArray, isBoolean, isFunction, isObject, isNothing, isNull, isNumber,

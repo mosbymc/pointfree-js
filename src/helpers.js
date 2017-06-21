@@ -58,13 +58,32 @@ var generatorProto = Object.getPrototypeOf(function *_generator(){});
  */
 function cacher(comparer) {
     var items = [];
-    return function cacheChecker(item) {
-        if (undefined === item || items.some(function _checkEquality(it) { return comparer(it, item); })) {
+    function cacheChecker(item) {
+        if (undefined === item || items.some(function _checkEquality(it) {
+                return comparer(it, item);
+            })) {
             return true;
         }
         items[items.length] = item;
         return false;
+    }
+        /*function cacheChecker(item) {
+            console.log(((undefined !== item && items.some(function _checkEquality(it) {
+                return comparer(it, item);
+            }) && true) || !(items[items.length] = item)));
+
+            return ((undefined !== item && items.some(function _checkEquality(it) {
+                return comparer(it, item);
+            }) && true) || !(items[items.length] = item));
+        }*/
+
+    cacheChecker.contains = function _contains(item) {
+        return items.some(function _checkEquality(it) {
+            return comparer(it, item);
+        });
     };
+
+    return cacheChecker;
 }
 
 /**

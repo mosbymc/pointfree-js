@@ -69,7 +69,7 @@ function constant(item) {
  */
 function curry(fn) {
     if (!fn.length || 1 === fn.length) return fn;
-    return curryN(this, fn.length, [], fn);
+    return curryN(this, fn.length, fn);
 }
 
 /**
@@ -81,10 +81,10 @@ function curry(fn) {
  * be applied before invocation, or will return the result of the function invocation
  * if the specified number of arguments have been received
  */
-function curryN(context, arity, received, fn) {
+function curryN(context, arity, fn, received = []) {
     return function _curryN(...rest) {
         var combined = received.concat(rest);
-        if (arity > combined.length) return curryN(context, arity, combined, fn);
+        if (arity > combined.length) return curryN(context, arity, fn, combined);
         return fn.call(context, ...combined.slice(0, arity));
     };
 }
@@ -95,7 +95,7 @@ function curryN(context, arity, received, fn) {
  * @return: {Function|*}
  */
 function curryRight(fn) {
-    return curryN(this, fn.length, [], function _wrapper(...args) {
+    return curryN(this, fn.length, function _wrapper(...args) {
         return fn.call(this, ...args.reverse());
     });
 }
@@ -148,10 +148,8 @@ function fixedPoint(fn) {
  * @param: {function} fn2
  * @returns: {function}
  */
-var fork = curry(function _fork(join, fn1, fn2) {
-    return function _fork_(...args) {
-        return join(fn1(...args), fn2(...args));
-    };
+var fork = curry((join, fn1, fn2) => {
+    return (...args) => join(fn1(...args), fn2(...args));
 });
 
 /**
@@ -161,7 +159,7 @@ var fork = curry(function _fork(join, fn1, fn2) {
  * @param: {*} item - Any value of any type
  * @returns: {*} - returns item
  */
-function identity(item) { return item; }
+var identity = item => item;
 
 /**
  * ifElse :: Function -> ( Function -> ( Function -> (a -> b) ) )
@@ -177,11 +175,7 @@ function identity(item) { return item; }
  * @return: {*} - returns the result of invoking the ifFunc or elseFunc
  * on the data
  */
-var ifElse = curry(function _ifElse(predicate, ifFunc, elseFunc, data) {
-    if (predicate(data))
-        return ifFunc(data);
-    return elseFunc(data);
-});
+var ifElse = curry((predicate, ifFunc, elseFunc, data) => predicate(data) ? ifFunc(data) : elseFunc(data));
 
 /**
  * @description:
@@ -192,11 +186,7 @@ var ifElse = curry(function _ifElse(predicate, ifFunc, elseFunc, data) {
  * @param: {*} thatArg
  * @return: {*}
  */
-var ifThisThenThat = curry(function _ifThisThenThat(predicate, ifFunc, ifArg, thatArg) {
-    if (predicate(ifArg))
-        return ifFunc(thatArg);
-    return thatArg;
-});
+var ifThisThenThat = curry((predicate, ifFunc, ifArg, thatArg) => predicate(ifArg) ? ifFunc(thatArg) : thatArg);
 
 /**
  * kestrel :: a -> () -> a
