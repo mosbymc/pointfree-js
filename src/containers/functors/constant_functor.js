@@ -80,7 +80,7 @@ var constant_functor = {
      * of JS developers; thanks for making the world of JavaScript a spec which has become the standard and as
      * such enforces poor practices, poor design, and mental hurdles.
      */
-    constructor: Constant
+    factory: Constant
 };
 
 function _map() {
@@ -103,4 +103,6 @@ function _toString() {
     return `Constant(${this.value})`;
 }
 
-    export { Constant, constant_functor };
+constant_functor.constructor = constant_functor.factory;
+
+export { Constant, constant_functor };

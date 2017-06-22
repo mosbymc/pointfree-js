@@ -1,5 +1,5 @@
 import { Constant, constant_functor } from './constant_functor';
-import { Either, Left, Right, either_functor } from './either_functor';
+import { Either, Left, Right, right_functor, left_functor } from './either_functor';
 import { Future, future_functor } from './future_functor';
 import { Identity, identity_functor } from './identity_functor';
 import { Io, io_functor } from './io_functor';
@@ -46,15 +46,6 @@ constant_functor.mapToRight = mapToRight;
 constant_functor.mapToValidation = mapToValidation;
 constant_functor[Symbol.iterator] = containerIterator;
 
-either_functor.mapToConstant = mapToConstant;
-either_functor.mapToFuture = mapToFuture;
-either_functor.mapToIdentity = mapToIdentity;
-either_functor.mapToIo = mapToIo;
-either_functor.mapToList = mapToList;
-either_functor.mapToMaybe = mapToMaybe;
-either_functor.mapToValidation = mapToValidation;
-either_functor[Symbol.iterator] = containerIterator;
-
 future_functor.mapToConstant = mapToConstant;
 future_functor.mapToEither = mapToEither;
 future_functor.mapToIdentity = mapToIdentity;
@@ -97,6 +88,15 @@ just_functor.mapToList = mapToList;
 just_functor.mapToValidation = mapToValidation;
 just_functor[Symbol.iterator] = containerIterator;
 
+left_functor.mapToConstant = mapToConstant;
+left_functor.mapToFuture = mapToFuture;
+left_functor.mapToIdentity = mapToIdentity;
+left_functor.mapToIo = mapToIo;
+left_functor.mapToList = mapToList;
+left_functor.mapToMaybe = mapToMaybe;
+left_functor.mapToValidation = mapToValidation;
+left_functor[Symbol.iterator] = containerIterator;
+
 list_core.mapToConstant = mapToConstant;
 list_core.mapToEither = mapToEither;
 list_core.mapToFuture = mapToFuture;
@@ -117,6 +117,15 @@ nothing_functor.mapToList = mapToList;
 nothing_functor.mapToRight = mapToRight;
 nothing_functor.mapToValidation = mapToValidation;
 nothing_functor[Symbol.iterator] = containerIterator;
+
+right_functor.mapToConstant = mapToConstant;
+right_functor.mapToFuture = mapToFuture;
+right_functor.mapToIdentity = mapToIdentity;
+right_functor.mapToIo = mapToIo;
+right_functor.mapToList = mapToList;
+right_functor.mapToMaybe = mapToMaybe;
+right_functor.mapToValidation = mapToValidation;
+right_functor[Symbol.iterator] = containerIterator;
 
 validation_functor.mapToConstant = mapToConstant;
 validation_functor.mapToEither = mapToEither;

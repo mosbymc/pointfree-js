@@ -91,10 +91,7 @@ var leftApply = fn => (...args) => fn(...args);
  * @param: {function} fn
  * @return: {*}
  */
-var maybe = (fn) =>
-    function _maybe(...args) {
-        return null != args ? fn.call(this, ...args) : null;
-    };
+var maybe = (fn) => (...args) => null != args ? fn.call(this, ...args) : null;
 
 /**
  * not :: () -> !()

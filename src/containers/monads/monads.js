@@ -1,5 +1,5 @@
 import { Constant, constant_monad } from './constant_monad';
-import { Either, Left, Right, either_monad } from './either_monad';
+import { Either, Left, Right, right_monad, left_monad } from './either_monad';
 import { Future, future_monad } from './future_monad';
 import { Identity, identity_monad } from './identity_monad';
 import { Io, io_monad } from './io_monad';
@@ -99,15 +99,6 @@ constant_monad.mapToRight = mapToRight;
 constant_monad.mapToValidation = mapToValidation;
 constant_monad[Symbol.iterator] = containerIterator;
 
-either_monad.mapToConstant = mapToConstant;
-either_monad.mapToFuture = mapToFuture;
-either_monad.mapToIdentity = mapToIdentity;
-either_monad.mapToIo = mapToIo;
-either_monad.mapToList = mapToList;
-either_monad.mapToMaybe = mapToMaybe;
-either_monad.mapToValidation = mapToValidation;
-either_monad[Symbol.iterator] = containerIterator;
-
 future_monad.mapToConstant = mapToConstant;
 future_monad.mapToEither = mapToEither;
 future_monad.mapToIdentity = mapToIdentity;
@@ -140,6 +131,15 @@ io_monad.mapToMaybe = mapToMaybe;
 io_monad.mapToRight = mapToRight;
 io_monad.mapToValidation = mapToValidation;
 io_monad[Symbol.iterator] = containerIterator;
+
+left_monad.mapToConstant = mapToConstant;
+left_monad.mapToFuture = mapToFuture;
+left_monad.mapToIdentity = mapToIdentity;
+left_monad.mapToIo = mapToIo;
+left_monad.mapToList = mapToList;
+left_monad.mapToMaybe = mapToMaybe;
+left_monad.mapToValidation = mapToValidation;
+left_monad[Symbol.iterator] = containerIterator;
 
 just_monad.mapToConstant = mapToConstant;
 just_monad.mapToEither = mapToEither;
@@ -180,6 +180,15 @@ nothing_monad.mapToList = mapToList;
 nothing_monad.mapToRight = mapToRight;
 nothing_monad.mapToValidation = mapToValidation;
 nothing_monad[Symbol.iterator] = containerIterator;
+
+right_monad.mapToConstant = mapToConstant;
+right_monad.mapToFuture = mapToFuture;
+right_monad.mapToIdentity = mapToIdentity;
+right_monad.mapToIo = mapToIo;
+right_monad.mapToList = mapToList;
+right_monad.mapToMaybe = mapToMaybe;
+right_monad.mapToValidation = mapToValidation;
+right_monad[Symbol.iterator] = containerIterator;
 
 validation_monad.mapToConstant = mapToConstant;
 validation_monad.mapToEither = mapToEither;

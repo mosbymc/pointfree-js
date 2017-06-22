@@ -10,14 +10,16 @@ function nameProjector(item) {
 }
 
 function namePredicate(item) {
-    return item.FirstName.length > 5;
+    return 5 < item.FirstName.length;
 }
 
 function isObject(item) {
     return 'object' === typeof item;
 }
 
-internal_orderedQueryable.source = testData.dataSource.data;
+beforeEach(function setSource() {
+    internal_orderedQueryable.source = testData.dataSource.data;
+});
 
 describe('Test orderedQueryable... ', function testOrderedQueryable() {
     it('should create a new queryable delegate', function testObjectDelegation() {

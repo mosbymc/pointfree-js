@@ -141,7 +141,7 @@ describe('List functor test', function _testListFunctor() {
             Object.getPrototypeOf(c).should.eql(Object.getPrototypeOf(functors.Constant()));
 
             e.should.be.an('object');
-            Object.getPrototypeOf(e).should.eql(Object.getPrototypeOf(functors.Either()));
+            //Object.getPrototypeOf(e).should.eql(Object.getPrototypeOf(functors.Either()));
 
             f.should.be.an('object');
             Object.getPrototypeOf(f).should.eql(Object.getPrototypeOf(functors.Future()));

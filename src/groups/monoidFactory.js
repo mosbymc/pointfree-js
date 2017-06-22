@@ -10,7 +10,7 @@ var emptyObj = Object.create({});
  * @param: {string} type
  * @returns {_monoid}
  */
-function monoidFactory(concatFn, type) {
+function monoidFactory(concatFn, type, empty) {
     /**
      * @description:
      * @param: {*} x - The initial value of the new semigroup/monoid

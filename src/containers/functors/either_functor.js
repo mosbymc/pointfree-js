@@ -1,5 +1,32 @@
 function Either(val, fork) {
-    return Object.create(either_functor, {
+    return 'right' === fork ?
+        Object.create(right_functor, {
+            _value: {
+                value: val,
+                writable: false,
+                configurable: false
+            },
+            isRight: {
+                value: true
+            },
+            isLeft: {
+                value: false
+            }
+        }) :
+        Object.create(left_functor, {
+            _value: {
+                value: val,
+                writable: false,
+                configurable: false
+            },
+            isRight: {
+                value: false
+            },
+            isLeft: {
+                value: true
+            }
+        })
+    /*return Object.create(either_functor, {
         _value: {
             value: val,
             writable: false,
@@ -15,7 +42,7 @@ function Either(val, fork) {
             writable: false,
             configurable: false
         }
-    });
+    });*/
 }
 
 Either.of = function _of(val) {
@@ -30,20 +57,60 @@ Either.isLeft = function _isLeft(ma) {
     return ma.isLeft;
 };
 
-function Left(val) {
-    return Either(val);
-}
+Either.Right = function _right(val) {
+    return Either(val, 'right');
+};
 
-Left.of = function _of(val) {
+Either.Left = function _left(val) {
     return Either(val);
 };
 
+function Left(val) {
+    return Object.create(left_functor, {
+        _value: {
+            value: val,
+            writable: false,
+            configurable: false
+        },
+        isRight: {
+            value: false,
+            writable: false,
+            configurable: false
+        },
+        isLeft: {
+            value: true,
+            writable: false,
+            configurable: false
+        }
+    });
+}
+
+Left.of = function _of(val) {
+    return Left(val);
+};
+
 function Right(val) {
-    return Either.of(val);
+    return Object.create(right_functor, {
+        _value: {
+            value: val,
+            writable: false,
+            configurable: false
+        },
+        isRight: {
+            value: true,
+            writable: false,
+            configurable: false
+        },
+        isLeft: {
+            value: false,
+            writable: false,
+            configurable: false
+        }
+    });
 }
 
 Right.of = function _of(val) {
-    return Either.of(val);
+    return Right(val);
 };
 
 var either_functor = {
@@ -84,7 +151,7 @@ var either_functor = {
     factory: Either
 };
 
-var right = {
+var right_functor = {
     get value() {
         return this._value;
     },
@@ -94,17 +161,7 @@ var right = {
      * @return: {@see either_functor}
      */
     map: function _map(fn) {
-        return this.isRight ? Right(fn(this.value)) : Left(this.value);
-    },
-    /**
-     * @description:
-     * @param: {function|undefined} fn
-     * @return: {@see either_functor}
-     */
-    flatMap: function _flatMap(fn) {
-        if (Object.getPrototypeOf(this).isPrototypeOf(this.value)) return this.value.map(fn);
-        if (this.isRight) return Right(fn(this.value));
-        return Left(this.value);
+        return this.of(fn(this.value));
     },
     /**
      * @description:
@@ -116,7 +173,7 @@ var right = {
             (this.isLeft && ma.isLeft && this.value === ma.value) || this.isRight && ma.isRight && this.value === ma.value : false;
     },
     of: function _of(val) {
-        return Either.of(val);
+        return Right(val);
     },
     /**
      * @description:
@@ -127,12 +184,12 @@ var right = {
     },
     toString: function _toString() {
         var val = this.value && this.value.toString && 'function' === typeof this.value.toString ? this.value.toString() : JSON.stringify(this.value);
-        return this.isLeft ? `Left(${val})` : `Right(${val})`;
+        return `Right(${val})`;
     },
     factory: Either
 };
 
-var left = {
+var left_functor = {
     get value() {
         return this._value;
     },
@@ -145,23 +202,18 @@ var left = {
     },
     /**
      * @description:
-     * @param: {function|undefined} fn
-     * @return: {@see either_functor}
-     */
-    flatMap: function _flatMap(fn) {
-        if (Object.getPrototypeOf(this).isPrototypeOf(this.value)) return this.value.map(fn);
-        return Left(this.value);
-    },
-    /**
-     * @description:
      * @param: {functor} ma
      * @return: {boolean}
      */
     equals: function _equals(ma) {
         return Object.getPrototypeOf(this).isPrototypeOf(ma) && this.isLeft && ma.isLeft && this.value === ma.value;
     },
+    /**
+     *
+     * @param val
+     */
     of: function _of(val) {
-        return Either.of(val);
+        return Right(val);
     },
     /**
      * @description:
@@ -193,9 +245,9 @@ function fromNullable(x) {
 //way of saying: "your too dumb to understand how JavaScript works, and I either don't know myself, or don't
 //care to know, so just stick with what I tell you to use."
 either_functor.constructor = either_functor.factory;
-right.constructor = right.factory;
-left.constructor = left.factory;
+right_functor.constructor = right_functor.factory;
+left_functor.constructor = left_functor.factory;
 
 
 
-export { Either, Left, Right, either_functor };
+export { Either, Left, Right, right_functor, left_functor };

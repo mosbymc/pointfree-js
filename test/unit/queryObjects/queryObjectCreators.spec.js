@@ -26,7 +26,7 @@ var sortObj = [{ keySelector: keySelector, direction: sortDirection.ascending }]
 
 var backupData = testData.dataSource.data.map(function _i(val) { return val; });
 
-afterEach(function setSource() {
+beforeEach(function setSource() {
     testData.dataSource.data = backupData;
 });
 

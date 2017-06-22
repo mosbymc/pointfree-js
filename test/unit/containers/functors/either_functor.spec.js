@@ -1,5 +1,5 @@
 import { functors } from '../../../../src/containers/functors/functors';
-import { either_functor } from '../../../../src/containers/functors/either_functor';
+import { right_functor, left_functor } from '../../../../src/containers/functors/either_functor';
 
 var Either = functors.Either,
     Left = functors.Left,
@@ -15,10 +15,10 @@ describe('Either functor tests', function _testEitherFunctor() {
                 e3 = Either(arr, 'right'),
                 e4 = Either(obj, 'right');
 
-            either_functor.isPrototypeOf(e1).should.be.true;
-            either_functor.isPrototypeOf(e2).should.be.true;
-            either_functor.isPrototypeOf(e3).should.be.true;
-            either_functor.isPrototypeOf(e4).should.be.true;
+            left_functor.isPrototypeOf(e1).should.be.true;
+            left_functor.isPrototypeOf(e2).should.be.true;
+            right_functor.isPrototypeOf(e3).should.be.true;
+            right_functor.isPrototypeOf(e4).should.be.true;
 
             e1.isLeft.should.be.true;
             e1.isRight.should.not.be.true;
@@ -38,10 +38,10 @@ describe('Either functor tests', function _testEitherFunctor() {
                 e3 = Either(arr, 'right'),
                 e4 = Either(obj, 'right');
 
-            either_functor.isPrototypeOf(e1).should.be.true;
-            either_functor.isPrototypeOf(e2).should.be.true;
-            either_functor.isPrototypeOf(e3).should.be.true;
-            either_functor.isPrototypeOf(e4).should.be.true;
+            left_functor.isPrototypeOf(e1).should.be.true;
+            left_functor.isPrototypeOf(e2).should.be.true;
+            right_functor.isPrototypeOf(e3).should.be.true;
+            right_functor.isPrototypeOf(e4).should.be.true;
 
             e1.isLeft.should.be.true;
             e1.isRight.should.not.be.true;
@@ -140,8 +140,8 @@ describe('Either functor tests', function _testEitherFunctor() {
             var e1_1 = e1.map(function _m(i) { return i*2; }),
                 e2_1 = e2.map(function _m(a) { return a.map(function t(i) { return i * 2 ;}); });
 
-            either_functor.isPrototypeOf(e1_1).should.be.true;
-            either_functor.isPrototypeOf(e2_1).should.be.true;
+            right_functor.isPrototypeOf(e1_1).should.be.true;
+            right_functor.isPrototypeOf(e2_1).should.be.true;
 
             e1_1.isLeft.should.be.false;
             e1_1.isRight.should.be.true;
@@ -160,8 +160,8 @@ describe('Either functor tests', function _testEitherFunctor() {
             var e1_1 = e1.map(),
                 e2_1 = e2.map();
 
-            either_functor.isPrototypeOf(e1_1).should.be.true;
-            either_functor.isPrototypeOf(e2_1).should.be.true;
+            left_functor.isPrototypeOf(e1_1).should.be.true;
+            left_functor.isPrototypeOf(e2_1).should.be.true;
 
             e1_1.isLeft.should.be.true;
             e1_1.isRight.should.be.false;
@@ -241,10 +241,10 @@ describe('Either functor tests', function _testEitherFunctor() {
                 e3 = e.of(arr),
                 e4 = e.of(obj);
 
-            either_functor.isPrototypeOf(e1).should.be.true;
-            either_functor.isPrototypeOf(e2).should.be.true;
-            either_functor.isPrototypeOf(e3).should.be.true;
-            either_functor.isPrototypeOf(e4).should.be.true;
+            right_functor.isPrototypeOf(e1).should.be.true;
+            right_functor.isPrototypeOf(e2).should.be.true;
+            right_functor.isPrototypeOf(e3).should.be.true;
+            right_functor.isPrototypeOf(e4).should.be.true;
 
             e1.isLeft.should.be.false;
             e1.isRight.should.be.true;

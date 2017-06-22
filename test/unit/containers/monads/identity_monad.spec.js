@@ -125,8 +125,9 @@ describe('Identity monad test', function _testIdentityMonad() {
 
             Object.getPrototypeOf(lRes).should.eql(Object.getPrototypeOf(monads.List()));
             Object.getPrototypeOf(cRes).should.eql(monads.Constant());
-            Object.getPrototypeOf(e1Res).should.eql(monads.Either());
-            Object.getPrototypeOf(e2Res).should.eql(monads.Either());
+            Object.getPrototypeOf(e1Res).should.eql(monads.Right());
+            e2Res.isRight.should.be.false;
+            e2Res.isLeft.should.be.true;
             //Object.getPrototypeOf(m1Res).should.eql(monads.Maybe(65));
             //Object.getPrototypeOf(m2Res).should.eql(monads.Maybe());
             //Object.getPrototypeOf(m3Res).should.eql(monads.Maybe(false));

@@ -28,7 +28,7 @@ Identity.of = function _of(item) {
 
 /**
  * @description:
- * @return {@see identity_monad}
+ * @return: {@see identity_monad}
  */
 Identity.empty = function _empty() {
     return this.of(Object.create(emptyObject));

@@ -1,4 +1,4 @@
-import { monoidFactory } from '../../src/monoidFactory';
+import { monoidFactory } from '../../src/groups/monoidFactory';
 import { pipe } from '../../src/combinators';
 
 describe('monoidFactory tests', function _testMonoidFactory() {

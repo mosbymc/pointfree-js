@@ -1,8 +1,44 @@
-import { either_functor } from '../functors/either_functor';
+import { right_functor, left_functor } from '../functors/either_functor';
 import { identity } from '../../combinators';
 
 function Either(val, fork) {
-    return Object.create(either_monad, {
+    return 'right' === fork ?
+        Object.create(right_monad, {
+            _value: {
+                value: val,
+                writable: false,
+                configurable: false
+            },
+            isRight: {
+                value: true,
+                writable: false,
+                configurable: false
+            },
+            isLeft: {
+                value: false,
+                writable: false,
+                configurable: false
+            }
+        }) :
+        Object.create(left_monad, {
+            _value: {
+                value: val,
+                writable: false,
+                configurable: false
+            },
+            isRight: {
+                value: false,
+                writable: false,
+                configurable: false
+            },
+            isLeft: {
+                value: true,
+                writable: false,
+                configurable: false
+            }
+        });
+
+    /*return Object.create(either_monad, {
         _value: {
             value: val,
             writable: false,
@@ -18,7 +54,7 @@ function Either(val, fork) {
             writable: false,
             configurable: false
         }
-    });
+    });*/
 }
 
 Either.of = function _of(val) {
@@ -49,17 +85,12 @@ function Right(val) {
     return Either(val, 'right');
 }
 
-var either_monad = Object.create(either_functor, {
-    map: {
-        value: function _map(fn) {
-            return this.isRight ? Right(fn(this.value)) : Left(this.value);
-        }
-    },
+
+var right_monad = Object.create(right_functor, {
     flatMap: {
         value: function _flatMap(fn) {
-            if (Object.getPrototypeOf(this).isPrototypeOf(this.value)) return this.value.map(fn);
-            if (this.isRight) return Right(fn(this.value));
-            return Left(this.value);
+            var val = fn(this.value);
+            return right_monad.isPrototypeOf(val) ? val : this.of(val);
         }
     },
     mjoin: {
@@ -67,29 +98,29 @@ var either_monad = Object.create(either_functor, {
             return this.value;
         }
     },
-    chain: {
-        value: function _chain(fn) {
-            return this.isRight ? fn(this.value) : this.value;
-        }
-    },
     fold: {
-        value: function _fold(fn, x) {
-            return this.isRight ? fn(this.value, x) : this.value;
+        value: function _fold(fn, acc) {
+            return fn(acc, this.value);
         }
     },
     sequence: {
-        value: function _sequence(a) {
-            return this.traverse(identity, a);
+        value: function _sequence(p) {
+            return this.traverse(identity, p);
         }
     },
     traverse: {
-        value: function _traverse(a, f) {
-            return this.isRight ? f(this.value).map(Either.of) : a.of(Either.Left(this.value));
+        value: function _traverse(a, f, g) {
+            return f(this.value).map(this.of);
         }
     },
+    /**
+     * @description:
+     * @param: {monad} ma
+     * @return: {monad}
+     */
     apply: {
         value: function _apply(ma) {
-            return this.map(ma.value);
+            return ma.map(this.value);
         }
     },
     of: {
@@ -102,9 +133,61 @@ var either_monad = Object.create(either_functor, {
     }
 });
 
-either_monad.ap = either_monad.apply;
-either_monad.bind = either_monad.chain;
-either_monad.reduce = either_monad.fold;
+
+var left_monad = Object.create(left_functor, {
+    flatMap: {
+        value: function _flatMap(fn) {
+            return Left(this.value);
+        }
+    },
+    mjoin: {
+        value: function _mjoin() {
+            return this.value;
+        }
+    },
+    fold: {
+        value: function _fold(fn, acc) {
+            return fn(acc, this.value);
+        }
+    },
+    sequence: {
+        value: function _sequence(p) {
+            return this.traverse(identity, p);
+        }
+    },
+    traverse: {
+        value: function _traverse(a, f) {
+            return a.of(this.of(this.value));
+        }
+    },
+    /**
+     * @description:
+     * @param: {monad} ma
+     * @return: {monad}
+     */
+    apply: {
+        value: function _apply(ma) {
+            return ma.map(this.value);
+        }
+    },
+    of: {
+        value: function _of(val) {
+            return Left(val);
+        }
+    },
+    factory: {
+        value: Either
+    }
+});
+
+
+
+right_monad.ap = right_monad.apply;
+left_monad.ap = left_monad.apply;
+right_monad.bind = right_monad.chain;
+left_monad.bind = left_monad.chain;
+right_monad.reduce = right_monad.fold;
+left_monad.reduce = left_monad.fold;
 
 
 
@@ -117,7 +200,8 @@ either_monad.reduce = either_monad.fold;
 //as it was intended... you know, like Douglas Crockford and his "good parts", which is really just another
 //way of saying: "your too dumb to understand how JavaScript works, and I either don't know myself, or don't
 //care to know, so just stick with what I tell you to use."
-either_monad.constructor = either_monad.factory;
+right_monad.constructor = right_monad.factory;
+left_monad.constructor = left_monad.factory;
 
 
-export { Either, Left, Right, either_monad };
+export { Either, Left, Right, right_monad, left_monad };

@@ -204,9 +204,7 @@ var kestrel = constant;
  * @param: {function} a
  * @return: {*}
  */
-function m(a) {
-    return a(a);
-}
+var m = a => a(a);
 
 /**
  * @description:
@@ -252,9 +250,7 @@ function mapReducer (mapFn) {
  * @param: {function} b
  * @return: {*}
  */
-var o = curry(function _o(a, b) {
-    return b(a(b));
-});
+var o = curry((a, b) => b(a(b)));
 
 /**
  * pipe :: [a] -> (b -> c)
@@ -289,9 +285,7 @@ function pipe(fn, ...fns) {
  * @param: {*} c
  * @return: {*}
  */
-var q = curry(function _q(a, b, c) {
-    b(a(c));
-});
+var q = curry((a, b, c) => b(a(c)));
 
 //const reduce = (accFn, start, xs) => xs.reduce(accFn, start);
 /**
@@ -354,9 +348,7 @@ function sequence(fns) {
  * @param: {function} f
  * @return: {*}
  */
-var t = curry(function _t(x, f) {
-    return f(x);
-});
+var t = curry((x, f) => f(x));
 
 var thrush = t;
 
@@ -367,9 +359,7 @@ var thrush = t;
  * @param: {function} b
  * @return: {*}
  */
-var u = curry(function _u(a, b) {
-    return b(a(a)(b));
-});
+var u = curry((a, b) => b(a(a)(b)));
 
 /**
  * @description:
@@ -378,9 +368,7 @@ var u = curry(function _u(a, b) {
  * @param: {*} b
  * @return: {*}
  */
-var w = curry(function _w(a, b) {
-    return a(b)(b);
-});
+var w = curry((a, b) => a(b)(b));
 
 /**
  * when :: Function -> (Function -> (a -> b))
@@ -392,10 +380,7 @@ var w = curry(function _w(a, b) {
  * @param: {*} data
  * @return: {*}
  */
-var when = curry(function _when(predicate, transform, data) {
-    if (predicate(data)) return transform(data);
-    return data;
-});
+var when = curry((predicate, transform, data) => predicate(data) ? transform(data) : data);
 
 /**
  * @description:
@@ -405,10 +390,7 @@ var when = curry(function _when(predicate, transform, data) {
  * @param: {*} data
  * @return: {*}
  */
-var whenNot = curry(function _whenNot(predicate, transform, data) {
-    if (!predicate(data)) return transform(data);
-    return data;
-});
+var whenNot = curry((predicate, transform, data) => !predicate(data) ? transform(data) : data);
 
 /**
  * @description:

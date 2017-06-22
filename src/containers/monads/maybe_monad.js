@@ -200,7 +200,7 @@ var just_monad = Object.create(just_functor, {
         }
     },
     factory: {
-        value: Just
+        value: Maybe
     }
 });
 
@@ -251,7 +251,7 @@ var nothing_monad = Object.create(nothing_functor, {
         }
     },
     factory: {
-        value: Nothing
+        value: Maybe
     }
 });
 
