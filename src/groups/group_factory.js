@@ -1,26 +1,34 @@
-import { identity } from '../combinators';
-
 /**
  * @description: Takes a function that can perform the desired type of concatenation and an optional
- * string that describes the type of monoid that is being created. The 'type' parameter is used in
+ * string that describes the type of group that is being created. The 'type' parameter is used in
  * the .toString() functionality only for representing the created monoid's type. The function returns
  * a new function, that, when invoked, will return a monoid with the concatenation function originally
  * provided as the means of concatenation. The resulting monoid adheres to the FantasyLand spec.
  * @param: {function} concatFn
+ * @param: {function} inverseFn
+ * @param: {*} e
  * @param: {string} type
- * @returns {_monoid}
+ * @return: {@see group}
  */
 function groupFactory(concatFn, inverseFn, e, type) {
-    //TODO: I need to figure out a way to create a new group type instance that enables
-    //TODO: me to set the 'prev' field on, or just after creation. Ideally, the consumer
-    //TODO: would not have access to this operation
+    /**
+     * @description:
+     * @param: {*} x
+     * @param: {*} prev
+     * @return: {@see group}
+     * @private
+     */
     function _internalGroupCreator(x, prev) {
         return Object.create(group, {
             _value: {
-                value: x
+                value: x,
+                writable: false,
+                configurable: false
             },
             _prev: {
-                value: prev
+                value: prev,
+                writable: false,
+                configurable: false
             },
             concat: {
                 value: _concat
@@ -44,7 +52,9 @@ function groupFactory(concatFn, inverseFn, e, type) {
                 value: _group
             },
             isEmpty: {
-                value: e === x
+                value: e === x,
+                writable: false,
+                configurable: false
             },
             toString: {
                 value: function _toString() {
@@ -57,20 +67,24 @@ function groupFactory(concatFn, inverseFn, e, type) {
     /**
      * @description:
      * @param: {*} x - The initial value of the new semigroup/monoid
-     * @return: {Object}
+     * @return: {@see group}
      */
     function _group(x) {
         return Object.create(group, {
             _value: {
-                value: x
+                value: x,
+                writable: false,
+                configurable: false
             },
             _prev: {
-                value: null
+                value: null,
+                writable: false,
+                configurable: false
             },
             /**
              * @description:
              * @param: {*} other
-             * @return:
+             * @return: {@see group}
              */
             concat: {
                 value: _concat
@@ -78,17 +92,31 @@ function groupFactory(concatFn, inverseFn, e, type) {
             /**
              * @description:
              * @param: {Array} others
-             * @return:
+             * @return: {@see group}
              */
             concatAll: {
                 value: _concatAll
             },
+            /**
+             * @description:
+             * @param: {*} other
+             * @return: {@see group}
+             */
             inverseConcat: {
                 value: _inverseConcat
             },
+            /**
+             * @description:
+             * @param: {*, *, ...} others
+             * @return: {@see group}
+             */
             inverseConcatAll: {
                 value: _inverseConcatAll
             },
+            /**
+             * @description:
+             * @return: {@see group}
+             */
             undo: {
                 value: _undo
             },
@@ -105,7 +133,9 @@ function groupFactory(concatFn, inverseFn, e, type) {
              * @description:
              */
             isEmpty: {
-                value: e === x
+                value: e === x,
+                writable: false,
+                configurable: false
             },
             /**
              * @description:
@@ -124,48 +154,77 @@ function groupFactory(concatFn, inverseFn, e, type) {
      * @return: {string}
      */
     function toString() {
-        if (this.isEmpty) return 'identity';
-        if (Object.is(-0, this.value)) return '-0';
-        return this._value.toString();
+        return (Object.is(-0, this.value)) ? '-0' : this.value.toString();
     }
 
+    /**
+     * @description:
+     * @param: {*} other
+     * @return: {@see group}
+     * @private
+     */
     function _concat(other) {
         return this.isEmpty ? _internalGroupCreator(other._value, other._value)
             : other.isEmpty ? _internalGroupCreator(this._value, other._value) :
                 _internalGroupCreator(concatFn(other._value, this._value), other._value);
     }
 
+    /**
+     * @description:
+     * @param: {Array} others
+     * @return: {@see group}
+     * @private
+     */
     function _concatAll(...others) {
         return others.filter(function _filterEmpty(m) {
             return !m.isEmpty;
         }).reduce(function _concatAll(curr, next) {
-            return curr.concat(next);
+            return _internalGroupCreator(concatFn(next.value, curr.value), next.value);
         }, this);
     }
 
+    /**
+     * @description:
+     * @param: {*} other
+     * @return: {@see group}
+     * @private
+     */
     function _inverseConcat(other) {
         var invertedOther = other.isEmpty ? e : inverseFn(other.value);
-        return this.isEmpty ? _internalGroupCreator(invertedOther, invertedOther)
-            : other.isEmpty ? _internalGroupCreator(this._value, this._value) :
-                _internalGroupCreator(concatFn(invertedOther, this._value), invertedOther);
+        return _concat.call(this, _group(invertedOther));
     }
 
+    /**
+     * @description:
+     * @param: {Array} others
+     * @return: {@see group}
+     * @private
+     */
     function _inverseConcatAll(...others) {
-
+        return others.filter(function _filterEmpty(m) {
+            return !m.isEmpty;
+        }).reduce(function _concatAll(curr, next) {
+            var invertedOther = inverseFn(next.value);
+            return _internalGroupCreator(concatFn(invertedOther, curr.value), invertedOther);
+        }, this);
     }
 
+    /**
+     * @description:
+     * @return: {@see group}
+     * @private
+     */
     function _undo() {
         if (null != this.previous && e != this.previous) {
             var invertedPrev = inverseFn(this.previous);
             return _internalGroupCreator(concatFn(invertedPrev, this._value), invertedPrev);
-            //return concatFn.call(this, _group(inverseFn(this.value)));
         }
         return _group(this.value);
     }
 
     /**
      * @description:
-     * @return: {Object}
+     * @return: {@see group}
      */
     _group.empty = function _empty() {
         return _group(e);
@@ -174,20 +233,17 @@ function groupFactory(concatFn, inverseFn, e, type) {
     return _group;
 }
 
-
+/**
+ *
+ * @type {{value, _prev: null, previous, valueOf: group._valueOf}}
+ */
 var group = {
     get value() {
-        return this.isEmpty ? undefined : this._value;
+        return this._value;
     },
     _prev: null,
     get previous() {
         return this._prev;
-    },
-    set previous(val) {
-        this._prev = val;
-    },
-    get isEmpty() {
-        return this.value === identity;
     },
     valueOf: function _valueOf() {
         return this._value;
