@@ -49,6 +49,25 @@ function compose(...fns) {
 }
 
 /**
+ * @description:
+ * @type: {function}
+ * @param: {function} exp1
+ * @param: {function} exp2
+ * @param: {function} cond
+ * @return: {*}
+ */
+var condition = curry((exp1, exp2, cond) => cond(x, exp1, exp2));
+
+var notFn = condition(constant(x => x), x => x);
+
+var n = function _n(x, y, z) {
+    return function (...args) {
+        console.log(x, y, z);
+        x ? y(...args) : z(...args);
+    };
+};
+
+/**
  * constant :: a -> () -> a
  * @description:
  * @param: {*} item

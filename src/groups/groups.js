@@ -9,9 +9,7 @@ var multGroup = groupFactory((x, y) => x * y, x => 1 / x, 1, 'Multiply');
 var divGroup = groupFactory((x, y) => x / y, x => 1 / x, 1, 'Division');
 
 
-var strGroup = groupFactory(function _strConcat(y) {
-    return strGroup(this.value.concat(y.value));
-}, 'String');
+var strGroup = groupFactory((x, y) => x + y, x => x, '', 'String');
 
 var allGroup = groupFactory(function _allConcat(y) {
     return allGroup(this.value && y.value);
@@ -24,7 +22,5 @@ var anyGroup = groupFactory(function _anyConcat(y) {
 var firstGroup = groupFactory(function _firstConcat(y) {
     return firstGroup(this.value);
 }, 'First');
-
-
 
 export { sumGroup, subGroup, multGroup, divGroup };
