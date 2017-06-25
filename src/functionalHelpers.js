@@ -115,7 +115,7 @@ var divide = curry((x, y) => x / y);
  * @param: {*} y
  * @return: {boolean}
  */
-var equal = curry((x, y) => x == y);
+var equals = curry((x, y) => x == y);
 
 /**
  * @description:
@@ -365,7 +365,7 @@ var set = curry(function _set(prop, val, obj) {
  * @param: {*} y
  * @return: {boolean}
  */
-var strictEqual = curry((x, y) => x === y);
+var strictEquals = curry((x, y) => x === y);
 
 /**
  * @description:
@@ -409,7 +409,7 @@ var type = a => typeof a;
  */
 var wrap = data => [data];
 
-export { add, adjust, and, arraySet, concat, defaultPredicate, delegatesFrom, delegatesTo, divide, equal, falsey, flip,
+export { add, adjust, and, arraySet, concat, defaultPredicate, delegatesFrom, delegatesTo, divide, equals, falsey, flip,
         getWith, greaterThan, greaterThanOrEqual, isArray, isBoolean, isFunction, isObject, isNothing, isNull, isNumber,
         isSomething, isString, isSymbol, isUndefined, lessThan, lessThanOrEqual, modulus, multiple, negate, notEqual, noop,
-        nth, objectSet, once, or, set, strictEqual, strictNotEqual, subtract, truthy, type, wrap };
+        nth, objectSet, once, or, set, strictEquals, strictNotEqual, subtract, truthy, type, wrap };

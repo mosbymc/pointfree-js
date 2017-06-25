@@ -1,4 +1,4 @@
-import { compose } from '../../combinators';
+import { compose, constant } from '../../combinators';
 
 /**
  * @description:
@@ -21,7 +21,7 @@ function Io(item) {
  * @return: {@see io_functor}
  */
 Io.of = function _of(item) {
-    return 'function' === typeof item ? Io(item) : Io(function _anon() { return item; });
+    return 'function' === typeof item ? Io(item) : Io(constant(item));
 };
 
 /**

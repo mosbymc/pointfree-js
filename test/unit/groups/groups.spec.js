@@ -1,4 +1,4 @@
-import { sumGroup, subGroup, multGroup, divGroup } from '../../../src/groups/groups';
+import { sumGroup, multGroup, strGroup, allGroup, anyGroup } from '../../../src/groups/groups';
 
 describe('Test Groups', function _testGroups() {
     describe('Test sumGroup', function _testSumGroup() {
@@ -450,6 +450,37 @@ describe('Test Groups', function _testGroups() {
             expect(function _writeToDotValue() { m.value = 5; }).to.throw();
             expect(function _writeToDot_prev() { m._prev = 5; }).to.throw();
             expect(function _writeToDotPrevious() { m.previous = 5; }).to.throw();
+        });
+    });
+
+    describe('Test allGroup', function _testAllGroup() {
+        it('should return the proper sum of two numbers', function _testAllConcatOnValues() {
+            var a1 = allGroup(true),
+                a2 = allGroup(true),
+                a3 = allGroup(false);
+
+            a1.concat(a2).value.should.eql(true);
+            a1.concat(a3).value.should.eql(false);
+
+            a2.concat(a3).value.should.eql(false);
+
+            //Associativity
+            console.log(a1.concat(a2).concat(a3).value);
+            a1.concat(a2).concat(a3).value.should.eql(a1.concat(a2.concat(a3)).value);
+        });
+
+        it('should allow concatenation via .valueOf function', function _testSameValueViaANDOperator() {
+            var a1 = allGroup(true),
+                a2 = allGroup(true),
+                a3 = allGroup(false);
+
+            ((a1 && a2).value).should.eql(true);
+            ((a1 && a3).value).should.eql(false);
+
+            ((a2 && a3).value).should.eql(false);
+
+            //Associativity
+            ((a1 && a2 && a3).value).should.eql((a1 && (a2 && a3)).value);
         });
     });
 });

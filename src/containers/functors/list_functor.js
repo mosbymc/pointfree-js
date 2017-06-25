@@ -62,12 +62,12 @@ var list_core = {
 
     /**
      * @description:
-     * @param: {@see list_core} ma
+     * @param: {@see list_core} f
      * @param: {function} comparer
      * @return: {boolean}
      */
-    equals: function _equals(ma, comparer) {
-        return list_core.isPrototypeOf(ma) && equals(this, ma, comparer);
+    equals: function _equals(f, comparer) {
+        return Object.getPrototypeOf(this).isPrototypeOf(f) && equals(this, f, comparer);
     },
 
     /**
@@ -103,11 +103,11 @@ var list_core = {
 
     /**
      * @description:
-     * @param: {iterable} enumerable
+     * @param: {iterable} xs
      * @return: {@see m_list}
      */
-    addFront: function _addFront(enumerable) {
-        return this.of(this, addFront(this, enumerable));
+    addFront: function _addFront(xs) {
+        return this.of(this, addFront(this, xs));
     },
 
     /**
@@ -115,11 +115,11 @@ var list_core = {
      * List's value. This function is a deferred execution call that returns
      * a new queryable object delegator instance that contains all the requisite
      * information on how to perform the operation.
-     * @param: {Array | *} enumerables
+     * @param: {Array | *} ys
      * @return: {@see m_list}
      */
-    concat: function _concat(...enumerables) {
-        return this.of(this, concat(this, enumerables, enumerables.length));
+    concat: function _concat(...ys) {
+        return this.of(this, concat(this, ys, ys.length));
     },
 
     /**
@@ -131,12 +131,12 @@ var list_core = {
      * object delegator instance that contains all the requisite information on
      * how to perform the operation.
      * equality comparer.
-     * @param: {iterable} enumerable
+     * @param: {iterable} xs
      * @param: {function} comparer
      * @return: {@see m_list}
      */
-    except: function _except(enumerable, comparer) {
-        return this.of(this, except(this, enumerable, comparer));
+    except: function _except(xs, comparer) {
+        return this.of(this, except(this, xs, comparer));
     },
 
     /**
@@ -147,15 +147,15 @@ var list_core = {
      * This function is a deferred execution call that returns a new queryable
      * object delegator instance that contains all the requisite information on
      * how to perform the operation.
-     * @param: {@see list_core | Array} inner
-     * @param: {function} outerSelector
-     * @param: {function} innerSelector
+     * @param: {@see list_core | Array} ys
+     * @param: {function} xSelector
+     * @param: {function} ySelector
      * @param: {function} projector
      * @param: {function} comparer
      * @return: {@see m_list}
      */
-    groupJoin: function _groupJoin(inner, outerSelector, innerSelector, projector, comparer) {
-        return this.of(this, groupJoin(this, inner, outerSelector, innerSelector, projector, comparer));
+    groupJoin: function _groupJoin(ys, xSelector, ySelector, projector, comparer) {
+        return this.of(this, groupJoin(this, ys, xSelector, ySelector, projector, comparer));
     },
 
     /**
@@ -166,12 +166,12 @@ var list_core = {
      * This function is a deferred execution call that returns a new queryable
      * object delegator instance that contains all the requisite information on
      * how to perform the operation.
-     * @param: {iterable} enumerable
+     * @param: {iterable} xs
      * @param: {function} comparer
      * @return: {@see m_list}
      */
-    intersect: function _intersect(enumerable, comparer) {
-        return this.of(this, intersect(this, enumerable, comparer));
+    intersect: function _intersect(xs, comparer) {
+        return this.of(this, intersect(this, xs, comparer));
     },
 
     /**
@@ -181,15 +181,15 @@ var list_core = {
      * function will use a default equality comparer. This function is a deferred
      * execution call that returns a new queryable object delegator instance that
      * contains all the requisite information on how to perform the operation.
-     * @param: {Array|List} inner
-     * @param: {function} outerSelector
-     * @param: {function} innerSelector
+     * @param: {Array|List} ys
+     * @param: {function} xSelector
+     * @param: {function} ySelector
      * @param: {function} projector
      * @param: {function} comparer
      * @return: {@see m_list}
      */
-    join: function _join(inner, outerSelector, innerSelector, projector, comparer) {
-        return this.of(this, join(this, inner, outerSelector, innerSelector, projector, comparer));
+    join: function _join(ys, xSelector, ySelector, projector, comparer) {
+        return this.of(this, join(this, ys, xSelector, ySelector, projector, comparer));
     },
 
     /**
@@ -199,12 +199,12 @@ var list_core = {
      * function will use a default equality comparer. This function is a deferred
      * execution call that returns a new queryable object delegator instance that
      * contains all the requisite information on how to perform the operation.
-     * @param: {iterable} enumerable
+     * @param: {iterable} xs
      * @param: {function} comparer
      * @return: {@see m_list}
      */
-    union: function _union(enumerable, comparer) {
-        return this.of(this, union(this, enumerable, comparer));
+    union: function _union(xs, comparer) {
+        return this.of(this, union(this, xs, comparer));
     },
 
     /**
@@ -215,11 +215,11 @@ var list_core = {
      * execution call that returns a new queryable object delegator instance that
      * contains all the requisite information on how to perform the operation.
      * @param: {function} selector
-     * @param: {iterable} enumerable
+     * @param: {iterable} xs
      * @return: {@see m_list}
      */
-    zip: function _zip(selector, enumerable) {
-        return this.of(this, zip(this, selector, enumerable));
+    zip: function _zip(selector, xs) {
+        return this.of(this, zip(this, selector, xs));
     },
 
     /**
@@ -442,14 +442,14 @@ var list_core = {
 
     /**
      * @description:
-     * @param: {*} source
+     * @param: {*} xs
      * @param: {generator} iterator
      * @param: {Array} sortObj
      * @param: {string} key
      * @return: {@see m_list}
      */
-    of: function _of(source, iterator, sortObj, key) {
-        return createListDelegateInstance(source, iterator, sortObj, key);
+    of: function _of(xs, iterator, sortObj, key) {
+        return createListDelegateInstance(xs, iterator, sortObj, key);
     },
 
     /**

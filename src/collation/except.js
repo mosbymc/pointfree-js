@@ -1,8 +1,8 @@
-import { isArray, strictEqual } from '../functionalHelpers';
+import { isArray, strictEquals } from '../functionalHelpers';
 import { when } from '../combinators';
 import { not } from '../decorators';
 
-function except(source, enumerable, comparer = strictEqual) {
+function except(source, enumerable, comparer = strictEquals) {
     return function *exceptIterator() {
         var res;
         for (let item of source) {

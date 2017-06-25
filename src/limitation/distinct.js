@@ -1,7 +1,7 @@
 import { cacher } from '../helpers';
-import { strictEqual } from '../functionalHelpers';
+import { strictEquals } from '../functionalHelpers';
 
-function distinct(source, comparer = strictEqual) {
+function distinct(source, comparer = strictEquals) {
     var isInCache = cacher(comparer);
 
     return function *distinctIterator() {

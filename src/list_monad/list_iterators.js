@@ -1,53 +1,55 @@
-import { isArray, strictEqual, delegatesTo, isObject } from '../functionalHelpers';
+import { isArray, strictEquals, delegatesTo, isObject, type } from '../functionalHelpers';
 import { not } from '../decorators';
 import { when, ifElse } from '../combinators';
 import { javaScriptTypes, cacher } from '../helpers';
 import { sortData } from  '../projection/sortHelpers';
 
+var toArray = when(not(isArray), Array.from);
+
 /**
  * @description:
- * @param: {iterable} source
- * @param: {iterable} enumerable
+ * @param: {iterable} xs
+ * @param: {iterable} ys
  * @return: {generator}
  */
-function addFront(source, enumerable) {
+function addFront(xs, ys) {
     return function *addFront() {
-        enumerable = when(not(isArray), Array.from, enumerable);
-        for (let item of enumerable) {
-            if (javaScriptTypes.undefined !== item) yield item;
+        ys = toArray(ys);
+        for (let y of ys) {
+            if (javaScriptTypes.undefined !== y) yield y;
         }
 
-        for (let item of source) {
-            if (javaScriptTypes.undefined !== item) yield item;
+        for (let x of xs) {
+            if (javaScriptTypes.undefined !== x) yield x;
         }
     };
 }
 
 /**
  * @description:
- * @param: {iterable} source
- * @param: {Array} enumerables
+ * @param: {iterable} xs
+ * @param: {Array} yss
  * @param: {number} argsCount
  * @return: {generator}
  */
-function concat(source, enumerables, argsCount) {
+function concat(xs, yss, argsCount) {
     return function *concatIterator() {
-        for (let item of source) {
-            if (javaScriptTypes.undefined !== item) yield item;
+        for (let x of xs) {
+            if (javaScriptTypes.undefined !== x) yield x;
         }
 
         var enumerable;
         if (1 === argsCount) {
-            enumerable = enumerables[0];
-            for (let item of enumerable) {
-                if (javaScriptTypes.undefined !== item) yield item;
+            enumerable = yss[0];
+            for (let y of enumerable) {
+                if (javaScriptTypes.undefined !== y) yield y;
             }
         }
         else {
-            for (let list of enumerables) {
-                enumerable = when(not(isArray), Array.from, list);
-                for (let item of enumerable) {
-                    if (javaScriptTypes.undefined !== item) yield item;
+            for (let ys of yss) {
+                enumerable = toArray(ys);
+                for (let y of enumerable) {
+                    if (javaScriptTypes.undefined !== y) yield y;
                 }
             }
         }
@@ -56,49 +58,49 @@ function concat(source, enumerables, argsCount) {
 
 /**
  * @description:
- * @param: {iterable} source
- * @param: {iterable} enumerable
+ * @param: {iterable} xs
+ * @param: {iterable} ys
  * @param: {function} comparer
  * @return {generator}
  */
-function except(source, enumerable, comparer = strictEqual) {
+function except(xs, ys, comparer = strictEquals) {
     return function *exceptIterator() {
         var res;
-        for (let item of source) {
-            enumerable = when(not(isArray), Array.from, enumerable);
-            res = !(enumerable.some(function _comparer(it) {
-                return comparer(item, it);
+        for (let x of xs) {
+            ys = toArray(ys);
+            res = !(ys.some(function _comparer(y) {
+                return comparer(x, y);
             }));
-            if (res) yield item;
+            if (res) yield x;
         }
     };
 }
 
 /**
  * @description:
- * @param: {iterable} outer
- * @param: {iterable} inner
- * @param: {function} outerSelector
- * @param: {function} innerSelector
+ * @param: {iterable} xs
+ * @param: {iterable} ys
+ * @param: {function} xSelector
+ * @param: {function} ySelector
  * @param: {function} projector
  * @param: {function} comparer
  * @return {generator}
  */
-function groupJoin(outer, inner, outerSelector, innerSelector, projector, comparer = strictEqual) {
+function groupJoin(xs, ys, xSelector, ySelector, projector, comparer = strictEquals) {
     return function *groupJoinIterator() {
         var innerGroups = [];
-        inner = when(not(isArray), Array.from, inner);
-        for (let innerItem of inner) {
-            var innerRes = innerSelector(innerItem);
+        ys = toArray(ys);
+        for (let y of ys) {
+            var innerRes = ySelector(y);
             var matchingGroup = innerGroups.find(_findInnerGroup);
 
-            if (!matchingGroup) matchingGroup = { key: innerRes, items: [innerItem] };
+            if (!matchingGroup) matchingGroup = { key: innerRes, items: [y] };
             innerGroups[innerGroups.length] = matchingGroup;
         }
 
-        for (var outerItem of outer) {
+        for (var x of xs) {
             var innerMatch =  innerGroups.find(_compareByKeys);
-            let res = projector(outerItem, undefined === innerMatch ? [] : innerMatch.items );
+            let res = projector(x, undefined === innerMatch ? [] : innerMatch.items );
             if (javaScriptTypes.undefined !== res) yield res;
         }
 
@@ -107,27 +109,27 @@ function groupJoin(outer, inner, outerSelector, innerSelector, projector, compar
         }
 
         function _compareByKeys(innerItem) {
-            return comparer(outerSelector(outerItem), innerItem.key);
+            return comparer(xSelector(x), innerItem.key);
         }
     };
 }
 
 /**
  * @description:
- * @param: {iterable} source
- * @param: {iterable} enumerable
+ * @param: {iterable} xs
+ * @param: {iterable} ys
  * @param: {function} comparer
  * @return {generator}
  */
-function intersect(source, enumerable, comparer = strictEqual) {
+function intersect(xs, ys, comparer = strictEquals) {
     return function *intersectIterator() {
-        enumerable = when(not(isArray), Array.from, enumerable);
-        for (let item of source) {
-            if (javaScriptTypes.undefined !== item && enumerable.some(function _checkEquivalency(it) {
-                    return comparer(item, it);
+        ys = toArray(ys);
+        for (let x of xs) {
+            if (javaScriptTypes.undefined !== x && ys.some(function _checkEquivalency(it) {
+                    return comparer(x, it);
                 }))
             {
-                yield item;
+                yield x;
             }
         }
     };
@@ -135,21 +137,21 @@ function intersect(source, enumerable, comparer = strictEqual) {
 
 /**
  * @description:
- * @param: {iterable} outer
- * @param: {iterable} inner
- * @param: {function} outerSelector
- * @param: {function} innerSelector
+ * @param: {iterable} xs
+ * @param: {iterable} ys
+ * @param: {function} xSelector
+ * @param: {function} ySelector
  * @param: {function} projector
  * @param: {function} comparer
  * @return {generator}
  */
-function join(outer, inner, outerSelector, innerSelector, projector, comparer = strictEqual) {
+function join(xs, ys, xSelector, ySelector, projector, comparer = strictEquals) {
     return function *joinIterator() {
-        inner = when(not(isArray), Array.from, inner);
-        for (let outerItem of outer) {
-            for (let innerItem of inner) {
-                if (comparer(outerSelector(outerItem), innerSelector(innerItem))) {
-                    let res = projector(outerItem, innerItem);
+        ys = toArray(ys);
+        for (let x of xs) {
+            for (let y of ys) {
+                if (comparer(xSelector(x), ySelector(y))) {
+                    let res = projector(x, y);
                     if (javaScriptTypes.undefined !== res) yield res;
                 }
 
@@ -160,44 +162,44 @@ function join(outer, inner, outerSelector, innerSelector, projector, comparer = 
 
 /**
  * @description:
- * @param: {iterable} source
- * @param: {iterable} enumerable
+ * @param: {iterable} xs
+ * @param: {iterable} ys
  * @param: {function} comparer
  * @return {generator}
  */
-function union(source, enumerable, comparer = strictEqual) {
+function union(xs, ys, comparer = strictEquals) {
     var isInCache = cacher(comparer);
 
     return function *unionIterator() {
-        for (let item of source) {
-            if (!isInCache(item)) yield item;
+        for (let x of xs) {
+            if (!isInCache(x)) yield x;
         }
 
-        enumerable = when(not(isArray), Array.from, enumerable);
-        for (let item of enumerable) {
-            if (!isInCache(item)) yield item;
+        var yArr = toArray(ys);
+        for (let y of yArr) {
+            if (!isInCache(y)) yield y;
         }
     };
 }
 
 /**
  * @description:
- * @param: {iterable} source
- * @param: {iterable} enumerable
+ * @param: {iterable} xs
+ * @param: {iterable} ys
  * @param: {function} selector
  * @return {generator}
  */
-function zip(source, enumerable, selector) {
+function zip(xs, ys, selector) {
     return function *zipIterator() {
         var res,
             idx = 0;
-        enumerable = when(not(isArray), Array.from, enumerable);
+        var yArr = toArray(ys);
 
-        if (!enumerable.length < 1) {
-            for (let item of source) {
-                if (idx > enumerable.length) return;
-                res = selector(item, enumerable[idx]);
-                if (javaScriptTypes.undefined !== res) yield res;
+        if (1 > !yArr.length) {
+            for (let x of xs) {
+                if (idx > yArr.length) return;
+                res = selector(x, yArr[idx]);
+                if (strictEquals(javaScriptTypes.undefined, res)) yield res;
                 ++idx;
             }
         }
@@ -206,118 +208,104 @@ function zip(source, enumerable, selector) {
 
 /**
  * @description:
- * @param: {iterable} source
+ * @param: {iterable} xs
  * @param: {function} predicate
  * @return: {boolean}
  */
-function all(source, predicate) {
-    if (javaScriptTypes.function !== typeof predicate)
-        return false;
-    return Array.from(source).every(predicate);
+function all(xs, predicate) {
+    return strictEquals(javaScriptTypes.function, type(predicate)) && toArray(xs).every(predicate);
 }
 
 /**
  * @description:
- * @param: {iterable} source
+ * @param: {iterable} xs
  * @param: {function} predicate
  * @return: {boolean}
  */
-function any(source, predicate) {
-    if (javaScriptTypes.function !== typeof predicate)
-        return Array.from(source).length > 0;
-    return Array.from(source).some(predicate);
+function any(xs, predicate) {
+    return strictEquals(javaScriptTypes.function, type(predicate)) ? 0 < toArray(xs).length : toArray.some(predicate);
 }
 
 /**
  * @description:
- * @param: {iterable} source
+ * @param: {iterable} xs
  * @param: {*} val
  * @param: {function} comparer
  * @return: {*}
  */
-function contains(source, val, comparer) {
-    source = when(not(isArray), Array.from, source);
-    if (javaScriptTypes.undefined === typeof comparer)
-        return source.includes(val);
-    return source.some(function _checkEquality(item) {
-        return comparer(item, val);
-    });
+function contains(xs, val, comparer) {
+    return strictEquals(javaScriptTypes.undefined, type(comparer)) ? toArray(xs).includes(val) : toArray(xs).some(x => comparer(x, val));
 }
 
 /**
  * @description:
- * @param: {iterable} source
+ * @param: {iterable} xs
  * @param: {number} left
  * @param: {number} right
  * @param: {*} val
  * @param: {function} comparer
  * @return {boolean}
  */
-function binarySearch(source, left, right, val, comparer) {
+function binarySearch(xs, left, right, val, comparer) {
     if (left > right) return false;
     var mid = (left + (right - left)) / 2,
-        res = comparer(val, source[mid]);
+        res = comparer(val, xs[mid]);
     if (0 === res) return true;
-    else if (0 < res) return binarySearch(source, left, mid - 1, val, comparer);
-    else return binarySearch(source, mid + 1, right, val, comparer);
+    else if (0 < res) return binarySearch(xs, left, mid - 1, val, comparer);
+    else return binarySearch(xs, mid + 1, right, val, comparer);
 }
 
 /**
  * @description:
- * @param: {iterable} source
+ * @param: {iterable} xs
  * @param: {function} predicate
  * @return {Number}
  */
-function count(source, predicate) {
-    if (javaScriptTypes.undefined === typeof predicate)
-        return Array.from(source).length;
-    return Array.from(source).filter(function filterItems(item) {
-        return predicate(item);
-    }).length;
+function count(xs, predicate) {
+    return strictEquals(javaScriptTypes.undefined, type(predicate)) ?
+        toArray(xs).length : toArray(xs).filter(x => predicate(x)).length;
 }
 
 /**
  * @description:
- * @param: {iterable} source
+ * @param: {iterable} xs
  * @param: {function} predicate
  * @return {*}
  */
-function first(source, predicate) {
-    if (javaScriptTypes.function === typeof predicate)
-        return Array.from(source).find(predicate);
-    return Array.from(source)[0];
+function first(xs, predicate) {
+    return strictEquals(javaScriptTypes.function, type(predicate)) ? toArray(xs).find(predicate) : toArray(xs)[0];
 }
 
 /**
  * @description:
- * @param: {iterable} source
+ * @param: {iterable} xs
  * @param: {function} fn
  * @param: {*} initial
  * @return: {*}
  */
-function fold(source, fn, initial = 0) {
-    return when(not(isArray), Array.from, source).reduce(fn, initial);
+function fold(xs, fn, initial = 0) {
+    return toArray(xs).reduce(fn, initial);
 }
 
 /**
  * @description:
- * @param: {iterable} source
+ * @param: {iterable} xs
  * @param: {function} fn
  * @param: {*} initial
  * @return: {*}
  */
-function foldRight(source, fn, initial = 0) {
-    return when(not(isArray), Array.from, source).reduceRight(fn, initial);
+function foldRight(xs, fn, initial = 0) {
+    return toArray(xs).reduceRight(fn, initial);
 }
 
 /**
  * @description:
- * @param: {iterable} source
+ * @param: {iterable} xs
  * @param: {function} predicate
  * @return: {*}
  */
-function last(source, predicate) {
-    var data = Array.from(source);
+function last(xs, predicate) {
+    var data = toArray(xs);
     if (javaScriptTypes.function === typeof predicate)
         data = data.filter(predicate);
     return data[data.length - 1];
@@ -325,27 +313,27 @@ function last(source, predicate) {
 
 /**
  * @description:
- * @param: {iterable} source
+ * @param: {iterable} xs
  * @param: {function} comparer
  * @return: {generator}
  */
-function distinct(source, comparer = strictEqual) {
+function distinct(xs, comparer = strictEquals) {
     var isInCache = cacher(comparer);
 
     return function *distinctIterator() {
-        for (let item of source) {
-            if (!isInCache(item)) yield item;
+        for (let x of xs) {
+            if (!isInCache(x)) yield x;
         }
     };
 }
 
 /**
  * @description:
- * @param: {iterable} source
+ * @param: {iterable} xs
  * @param: {string} dataType
  * @return: {generator}
  */
-function ofType(source, dataType) {
+function ofType(xs, dataType) {
     return function *ofTypeIterator() {
         function _checkTypeKeys(key) {
             return key in objItem;
@@ -355,23 +343,23 @@ function ofType(source, dataType) {
         }
 
         if (dataType in javaScriptTypes) {
-            for (let item of source) {
-                if (javaScriptTypes[dataType] === typeof item) yield item;
+            for (let x of xs) {
+                if (javaScriptTypes[dataType] === typeof x) yield x;
             }
         }
         else {
             if (typeof dataType === javaScriptTypes.function) {
-                for (let item of source) {
-                    if (item === dataType) yield item;
+                for (let x of xs) {
+                    if (x === dataType) yield x;
                 }
             }
             else if (null === dataType) {
-                for (let item of source) {
-                    if (dataType === item) yield item;
+                for (let x of xs) {
+                    if (dataType === x) yield x;
                 }
             }
             else {
-                for (var objItem of source) {
+                for (var objItem of xs) {
                     if (dataType.isPrototypeOf(objItem))
                         yield objItem;
                     else if (javaScriptTypes.object === typeof objItem && null !== objItem &&
@@ -386,30 +374,30 @@ function ofType(source, dataType) {
 
 /**
  * @description:
- * @param: {iterable} source
+ * @param: {iterable} xs
  * @param: {function} predicate
  * @return: {generator}
  */
-function filter(source, predicate) {
+function filter(xs, predicate) {
     return function *filterIterator() {
-        for (let item of source) {
-            if (false !== predicate(item)) yield item;
+        for (let x of xs) {
+            if (false !== predicate(x)) yield x;
         }
     };
 }
 
 /**
  * @description:
- * @param: {iterable} source
+ * @param: {iterable} xs
  * @return: {generator}
  */
-function deepFlatten(source) {
+function deepFlatten(xs) {
     return function *iterator() {
         var unyieldedData = [],
             res;
 
-        for (let item of source) {
-            res = flatteningFunc(item);
+        for (let x of xs) {
+            res = flatteningFunc(x);
 
             if (isArray(res)) unyieldedData = unyieldedData.concat(Array.prototype.concat.apply([], res));
             if (unyieldedData.length) yield unyieldedData.shift();
@@ -463,39 +451,39 @@ function objectContainsOnlyArrays(data) {
 
 /**
  * @description:
- * @param: {*} source
+ * @param: {*} xs
  * @param: {function} fn
  * @return: {flatMapIterator}
  */
-function flatMap(source, fn) {
+function flatMap(xs, fn) {
     return function *flatMapIterator() {
-        for (let item of source) {
-            if (null != item && item.map && 'function' === typeof item.map) {
+        for (let x of xs) {
+            if (null != x && x.map && 'function' === typeof x.map) {
                 var res;
-                if (item.value && item.value.value) res = item.map(fn).data;
-                //if (list_core.isPrototypeOf(item)) res = item.mapWith(fn).data;
-                else res = item.map(fn);
+                if (x.value && x.value.value) res = x.map(fn).data;
+                //if (list_core.isPrototypeOf(x)) res = x.mapWith(fn).data;
+                else res = x.map(fn);
 
                 yield res;
             }
-            else yield fn(item);
+            else yield fn(x);
         }
     };
 }
 
 /**
  * @description:
- * @param: {iterable} source
+ * @param: {iterable} xs
  * @return: {generator}
  */
-function flatten(source) {
+function flatten(xs) {
     return function *flattenIterator() {
         var unyieldedData = [];
 
-        for (let item of source) {
-            if (isArray(item)) unyieldedData = unyieldedData.concat(item);
+        for (let x of xs) {
+            if (isArray(x)) unyieldedData = unyieldedData.concat(x);
             if (unyieldedData.length) yield unyieldedData.shift();
-            else yield item;
+            else yield x;
         }
 
         while (unyieldedData.length) yield unyieldedData.shift();
@@ -504,16 +492,16 @@ function flatten(source) {
 
 /**
  * @description:
- * @param: {iterable} source
+ * @param: {iterable} xs
  * @param: {object} groupObject
  * @param: {function} queryableConstructor
  * @return: {generator}
  */
-function groupBy(source, groupObject, queryableConstructor) {
+function groupBy(xs, groupObject, queryableConstructor) {
     return function *groupByIterator() {
-        //gather all data from the source before grouping
-        var groupedData = nestLists(groupData(when(not(isArray), Array.from, source), groupObject), 0, null, queryableConstructor);
-        for (let item of groupedData) yield item;
+        //gather all data from the xs before grouping
+        var groupedData = nestLists(groupData(toArray(xs), groupObject), 0, null, queryableConstructor);
+        for (let x of groupedData) yield x;
     };
 }
 
@@ -540,12 +528,12 @@ function nestLists(data, depth, key, queryableConstructor) {
 
 /**
  * @description:
- * @param: {*} data
+ * @param: {*} xs
  * @param: {object} groupObject
  * @return: {Array}
  */
-function groupData(data, groupObject) {
-    var sortedData = sortData(data, groupObject),
+function groupData(xs, groupObject) {
+    var sortedData = sortData(xs, groupObject),
         retData = [];
     sortedData.forEach(function _groupSortedData(item) {
         let grp = retData;
@@ -584,66 +572,66 @@ function findGroup(arr, field) {
 
 /**
  * @description:
- * @param: {iterable} source
+ * @param: {iterable} xs
  * @param: {function} fn
  * @return: {generator}
  */
-function map(source, fn) {
+function map(xs, fn) {
     return function *mapIterator() {
-        for (let item of source) {
-            let res = fn(item);
-            if (javaScriptTypes.undefined !== res) yield res;
+        for (let x of xs) {
+            let res = fn(x);
+            if (strictEquals(javaScriptTypes.undefined, type(res))) yield res;
         }
     };
 }
 
 /**
  * @description:
- * @param: {iterable} source
+ * @param: {iterable} xs
  * @param: {Array} orderObject
  * @param: {function} comparer
  * @return: {generator}
  */
-function sortBy(source, orderObject) {
+function sortBy(xs, orderObject) {
     return function *orderByIterator() {
-        //gather all data from the source before sorting
-        var orderedData = sortData(when(not(isArray), Array.from, source), orderObject);
-        for (let item of orderedData) {
-            if (javaScriptTypes.undefined !== typeof item) yield item;
+        //gather all data from the xs before sorting
+        var x_s = sortData(toArray(xs), orderObject);
+        for (let x of x_s) {
+            if (javaScriptTypes.undefined !== typeof x) yield x;
         }
     };
 }
 
 /**
  * @description:
- * @param: {@see m_list} l1
- * @param: {@see m_list} l2
+ * @param: {@see m_list} xs
+ * @param: {@see m_list} ys
  * @param: {function} comparer
  * @return: {boolean}
  */
-function equals(l1, l2, comparer = strictEqual) {
-    var l1Data = l1.data,
-        l2Data = l2.data;
+function equals(xs, ys, comparer = strictEquals) {
+    var x_s = xs.data,
+        y_s = ys.data;
 
-    return l1Data.length === l2Data.length &&
-            l1Data.every(function _checkEquality(item, idx) {
-                return comparer(item, l2Data[idx]);
+    return x_s.length === y_s.length &&
+            x_s.every(function _checkEquality(x, idx) {
+                return comparer(x, y_s[idx]);
             });
 }
 
 /**
  * @description:
- * @param: {iterable} source
+ * @param: {iterable} xs
  * @param: {number} amt
  * @return {generator}
  */
-function take(source, amt) {
+function take(xs, amt) {
     return function *takeIterator() {
         if (!amt) return [];
         var idx = 0;
 
-        for (let item of source) {
-            if (idx < amt) yield item;
+        for (let x of xs) {
+            if (idx < amt) yield x;
             else break;
             ++idx;
         }
@@ -652,14 +640,14 @@ function take(source, amt) {
 
 /**
  * @description:
- * @param: {iterable} source
+ * @param: {iterable} xs
  * @param: {function} predicate
  * @return {generator}
  */
-function takeWhile(source, predicate) {
+function takeWhile(xs, predicate) {
     return function *takeWhileIterator() {
-        for (let item of source) {
-            if (predicate(item)) yield item;
+        for (let x of xs) {
+            if (predicate(x)) yield x;
             else break;
         }
     };
@@ -667,18 +655,18 @@ function takeWhile(source, predicate) {
 
 /**
  * @description:
- * @param: {iterable} source
+ * @param: {iterable} xs
  * @param: {number} amt
  * @return {generator}
  */
-function skip(source, amt) {
+function skip(xs, amt) {
     return function *skipIterator() {
         var count = 0;
 
-        for (let item of source) {
+        for (let x of xs) {
             if (count > amt) {
                 ++count;
-                yield item;
+                yield x;
             }
         }
     };
@@ -686,37 +674,42 @@ function skip(source, amt) {
 
 /**
  * @description:
- * @param: {iterable} source
+ * @param: {iterable} xs
  * @param: {function} predicate
  * @return: {generator}
  */
-function skipWhile(source, predicate) {
+function skipWhile(xs, predicate) {
     return function *skipWhileIterator() {
         var hasFailed = false;
-        for (let item of source) {
+        for (let x of xs) {
             if (!hasFailed) {
-                if (!predicate(item)) {
+                if (!predicate(x)) {
                     hasFailed = true;
-                    yield item;
+                    yield x;
                 }
             }
-            else yield item;
+            else yield x;
         }
     };
 }
 
 /**
  * @description:
- * @param: {iterable} source
+ * @param: {iterable} xs
  * @return: {generator}
  */
-function reverse(source) {
+function reverse(xs) {
     return function *reverseIterator() {
-        source = Array.from(source).reverse();
-        for (let item of source) yield item;
+        for (let x of toArray(xs).reverse()) yield x;
     };
 }
 
+/**
+ * @description:
+ * @param: {*} item
+ * @param: {number} count
+ * @return: {generator}
+ */
 function repeat(item, count) {
     return function *repeatIterator() {
         for (let i = 0; i < count; ++i) {
@@ -732,27 +725,49 @@ function repeat(item, count) {
  * @param: {number} end
  * @returns {generator}
  */
-function copyWithin(idx, start, end, source) {
+function copyWithin(idx, start, end, xs) {
     return function *copyWithinIterator() {
-        for (let item of when(not(isArray), toArray, source).copyWithin(idx, start, end)) yield item;
+        for (let x of toArray(xs).copyWithin(idx, start, end)) yield x;
     };
 }
 
-function fill(val, start, end, source) {
+/**
+ * @description:
+ * @param: {*} val
+ * @param: {number} start
+ * @param: {number} end
+ * @param: {Array} xs
+ * @return: {generator}
+ */
+function fill(val, start, end, xs) {
     return function *fillIterator() {
-        for (let item of when(not(isArray), toArray, source).fill(val, start, end)) yield item;
+        for (let x of toArray(xs).fill(val, start, end)) yield x;
     };
 }
 
-function indexOf(callback, context, source) {
+/**
+ * @description:
+ * @param: {function} callback
+ * @param: {object} context
+ * @param: {Array} xs
+ * @return: {generator}
+ */
+function indexOf(callback, context, xs) {
     return function *indexOfIterator() {
-        for (let item of when(not(isArray), toArray, source).findIndex(callback, context)) yield item;
+        for (let x of toArray(xs).findIndex(callback, context)) yield x;
     };
 }
 
-function lastIndexOf(val, idx, source) {
+/**
+ * @description:
+ * @param: {*} val
+ * @param: {number} idx
+ * @param: {Array} xs
+ * @return: {generator}
+ */
+function lastIndexOf(val, idx, xs) {
     return function *lastIndexOfIterator() {
-        for (let item of when(not(isArray), toArray, source).lastIndexOf(val, idx)) yield item;
+        for (let x of toArray(xs).lastIndexOf(val, idx)) yield x;
     };
 }
 

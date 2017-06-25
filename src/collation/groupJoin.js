@@ -1,9 +1,9 @@
 import { javaScriptTypes } from '../helpers';
-import { isArray, strictEqual } from '../functionalHelpers';
+import { isArray, strictEquals } from '../functionalHelpers';
 import { when } from '../combinators';
 import { not } from '../decorators';
 
-function groupJoin(outer, inner, outerSelector, innerSelector, projector, comparer = strictEqual) {
+function groupJoin(outer, inner, outerSelector, innerSelector, projector, comparer = strictEquals) {
     return function *groupJoinIterator() {
         var innerGroups = [];
         inner = when(not(isArray), Array.from, inner);
