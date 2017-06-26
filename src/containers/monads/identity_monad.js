@@ -41,8 +41,8 @@ var identity_monad = Object.create(identity_functor, {
             return this.value;
         }
     },
-    flatMap: {
-        value: function _flatMap(fn) {
+    chain: {
+        value: function _chain(fn) {
             var val = fn(this.value);
             return identity_monad.isPrototypeOf(val) ? val : this.of(val);
         }
@@ -121,9 +121,9 @@ var identity_monad = Object.create(identity_functor, {
 });
 
 identity_monad.ap = identity_monad.apply;
-identity_monad.fmap = identity_monad.flatMap;
-identity_monad.chain = identity_monad.flatMap;
-identity_monad.bind = identity_monad.flatMap;
+identity_monad.fmap = identity_monad.chain;
+identity_monad.flapMap = identity_monad.chain;
+identity_monad.bind = identity_monad.chain;
 identity_monad.reduce = identity_monad.fold;
 
 

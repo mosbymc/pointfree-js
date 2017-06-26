@@ -48,8 +48,7 @@ Future.reject = function _reject(val) {
  * @return: {*}
  */
 Future.unit = function _unit(val) {
-    var f = Future(val);
-    return f.complete();
+    return Future(val).complete();
 };
 
 /**
@@ -69,15 +68,8 @@ var future_functor = {
         return this._value;
     },
     map: function _map(fn) {
-        //TODO: replace 'reject' function with noop?
-        return this.of((function _mapFunc(reject, resolve) {
-            return this._fork(function _rej(err) {
-                    reject(err);
-                },
-                function _res(val) {
-                    resolve(fn(val));
-                });
-        }).bind(this));
+        return this.of((reject, resolve) =>
+            this.fork(a => reject(a), b => resolve(fn(b))));
     },
     fork: function _fork(reject, resolve) {
         this._fork(reject, resolve);

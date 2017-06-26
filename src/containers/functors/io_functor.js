@@ -12,7 +12,7 @@ function Io(item) {
             writable: false,
             configurable: false
         }
-    })
+    });
 }
 
 /**
@@ -24,7 +24,7 @@ Io.of = function _of(item) {
     return 'function' === typeof item ? Io(item) : Io(constant(item));
 };
 
-/**
+ /**
  * @description:
  * @type {{
  * value,

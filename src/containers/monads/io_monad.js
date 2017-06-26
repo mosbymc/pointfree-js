@@ -21,13 +21,11 @@ var io_monad = Object.create(io_functor, {
             return this.value;
         }
     },
-    flatMap: {
-        value: function _flatMap(fn) {
-            var fMapIo = (function _flatMapIo(...args) {
+    chain: {
+        value: function _chain(fn) {
+            return Io((function _flatMapIo(...args) {
                 return fn(this.value(...args)).value(...args);
-            }).bind(this);
-
-            return Io(fMapIo);
+            }).bind(this));
         }
     },
     fold: {
@@ -63,9 +61,9 @@ var io_monad = Object.create(io_functor, {
 });
 
 io_monad.ap =io_monad.apply;
-io_monad.fmap = io_monad.flatMap;
-io_monad.chain = io_monad.flatMap;
-io_monad.bind = io_monad.flatMap;
+io_monad.fmap = io_monad.chain;
+io_monad.flapMap = io_monad.chain;
+io_monad.bind = io_monad.chain;
 io_monad.reduce = io_monad.fold;
 
 

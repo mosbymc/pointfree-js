@@ -83,17 +83,17 @@ describe('Identity monad test', function _testIdentityMonad() {
                 i2 = Identity(Identity({ a: 1, b: 2 })),
                 i3 = Identity(25);
 
-            i1.flatMap(function _flatMap(val) {
+            i1.chain(function _flatMap(val) {
                 return Identity.of(5 * val);
             }).value.should.eql(50);
 
-            i2.flatMap(function _flatMap(ma) {
+            i2.chain(function _flatMap(ma) {
                 return ma.map(function _innerMap(val) {
                     return val.a + val.b;
                 });
             }).value.should.eql(3);
 
-            i3.flatMap(function _flatMap(val) {
+            i3.chain(function _flatMap(val) {
                 return val + 2;
             }).value.should.eql(27);
         });

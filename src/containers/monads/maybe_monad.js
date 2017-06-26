@@ -152,8 +152,8 @@ maybe_monad.bind = maybe_monad.flapMap;
 maybe_monad.reduce = maybe_monad.fold;*/
 
 var just_monad = Object.create(just_functor, {
-    flatMap: {
-        value: function _flatMap(fn) {
+    chain: {
+        value: function _chain(fn) {
             var val = fn(this.value);
             return just_monad.isPrototypeOf(val) ? val : this.of(val);
         }
@@ -205,8 +205,8 @@ var just_monad = Object.create(just_functor, {
 });
 
 var nothing_monad = Object.create(nothing_functor, {
-    flatMap: {
-        value: function _flatMap() {
+    chain: {
+        value: function _chain() {
             return this.nothing();
         }
     },
@@ -227,7 +227,7 @@ var nothing_monad = Object.create(nothing_functor, {
     },
     traverse: {
         value: function _traverse(a, f) {
-            return a.of(Maybe.Nothing);
+            return a.of(Maybe.Nothing());
         }
     },
     /**
@@ -257,15 +257,15 @@ var nothing_monad = Object.create(nothing_functor, {
 
 
 just_monad.ap = just_monad.apply;
-just_monad.fmap = just_monad.flatMap;
-just_monad.chain = just_monad.flatMap;
-just_monad.bind = just_monad.flapMap;
+just_monad.fmap = just_monad.chain;
+just_monad.flapMap = just_monad.chain;
+just_monad.bind = just_monad.chain;
 just_monad.reduce = just_monad.fold;
 
 nothing_monad.ap = nothing_monad.apply;
-nothing_monad.fmap = nothing_monad.flatMap;
-nothing_monad.chain = nothing_monad.flatMap;
-nothing_monad.bind = nothing_monad.flapMap;
+nothing_monad.fmap = nothing_monad.chain;
+nothing_monad.flapMap = nothing_monad.chain;
+nothing_monad.bind = nothing_monad.chain;
 nothing_monad.reduce = nothing_monad.fold;
 
 

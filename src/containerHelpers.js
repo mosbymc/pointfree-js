@@ -258,27 +258,34 @@ function _toMaybe() {
  * @description:
  * @type: {function}
  * @param: {function} predicate
- * @param: {Array} list_functor
+ * @param: {Array} xs
  * @return: {Array}
  */
-var filter = curry(function _filter(predicate, list) {
-    list.filter(predicate);
+var filter = curry(function _filter(predicate, xs) {
+    xs.filter(predicate);
 });
 
 /**
  * @description:
  * @type: {function}
- * @param: {Array} enumerable
+ * @param: {Array} xs
  * @param: {function} comparer
- * @param: {Array} list_functor
+ * @param: {Array} ys
  * @return: {Array}
  */
-var intersect = curry(function _intersect(enumerable, comparer, list) {
-    return list.intersect(enumerable, comparer);
+var intersect = curry(function _intersect(xs, comparer, ys) {
+    return ys.intersect(xs, comparer);
 });
 
-var except = curry(function _except(enumerable, comparer, list) {
-    return list.except(enumerable, comparer);
+/**
+ * @description:
+ * @type: {function}
+ * @param: {Array} xs
+ * @param: {function} comparer
+ * @param: {Array}
+ */
+var except = curry(function _except(xs, comparer, ys) {
+    return ys.except(xs, comparer);
 });
 
 export { apply, ap, fmap, mapWith, flatMap, lift2, lift3, lift4, liftN, mjoin, pluckWith, toContainerType,

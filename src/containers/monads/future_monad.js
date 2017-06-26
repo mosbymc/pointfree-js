@@ -51,33 +51,18 @@ var future_monad = Object.create(future_functor, {
             return this.value;
         }
     },
-    flapMap: {
-        //TODO: probably need to compose here, not actually mapWith over the value; this is a temporary fill-in until
+    chain: {
+        //TODO: probably need to compose here, not actually map over the value; this is a temporary fill-in until
         //TODO: I have time to finish working on the Future
-        value: function _flatMap(fn) {
-            return this.of((function _chainFn(reject, resolve) {
-                return this._fork(function rej(a) {
-                        return reject(a);
-                    },
-                    function res(b) {
-                        return fn(b)._fork(reject, resolve);
-                    })
-            }).bind(this));
+        value: function _chain(fn) {
+            return this.of((reject, resolve) =>
+                this._fork(a => reject(a), b => fn(b).fork(reject, resolve)));
         }
     },
     fold: {
         value: function _fold(f, g) {
-            //return fn(this.value, x);
-            return this.of(
-                (function(reject, resolve) {
-                    return this._fork(function _f1(a) {
-                        return resolve(f(a));
-                    },
-                    function _f2(b) {
-                        return resolve(g(b));
-                    });
-                }).bind(this)
-            );
+            return this.of((reject, resolve) =>
+                this.fork(a => resolve(f(a)), b => resolve(g(b))));
         }
     },
     traverse: {
@@ -108,9 +93,9 @@ var future_monad = Object.create(future_functor, {
 });
 
 future_monad.ap = future_monad.apply;
-future_monad.fmap = future_monad.flapMap;
-future_monad.chain = future_monad.flapMap;
-future_monad.bind = future_monad.flapMap;
+future_monad.fmap = future_monad.chain;
+future_monad.flapMap = future_monad.chain;
+future_monad.bind = future_monad.chain;
 future_monad.reduce = future_monad.fold;
 
 

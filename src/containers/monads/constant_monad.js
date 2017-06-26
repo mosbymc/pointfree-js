@@ -20,12 +20,12 @@ Constant.of = function _of(item) {
 };
 
 var constant_monad = Object.create(constant_functor, {
-    flatMap: {
-        value: _flatMap
+    chain: {
+        value: _chain
     },
     mjoin: {
         value: function _mjoin() {
-            return this;
+            return this.value;
         }
     },
     fold: {
@@ -63,14 +63,14 @@ var constant_monad = Object.create(constant_functor, {
     }
 });
 
-function _flatMap() {
+function _chain() {
     return this;
 }
 
 constant_monad.ap =constant_monad.apply;
-constant_monad.fmap = constant_monad.flatMap;
-constant_monad.chain = constant_monad.flatMap;
-constant_monad.bind = constant_monad.flatMap;
+constant_monad.fmap = constant_monad.chain;
+constant_monad.flapMap = constant_monad.chain;
+constant_monad.bind = constant_monad.chain;
 constant_monad.reduce = constant_monad.fold;
 
 

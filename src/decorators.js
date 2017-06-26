@@ -106,6 +106,10 @@ var maybe = (fn) => (...args) => null != args ? fn.call(this, ...args) : null;
  */
 var not = fn => (...args) => !fn(...args);
 
+/**
+ * @description:
+ * @type: {function}
+ */
 var not2point0 = curry(function _n(fn, ...args) {
     if (args.length < fn.length) {
         return curryN(this, (fn.length - args.length), function _not(...a) {

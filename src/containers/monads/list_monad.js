@@ -84,13 +84,13 @@ List.extend = function _extend(propName, fn) {
 };
 
 var list_monad = Object.create(list_functor, {
-    flatMap: {
+    chain: {
         /**
          * @description:
          * @param: {function} fn
          * @return: {@see m_list}
          */
-        value: function _flatMap(fn) {
+        value: function _chain(fn) {
             return this.of(flatMap(this, fn));
         }
     },
@@ -178,18 +178,18 @@ var list_monad = Object.create(list_functor, {
 });
 
 list_monad.ap =list_monad.apply;
-list_monad.fmap = list_monad.flatMap;
-list_monad.chain = list_monad.flatMap;
-list_monad.bind = list_monad.flatMap;
+list_monad.fmap = list_monad.chain;
+list_monad.flapMap = list_monad.chain;
+list_monad.bind = list_monad.chain;
 
 var ordered_list_monad = Object.create(ordered_list_functor, {
-    flatMap: {
+    chain: {
         /**
          * @description:
          * @param: {function} fn
          * @return: {@see m_list}
          */
-        value: function _flatMap(fn) {
+        value: function _chain(fn) {
             return this.of(flatMap(this, fn));
         }
     },
@@ -243,9 +243,9 @@ var ordered_list_monad = Object.create(ordered_list_functor, {
 });
 
 ordered_list_monad.ap = ordered_list_monad.apply;
-ordered_list_monad.fmap = ordered_list_monad.flatMap;
-ordered_list_monad.chain = ordered_list_monad.flatMap;
-ordered_list_monad.bind = ordered_list_monad.flatMap;
+ordered_list_monad.fmap = ordered_list_monad.chain;
+ordered_list_monad.flapMap = ordered_list_monad.chain;
+ordered_list_monad.bind = ordered_list_monad.chain;
 //ordered_list_monad.reduce = ordered_list_monad.fold;
 
 function createGroupedListDelegate(source, key) {

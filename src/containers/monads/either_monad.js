@@ -87,8 +87,8 @@ function Right(val) {
 
 
 var right_monad = Object.create(right_functor, {
-    flatMap: {
-        value: function _flatMap(fn) {
+    chain: {
+        value: function _chain(fn) {
             var val = fn(this.value);
             return right_monad.isPrototypeOf(val) ? val : this.of(val);
         }
@@ -135,8 +135,8 @@ var right_monad = Object.create(right_functor, {
 
 
 var left_monad = Object.create(left_functor, {
-    flatMap: {
-        value: function _flatMap(fn) {
+    chain: {
+        value: function _chain(fn) {
             return Left(this.value);
         }
     },
@@ -184,6 +184,8 @@ var left_monad = Object.create(left_functor, {
 
 right_monad.ap = right_monad.apply;
 left_monad.ap = left_monad.apply;
+right_monad.flatMap = right_monad.chain;
+left_monad.flatMap = left_monad.chain;
 right_monad.bind = right_monad.chain;
 left_monad.bind = left_monad.chain;
 right_monad.reduce = right_monad.fold;
