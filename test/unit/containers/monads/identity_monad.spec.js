@@ -119,10 +119,6 @@ describe('Identity monad test', function _testIdentityMonad() {
                 m2Res = i.apply(m2),
                 m3Res = i.apply(m3);
 
-            console.log(m1Res);
-            console.log(Object.getPrototypeOf(m1Res));
-            console.log(Object.getPrototypeOf(monads.Maybe(65)));
-
             Object.getPrototypeOf(lRes).should.eql(Object.getPrototypeOf(monads.List()));
             Object.getPrototypeOf(cRes).should.eql(monads.Constant());
             Object.getPrototypeOf(e1Res).should.eql(monads.Right());
@@ -179,6 +175,8 @@ describe('Identity monad test', function _testIdentityMonad() {
             //Associativity
             m.chain(f).chain(h).value.should.eql(m.chain(x => f(x).chain(h)).value);
 
+            Identity(2).map(x => x + 2).fold(monads.Right).value.should.eql(Identity(2).fold(monads.Right).map(x => x + 2).value);
+
             //Traversable Identity
             Identity(2).traverse(monads.Maybe, monads.Maybe.of).toString().should.eql(monads.Maybe.of(Identity(2)).toString());
 
@@ -196,6 +194,24 @@ describe('Identity monad test', function _testIdentityMonad() {
             function test2(val) {
                 return monads.Maybe(val.value + 5);
             }
+
+            function test3(m) {
+                return m.map(traverseMap);
+            }
+
+            function traverseMap(val) {
+                return val + 5;
+            }
+
+            function fromNullable(fn) {
+                return function _fromNullable(...args) {
+                    return monads.Maybe(fn(...args));
+                };
+            }
+            var nullableTraverse = fromNullable(traverseMap);
+
+            console.log(Identity(2).traverse(monads.Maybe, nullableTraverse));
+            console.log(Object.getPrototypeOf(Identity(2).traverse(monads.Maybe, nullableTraverse)));
 
 
             //var yy = mona.of(identity(10));

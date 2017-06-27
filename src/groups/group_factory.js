@@ -1,3 +1,9 @@
+import { identity } from '../combinators';
+import { binary, rightApply } from '../decorators';
+
+var e = binary(rightApply(identity));
+console.log(e(1)(2));
+
 /**
  * @description: Takes a function that can perform the desired type of concatenation and an optional
  * string that describes the type of group that is being created. The 'type' parameter is used in
@@ -12,7 +18,7 @@
  * @param: {string} type
  * @return: {@see group}
  */
-function groupFactory(concatFn, inverseFn, e, type) {
+function groupFactory(concatFn, inverseFn, identity, type) {
     /**
      * @description:
      * @param: {*} x
@@ -54,7 +60,7 @@ function groupFactory(concatFn, inverseFn, e, type) {
                 value: _group
             },
             isEmpty: {
-                value: e === x,
+                value: identity === x,
                 writable: false,
                 configurable: false
             },
@@ -62,6 +68,18 @@ function groupFactory(concatFn, inverseFn, e, type) {
                 value: function _toString() {
                     return `${type || 'Group'}(${toString.call(this)})`;
                 }
+            },
+            concatFn: {
+                get: function _getConcatFn() {
+                    return this._concatFn ? this._concatFn.bind(this) : concatFn.bind(this);
+                },
+                set: function _setConcatFn(fn) {
+                    this._concatFn = fn.bind(this);
+                }
+            },
+            inverseFn: {
+                value: inverseFn,
+                writable: true
             }
         });
     }
@@ -135,7 +153,7 @@ function groupFactory(concatFn, inverseFn, e, type) {
              * @description:
              */
             isEmpty: {
-                value: e === x,
+                value: identity === x,
                 writable: false,
                 configurable: false
             },
@@ -147,6 +165,18 @@ function groupFactory(concatFn, inverseFn, e, type) {
                 value: function _toString() {
                     return `${type}(${toString.call(this)})`;
                 }
+            },
+            concatFn: {
+                get: function _getConcatFn() {
+                    return this._concatFn ? this._concatFn.bind(this) : concatFn.bind(this);
+                },
+                set: function _setConcatFn(fn) {
+                    this._concatFn = fn.bind(this);
+                }
+            },
+            inverseFn: {
+                value: inverseFn,
+                writable: true
             }
         });
     }
@@ -156,46 +186,19 @@ function groupFactory(concatFn, inverseFn, e, type) {
      * @return: {string}
      */
     function toString() {
-        return (Object.is(-0, this.value)) ? '-0' : this.value.toString();
+        return (Object.is(-0, this.value)) ? '-0' :
+            this.isEmpty ? 'nil' : this.value.toString();
     }
 
     /**
      * @description:
-     * @param: {*} other
+     * @param: {*} x
      * @return: {@see group}
      * @private
      */
-    function _concat(other) {
-        if (!Object.getPrototypeOf(this).isPrototypeOf(other)) return this;
-        return this.isEmpty ? _internalGroupCreator(other._value, other._value)
-            : other.isEmpty ? _internalGroupCreator(this._value, other._value) :
-                _internalGroupCreator(concatFn(this._value, other._value), other._value);
-    }
-
-    /**
-     * @description:
-     * @param: {Array} others
-     * @return: {@see group}
-     * @private
-     */
-    function _concatAll(...others) {
-        return others.filter(function _filterEmpty(g) {
-            return !g.isEmpty && this.factory === g.factory && this.inverseConcat === g.inverseConcat;
-        }, this).reduce(function _concatAll(curr, next) {
-            return _internalGroupCreator(concatFn(curr.value, next.value), next.value);
-        }, this);
-    }
-
-    /**
-     * @description:
-     * @param: {*} other
-     * @return: {@see group}
-     * @private
-     */
-    function _inverseConcat(other) {
-        if (!Object.getPrototypeOf(this).isPrototypeOf(other)) return this;
-        var invertedOther = other.isEmpty ? e : inverseFn(other.value);
-        return _concat.call(this, _group(invertedOther));
+    function _concat(x) {
+        if (x.isEmpty || !Object.getPrototypeOf(this).isPrototypeOf(x)) return this;
+        return _internalGroupCreator(this.concatFn(this.value, x.value), x.value);
     }
 
     /**
@@ -204,13 +207,35 @@ function groupFactory(concatFn, inverseFn, e, type) {
      * @return: {@see group}
      * @private
      */
-    function _inverseConcatAll(...others) {
-        return others.filter(function _filterEmpty(g) {
-            return !g.isEmpty && Object.getPrototypeOf(this).isPrototypeOf(g);
-        }, this).reduce(function _concatAll(curr, next) {
-            var invertedOther = inverseFn(next.value);
-            return _internalGroupCreator(concatFn(curr.value, invertedOther), invertedOther);
-        }, this);
+    function _concatAll(...xs) {
+        return xs.filter(x => !x.isEmpty && this.factory === x.factory && this.inverseConcat === x.inverseConcat, this)
+            .reduce((curr, next) => _internalGroupCreator(curr.concatFn(curr.value, next.value), next.value), this);
+    }
+
+    /**
+     * @description:
+     * @param: {*} x
+     * @return: {@see group}
+     * @private
+     */
+    function _inverseConcat(x) {
+        if (x.isEmpty || !Object.getPrototypeOf(this).isPrototypeOf(x)) return this;
+        var inverseX = inverseFn(x.value);
+        return _internalGroupCreator(this.concatFn(this.value, inverseX), inverseX);
+    }
+
+    /**
+     * @description:
+     * @param: {Array} xs
+     * @return: {@see group}
+     * @private
+     */
+    function _inverseConcatAll(...xs) {
+        return xs.filter(x => !x.isEmpty && Object.getPrototypeOf(this).isPrototypeOf(x), this)
+            .reduce((curr, next) => {
+                var inverseVal = inverseFn(next.value);
+                return _internalGroupCreator(curr.concatFn(curr.value, inverseVal), inverseVal);
+            }, this);
     }
 
     /**
@@ -219,9 +244,9 @@ function groupFactory(concatFn, inverseFn, e, type) {
      * @private
      */
     function _undo() {
-        if (null != this.previous && e != this.previous) {
-            var invertedPrev = inverseFn(this.previous);
-            return _internalGroupCreator(concatFn(this._value, invertedPrev), invertedPrev);
+        if (null != this.previous && identity != this.previous) {
+            var invertedPrev = this.inverseFn(this.previous);
+            return _internalGroupCreator(this.concatFn(this.value, invertedPrev), invertedPrev);
         }
         return _group(this.value);
     }
@@ -231,7 +256,9 @@ function groupFactory(concatFn, inverseFn, e, type) {
      * @return: {@see group}
      */
     _group.identity = function _identity() {
-        return _group(e);
+        var g = _group(identity);
+        g.concatFn = e;
+        return g;
     };
 
     /**

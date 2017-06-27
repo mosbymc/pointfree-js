@@ -198,6 +198,9 @@ var just_functor = {
     map: function _map(fn) {
         return this.of(fn(this.value));
     },
+    bimap: function _bimap(f, g) {
+        return this.of(f(this.value));
+    },
     equals: function _equals(ma) {
         return Object.getPrototypeOf(this).isPrototypeOf(ma) && ma.isJust && this.value === ma.value;
     },
@@ -219,6 +222,9 @@ var nothing_functor = {
     },
     map: function _map() {
         return this.of();
+    },
+    bimap: function _bimap(f, g) {
+        return this.of(g(this.value));
     },
     equals: function _equals(ma) {
         return Object.getPrototypeOf(this).isPrototypeOf(ma) && ma.isNothing;

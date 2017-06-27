@@ -222,9 +222,8 @@ var ordered_list_monad = Object.create(ordered_list_functor, {
     },
     traverse: {
         value: function _traverse(fa, fn) {
-            return this.value.reduce(function _reduce(xs, x) {
-                fn(x).map(x => y => y.concat([x])).apply(xs);
-            }, fa.of(List.of()));
+            return this.reduce((ys, x) =>
+                fn(x).map(x => y => y.concat([x])).apply(ys), fa.of(this.empty))
         }
     },
     apply: {

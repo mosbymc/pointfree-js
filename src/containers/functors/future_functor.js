@@ -1,5 +1,16 @@
 import { noop, once } from '../../functionalHelpers';
 
+function safeFork(reject, resolve) {
+    return function _safeFork(val) {
+        try {
+            return resolve(val);
+        }
+        catch(ex) {
+            reject(ex);
+        }
+    }
+}
+
 /**
  * @description:
  * @param: {function} fn
@@ -26,9 +37,7 @@ function Future(fn) {
  */
 Future.of = function _of(val) {
     return 'function' === typeof val ? Future(val) :
-        Future(function _runner(rej, res) {
-            return res(val)
-        });
+        Future((reject, resolve) => safeFork(reject, resolve(val)));
 };
 
 /**
@@ -37,9 +46,7 @@ Future.of = function _of(val) {
  * @return: {@see future_functor}
  */
 Future.reject = function _reject(val) {
-    return Future(function _future(reject) {
-        reject(val);
-    });
+    return Future((reject, resolve) => reject(val));
 };
 
 /**
@@ -96,6 +103,8 @@ var future_functor = {
     },
     factory: Future
 };
+
+
 
 
 

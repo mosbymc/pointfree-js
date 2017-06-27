@@ -119,10 +119,6 @@ describe('Constant monad tests', function _testConstantMonad() {
                 m2Res = i.apply(m2),
                 m3Res = i.apply(m3);
 
-            console.log(m1Res);
-            console.log(Object.getPrototypeOf(m1Res));
-            console.log(Object.getPrototypeOf(monads.Maybe(65)));
-
             Object.getPrototypeOf(lRes).should.eql(Object.getPrototypeOf(monads.List()));
             Object.getPrototypeOf(cRes).should.eql(monads.Constant());
             Object.getPrototypeOf(e1Res).should.eql(monads.Right());
@@ -170,7 +166,7 @@ describe('Constant monad tests', function _testConstantMonad() {
             }
 
             function h(val) {
-                return Identity(val + 7);
+                return monads.Identity(val + 7);
             }
 
             //Associativity

@@ -125,6 +125,9 @@ var either_functor = {
     map: function _map(fn) {
         return this.isRight ? Right(fn(this.value)) : Left(this.value);
     },
+    bimap: function _bimap(f, g) {
+        return this.isRight ? Right(f(this.value)) : Left(g(this.value));
+    },
     /**
      * @description:
      * @param: {functor} ma
@@ -163,6 +166,9 @@ var right_functor = {
     map: function _map(fn) {
         return this.of(fn(this.value));
     },
+    bimap: function _bimap(f, g) {
+        return this.of(f(this.value));
+    },
     /**
      * @description:
      * @param: {functor} ma
@@ -199,6 +205,9 @@ var left_functor = {
      */
     map: function _map() {
         return Left(this.value);
+    },
+    bimap: function _bimap(f, g) {
+        return this.of(g(this.value));
     },
     /**
      * @description:

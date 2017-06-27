@@ -210,7 +210,7 @@ describe('Test Groups', function _testGroups() {
             s3.toString().should.eql('Sum(11)');
             s4.toString().should.eql('Sum(37)');
             s5.toString().should.eql('Sum(-0)');
-            se.toString().should.eql('Sum(0)');
+            se.toString().should.eql('Sum(nil)');
 
             s1.concat(s2).toString().should.eql('Sum(6)');
             s3.concat(s4).toString().should.eql('Sum(48)');
@@ -436,7 +436,7 @@ describe('Test Groups', function _testGroups() {
             m3.toString().should.eql('Multiply(11)');
             m4.toString().should.eql('Multiply(37)');
             m5.toString().should.eql('Multiply(-0)');
-            me.toString().should.eql('Multiply(1)');
+            me.toString().should.eql('Multiply(nil)');
 
             m1.concat(m2).toString().should.eql('Multiply(10)');
             m3.concat(m4).toString().should.eql('Multiply(407)');
@@ -465,7 +465,6 @@ describe('Test Groups', function _testGroups() {
             a2.concat(a3).value.should.eql(false);
 
             //Associativity
-            console.log(a1.concat(a2).concat(a3).value);
             a1.concat(a2).concat(a3).value.should.eql(a1.concat(a2.concat(a3)).value);
         });
 

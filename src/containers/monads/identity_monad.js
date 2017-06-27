@@ -48,8 +48,8 @@ var identity_monad = Object.create(identity_functor, {
         }
     },
     fold: {
-        value: function _fold(fn, acc) {
-            return fn(acc, this.value);
+        value: function _fold(fn) {
+            return fn(this.value);
         }
     },
     sequence: {

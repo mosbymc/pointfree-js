@@ -1,5 +1,16 @@
 import { future_functor } from '../functors/future_functor';
 
+function safeFork(reject, resolve) {
+    return function _safeFork(val) {
+        try {
+            return resolve(val);
+        }
+        catch(ex) {
+            reject(ex);
+        }
+    }
+}
+
 function Future(f) {
     return Object.create(future_monad, {
         _value: {
@@ -7,15 +18,8 @@ function Future(f) {
             writable: false,
             configurable: false
         }
-    })
+    });
 }
-
-Future.of = function _of(a) {
-    return 'function' === typeof a ? Future(a) :
-        Future(function _wrapper() {
-            return a;
-        });
-};
 
 /**
  * @description:
@@ -24,9 +28,7 @@ Future.of = function _of(a) {
  */
 Future.of = function _of(val) {
     return 'function' === typeof val ? Future(val) :
-        Future(function _runner(rej, res) {
-            return res(val)
-        });
+        Future((reject, resolve) => safeFork(reject, resolve(val)));
 };
 
 /**
@@ -35,14 +37,11 @@ Future.of = function _of(val) {
  * @return: {@see future_functor}
  */
 Future.reject = function _reject(val) {
-    return Future(function _future(reject) {
-        reject(val);
-    });
+    return Future((reject, resolve) => reject(val));
 };
 
 Future.unit = function _unit(val) {
-    var f = Future(val);
-    return f.complete();
+    return Future(val).complete();
 };
 
 var future_monad = Object.create(future_functor, {
@@ -56,7 +55,13 @@ var future_monad = Object.create(future_functor, {
         //TODO: I have time to finish working on the Future
         value: function _chain(fn) {
             return this.of((reject, resolve) =>
-                this._fork(a => reject(a), b => fn(b).fork(reject, resolve)));
+            {
+                let cancel,
+                    outerFork = this._fork(a => reject(a), b => {
+                        cancel = fn(b).fork(reject, resolve);
+                    });
+                return cancel ? cancel : (cancel = outerFork, x => cancel());
+            });
         }
     },
     fold: {
@@ -75,6 +80,9 @@ var future_monad = Object.create(future_functor, {
                 }).ap(xs);
                 return fa(this.empty);
             });
+
+
+
         }
     },
     apply: {

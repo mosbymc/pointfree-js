@@ -6,9 +6,9 @@ var multGroup = groupFactory((x, y) => x * y, x => 1 / x, 1, 'Multiply');
 
 var strGroup = groupFactory((x, y) => x + y, x => x, '', 'String');
 
-var allGroup = groupFactory(_all, x => !x, null, 'All');
+var allGroup = groupFactory(_all, x => !x, 'All');
 
-var anyGroup = groupFactory((x, y) => !!(x || y), x => !x, false, 'Any');
+var anyGroup = groupFactory((x, y) => !!(x || y), x => !x, 'Any');
 
 function _all(x, y) {
     return !!(x && y);
