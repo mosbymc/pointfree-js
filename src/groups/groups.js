@@ -1,20 +1,31 @@
 import { groupFactory } from './group_factory';
 
-var sumGroup = groupFactory((x, y) => x + y, x => -x, 0, 'Sum');
+var xor = (x, y) => !!(x ^ y);
 
-var multGroup = groupFactory((x, y) => x * y, x => 1 / x, 1, 'Multiply');
+var xnor = (x, y) => x && y || !x && !y;
 
-var strGroup = groupFactory((x, y) => x + y, x => x, '', 'String');
 
-var allGroup = groupFactory(_all, x => !x, 'All');
 
-var anyGroup = groupFactory((x, y) => !!(x || y), x => !x, 'Any');
+var sumGroup = groupFactory((x, y) => x + y, (x, y) => x - y, x => -x, 0, 'Sum');
+
+var multGroup = groupFactory((x, y) => x * y, (x, y) => x * (1 / y), x => 1 / x, 1, 'Multiply');
+
+var strGroup = groupFactory((x, y) => x + y, (x, y) => x.slice(x.lastIndexOf(y)), x => x, '', 'String');
+
+var xorGroup = groupFactory(xor, (x, y) => !(x ^ y), x => x, false, 'Xor');
+
+var xnorGroup = groupFactory(xnor, xnor, x => x, false, 'Xnor');
+
+
+
+
+var allGroup = groupFactory(_all, x => x, undefined, 'All');
+
+var anyGroup = groupFactory((x, y) => !!(x || y), x => !x, undefined, 'Any');
 
 function _all(x, y) {
     return !!(x && y);
 }
-
-
 
 
 
@@ -27,4 +38,4 @@ var firstGroup = groupFactory(function _firstConcat(y) {
     return firstGroup(this.value);
 }, 'First');
 
-export { sumGroup, multGroup, strGroup, allGroup, anyGroup };
+export { sumGroup, multGroup, strGroup, xorGroup, xnorGroup };

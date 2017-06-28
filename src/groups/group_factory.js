@@ -2,7 +2,6 @@ import { identity } from '../combinators';
 import { binary, rightApply } from '../decorators';
 
 var e = binary(rightApply(identity));
-console.log(e(1)(2));
 
 /**
  * @description: Takes a function that can perform the desired type of concatenation and an optional
@@ -18,7 +17,7 @@ console.log(e(1)(2));
  * @param: {string} type
  * @return: {@see group}
  */
-function groupFactory(concatFn, inverseFn, identity, type) {
+function groupFactory(concatFn, inverseConcatFn, invertFn, identity, type) {
     /**
      * @description:
      * @param: {*} x
@@ -77,8 +76,16 @@ function groupFactory(concatFn, inverseFn, identity, type) {
                     this._concatFn = fn.bind(this);
                 }
             },
-            inverseFn: {
-                value: inverseFn,
+            inverseConcatFn: {
+                get: function _getInverseConcatFn() {
+                    return this._inverseConcatFn ? this._inverseConcatFn.bind(this) : inverseConcatFn.bind(this);
+                },
+                set: function _setInverseConcatFn(fn) {
+                    this._inverseConcatFn = fn.bind(this);
+                }
+            },
+            invertFn: {
+                value: invertFn,
                 writable: true
             }
         });
@@ -168,14 +175,23 @@ function groupFactory(concatFn, inverseFn, identity, type) {
             },
             concatFn: {
                 get: function _getConcatFn() {
+                    console.log(this._concatFn);
                     return this._concatFn ? this._concatFn.bind(this) : concatFn.bind(this);
                 },
                 set: function _setConcatFn(fn) {
                     this._concatFn = fn.bind(this);
                 }
             },
-            inverseFn: {
-                value: inverseFn,
+            inverseConcatFn: {
+                get: function _getInverseConcatFn() {
+                    return this._inverseConcatFn ? this._inverseConcatFn.bind(this) : inverseConcatFn.bind(this);
+                },
+                set: function _setInverseConcatFn(fn) {
+                    this._inverseConcatFn = fn.bind(this);
+                }
+            },
+            invertFn: {
+                value: invertFn,
                 writable: true
             }
         });
@@ -220,8 +236,7 @@ function groupFactory(concatFn, inverseFn, identity, type) {
      */
     function _inverseConcat(x) {
         if (x.isEmpty || !Object.getPrototypeOf(this).isPrototypeOf(x)) return this;
-        var inverseX = inverseFn(x.value);
-        return _internalGroupCreator(this.concatFn(this.value, inverseX), inverseX);
+        return _internalGroupCreator(this.inverseConcatFn(this.value, x.value), invertFn(x.value));
     }
 
     /**
@@ -232,10 +247,7 @@ function groupFactory(concatFn, inverseFn, identity, type) {
      */
     function _inverseConcatAll(...xs) {
         return xs.filter(x => !x.isEmpty && Object.getPrototypeOf(this).isPrototypeOf(x), this)
-            .reduce((curr, next) => {
-                var inverseVal = inverseFn(next.value);
-                return _internalGroupCreator(curr.concatFn(curr.value, inverseVal), inverseVal);
-            }, this);
+            .reduce((curr, next) => _internalGroupCreator(curr.inverseConcatFn(curr.value, next.value), invertFn(next.value)), this);
     }
 
     /**
@@ -245,7 +257,7 @@ function groupFactory(concatFn, inverseFn, identity, type) {
      */
     function _undo() {
         if (null != this.previous && identity != this.previous) {
-            var invertedPrev = this.inverseFn(this.previous);
+            var invertedPrev = invertFn(this.previous);
             return _internalGroupCreator(this.concatFn(this.value, invertedPrev), invertedPrev);
         }
         return _group(this.value);
@@ -263,9 +275,17 @@ function groupFactory(concatFn, inverseFn, identity, type) {
 
     /**
      * @description:
+     * @type: {function}
      * @return: {@see group}
      */
     _group.empty = _group.identity;
+
+    /**
+     * @description:
+     * @type: {function}
+     * @return: {@see group}
+     */
+    _group.unit = _group.identity;
 
     return _group;
 }

@@ -1,4 +1,4 @@
-import { sumGroup, multGroup, strGroup, allGroup, anyGroup } from '../../../src/groups/groups';
+import { sumGroup, multGroup, strGroup, xorGroup, xnorGroup } from '../../../src/groups/groups';
 
 describe('Test Groups', function _testGroups() {
     describe('Test sumGroup', function _testSumGroup() {
@@ -453,33 +453,193 @@ describe('Test Groups', function _testGroups() {
         });
     });
 
-    describe('Test allGroup', function _testAllGroup() {
-        it('should return the proper sum of two numbers', function _testAllConcatOnValues() {
-            var a1 = allGroup(true),
-                a2 = allGroup(true),
-                a3 = allGroup(false);
+    describe('Test xorGroup', function _testXorGroup() {
+        it('should return the proper sum of two numbers', function _testXorConcatOnValues() {
+            var x1 = xorGroup(true),
+                x2 = xorGroup(true),
+                x3 = xorGroup(false),
+                x4 = xorGroup(false);
 
-            a1.concat(a2).value.should.eql(true);
-            a1.concat(a3).value.should.eql(false);
+            x1.concat(x2).value.should.be.false;
+            x1.concat(x3).value.should.be.true;
+            x1.concat(x4).value.should.be.true;
 
-            a2.concat(a3).value.should.eql(false);
+            x2.concat(x3).value.should.be.true;
+            x2.concat(x4).value.should.be.true;
+
+            x3.concat(x4).value.should.be.false;
 
             //Associativity
-            a1.concat(a2).concat(a3).value.should.eql(a1.concat(a2.concat(a3)).value);
+            x1.concat(x2).concat(x3).value.should.eql(x1.concat(x2.concat(x3)).value);
         });
 
-        it('should allow concatenation via .valueOf function', function _testSameValueViaANDOperator() {
-            var a1 = allGroup(true),
-                a2 = allGroup(true),
-                a3 = allGroup(false);
+        it('should allow concatenation via .valueOf function', function _testSameValueViaBitwiseXorOperator() {
+            var x1 = xorGroup(true),
+                x2 = xorGroup(true),
+                x3 = xorGroup(false),
+                x4 = xorGroup(false);
 
-            ((a1 && a2).value).should.eql(true);
-            ((a1 && a3).value).should.eql(false);
+            (!!(x1 ^ x2)).should.be.false;
+            (!!(x1 ^ x3)).should.be.true;
 
-            ((a2 && a3).value).should.eql(false);
+            (!!(x2 ^ x3)).should.be.true;
+            (!!(x2 ^ x4)).should.be.true;
+
+            (!!(x3 ^ x4)).should.be.false;
 
             //Associativity
-            ((a1 && a2 && a3).value).should.eql((a1 && (a2 && a3)).value);
+            ((x1 && x2 && x3).value).should.eql((x1 && (x2 && x3)).value);
+        });
+
+        it('should revert the last operation performed on an xor', function _testXorGroupRevert() {
+            var x1 = xorGroup(true),
+                x2 = xorGroup(true),
+                x3 = xorGroup(false),
+                x4 = xorGroup(false);
+
+            var x12 = x1.concat(x2).undo(),
+                x13 = x1.concat(x3).undo(),
+                x14 = x1.concat(x4).undo();
+
+            x12.value.should.eql(x1.value);
+            x13.value.should.eql(x1.value);
+            x14.value.should.eql(x1.value);
+
+            var x23 = x2.concat(x3).undo(),
+                x24 = x2.concat(x4).undo();
+
+            x23.value.should.eql(x2.value);
+            x24.value.should.eql(x2.value);
+
+            var x34 = x3.concat(x4).undo();
+
+            x34.value.should.eql(x3.value);
+
+            var x121 = x1.concat(x2).undo().undo();
+            x121.value.should.eql(x1.concat(x2).value);
+
+            var x131 = x1.concat(x3).undo().undo();
+            x131.value.should.eql(x1.concat(x3).value);
+
+            var x141 = x1.concat(x4).undo().undo();
+            x141.value.should.eql(x1.concat(x4).value);
+        });
+
+        it('should perform concatenation on many groups via concatAll', function _testSumGroupConcatAll() {
+            var s1 = sumGroup(1),
+                s2 = sumGroup(5),
+                s3 = sumGroup(11),
+                s4 = sumGroup(37);
+
+            var s1All = s1.concatAll(s2, s3, s4),
+                s2All = s2.concatAll(s1, s3, s4),
+                s3All = s3.concatAll(s1, s2, s4),
+                s4All = s4.concatAll(s1, s2, s3);
+
+            s1All.value.should.eql(54);
+            s1All.value.should.eql(s2All.value);
+            s1All.value.should.eql(s3All.value);
+            s1All.value.should.eql(s4All.value);
+
+            s1All.undo().value.should.eql(17);
+            s2All.undo().value.should.eql(17);
+            s3All.undo().value.should.eql(17);
+            s4All.undo().value.should.eql(43);
+        });
+
+        it('should perform inverted concatenation on many groups via inverseConcatAll', function _testSumGroupInverseConcatAll() {
+            var s1 = sumGroup(1),
+                s2 = sumGroup(5),
+                s3 = sumGroup(11),
+                s4 = sumGroup(37);
+
+            var s1All = s1.inverseConcatAll(s2, s3, s4),
+                s2All = s2.inverseConcatAll(s1, s3, s4),
+                s3All = s3.inverseConcatAll(s1, s2, s4),
+                s4All = s4.inverseConcatAll(s1, s2, s3);
+
+            s1All.value.should.eql(-52);
+            s2All.value.should.eql(-44);
+            s3All.value.should.eql(-32);
+            s4All.value.should.eql(20);
+
+            s1All.undo().value.should.eql(-15);
+            s2All.undo().value.should.eql(-7);
+            s3All.undo().value.should.eql(5);
+            s4All.undo().value.should.eql(31);
+        });
+
+        it('should handle empty groups as identity during concatenation', function _testSumGroupEmptyConcatenation() {
+            var s1 = sumGroup(1),
+                s2 = sumGroup(5),
+                s3 = sumGroup(11),
+                s4 = sumGroup(37),
+                se1 = sumGroup.empty(),
+                se2 = sumGroup.empty();
+
+            se1.isEmpty.should.be.true;
+            se2.isEmpty.should.be.true;
+
+            s1.isEmpty.should.be.false;
+            s2.isEmpty.should.be.false;
+            s3.isEmpty.should.be.false;
+            s4.isEmpty.should.be.false;
+
+            s1.concat(se1).value.should.eql(s1.value);
+            s2.concat(se2).value.should.eql(s2.value);
+            s3.concat(se1).value.should.eql(s3.value);
+            s4.concat(se2).value.should.eql(s4.value);
+
+            se1.concat(se2).value.should.eql(se1.value);
+            se2.concat(se1).value.should.eql(se2.value);
+            se1.value.should.eql(se2.value);
+
+            se1.undo().value.should.eql(se1.value);
+            se1.undo().value.should.eql(se2.value);
+
+            se1.concat(se2).undo().value.should.eql(se1.value);
+            se2.concat(se1).undo().value.should.eql(se2.value);
+
+            se1.inverseConcat(se2).value.should.eql(se1.value);
+            se2.inverseConcat(se1).value.should.eql(se2.value);
+
+            se1.concatAll(s1, s2, s3, s4, se2).value.should.eql(s1.concatAll(s2, s3, s4).value);
+            se1.concatAll(s1, s2, s3, s4, se1).value.should.eql(s1.concatAll(s2, s3, s4).value);
+
+            se1.concat(s4).undo().value.should.eql(se1.value);
+            se2.concat(s3).undo().value.should.eql(se2.value);
+
+            se1.inverseConcatAll(s1, s2, s3, s4, se2).value.should.eql(-54);
+            se2.inverseConcatAll(s1, s2, s3, s4, se1).value.should.eql(-54);
+        });
+
+        it('should represent the correct type and value of a sum group', function _testSumGroupToString() {
+            var s1 = sumGroup(1),
+                s2 = sumGroup(5),
+                s3 = sumGroup(11),
+                s4 = sumGroup(37),
+                s5 = sumGroup(-0),
+                se = sumGroup.empty();
+
+            s1.toString().should.eql('Sum(1)');
+            s2.toString().should.eql('Sum(5)');
+            s3.toString().should.eql('Sum(11)');
+            s4.toString().should.eql('Sum(37)');
+            s5.toString().should.eql('Sum(-0)');
+            se.toString().should.eql('Sum(nil)');
+
+            s1.concat(s2).toString().should.eql('Sum(6)');
+            s3.concat(s4).toString().should.eql('Sum(48)');
+            s1.concatAll(s2, s3, s4, se).toString().should.eql('Sum(54)');
+        });
+
+        it('should prevent writing to ._value, .value, ._prev, and .previous', function _testSumGroupRestrictedWrites() {
+            var s = sumGroup(10);
+
+            expect(function _writeToDot_value() { s._value = 5; }).to.throw();
+            expect(function _writeToDotValue() { s.value = 5; }).to.throw();
+            expect(function _writeToDot_prev() { s._prev = 5; }).to.throw();
+            expect(function _writeToDotPrevious() { s.previous = 5; }).to.throw();
         });
     });
 });
