@@ -1,11 +1,11 @@
-import { sortData } from '../../../src/projection/sortHelpers';
+import { sortData } from '../../../src/containers/sortHelpers';
 import { sortDirection } from '../../../src/helpers'
 import { testData } from '../../testData';
 
 /*
-describe('sortData', function testSortData() {
-    var previousFieldsValues = [],
-        orderedField;
+ describe('sortData', function testSortData() {
+     var previousFieldsValues = [],
+     orderedField;
 
     it('should order the data properly the data in ascending order', function testSortingDataAscending() {
         var sortResult1 = sortData(testData.dataSource.data, [{ key: 'FirstName', dir: 'asc', dataType: 'string' }]);
@@ -40,7 +40,7 @@ describe('sortData', function testSortData() {
                     previousFieldsValues[0] = item[orderedField];
             }
         });
-    });
+     });
 
     it('should sort on more than one field', function testSortingOnTwoFields() {
         var sortResult = sortData(testData.dataSource.data, [{ key: 'Zip', dir: 'desc', dataType: 'number' }, { key: 'FirstName', dir: 'asc', dataType: 'string' }]);

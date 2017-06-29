@@ -1,6 +1,6 @@
 import { list_functor, ordered_list_functor, list_core } from '../functors/list_functor';
 import { sortDirection } from '../../helpers';
-import { groupBy, flatMap } from '../../list_monad/list_iterators';
+import { groupBy, flatMap } from '../list_iterators';
 import { wrap } from '../../functionalHelpers';
 import { identity } from '../../combinators';
 import { createListCreator } from '../list_helpers';

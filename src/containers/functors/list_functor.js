@@ -1,6 +1,6 @@
 import { all, any, except, intersect, union, map, flatMap, groupBy, sortBy, addFront, concat, groupJoin, join, zip, filter,
     contains, first, last, count, fold, foldRight, distinct, ofType, binarySearch, equals, take, takeWhile, skip, skipWhile, reverse,
-    copyWithin, fill, indexOf, lastIndexOf, repeat } from '../../list_monad/list_iterators';
+    copyWithin, fill, indexOf, lastIndexOf, repeat } from '../list_iterators';
 import { sortDirection } from '../../helpers';
 import { wrap, defaultPredicate, delegatesTo, isArray } from '../../functionalHelpers';
 import { when } from '../../combinators';

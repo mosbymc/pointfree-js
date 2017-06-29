@@ -1,8 +1,8 @@
-import { isArray, strictEquals, delegatesTo, isObject, type } from '../functionalHelpers';
-import { not } from '../decorators';
-import { when, ifElse } from '../combinators';
+import { isArray, strictEquals, isObject, type } from '../functionalHelpers';
+import { apply, not } from '../decorators';
+import { when, ifElse, ifThisThenThat } from '../combinators';
 import { javaScriptTypes, cacher } from '../helpers';
-import { sortData } from  '../projection/sortHelpers';
+import { sortData } from  './sortHelpers';
 
 var toArray = when(not(isArray), Array.from);
 
@@ -38,17 +38,16 @@ function concat(xs, yss, argsCount) {
             if (javaScriptTypes.undefined !== x) yield x;
         }
 
-        var enumerable;
         if (1 === argsCount) {
-            enumerable = yss[0];
-            for (let y of enumerable) {
+            let ys = yss[0];
+            for (let y of ys) {
                 if (javaScriptTypes.undefined !== y) yield y;
             }
         }
         else {
             for (let ys of yss) {
-                enumerable = toArray(ys);
-                for (let y of enumerable) {
+                console.log(ys);
+                for (let y of toArray(ys)) {
                     if (javaScriptTypes.undefined !== y) yield y;
                 }
             }
@@ -65,13 +64,11 @@ function concat(xs, yss, argsCount) {
  */
 function except(xs, ys, comparer = strictEquals) {
     return function *exceptIterator() {
-        var res;
         for (let x of xs) {
             ys = toArray(ys);
-            res = !(ys.some(function _comparer(y) {
-                return comparer(x, y);
-            }));
-            if (res) yield x;
+            if (!(ys.some(function _comparer(y) {
+                    return comparer(x, y);
+                }))) yield x;
         }
     };
 }
@@ -127,10 +124,7 @@ function intersect(xs, ys, comparer = strictEquals) {
         for (let x of xs) {
             if (javaScriptTypes.undefined !== x && ys.some(function _checkEquivalency(it) {
                     return comparer(x, it);
-                }))
-            {
-                yield x;
-            }
+                })) yield x;
         }
     };
 }
@@ -175,8 +169,7 @@ function union(xs, ys, comparer = strictEquals) {
             if (!isInCache(x)) yield x;
         }
 
-        var yArr = toArray(ys);
-        for (let y of yArr) {
+        for (let y of toArray(ys)) {
             if (!isInCache(y)) yield y;
         }
     };
@@ -195,13 +188,11 @@ function zip(xs, ys, selector) {
             idx = 0;
         var yArr = toArray(ys);
 
-        if (1 > !yArr.length) {
-            for (let x of xs) {
-                if (idx > yArr.length) return;
-                res = selector(x, yArr[idx]);
-                if (strictEquals(javaScriptTypes.undefined, res)) yield res;
-                ++idx;
-            }
+        for (let x of xs) {
+            if (idx > yArr.length || !yArr.length) return;
+            res = selector(x, yArr[idx]);
+            if (not(strictEquals)(javaScriptTypes.undefined, res)) yield res;
+            ++idx;
         }
     };
 }
@@ -223,7 +214,7 @@ function all(xs, predicate) {
  * @return: {boolean}
  */
 function any(xs, predicate) {
-    return strictEquals(javaScriptTypes.function, type(predicate)) ? 0 < toArray(xs).length : toArray.some(predicate);
+    return strictEquals(javaScriptTypes.function, type(predicate)) ? toArray(xs).some(predicate) : 0 < toArray(xs).length;
 }
 
 /**
@@ -234,6 +225,7 @@ function any(xs, predicate) {
  * @return: {*}
  */
 function contains(xs, val, comparer) {
+    //TODO: see if there is any real performance increase by just using .includes when a comparer hasn't been passed
     return strictEquals(javaScriptTypes.undefined, type(comparer)) ? toArray(xs).includes(val) : toArray(xs).some(x => comparer(x, val));
 }
 
@@ -263,7 +255,7 @@ function binarySearch(xs, left, right, val, comparer) {
  */
 function count(xs, predicate) {
     return strictEquals(javaScriptTypes.undefined, type(predicate)) ?
-        toArray(xs).length : toArray(xs).filter(x => predicate(x)).length;
+        toArray(xs).length : toArray(xs).filter(predicate).length;
 }
 
 /**
@@ -305,10 +297,9 @@ function foldRight(xs, fn, initial = 0) {
  * @return: {*}
  */
 function last(xs, predicate) {
-    var data = toArray(xs);
-    if (javaScriptTypes.function === typeof predicate)
-        data = data.filter(predicate);
-    return data[data.length - 1];
+    if (strictEquals(javaScriptTypes.function, type(predicate)))
+        return toArray(xs).filter(predicate).slice(-1)[0];
+    return toArray(xs).slice(-1)[0];
 }
 
 /**
@@ -471,6 +462,30 @@ function flatMap(xs, fn) {
     };
 }
 
+/*
+ function flatMap1(source, fn) {
+    return function *flatMap1Iterator() {
+        var results = [];
+        for (let item of source) {
+            var res = fn(item);
+            if (res.length) {
+                results = results.concat(res);
+                yield results.shift();
+            }
+            else if (undefined !== res) {
+                if (isArray(res)) {
+                    yield res.shift();
+                    results = results.concat(res);
+                }
+            }
+            else yield res;
+        }
+
+        while (results.length) yield results.shift();
+    };
+ }
+ */
+
 /**
  * @description:
  * @param: {iterable} xs
@@ -499,7 +514,7 @@ function flatten(xs) {
  */
 function groupBy(xs, groupObject, queryableConstructor) {
     return function *groupByIterator() {
-        //gather all data from the xs before grouping
+        //gather all data from the iterable before grouping
         var groupedData = nestLists(groupData(toArray(xs), groupObject), 0, null, queryableConstructor);
         for (let x of groupedData) yield x;
     };
@@ -521,7 +536,7 @@ function nestLists(data, depth, key, queryableConstructor) {
         });
     }
     if (0 !== depth) {
-        data = queryableConstructor(data, key);
+        data = queryableConstructor(data, null, null, key);
     }
     return data;
 }
@@ -540,7 +555,7 @@ function groupData(xs, groupObject) {
         groupObject.forEach(function _createGroupsByFields(group) {
             grp = findGroup(grp, group.keySelector(item));
         });
-        grp[grp.length] = item;
+        grp.push(item);
     });
 
     return retData;
@@ -580,7 +595,7 @@ function map(xs, fn) {
     return function *mapIterator() {
         for (let x of xs) {
             let res = fn(x);
-            if (strictEquals(javaScriptTypes.undefined, type(res))) yield res;
+            if (!strictEquals(javaScriptTypes.undefined, type(res))) yield res;
         }
     };
 }

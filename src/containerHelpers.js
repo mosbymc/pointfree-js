@@ -1,6 +1,5 @@
 import { curry, compose, identity } from './combinators';
 import { getWith } from './functionalHelpers';
-import { List, list_core } from './list_monad/list';
 
 //TODO: I need to figure out how to structure this lib. I'd like to have several different types of containers...
 //TODO: ...specifically, functors (pointed), monads, and maybe one other type. In addition, each container type

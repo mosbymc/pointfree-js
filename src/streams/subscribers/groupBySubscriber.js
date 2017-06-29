@@ -1,5 +1,5 @@
 import { subscriber } from './subscriber';
-import { sortData } from '../../projection/sortHelpers';
+import { sortData } from '../../containers/sortHelpers';
 
 var groupBySubscriber = Object.create(subscriber, {
     next: {

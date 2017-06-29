@@ -39,7 +39,10 @@ module.exports = function _wallaby(wallaby) {
          objectSet to false are being loaded by browserify after transpilation
          */
         tests: [
-            { pattern: 'test/**/*.spec.js', load: true }
+            { pattern: 'test/**/*.spec.js', load: true },
+            '!test/integration/**/*.spec.js',
+            '!test/unit/queryObjects/*.spec.js',
+            '!test/unit/projection/*.spec.js'
         ],
 
         /*
