@@ -238,6 +238,7 @@ describe('Test List Iterators', function _testListIterators() {
     });
 
     describe('Test groupJoin...', function testGroupJoin() {
+        var factoryFn = createListCreator(list_functor, ordered_list_functor, list_functor);
         var preViewed = {};
         var uniqueCities = testData.dataSource.data.filter(function _gatherUniqueCities(item) {
             if (!(item.City in preViewed)) {
@@ -292,7 +293,7 @@ describe('Test List Iterators', function _testListIterators() {
         }
         describe('...using default equality comparer', function testGroupJoinUsingDefaultComparer() {
             it('should return all items grouped by city', function testBasicGroupJoin() {
-                var groupJoinIterable = groupJoin(uniqueCities, testData.dataSource.data, primitiveSelector, citySelector, cityProjector),
+                var groupJoinIterable = groupJoin(factoryFn, uniqueCities, testData.dataSource.data, primitiveSelector, citySelector, cityProjector),
                     groupJoinRes = Array.from(groupJoinIterable());
 
                 groupJoinRes.should.have.lengthOf(uniqueCities.length);
@@ -306,7 +307,7 @@ describe('Test List Iterators', function _testListIterators() {
             });
 
             it('should return all items grouped by state', function testBasicGroupJoin() {
-                var groupJoinIterable = groupJoin(uniqueStates, testData.dataSource.data, primitiveSelector, stateSelector, stateProjector),
+                var groupJoinIterable = groupJoin(factoryFn, uniqueStates, testData.dataSource.data, primitiveSelector, stateSelector, stateProjector),
                     groupJoinRes = Array.from(groupJoinIterable());
 
                 groupJoinRes.should.have.lengthOf(uniqueStates.length);
@@ -320,7 +321,7 @@ describe('Test List Iterators', function _testListIterators() {
             });
 
             it('should return items that have no inner matches', function testGroupJoinWithNoInnerMatches() {
-                var groupJoinIterable = groupJoin(uniqueStates, [], primitiveSelector, stateSelector, stateProjector),
+                var groupJoinIterable = groupJoin(factoryFn, uniqueStates, [], primitiveSelector, stateSelector, stateProjector),
                     groupJoinRes = Array.from(groupJoinIterable());
 
                 groupJoinRes.should.have.lengthOf(uniqueStates.length);
@@ -332,7 +333,7 @@ describe('Test List Iterators', function _testListIterators() {
             });
 
             it('should return empty array when source is empty', function testGroupJoinWithEmptySource() {
-                var groupJoinIterable = groupJoin([], testData.dataSource.data, primitiveSelector, stateSelector, stateProjector),
+                var groupJoinIterable = groupJoin(factoryFn, [], testData.dataSource.data, primitiveSelector, stateSelector, stateProjector),
                     groupJoinRes = Array.from(groupJoinIterable());
 
                 groupJoinRes.should.have.lengthOf(0);
@@ -341,7 +342,7 @@ describe('Test List Iterators', function _testListIterators() {
 
         describe('...using defined equality comparer', function testGroupJoinWithDefinedComparer() {
             it('should return all items grouped by city', function testGroupJoinWithDefinedEqualityComparer() {
-                var groupJoinIterable = groupJoin(uniqueCities, testData.dataSource.data, primitiveSelector, citySelector, cityProjector, cityComparer),
+                var groupJoinIterable = groupJoin(factoryFn, uniqueCities, testData.dataSource.data, primitiveSelector, citySelector, cityProjector, cityComparer),
                     groupJoinRes = Array.from(groupJoinIterable());
 
                 groupJoinRes.should.have.lengthOf(uniqueCities.length);
@@ -355,7 +356,7 @@ describe('Test List Iterators', function _testListIterators() {
             });
 
             it('should return all items grouped by state', function testGroupJoinWithDefinedEqualityComparer() {
-                var groupJoinIterable = groupJoin(uniqueStates, testData.dataSource.data, primitiveSelector, stateSelector, stateProjector, stateComparer),
+                var groupJoinIterable = groupJoin(factoryFn, uniqueStates, testData.dataSource.data, primitiveSelector, stateSelector, stateProjector, stateComparer),
                     groupJoinRes = Array.from(groupJoinIterable());
 
                 groupJoinRes.should.have.lengthOf(uniqueStates.length);
@@ -373,7 +374,7 @@ describe('Test List Iterators', function _testListIterators() {
                     return a === b.Zip;
                 }
 
-                var groupJoinIterable = groupJoin(uniqueCities, testData.dataSource.data, primitiveSelector, citySelector, cityProjector, badComparer),
+                var groupJoinIterable = groupJoin(factoryFn, uniqueCities, testData.dataSource.data, primitiveSelector, citySelector, cityProjector, badComparer),
                     groupJoinRes = Array.from(groupJoinIterable());
 
                 groupJoinRes.should.have.lengthOf(uniqueCities.length);
@@ -385,7 +386,7 @@ describe('Test List Iterators', function _testListIterators() {
             });
 
             it('should return items that have no inner matches', function testGroupJoinWithNoInnerMatches() {
-                var groupJoinIterable = groupJoin(uniqueStates, [], primitiveSelector, stateSelector, stateProjector, stateComparer),
+                var groupJoinIterable = groupJoin(factoryFn, uniqueStates, [], primitiveSelector, stateSelector, stateProjector, stateComparer),
                     groupJoinRes = Array.from(groupJoinIterable());
 
                 groupJoinRes.should.have.lengthOf(uniqueStates.length);
@@ -397,7 +398,7 @@ describe('Test List Iterators', function _testListIterators() {
             });
 
             it('should return empty array when source is empty', function testGroupJoinWithEmptySource() {
-                var groupJoinIterable = groupJoin([], testData.dataSource.data, primitiveSelector, stateSelector, stateProjector, stateComparer),
+                var groupJoinIterable = groupJoin(factoryFn, [], testData.dataSource.data, primitiveSelector, stateSelector, stateProjector, stateComparer),
                     groupJoinRes = Array.from(groupJoinIterable());
 
                 groupJoinRes.should.have.lengthOf(0);
@@ -411,7 +412,7 @@ describe('Test List Iterators', function _testListIterators() {
             }
 
             it('should return all items grouped by city', function testGroupJoinWithDefinedEqualityComparer() {
-                var groupJoinIterable = groupJoin(gen(uniqueCities), gen(testData.dataSource.data), primitiveSelector, citySelector, cityProjector, cityComparer),
+                var groupJoinIterable = groupJoin(factoryFn, gen(uniqueCities), gen(testData.dataSource.data), primitiveSelector, citySelector, cityProjector, cityComparer),
                     groupJoinRes = Array.from(groupJoinIterable());
 
                 groupJoinRes.should.have.lengthOf(uniqueCities.length);
@@ -425,7 +426,7 @@ describe('Test List Iterators', function _testListIterators() {
             });
 
             it('should return all items grouped by state', function testGroupJoinWithDefinedEqualityComparer() {
-                var groupJoinIterable = groupJoin(gen(uniqueStates), gen(testData.dataSource.data), primitiveSelector, stateSelector, stateProjector, stateComparer),
+                var groupJoinIterable = groupJoin(factoryFn, gen(uniqueStates), gen(testData.dataSource.data), primitiveSelector, stateSelector, stateProjector, stateComparer),
                     groupJoinRes = Array.from(groupJoinIterable());
 
                 groupJoinRes.should.have.lengthOf(uniqueStates.length);
@@ -443,7 +444,7 @@ describe('Test List Iterators', function _testListIterators() {
                     return a === b.Zip;
                 }
 
-                var groupJoinIterable = groupJoin(gen(uniqueCities), gen(testData.dataSource.data), primitiveSelector, citySelector, cityProjector, badComparer),
+                var groupJoinIterable = groupJoin(factoryFn, gen(uniqueCities), gen(testData.dataSource.data), primitiveSelector, citySelector, cityProjector, badComparer),
                     groupJoinRes = Array.from(groupJoinIterable());
 
                 groupJoinRes.should.have.lengthOf(uniqueCities.length);
@@ -455,7 +456,7 @@ describe('Test List Iterators', function _testListIterators() {
             });
 
             it('should return items that have no inner matches', function testGroupJoinWithNoInnerMatches() {
-                var groupJoinIterable = groupJoin(gen(uniqueStates), gen([]), primitiveSelector, stateSelector, stateProjector, stateComparer),
+                var groupJoinIterable = groupJoin(factoryFn, gen(uniqueStates), gen([]), primitiveSelector, stateSelector, stateProjector, stateComparer),
                     groupJoinRes = Array.from(groupJoinIterable());
 
                 groupJoinRes.should.have.lengthOf(uniqueStates.length);
@@ -467,7 +468,7 @@ describe('Test List Iterators', function _testListIterators() {
             });
 
             it('should return empty array when source is empty', function testGroupJoinWithEmptySource() {
-                var groupJoinIterable = groupJoin(gen([]), gen(testData.dataSource.data), primitiveSelector, stateSelector, stateProjector, stateComparer),
+                var groupJoinIterable = groupJoin(factoryFn, gen([]), gen(testData.dataSource.data), primitiveSelector, stateSelector, stateProjector, stateComparer),
                     groupJoinRes = Array.from(groupJoinIterable());
 
                 groupJoinRes.should.have.lengthOf(0);

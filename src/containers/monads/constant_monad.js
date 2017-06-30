@@ -19,6 +19,13 @@ Constant.of = function _of(item) {
     return Constant(item);
 };
 
+/**
+ * @description:
+ * @param: {monad} m
+ * @return: {boolean}
+ */
+Constant.is = m => constant_monad.isPrototypeOf(m);
+
 var constant_monad = Object.create(constant_functor, {
     chain: {
         value: _chain

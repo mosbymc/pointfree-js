@@ -18,9 +18,14 @@ function Identity(item) {
  * @param: {*} item
  * @return: {@see identity_functor}
  */
-Identity.of = function _of(item) {
-    return Identity(item);
-};
+Identity.of = x => Identity(x);
+
+/**
+ * @description:
+ * @param: {functor} f
+ * @return: {boolean}
+ */
+Identity.is = f => identity_functor.isPrototypeOf(f);
 
 var identity_functor = {
     /**

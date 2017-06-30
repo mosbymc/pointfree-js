@@ -14,6 +14,13 @@ Validation.of = function _of(val) {
     return Validation(val);
 };
 
+/**
+ * @description:
+ * @param: {monad} m
+ * @return: {boolean}
+ */
+Validation.is = m => validation_monad.isPrototypeOf(m);
+
 var validation_monad = Object.create(validation_functor, {
     factory: {
         value: Validation

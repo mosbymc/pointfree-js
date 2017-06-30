@@ -155,7 +155,7 @@ var list_core = {
      * @return: {@see m_list}
      */
     groupJoin: function _groupJoin(ys, xSelector, ySelector, projector, comparer) {
-        return this.of(this, groupJoin(this, ys, xSelector, ySelector, projector, comparer));
+        return this.of(this, groupJoin(createGroupedListDelegate, this, ys, xSelector, ySelector, projector, comparer));
     },
 
     /**
@@ -673,6 +673,13 @@ List.from = function _from(source) {
  * @return: {@see list_core}
  */
 List.of = List.from;
+
+/**
+ * @description:
+ * @param: {functor} f
+ * @return: {boolean}
+ */
+List.is = f => list_core.isPrototypeOf(f);
 
 /**
  * Generates a new list with the specified item repeated the specified number of times

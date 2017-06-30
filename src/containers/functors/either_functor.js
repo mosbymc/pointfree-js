@@ -45,25 +45,17 @@ function Either(val, fork) {
     });*/
 }
 
-Either.of = function _of(val) {
-    return Either(val, 'right');
-};
+Either.of = x => Either(x, 'right');
 
-Either.isRight = function _isRight(ma) {
-    return ma.isRight;
-};
+Either.is = f => Left.is(f) || Right.is(f);
 
-Either.isLeft = function _isLeft(ma) {
-    return ma.isLeft;
-};
+Either.isRight = f => f.isRight;
 
-Either.Right = function _right(val) {
-    return Either(val, 'right');
-};
+Either.isLeft = f => f.isLeft;
 
-Either.Left = function _left(val) {
-    return Either(val);
-};
+Either.Right = x => Either(x, 'right');
+
+Either.Left = x => Either(x);
 
 function Left(val) {
     return Object.create(left_functor, {
@@ -85,9 +77,9 @@ function Left(val) {
     });
 }
 
-Left.of = function _of(val) {
-    return Left(val);
-};
+Left.of = x => Left(x);
+
+Left.is = f => left_functor.isPrototypeOf(f);
 
 function Right(val) {
     return Object.create(right_functor, {
@@ -109,9 +101,9 @@ function Right(val) {
     });
 }
 
-Right.of = function _of(val) {
-    return Right(val);
-};
+Right.is = x => right_functor.isPrototypeOf(x);
+
+Right.of = x => Right(x);
 
 var either_functor = {
     get value() {

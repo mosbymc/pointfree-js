@@ -24,7 +24,7 @@ function sortData(data, sortObject) {
                     itemsToSort.push(item);
                 else {
                     //TODO: see if there's a realistic way that length === 1 || 2 could be combined into one statement
-                    if (itemsToSort.length === 1) sortedSubData = sortedSubData.concat(itemsToSort);
+                    if (1 === itemsToSort.length) sortedSubData = sortedSubData.concat(itemsToSort);
                     //else if (itemsToSort.length === 2) {
                         //sortedSubData = -1 < comparer(sort.keySelector(itemsToSort[0]), sort.keySelector(itemsToSort[1]), sort.direction) ?
                             //sortedSubData.concat(itemsToSort) : sortedSubData.concat(itemsToSort.reverse());
@@ -36,7 +36,7 @@ function sortData(data, sortObject) {
                         */
                     //}
                     else {
-                        sortedSubData = sortedSubData.concat(itemsToSort.length < 5001 ?
+                        sortedSubData = sortedSubData.concat(5001 > itemsToSort.length ?
                             insertionSort(itemsToSort, sort.keySelector, comparer, sort.direction) : mergeSort(itemsToSort, sort.keySelector, comparer, sort.direction));
                         //sortedSubData = sortedSubData.concat(quickSort(itemsToSort, sort.direction, sort.keySelector, comparer));
                     }
@@ -44,7 +44,7 @@ function sortData(data, sortObject) {
                     itemsToSort[0] = item;
                 }
                 if (idx === sortedData.length - 1) {
-                    sortedSubData = sortedSubData.concat(itemsToSort.length < 5001 ?
+                    sortedSubData = sortedSubData.concat(5001 > itemsToSort.length ?
                         insertionSort(itemsToSort, sort.keySelector, comparer, sort.direction) : mergeSort(itemsToSort, sort.keySelector, comparer, sort.direction));
                 }
             });
@@ -63,7 +63,7 @@ function sortData(data, sortObject) {
  * @return {Array}
  */
 function mergeSort(data, keySelector, comparer, direction) {
-    if (data.length < 2) return data;
+    if (2 > data.length) return data;
     var middle = parseInt(data.length / 2);
     return merge(mergeSort(data.slice(0, middle), keySelector, comparer, direction),
         mergeSort(data.slice(middle), keySelector, comparer, direction), keySelector, comparer, direction);
@@ -123,8 +123,8 @@ function qSort(data, left, right, dir, keySelector, keyComparer) {
             itemIdx = i + ((j - i) >> 1);
 
         do {
-            while (i < data.length && keyComparer(keySelector, itemIdx, i, data, dir) > 0) ++i;
-            while (j >= 0 && keyComparer(keySelector, itemIdx, j, data, dir) < 0) --j;
+            while (i < data.length && 0 < keyComparer(keySelector, itemIdx, i, data, dir)) ++i;
+            while (0 <= j && 0 > keyComparer(keySelector, itemIdx, j, data, dir)) --j;
             if (i > j) break;
             if (i < j) {
                 let tmp = data[i];
@@ -181,7 +181,7 @@ function iSort(source, keySelector, keyComparer, direction) {
         item = source[i];
         val = keySelector(source[i]);
         j = i - 1;
-        while (0 <= j && keyComparer(keySelector(source[j]), val, direction) < 0) {
+        while (0 <= j && 0 > keyComparer(keySelector(source[j]), val, direction)) {
             source[j + 1] = source[j];
             --j;
         }

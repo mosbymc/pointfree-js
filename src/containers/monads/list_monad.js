@@ -38,6 +38,13 @@ List.from = function _from(source) {
 List.of = List.from;
 
 /**
+ * @description:
+ * @param: {monad} m
+ * @return: {boolean}
+ */
+List.is = m => list_monad.isPrototypeOf(m) || ordered_list_monad.isPrototypeOf(m);
+
+/**
  * @description: Extension function that allows new functionality to be applied to
  * the queryable object
  * @param: {string} propName - The name of the new property that should exist on the List; must be unique

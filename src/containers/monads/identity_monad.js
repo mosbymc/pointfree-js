@@ -28,6 +28,13 @@ Identity.of = function _of(item) {
 
 /**
  * @description:
+ * @param: {monad} m
+ * @return: {boolean}
+ */
+Identity.is = m => identity_monad.isPrototypeOf(m);
+
+/**
+ * @description:
  * @return: {@see identity_monad}
  */
 Identity.empty = function _empty() {

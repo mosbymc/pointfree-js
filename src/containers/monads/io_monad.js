@@ -15,6 +15,13 @@ Io.of = function _of(val) {
     return 'function' === typeof val ? Io(val) : Io(function _wrapper() { return val; });
 };
 
+/**
+ * @description:
+ * @param: {monad} m
+ * @return: {boolean}
+ */
+Io.is = m => io_monad.isPrototypeOf(m);
+
 var io_monad = Object.create(io_functor, {
     mjoin: {
         value: function _mjoin() {

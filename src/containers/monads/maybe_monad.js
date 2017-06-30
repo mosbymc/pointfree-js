@@ -39,6 +39,13 @@ Maybe.of = function _of(item) {
     });
 };
 
+/**
+ * @description:
+ * @param: {monad} m
+ * @return: {boolean}
+ */
+Maybe.is = m => just_monad.isPrototypeOf(m) || nothing_monad.isPrototypeOf(m);
+
 Maybe.Just = function _just(item) {
     return Maybe.of(item);
 };
@@ -77,6 +84,13 @@ function Just(val) {
 
 Just.of = Just;
 
+/**
+ * @description:
+ * @param: {monad} m
+ * @return: {boolean}
+ */
+Just.is = m => just_monad.isPrototypeOf(m);
+
 function Nothing() {
     return Object.create(nothing_monad, {
         _value: {
@@ -94,6 +108,13 @@ function Nothing() {
 }
 
 Nothing.of = Nothing;
+
+/**
+ * @description:
+ * @param: {monad} m
+ * @return: {boolean}
+ */
+Nothing.is = m => nothing_monad.isPrototypeOf(m);
 
 /*
 var maybe_monad = Object.create(maybe_functor, {

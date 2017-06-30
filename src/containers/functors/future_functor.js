@@ -30,6 +30,8 @@ function Future(fn) {
     });
 }
 
+Future.is = f => future_functor.isPrototypeOf(f);
+
 /**
  * @description:
  * @param: {function|*} val

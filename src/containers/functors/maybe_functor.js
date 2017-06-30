@@ -65,6 +65,13 @@ Maybe.of = function _of(val) {
 
 /**
  * @description:
+ * @param: {functor} f
+ * @return: {boolean}
+ */
+Maybe.is = f => just_functor.isPrototypeOf(f) || nothing_functor.isPrototypeOf(f);
+
+/**
+ * @description:
  * @param {*} val
  * @return: {@see maybe_functor}
  * @type {function}
@@ -123,6 +130,13 @@ Just.of = function _of(val) {
     });
 };
 
+/**
+ * @description:
+ * @param: {functor} f
+ * @return: {boolean}
+ */
+Just.is = f => just_functor.isPrototypeOf(f);
+
 function Nothing() {
     return Object.create(nothing_functor, {
         _value: {
@@ -140,6 +154,13 @@ function Nothing() {
 }
 
 Nothing.of = Nothing;
+
+/**
+ * @description:
+ * @param: {functor} f
+ * @return: {boolean}
+ */
+Nothing.is = f => nothing_functor.isPrototypeOf(f);
 
 //TODO: Using this.of in order to create a new instance of a Maybe container (functor/monad) will
 //TODO: not work as it is implemented here in terms of creating a new maybe container with the

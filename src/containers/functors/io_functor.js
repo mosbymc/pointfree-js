@@ -24,6 +24,13 @@ Io.of = function _of(item) {
     return 'function' === typeof item ? Io(item) : Io(constant(item));
 };
 
+/**
+ * @description:
+ * @param: {functor} f
+ * @return: {boolean}
+ */
+Io.is = f => io_functor.isPrototypeOf(f);
+
  /**
  * @description:
  * @type {{

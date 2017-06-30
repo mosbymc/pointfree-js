@@ -10,6 +10,13 @@ Validation.of = function _of(val) {
     return Validation(val);
 };
 
+/**
+ * @description:
+ * @param: {functor} f
+ * @return: {boolean}
+ */
+Validation.is = f => validation_functor.isPrototypeOf(f);
+
 var validation_functor = {
     factory: Validation
 };

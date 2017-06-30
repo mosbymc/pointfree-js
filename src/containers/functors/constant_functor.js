@@ -18,9 +18,9 @@ function Constant(item) {
  * @param: {*} item
  * @return: {@see constant_functor}
  */
-Constant.of = function _of(item) {
-    return Constant(item);
-};
+Constant.of = x => Constant(x);
+
+Constant.is = f => constant_functor.isPrototypeOf(f);
 
 /**
  * @description:

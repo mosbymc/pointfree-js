@@ -61,6 +61,13 @@ Either.of = function _of(val) {
     return Either(val, 'right');
 };
 
+/**
+ * @description:
+ * @param: {monad} m
+ * @return: {boolean}
+ */
+Either.is = m => left_monad.isPrototypeOf(m) || right_monad.isPrototypeOf(m);
+
 Either.Left = function _left(val) {
     return Either(val);
 };
@@ -81,9 +88,37 @@ function Left(val) {
     return Either(val);
 }
 
+/**
+ * @description:
+ * @param: {*} val
+ * @return: {@see left_monad}
+ */
+Left.of = val => Left(val);
+
+/**
+ * @description:
+ * @param: {monad} m
+ * @return: {boolean}
+ */
+Left.is = m => left_monad.isPrototypeOf(m);
+
 function Right(val) {
     return Either(val, 'right');
 }
+
+/**
+ * @description:
+ * @param: {*} val
+ * @return: {@see right_monad}
+ */
+Right.of = val => Right(val);
+
+/**
+ * @description:
+ * @param: {monad} m
+ * @return: {boolean}
+ */
+Right.is = m => right_monad.isPrototypeOf(m);
 
 
 var right_monad = Object.create(right_functor, {

@@ -83,9 +83,10 @@ function except(xs, ys, comparer = strictEquals) {
  * @param: {function} comparer
  * @return {generator}
  */
-function groupJoin(xs, ys, xSelector, ySelector, projector, comparer = strictEquals) {
+function groupJoin(listFactory, xs, ys, xSelector, ySelector, projector, comparer = strictEquals) {
     return function *groupJoinIterator() {
         var innerGroups = [];
+        //groupData(toArray(xs), groupObject)
         ys = toArray(ys);
         for (let y of ys) {
             var innerRes = ySelector(y);

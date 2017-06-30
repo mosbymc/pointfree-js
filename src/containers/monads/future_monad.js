@@ -33,6 +33,13 @@ Future.of = function _of(val) {
 
 /**
  * @description:
+ * @param: {monad} m
+ * @return: {boolean}
+ */
+Future.is = m => future_monad.isPrototypeOf(m);
+
+/**
+ * @description:
  * @param: {*} val
  * @return: {@see future_functor}
  */
