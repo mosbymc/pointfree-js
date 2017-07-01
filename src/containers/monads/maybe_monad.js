@@ -118,7 +118,7 @@ Nothing.is = m => nothing_monad.isPrototypeOf(m);
 
 /*
 var maybe_monad = Object.create(maybe_functor, {
-    flatMap: {
+    flatMapWith: {
         value: function _flatMap(fn) {
             //return maybe_functor.isPrototypeOf(this.value) ? this.value.mapWith(fn) : this.of(fn(this.value));
             if (Object.getPrototypeOf(this).isPrototypeOf(this.value)) return this.value.map(fn);
@@ -167,8 +167,8 @@ var maybe_monad = Object.create(maybe_functor, {
 });
 
 maybe_monad.ap = maybe_monad.apply;
-maybe_monad.fmap = maybe_monad.flatMap;
-maybe_monad.chain = maybe_monad.flatMap;
+maybe_monad.fmap = maybe_monad.flatMapWith;
+maybe_monad.chain = maybe_monad.flatMapWith;
 maybe_monad.bind = maybe_monad.flapMap;
 maybe_monad.reduce = maybe_monad.fold;*/
 

@@ -1,3 +1,5 @@
+import { equalMaker, pointMaker, stringMaker, valueOf } from '../containerHelpers';
+
 function Validation(val) {
     return Object.create(validation_functor, {
         _value: {
@@ -20,6 +22,30 @@ Validation.is = f => validation_functor.isPrototypeOf(f);
 var validation_functor = {
     factory: Validation
 };
+
+/**
+ * @description:
+ * @return:
+ */
+validation_functor.equals = equalMaker(validation_functor);
+
+/**
+ * @description:
+ * @return:
+ */
+validation_functor.of = pointMaker(Validation);
+
+/**
+ * @description:
+ * @return:
+ */
+validation_functor.valueOf = valueOf;
+
+/**
+ * @description:
+ * @return:
+ */
+validation_functor.toString = stringMaker('Validation');
 
 
 

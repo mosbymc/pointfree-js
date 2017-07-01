@@ -1,3 +1,5 @@
+import { equalMaker, pointMaker, stringMaker, valueOf } from '../containerHelpers';
+
 /**
  * @description:
  * @param: {*} item
@@ -25,12 +27,12 @@ Constant.is = f => constant_functor.isPrototypeOf(f);
 /**
  * @description:
  * @type {{
- * map: {function} constant_functor._map,
- * apply: {function} constant_functor._apply,
- * flatMap: {function} constant_functor._flatMap,
- * mjoin: {function} constant_functor._mjoin,
- * of: {function} constant_functor._of,
- * toString: {function} constant_functor._toString
+ * map: {function} _map,
+ * apply: {function} _apply,
+ * flatMapWith: {function} _flatMap,
+ * mjoin: {function} _mjoin,
+ * of: {function} _of,
+ * toString: {function} _toString
  * }}
  */
 var constant_functor = {
@@ -41,29 +43,9 @@ var constant_functor = {
      * @description:
      * @return: {@see constant_functor}
      */
-    map: _map,
-    /**
-     * @description:
-     * @param: {*} item
-     * @return: {@see constant_functor}
-     */
-    of: _of,
-    /**
-     * @description:
-     * @param: {functor} ma
-     * @return: {boolean}
-     */
-    equals: _equals,
-    /**
-     * @description:
-     * @return: {*}
-     */
-    valueOf: _valueOf,
-    /**
-     * @description:
-     * @return: {string}
-     */
-    toString: _toString,
+    map: function _map() {
+        return this.of(this.value);
+    },
     /**
      * @description: sigh.... awesome spec ya got there fantasy-land. Yup, good thing you guys understand
      * JS and aren't treating it like a static, strongly-typed, class-based language with inheritance...
@@ -83,25 +65,31 @@ var constant_functor = {
     factory: Constant
 };
 
-function _map() {
-    return this.of(this.value);
-}
+/**
+ * @description:
+ * @param: {functor} ma
+ * @return: {boolean}
+ */
+constant_functor.equals = equalMaker(constant_functor);
 
-function _of(item) {
-    return Constant.of(item);
-}
+/**
+ * @description:
+ * @param: {*} item
+ * @return: {@see constant_functor}
+ */
+constant_functor.of = pointMaker(Constant);
 
-function _equals(ma) {
-    return Object.getPrototypeOf(this).isPrototypeOf(ma) && this.value === ma.value;
-}
+/**
+ * @description:
+ * @return: {*}
+ */
+constant_functor.valueOf = valueOf;
 
-function _valueOf() {
-    return this.value;
-}
-
-function _toString() {
-    return `Constant(${this.value})`;
-}
+/**
+ * @description:
+ * @return: {string}
+ */
+constant_functor.toString = stringMaker('Constant');
 
 constant_functor.constructor = constant_functor.factory;
 

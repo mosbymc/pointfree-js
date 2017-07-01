@@ -1,4 +1,5 @@
 import { noop, once } from '../../functionalHelpers';
+import { pointMaker, stringMaker, valueOf } from '../containerHelpers';
 
 function safeFork(reject, resolve) {
     return function _safeFork(val) {
@@ -86,25 +87,26 @@ var future_functor = {
     equals: function _equals(ma) {
         return Object.getPrototypeOf(this).isPrototypeOf(ma);
     },
-    of: function _of(val) {
-        return Future.of(val);
-    },
-    /**
-     * @description:
-     * @return: {*}
-     */
-    valueOf: function _valueOf() {
-        return this.value;
-    },
-    /**
-     * @description:
-     * @return: {string}
-     */
-    toString: function _toString() {
-        return `Future(${this.value})`;
-    },
     factory: Future
 };
+
+/**
+ * @description:
+ * @return:
+ */
+future_functor.of = pointMaker(Future);
+
+/**
+ * @description:
+ * @return:
+ */
+future_functor.valueOf = valueOf;
+
+/**
+ * @description:
+ * @return:
+ */
+future_functor.toString = stringMaker('Future');
 
 
 

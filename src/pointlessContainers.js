@@ -6,7 +6,7 @@ import { getWith } from './functionalHelpers';
 //TODO: would have several implementations: maybe, option, constant, identity, future_functor, io, etc. It would make sense
 //TODO: to let the "higher" level containers delegate to the "lower" level implementations since they share all the
 //TODO: functionality of the "lower" containers and add to them. In addition, a lot of the containers will have the
-//TODO: same mapWith, flatMap, chain, apply, etc functionality; it would be nice to share this functionality as well.
+//TODO: same mapWith, flatMapWith, chain, apply, etc functionality; it would be nice to share this functionality as well.
 //TODO: Finally, I'd like to have each container in a category be capable of converting their underlying value to
 //TODO: another container of the same category without the use of 'apply', more in the manner of 'toContainerX'.
 //TODO: However, this means that each container in a given category has a dependency on all the other containers in
@@ -28,14 +28,36 @@ var apply = curry(function _apply(ma, mb) {
 var ap = apply;
 
 /**
+ * @type:
+ * @description:
+ * @param: {Monad a} m
+ * @param: {function} fn :: (a) -> Monad b
+ * @return: {Monad b}
+ */
+var flatMap = curry(function _flatMap(m, fn) {
+    return m.flatMap(fn);
+});
+
+/**
  * @description:
  * @type: {function}
  * @param: {function} fn
  * @param: {functor} m
  * @return: {functor}
  */
-var flatMap = curry(function _flatMap(fn, m) {
+var flatMapWith = curry(function _flatMapWith(fn, m) {
     return m.flatMap(fn);
+});
+
+/**
+ * @type:
+ * @description:
+ * @param: {Monad a} m
+ * @param: {function} fn :: (a) -> b
+ * @return: {Monad b}
+ */
+var map = curry(function _map(m, fn) {
+    return m.map(fn);
 });
 
 /**
@@ -287,5 +309,5 @@ var except = curry(function _except(xs, comparer, ys) {
     return ys.except(xs, comparer);
 });
 
-export { apply, ap, fmap, mapWith, flatMap, lift2, lift3, lift4, liftN, mjoin, pluckWith, toContainerType,
+export { apply, ap, fmap, map, mapWith, flatMap, flatMapWith, lift2, lift3, lift4, liftN, mjoin, pluckWith, toContainerType,
             containerIterator, chain, bind, mcompose, filter, intersect, except };

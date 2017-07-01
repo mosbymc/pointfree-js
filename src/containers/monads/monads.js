@@ -7,7 +7,7 @@ import { List, list_monad, ordered_list_monad } from './list_monad';
 import { Maybe, Just, Nothing, just_monad, nothing_monad } from './maybe_monad';
 import { Validation, validation_monad } from './validation_monad';
 
-import { toContainerType, containerIterator } from '../../containerHelpers';
+import { toContainerType, containerIterator } from '../../pointlessContainers';
 
 
 /*

@@ -1,3 +1,5 @@
+import { disjunctionEqualMaker, pointMaker, stringMaker, valueOf } from '../containerHelpers';
+
 function Either(val, fork) {
     return 'right' === fork ?
         Object.create(right_functor, {
@@ -25,24 +27,7 @@ function Either(val, fork) {
             isLeft: {
                 value: true
             }
-        })
-    /*return Object.create(either_functor, {
-        _value: {
-            value: val,
-            writable: false,
-            configurable: false
-        },
-        isRight: {
-            value: 'right' === fork,
-            writable: false,
-            configurable: false
-        },
-        isLeft: {
-            value: 'right' !== fork,
-            writable: false,
-            configurable: false
-        }
-    });*/
+        });
 }
 
 Either.of = x => Either(x, 'right');
@@ -105,47 +90,6 @@ Right.is = x => right_functor.isPrototypeOf(x);
 
 Right.of = x => Right(x);
 
-var either_functor = {
-    get value() {
-        return this._value;
-    },
-    /**
-     * @description:
-     * @param: {function|undefined} fn
-     * @return: {@see either_functor}
-     */
-    map: function _map(fn) {
-        return this.isRight ? Right(fn(this.value)) : Left(this.value);
-    },
-    bimap: function _bimap(f, g) {
-        return this.isRight ? Right(f(this.value)) : Left(g(this.value));
-    },
-    /**
-     * @description:
-     * @param: {functor} ma
-     * @return: {boolean}
-     */
-    equals: function _equals(ma) {
-        return Object.getPrototypeOf(this).isPrototypeOf(ma) ?
-            (this.isLeft && ma.isLeft && this.value === ma.value) || this.isRight && ma.isRight && this.value === ma.value : false;
-    },
-    of: function _of(val) {
-        return Either.of(val);
-    },
-    /**
-     * @description:
-     * @return: {*}
-     */
-    valueOf: function _valueOf() {
-        return this.value;
-    },
-    toString: function _toString() {
-        var val = this.value && this.value.toString && 'function' === typeof this.value.toString ? this.value.toString() : JSON.stringify(this.value);
-        return this.isLeft ? `Left(${val})` : `Right(${val})`;
-    },
-    factory: Either
-};
-
 var right_functor = {
     get value() {
         return this._value;
@@ -161,31 +105,32 @@ var right_functor = {
     bimap: function _bimap(f, g) {
         return this.of(f(this.value));
     },
-    /**
-     * @description:
-     * @param: {functor} ma
-     * @return: {boolean}
-     */
-    equals: function _equals(ma) {
-        return Object.getPrototypeOf(this).isPrototypeOf(ma) ?
-            (this.isLeft && ma.isLeft && this.value === ma.value) || this.isRight && ma.isRight && this.value === ma.value : false;
-    },
-    of: function _of(val) {
-        return Right(val);
-    },
-    /**
-     * @description:
-     * @return: {*}
-     */
-    valueOf: function _valueOf() {
-        return this.value;
-    },
-    toString: function _toString() {
-        var val = this.value && this.value.toString && 'function' === typeof this.value.toString ? this.value.toString() : JSON.stringify(this.value);
-        return `Right(${val})`;
-    },
     factory: Either
 };
+
+/**
+ * @description:
+ * @return:
+ */
+right_functor.equals = disjunctionEqualMaker(right_functor, 'isRight');
+
+/**
+ * @description:
+ * @return:
+ */
+right_functor.of = pointMaker(Right);
+
+/**
+ * @description:
+ * @return:
+ */
+right_functor.valueOf = valueOf;
+
+/**
+ * @description:
+ * @return:
+ */
+right_functor.toString = stringMaker('Right');
 
 var left_functor = {
     get value() {
@@ -207,7 +152,7 @@ var left_functor = {
      * @return: {boolean}
      */
     equals: function _equals(ma) {
-        return Object.getPrototypeOf(this).isPrototypeOf(ma) && this.isLeft && ma.isLeft && this.value === ma.value;
+        return Object.getPrototypeOf(this).isPrototypeOf(ma) && ma.isLeft && this.value === ma.value;
     },
     /**
      *
@@ -230,6 +175,33 @@ var left_functor = {
     factory: Either
 };
 
+/**
+ * @description:
+ * @return:
+ */
+//left_functor.equals = disjunctionEqualMaker(left_functor, 'isLeft');
+
+/**
+ * @description:
+ * @return:
+ */
+left_functor.of = pointMaker(Right);
+
+/**
+ * @description:
+ * @return:
+ */
+left_functor.valueOf = valueOf;
+
+/**
+ * @description:
+ * @return:
+ */
+left_functor.toString = stringMaker('Left');
+
+
+
+
 function fromNullable(x) {
     return null != x ? Right(x) : Left(x);
 }
@@ -245,7 +217,6 @@ function fromNullable(x) {
 //as it was intended... you know, like Douglas Crockford and his "good parts", which is really just another
 //way of saying: "your too dumb to understand how JavaScript works, and I either don't know myself, or don't
 //care to know, so just stick with what I tell you to use."
-either_functor.constructor = either_functor.factory;
 right_functor.constructor = right_functor.factory;
 left_functor.constructor = left_functor.factory;
 

@@ -1,3 +1,5 @@
+import { disjunctionEqualMaker, pointMaker, stringMaker, valueOf } from '../containerHelpers';
+
 /**
  * @description:
  * @param: {*} val
@@ -222,20 +224,32 @@ var just_functor = {
     bimap: function _bimap(f, g) {
         return this.of(f(this.value));
     },
-    equals: function _equals(ma) {
-        return Object.getPrototypeOf(this).isPrototypeOf(ma) && ma.isJust && this.value === ma.value;
-    },
-    of: function _of(val) {
-        return Just.of(val);
-    },
-    valueOf: function _valueOf() {
-        return this.value;
-    },
-    toString: function _toString() {
-        return `Just(${this.value})`;
-    },
     factory: Just
 };
+
+/**
+ * @description:
+ * @return:
+ */
+just_functor.equals = disjunctionEqualMaker(just_functor, 'isJust');
+
+/**
+ * @description:
+ * @return:
+ */
+just_functor.of = pointMaker(Just);
+
+/**
+ * @description:
+ * @return:
+ */
+just_functor.valueOf = valueOf;
+
+/**
+ * @description:
+ * @return:
+ */
+just_functor.toString = stringMaker('Just');
 
 var nothing_functor = {
     get value() {
@@ -247,20 +261,29 @@ var nothing_functor = {
     bimap: function _bimap(f, g) {
         return this.of(g(this.value));
     },
-    equals: function _equals(ma) {
-        return Object.getPrototypeOf(this).isPrototypeOf(ma) && ma.isNothing;
-    },
-    of: function _of() {
-        return Nothing.of();
-    },
-    valueOf: function _valueOf() {
-        return this.value;
-    },
     toString: function _toString() {
         return `Nothing()`;
     },
     factory: Nothing
 };
+
+/**
+ * @description:
+ * @return:
+ */
+nothing_functor.equals = disjunctionEqualMaker(nothing_functor, 'isNothing');
+
+/**
+ * @description:
+ * @return:
+ */
+nothing_functor.of = pointMaker(Nothing);
+
+/**
+ * @description:
+ * @return:
+ */
+nothing_functor.valueOf = valueOf;
 
 
 //Since FantasyLand is the defacto standard for JavaScript algebraic data structures, and I want to maintain

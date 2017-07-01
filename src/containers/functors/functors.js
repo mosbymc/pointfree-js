@@ -7,7 +7,7 @@ import { List, list_core } from './list_functor';
 import { Maybe, Just, Nothing, just_functor, nothing_functor } from './maybe_functor';
 import { Validation, validation_functor } from './validation_functor';
 
-import { toContainerType, containerIterator } from '../../containerHelpers';
+import { toContainerType, containerIterator } from '../../pointlessContainers';
 
 var mapToConstant = toContainerType(Constant),
     mapToEither = toContainerType(Either),

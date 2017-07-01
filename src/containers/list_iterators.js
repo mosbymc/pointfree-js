@@ -1,6 +1,6 @@
 import { isArray, strictEquals, isObject, type } from '../functionalHelpers';
 import { apply, not } from '../decorators';
-import { when, ifElse, ifThisThenThat } from '../combinators';
+import { when, ifElse, ifThisThenThat, curry } from '../combinators';
 import { javaScriptTypes, cacher } from '../helpers';
 import { sortData } from  './sortHelpers';
 
@@ -276,8 +276,17 @@ function first(xs, predicate) {
  * @param: {*} initial
  * @return: {*}
  */
-function fold(xs, fn, initial = 0) {
+function foldLeft(xs, fn, initial = 0) {
     return toArray(xs).reduce(fn, initial);
+}
+
+function foldRight(arr, op, acc) {
+    var len = arr.length,
+        res = acc || arr[--len];
+    while (0 < len) {
+        res = op(arr[--len], res, len, arr);
+    }
+    return res;
 }
 
 /**
@@ -287,7 +296,7 @@ function fold(xs, fn, initial = 0) {
  * @param: {*} initial
  * @return: {*}
  */
-function foldRight(xs, fn, initial = 0) {
+function reduceRight(xs, fn, initial = 0) {
     return toArray(xs).reduceRight(fn, initial);
 }
 
@@ -788,5 +797,5 @@ function lastIndexOf(val, idx, xs) {
 }
 
 export { all, any, except, intersect, union, map, flatMap, groupBy, sortBy, addFront, concat, groupJoin, join, zip, filter,
-    contains, first, last, count, fold, foldRight, distinct, ofType, binarySearch, equals, take, takeWhile, skip, skipWhile, reverse,
-    copyWithin, fill, indexOf, lastIndexOf, repeat };
+    contains, first, last, count, foldLeft, reduceRight, distinct, ofType, binarySearch, equals, take, takeWhile, skip, skipWhile, reverse,
+    copyWithin, fill, indexOf, lastIndexOf, repeat, foldRight };

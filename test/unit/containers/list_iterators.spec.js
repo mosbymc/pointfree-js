@@ -1,5 +1,5 @@
 import { all, any, except, intersect, union, map, flatMap, groupBy, sortBy, addFront, concat, groupJoin, join, zip, filter,
-    contains, first, last, count, fold, foldRight, distinct, ofType, binarySearch, equals, take, takeWhile, skip, skipWhile, reverse,
+    contains, first, last, count, foldLeft, reduceRight, distinct, ofType, binarySearch, equals, take, takeWhile, skip, skipWhile, reverse,
     copyWithin, fill, indexOf, lastIndexOf, repeat } from '../../../src/containers/list_iterators';
 import { createListCreator } from '../../../src/containers/list_helpers';
 import { list_functor, ordered_list_functor } from '../../../src/containers/functors/list_functor';
@@ -1271,19 +1271,19 @@ describe('Test List Iterators', function _testListIterators() {
     describe('Test fold', function testFold() {
         it('should return sum of values', function testFoldWithAddition() {
             var arr = [1, 2, 3, 4, 5];
-            var foldRes = fold(arr, function _fold(val, cur) { return cur + val; }, 0);
+            var foldRes = foldLeft(arr, function _fold(val, cur) { return cur + val; }, 0);
             foldRes.should.eql(15);
         });
 
         it('should return product of values', function testFoldWithMultiplication() {
             var arr = [1, 2, 3, 4, 5];
-            var foldRes = fold(arr, function _fold(val, cur) { return cur * val; }, 1);
+            var foldRes = foldLeft(arr, function _fold(val, cur) { return cur * val; }, 1);
             foldRes.should.eql(120);
         });
 
         it('should default initial to zero', function testFoldWithNoInitialValue() {
             var arr = [1, 2, 3, 4, 5];
-            var foldRes = fold(arr, function _fold(val, cur) { return cur * val; });
+            var foldRes = foldLeft(arr, function _fold(val, cur) { return cur * val; });
             foldRes.should.eql(0);
         });
     });

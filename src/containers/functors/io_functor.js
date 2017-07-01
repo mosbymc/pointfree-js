@@ -1,4 +1,5 @@
 import { compose, constant } from '../../combinators';
+import { equalMaker, pointMaker, stringMaker, valueOf } from '../containerHelpers';
 
 /**
  * @description:
@@ -44,40 +45,38 @@ var io_functor = {
     get value() {
         return this._value;
     },
-    map: _map,
+    map: function _map(fn) {
+        return this.of(compose(fn, this.value));
+    },
     runIo: function _runIo(...args) {
         return this.value(...args);
     },
-    equals: _equals,
-    of: _of,
-    /**
-     * @description:
-     * @return: {*}
-     */
-    valueOf: _valueOf,
-    toString: _toString,
     factory: Io
 };
 
-function _map(fn) {
-    return this.of(compose(fn, this.value));
-}
+/**
+ * @description:
+ * @return:
+ */
+io_functor.equals = equalMaker(io_functor);
 
-function _equals(ma) {
-    return Object.getPrototypeOf(this).isPrototypeOf(ma) && this.value === ma.value;
-}
+/**
+ * @description:
+ * @return:
+ */
+io_functor.of = pointMaker(Io);
 
-function _of(item) {
-    return Io.of(item);
-}
+/**
+ * @description:
+ * @return:
+ */
+io_functor.valueOf = valueOf;
 
-function _valueOf() {
-    return this.value;
-}
-
-function _toString() {
-    return `Io(${this.value})`;
-}
+/**
+ * @description:
+ * @return:
+ */
+io_functor.toString = stringMaker('IO');
 
 
 

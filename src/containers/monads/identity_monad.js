@@ -1,6 +1,7 @@
 import { identity_functor } from '../functors/identity_functor';
 import { emptyObject } from '../../helpers';
 import { identity } from '../../combinators';
+import { apply, chainMaker, mjoin, pointMaker } from '../containerHelpers';
 
 /**
  * @description:
@@ -42,18 +43,6 @@ Identity.empty = function _empty() {
 };
 
 var identity_monad = Object.create(identity_functor, {
-    mjoin: {
-        value: function _mjoin() {
-            //return identity_monad.isPrototypeOf(this.value) ? this.value : this;
-            return this.value;
-        }
-    },
-    chain: {
-        value: function _chain(fn) {
-            var val = fn(this.value);
-            return identity_monad.isPrototypeOf(val) ? val : this.of(val);
-        }
-    },
     fold: {
         value: function _fold(fn) {
             return fn(this.value);
@@ -84,32 +73,9 @@ var identity_monad = Object.create(identity_functor, {
             });*/
         }
     },
-    traverse2: {
-        value: function _traverse2(a, f) {
-            return f(this.value).map(this.of);
-        }
-    },
     traverse3: {
         value: function _traverse3(a, f) {
             return this.apply(f(this.value));
-        }
-    },
-    /**
-     * @description:
-     * @param: {monad} ma
-     * @return: {monad}
-     */
-    apply: {
-        value: //ma => ma.mapWith(this.value)
-            function _apply(ma) {
-            //console.log(Object.getPrototypeOf(ma), ma.mapWith);
-            //return this.flatMap(function _apply(f) { return ma.mapWith(f); });
-            return ma.map(this.value);
-        }
-    },
-    of: {
-        value: function _of(val) {
-            return Identity.of(val);
         }
     },
     empty: {
@@ -126,6 +92,11 @@ var identity_monad = Object.create(identity_functor, {
         value: Identity
     }
 });
+
+identity_monad.chain = chainMaker(identity_monad);
+identity_monad.mjoin = mjoin;
+identity_monad.apply = apply;
+identity_monad.of = pointMaker(Identity);
 
 identity_monad.ap = identity_monad.apply;
 identity_monad.fmap = identity_monad.chain;
