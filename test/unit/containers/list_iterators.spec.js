@@ -1,6 +1,6 @@
-import { all, any, except, intersect, union, map, flatMap, groupBy, sortBy, addFront, concat, groupJoin, join, zip, filter,
+import { all, any, except, intersect, union, map, chain, groupBy, sortBy, addFront, concat, groupJoin, join, zip, filter,
     contains, first, last, count, foldLeft, reduceRight, distinct, ofType, binarySearch, equals, take, takeWhile, skip, skipWhile, reverse,
-    copyWithin, fill, indexOf, lastIndexOf, repeat } from '../../../src/containers/list_iterators';
+    copyWithin, fill, findIndex, lastIndexOf, repeat } from '../../../src/containers/list_iterators';
 import { createListCreator } from '../../../src/containers/list_helpers';
 import { list_functor, ordered_list_functor } from '../../../src/containers/functors/list_functor';
 import { cacher, javaScriptTypes, sortDirection } from '../../../src/helpers';
@@ -293,47 +293,47 @@ describe('Test List Iterators', function _testListIterators() {
         }
         describe('...using default equality comparer', function testGroupJoinUsingDefaultComparer() {
             it('should return all items grouped by city', function testBasicGroupJoin() {
-                var groupJoinIterable = groupJoin(factoryFn, uniqueCities, testData.dataSource.data, primitiveSelector, citySelector, cityProjector),
+                var groupJoinIterable = groupJoin(uniqueCities, testData.dataSource.data, primitiveSelector, citySelector, cityProjector, factoryFn),
                     groupJoinRes = Array.from(groupJoinIterable());
 
                 groupJoinRes.should.have.lengthOf(uniqueCities.length);
                 groupJoinRes.forEach(function _validateEntries(item) {
                     item.should.have.keys('City', 'People');
-                    item.People.should.be.an('array');
-                    item.People.forEach(function _ensurePeopleLiveInCity(person) {
+                    item.People.should.be.an('object');
+                    item.People.data.forEach(function _ensurePeopleLiveInCity(person) {
                         item.City.should.eql(person.City);
                     });
                 });
             });
 
             it('should return all items grouped by state', function testBasicGroupJoin() {
-                var groupJoinIterable = groupJoin(factoryFn, uniqueStates, testData.dataSource.data, primitiveSelector, stateSelector, stateProjector),
+                var groupJoinIterable = groupJoin(uniqueStates, testData.dataSource.data, primitiveSelector, stateSelector, stateProjector, factoryFn),
                     groupJoinRes = Array.from(groupJoinIterable());
 
                 groupJoinRes.should.have.lengthOf(uniqueStates.length);
                 groupJoinRes.forEach(function _validateEntries(item) {
                     item.should.have.keys('State', 'People');
-                    item.People.should.be.an('array');
-                    item.People.forEach(function _ensurePeopleLiveInState(person) {
+                    item.People.should.be.an('object');
+                    item.People.data.forEach(function _ensurePeopleLiveInState(person) {
                         item.State.should.eql(person.State);
                     });
                 });
             });
 
             it('should return items that have no inner matches', function testGroupJoinWithNoInnerMatches() {
-                var groupJoinIterable = groupJoin(factoryFn, uniqueStates, [], primitiveSelector, stateSelector, stateProjector),
+                var groupJoinIterable = groupJoin(uniqueStates, [], primitiveSelector, stateSelector, stateProjector, factoryFn),
                     groupJoinRes = Array.from(groupJoinIterable());
 
                 groupJoinRes.should.have.lengthOf(uniqueStates.length);
                 groupJoinRes.forEach(function _validateEntries(item) {
                     item.should.have.keys('State', 'People');
-                    item.People.should.be.an('array');
-                    item.People.should.have.lengthOf(0);
+                    item.People.should.be.an('object');
+                    item.People.data.should.have.lengthOf(0);
                 });
             });
 
             it('should return empty array when source is empty', function testGroupJoinWithEmptySource() {
-                var groupJoinIterable = groupJoin(factoryFn, [], testData.dataSource.data, primitiveSelector, stateSelector, stateProjector),
+                var groupJoinIterable = groupJoin([], testData.dataSource.data, primitiveSelector, stateSelector, stateProjector, factoryFn),
                     groupJoinRes = Array.from(groupJoinIterable());
 
                 groupJoinRes.should.have.lengthOf(0);
@@ -342,28 +342,28 @@ describe('Test List Iterators', function _testListIterators() {
 
         describe('...using defined equality comparer', function testGroupJoinWithDefinedComparer() {
             it('should return all items grouped by city', function testGroupJoinWithDefinedEqualityComparer() {
-                var groupJoinIterable = groupJoin(factoryFn, uniqueCities, testData.dataSource.data, primitiveSelector, citySelector, cityProjector, cityComparer),
+                var groupJoinIterable = groupJoin(uniqueCities, testData.dataSource.data, primitiveSelector, citySelector, cityProjector, factoryFn, cityComparer),
                     groupJoinRes = Array.from(groupJoinIterable());
 
                 groupJoinRes.should.have.lengthOf(uniqueCities.length);
                 groupJoinRes.forEach(function _ensurePeopleLiveInCities(item) {
                     item.should.have.keys('City', 'People');
-                    item.People.should.be.an('array');
-                    item.People.forEach(function _ensurePeopleLiveInCity(person) {
+                    item.People.should.be.an('object');
+                    item.People.data.forEach(function _ensurePeopleLiveInCity(person) {
                         item.City.should.eql(person.City);
                     });
                 });
             });
 
             it('should return all items grouped by state', function testGroupJoinWithDefinedEqualityComparer() {
-                var groupJoinIterable = groupJoin(factoryFn, uniqueStates, testData.dataSource.data, primitiveSelector, stateSelector, stateProjector, stateComparer),
+                var groupJoinIterable = groupJoin(uniqueStates, testData.dataSource.data, primitiveSelector, stateSelector, stateProjector, factoryFn, stateComparer),
                     groupJoinRes = Array.from(groupJoinIterable());
 
                 groupJoinRes.should.have.lengthOf(uniqueStates.length);
                 groupJoinRes.forEach(function _validateEntries(item) {
                     item.should.have.keys('State', 'People');
-                    item.People.should.be.an('array');
-                    item.People.forEach(function _ensurePeopleLiveInState(person) {
+                    item.People.should.be.an('object');
+                    item.People.data.forEach(function _ensurePeopleLiveInState(person) {
                         item.State.should.eql(person.State);
                     });
                 });
@@ -374,31 +374,31 @@ describe('Test List Iterators', function _testListIterators() {
                     return a === b.Zip;
                 }
 
-                var groupJoinIterable = groupJoin(factoryFn, uniqueCities, testData.dataSource.data, primitiveSelector, citySelector, cityProjector, badComparer),
+                var groupJoinIterable = groupJoin(uniqueCities, testData.dataSource.data, primitiveSelector, citySelector, cityProjector, factoryFn, badComparer),
                     groupJoinRes = Array.from(groupJoinIterable());
 
                 groupJoinRes.should.have.lengthOf(uniqueCities.length);
                 groupJoinRes.forEach(function _ensurePeopleLiveInCities(item) {
                     item.should.have.keys('City', 'People');
-                    item.People.should.be.an('array');
-                    item.People.should.have.lengthOf(0);
+                    item.People.should.be.an('object');
+                    item.People.data.should.have.lengthOf(0);
                 });
             });
 
             it('should return items that have no inner matches', function testGroupJoinWithNoInnerMatches() {
-                var groupJoinIterable = groupJoin(factoryFn, uniqueStates, [], primitiveSelector, stateSelector, stateProjector, stateComparer),
+                var groupJoinIterable = groupJoin(uniqueStates, [], primitiveSelector, stateSelector, stateProjector, factoryFn, stateComparer),
                     groupJoinRes = Array.from(groupJoinIterable());
 
                 groupJoinRes.should.have.lengthOf(uniqueStates.length);
                 groupJoinRes.forEach(function _validateEntries(item) {
                     item.should.have.keys('State', 'People');
-                    item.People.should.be.an('array');
-                    item.People.should.have.lengthOf(0);
+                    item.People.should.be.an('object');
+                    item.People.data.should.have.lengthOf(0);
                 });
             });
 
             it('should return empty array when source is empty', function testGroupJoinWithEmptySource() {
-                var groupJoinIterable = groupJoin(factoryFn, [], testData.dataSource.data, primitiveSelector, stateSelector, stateProjector, stateComparer),
+                var groupJoinIterable = groupJoin([], testData.dataSource.data, primitiveSelector, stateSelector, stateProjector, factoryFn, stateComparer),
                     groupJoinRes = Array.from(groupJoinIterable());
 
                 groupJoinRes.should.have.lengthOf(0);
@@ -412,28 +412,28 @@ describe('Test List Iterators', function _testListIterators() {
             }
 
             it('should return all items grouped by city', function testGroupJoinWithDefinedEqualityComparer() {
-                var groupJoinIterable = groupJoin(factoryFn, gen(uniqueCities), gen(testData.dataSource.data), primitiveSelector, citySelector, cityProjector, cityComparer),
+                var groupJoinIterable = groupJoin(gen(uniqueCities), gen(testData.dataSource.data), primitiveSelector, citySelector, cityProjector, factoryFn, cityComparer),
                     groupJoinRes = Array.from(groupJoinIterable());
 
                 groupJoinRes.should.have.lengthOf(uniqueCities.length);
                 groupJoinRes.forEach(function _validateEntries(item) {
                     item.should.have.keys('City', 'People');
-                    item.People.should.be.an('array');
-                    item.People.forEach(function _ensurePeopleLiveInState(person) {
+                    item.People.should.be.an('object');
+                    item.People.data.forEach(function _ensurePeopleLiveInState(person) {
                         item.City.should.eql(person.City);
                     });
                 });
             });
 
             it('should return all items grouped by state', function testGroupJoinWithDefinedEqualityComparer() {
-                var groupJoinIterable = groupJoin(factoryFn, gen(uniqueStates), gen(testData.dataSource.data), primitiveSelector, stateSelector, stateProjector, stateComparer),
+                var groupJoinIterable = groupJoin(gen(uniqueStates), gen(testData.dataSource.data), primitiveSelector, stateSelector, stateProjector, factoryFn, stateComparer),
                     groupJoinRes = Array.from(groupJoinIterable());
 
                 groupJoinRes.should.have.lengthOf(uniqueStates.length);
                 groupJoinRes.forEach(function _validateEntries(item) {
                     item.should.have.keys('State', 'People');
-                    item.People.should.be.an('array');
-                    item.People.forEach(function _ensurePeopleLiveInState(person) {
+                    item.People.should.be.an('object');
+                    item.People.data.forEach(function _ensurePeopleLiveInState(person) {
                         item.State.should.eql(person.State);
                     });
                 });
@@ -444,31 +444,31 @@ describe('Test List Iterators', function _testListIterators() {
                     return a === b.Zip;
                 }
 
-                var groupJoinIterable = groupJoin(factoryFn, gen(uniqueCities), gen(testData.dataSource.data), primitiveSelector, citySelector, cityProjector, badComparer),
+                var groupJoinIterable = groupJoin(gen(uniqueCities), gen(testData.dataSource.data), primitiveSelector, citySelector, cityProjector, factoryFn, badComparer),
                     groupJoinRes = Array.from(groupJoinIterable());
 
                 groupJoinRes.should.have.lengthOf(uniqueCities.length);
                 groupJoinRes.forEach(function _ensurePeopleLiveInCities(item) {
                     item.should.have.keys('City', 'People');
-                    item.People.should.be.an('array');
-                    item.People.should.have.lengthOf(0);
+                    item.People.should.be.an('object');
+                    item.People.data.should.have.lengthOf(0);
                 });
             });
 
             it('should return items that have no inner matches', function testGroupJoinWithNoInnerMatches() {
-                var groupJoinIterable = groupJoin(factoryFn, gen(uniqueStates), gen([]), primitiveSelector, stateSelector, stateProjector, stateComparer),
+                var groupJoinIterable = groupJoin(gen(uniqueStates), gen([]), primitiveSelector, stateSelector, stateProjector, factoryFn, stateComparer),
                     groupJoinRes = Array.from(groupJoinIterable());
 
                 groupJoinRes.should.have.lengthOf(uniqueStates.length);
                 groupJoinRes.forEach(function _validateEntries(item) {
                     item.should.have.keys('State', 'People');
-                    item.People.should.be.an('array');
-                    item.People.should.have.lengthOf(0);
+                    item.People.should.be.an('object');
+                    item.People.data.should.have.lengthOf(0);
                 });
             });
 
             it('should return empty array when source is empty', function testGroupJoinWithEmptySource() {
-                var groupJoinIterable = groupJoin(factoryFn, gen([]), gen(testData.dataSource.data), primitiveSelector, stateSelector, stateProjector, stateComparer),
+                var groupJoinIterable = groupJoin(gen([]), gen(testData.dataSource.data), primitiveSelector, stateSelector, stateProjector, factoryFn, stateComparer),
                     groupJoinRes = Array.from(groupJoinIterable());
 
                 groupJoinRes.should.have.lengthOf(0);

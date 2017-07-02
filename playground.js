@@ -8564,7 +8564,7 @@ attachListener('click');
      *
      * In JavaScript runtimes that support `Set`, this operator will use a `Set` to improve performance of the distinct value checking.
      *
-     * In other runtimes, this operator will use a minimal implementation of `Set` that relies on an `Array` and `indexOf` under the
+     * In other runtimes, this operator will use a minimal implementation of `Set` that relies on an `Array` and `findIndex` under the
      * hood, so performance will degrade as more values are checked for distinction. Even in newer browsers, a long-running `distinct`
      * use might result in memory leaks. To help alleviate this in some scenarios, an optional `flushes` parameter is also provided so
      * that the internal `Set` can be "flushed", basically clearing it of values.

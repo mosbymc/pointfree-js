@@ -1,5 +1,6 @@
 import { right_functor, left_functor } from '../functors/either_functor';
 import { identity } from '../../combinators';
+import { apply, chainMaker, mjoin, pointMaker, sharedEitherFns } from '../containerHelpers';
 
 function Either(val, fork) {
     return 'right' === fork ?
@@ -37,24 +38,6 @@ function Either(val, fork) {
                 configurable: false
             }
         });
-
-    /*return Object.create(either_monad, {
-        _value: {
-            value: val,
-            writable: false,
-            configurable: false
-        },
-        isRight: {
-            value: 'right' === fork,
-            writable: false,
-            configurable: false
-        },
-        isLeft: {
-            value: 'right' !== fork,
-            writable: false,
-            configurable: false
-        }
-    });*/
 }
 
 Either.of = function _of(val) {
@@ -122,16 +105,11 @@ Right.is = m => right_monad.isPrototypeOf(m);
 
 
 var right_monad = Object.create(right_functor, {
-    chain: {
-        value: function _chain(fn) {
-            var val = fn(this.value);
-            return right_monad.isPrototypeOf(val) ? val : this.of(val);
-        }
+    map: {
+        value: sharedEitherFns.rightMap
     },
-    mjoin: {
-        value: function _mjoin() {
-            return this.value;
-        }
+    bimap: {
+        value: sharedEitherFns.rightBiMap
     },
     fold: {
         value: function _fold(fn, acc) {
@@ -148,37 +126,23 @@ var right_monad = Object.create(right_functor, {
             return f(this.value).map(this.of);
         }
     },
-    /**
-     * @description:
-     * @param: {monad} ma
-     * @return: {monad}
-     */
-    apply: {
-        value: function _apply(ma) {
-            return ma.map(this.value);
-        }
-    },
-    of: {
-        value: function _of(val) {
-            return Right(val);
-        }
-    },
     factory: {
         value: Either
     }
 });
 
+right_monad.chain = chainMaker(right_monad);
+right_monad.mjoin = mjoin;
+right_monad.apply = apply;
+right_monad.of = pointMaker(Right);
+
 
 var left_monad = Object.create(left_functor, {
-    chain: {
-        value: function _chain(fn) {
-            return Left(this.value);
-        }
+    map: {
+        value: sharedEitherFns.leftMapMaker(Left)
     },
-    mjoin: {
-        value: function _mjoin() {
-            return this.value;
-        }
+    bimap: {
+        value: sharedEitherFns.leftBimapMaker(Left)
     },
     fold: {
         value: function _fold(fn, acc) {
@@ -195,25 +159,15 @@ var left_monad = Object.create(left_functor, {
             return a.of(this.of(this.value));
         }
     },
-    /**
-     * @description:
-     * @param: {monad} ma
-     * @return: {monad}
-     */
-    apply: {
-        value: function _apply(ma) {
-            return ma.map(this.value);
-        }
-    },
-    of: {
-        value: function _of(val) {
-            return Left(val);
-        }
-    },
     factory: {
         value: Either
     }
 });
+
+left_monad.chain = chainMaker(left_monad);
+left_monad.mjoin = mjoin;
+left_monad.apply = apply;
+left_monad.of = pointMaker(Right);
 
 
 

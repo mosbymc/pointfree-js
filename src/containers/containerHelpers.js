@@ -21,6 +21,12 @@ function equalMaker(type) {
     };
 }
 
+function maybeFactoryHelper(type) {
+    return function _maybe(val) {
+        return type(val);
+    };
+}
+
 function mjoin() {
     return this.value;
 }
@@ -41,4 +47,71 @@ function valueOf() {
     return this.value;
 }
 
-export { apply, chainMaker, disjunctionEqualMaker, equalMaker, mjoin, pointMaker, stringMaker, valueOf };
+
+
+//==========================================================================================================//
+//==========================================================================================================//
+//================================        Shared Maybe Functionality        ================================//
+//==========================================================================================================//
+//==========================================================================================================//
+function justMap(fn) {
+    return this.of(fn(this.value));
+}
+
+function nothingMapMaker(factory) {
+    return function nothingMap(fn) {
+        return factory(this.value);
+    }
+}
+
+function justBimap(f, g) {
+    return this.of(f(this.value));
+}
+
+function nothingBimapMaker(factory) {
+    return function nothingBimap(f, g) {
+        return factory(g(this.value));
+    }
+}
+
+var sharedMaybeFns = {
+    justMap,
+    nothingMapMaker,
+    justBimap,
+    nothingBimapMaker
+};
+
+//==========================================================================================================//
+//==========================================================================================================//
+//================================        Shared Either Functionality        ===============================//
+//==========================================================================================================//
+//==========================================================================================================//
+function rightMap(fn) {
+    return this.of(fn(this.value));
+}
+
+function leftMapMaker(factory) {
+    return function leftMap(fn) {
+        return factory(this.value);
+    }
+}
+
+function rightBiMap(f, g) {
+    return this.of(f(this.value));
+}
+
+function leftBimapMaker(factory) {
+    return function leftBimap(f, g) {
+        return factory(g(this.value));
+    }
+}
+
+var sharedEitherFns = {
+    rightMap,
+    leftMapMaker,
+    rightBiMap,
+    leftBimapMaker
+};
+
+export { apply, chainMaker, disjunctionEqualMaker, equalMaker, maybeFactoryHelper, mjoin, pointMaker, stringMaker, valueOf,
+        sharedMaybeFns, sharedEitherFns };

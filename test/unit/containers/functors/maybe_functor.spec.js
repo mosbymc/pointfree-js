@@ -292,25 +292,26 @@ describe('Maybe functor tests', function _testMaybeFunctor() {
         it('should return a new maybe functor regardless of data type', function _testMaybeFactoryObjectCreation() {
             var arr = [1, 2, 3],
                 obj = { a: 1, b: 2 },
-                m = Maybe();
+                m = Maybe(),
+                s = Symbol();
 
             var m1 = m.of(),
                 m2 = m.of(null),
                 m3 = m.of(1),
                 m4 = m.of(arr),
                 m5 = m.of(obj),
-                m6 = m.of(Symbol()),
+                m6 = m.of(s),
                 m7 = m.of('testing constant'),
                 m8 = m.of(false);
 
-            expect(null).to.eql(m1.value);
+            expect().to.eql(m1.value);
             expect(null).to.eql(m2.value);
-            expect(null).to.eql(m3.value);
-            expect(null).to.eql(m4.value);
-            expect(null).to.eql(m5.value);
-            expect(null).to.eql(m6.value);
-            expect(null).to.eql(m7.value);
-            expect(null).to.eql(m8.value);
+            expect(1).to.eql(m3.value);
+            expect([1, 2, 3]).to.eql(m4.value);
+            expect({ a: 1, b: 2 }).to.eql(m5.value);
+            expect(s).to.eql(m6.value);
+            expect('testing constant').to.eql(m7.value);
+            expect(false).to.eql(m8.value);
         });
 
         it('should have a functioning iterator', function _testMaybeFunctorIterator() {

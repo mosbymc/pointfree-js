@@ -1,4 +1,4 @@
-import { disjunctionEqualMaker, pointMaker, stringMaker, valueOf } from '../containerHelpers';
+import { disjunctionEqualMaker, pointMaker, stringMaker, valueOf, sharedEitherFns } from '../containerHelpers';
 
 function Either(val, fork) {
     return 'right' === fork ?
@@ -99,12 +99,8 @@ var right_functor = {
      * @param: {function|undefined} fn
      * @return: {@see either_functor}
      */
-    map: function _map(fn) {
-        return this.of(fn(this.value));
-    },
-    bimap: function _bimap(f, g) {
-        return this.of(f(this.value));
-    },
+    map: sharedEitherFns.rightMap,
+    bimap: sharedEitherFns.rightBiMap,
     factory: Either
 };
 
@@ -140,12 +136,14 @@ var left_functor = {
      * @description:
      * @return: {@see either_functor}
      */
-    map: function _map() {
-        return Left(this.value);
-    },
-    bimap: function _bimap(f, g) {
-        return this.of(g(this.value));
-    },
+    map: sharedEitherFns.leftMapMaker(Left),
+    /**
+     * @description:
+     * @param: {function} f
+     * @param: {function} g
+     * @return: {@see left_functor}
+     */
+    bimap: sharedEitherFns.leftBimapMaker(Left),
     /**
      * @description:
      * @param: {functor} ma
@@ -153,24 +151,6 @@ var left_functor = {
      */
     equals: function _equals(ma) {
         return Object.getPrototypeOf(this).isPrototypeOf(ma) && ma.isLeft && this.value === ma.value;
-    },
-    /**
-     *
-     * @param val
-     */
-    of: function _of(val) {
-        return Right(val);
-    },
-    /**
-     * @description:
-     * @return: {*}
-     */
-    valueOf: function _valueOf() {
-        return this.value;
-    },
-    toString: function _toString() {
-        var val = this.value && this.value.toString && 'function' === typeof this.value.toString ? this.value.toString() : JSON.stringify(this.value);
-        return `Left(${val})`;
     },
     factory: Either
 };

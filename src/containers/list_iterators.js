@@ -1,7 +1,7 @@
 import { isArray, strictEquals, isObject, type } from '../functionalHelpers';
 import { apply, not } from '../decorators';
 import { when, ifElse, ifThisThenThat, curry } from '../combinators';
-import { javaScriptTypes, cacher } from '../helpers';
+import { javaScriptTypes, sortDirection, cacher } from '../helpers';
 import { sortData } from  './sortHelpers';
 
 var toArray = when(not(isArray), Array.from);
@@ -15,13 +15,9 @@ var toArray = when(not(isArray), Array.from);
 function addFront(xs, ys) {
     return function *addFront() {
         ys = toArray(ys);
-        for (let y of ys) {
-            if (javaScriptTypes.undefined !== y) yield y;
-        }
+        for (let y of ys) yield y;
 
-        for (let x of xs) {
-            if (javaScriptTypes.undefined !== x) yield x;
-        }
+        for (let x of xs) yield x;
     };
 }
 
@@ -34,22 +30,15 @@ function addFront(xs, ys) {
  */
 function concat(xs, yss, argsCount) {
     return function *concatIterator() {
-        for (let x of xs) {
-            if (javaScriptTypes.undefined !== x) yield x;
-        }
+        for (let x of xs) yield x;
 
         if (1 === argsCount) {
             let ys = yss[0];
-            for (let y of ys) {
-                if (javaScriptTypes.undefined !== y) yield y;
-            }
+            for (let y of ys) yield y;
         }
         else {
             for (let ys of yss) {
-                console.log(ys);
-                for (let y of toArray(ys)) {
-                    if (javaScriptTypes.undefined !== y) yield y;
-                }
+                for (let y of toArray(ys)) yield y;
             }
         }
     };
@@ -63,9 +52,9 @@ function concat(xs, yss, argsCount) {
  * @return {generator}
  */
 function except(xs, ys, comparer = strictEquals) {
+    ys = toArray(ys);
     return function *exceptIterator() {
         for (let x of xs) {
-            ys = toArray(ys);
             if (!(ys.some(function _comparer(y) {
                     return comparer(x, y);
                 }))) yield x;
@@ -80,36 +69,27 @@ function except(xs, ys, comparer = strictEquals) {
  * @param: {function} xSelector
  * @param: {function} ySelector
  * @param: {function} projector
+ * @param: {function} listFactory
  * @param: {function} comparer
  * @return {generator}
  */
-function groupJoin(listFactory, xs, ys, xSelector, ySelector, projector, comparer = strictEquals) {
+function groupJoin(xs, ys, xSelector, ySelector, projector, listFactory, comparer = strictEquals) {
     return function *groupJoinIterator() {
-        var innerGroups = [];
-        //groupData(toArray(xs), groupObject)
-        ys = toArray(ys);
-        for (let y of ys) {
-            var innerRes = ySelector(y);
-            var matchingGroup = innerGroups.find(_findInnerGroup);
+        var groupObj = [{ keySelector: ySelector, comparer: comparer, direction: sortDirection.ascending }];
+        var groupedY = nestLists(groupData(toArray(ys), groupObj), 0, null, listFactory);
 
-            if (!matchingGroup) matchingGroup = { key: innerRes, items: [y] };
-            innerGroups[innerGroups.length] = matchingGroup;
-        }
+        for (let x of xs) {
+            let grp;
+            for (let yGroup of groupedY) {
+                if (comparer(xSelector(x), yGroup.key)) {
+                    grp = yGroup;
+                    break;
+                }
+            }
 
-        for (var x of xs) {
-            var innerMatch =  innerGroups.find(_compareByKeys);
-            let res = projector(x, undefined === innerMatch ? [] : innerMatch.items );
-            if (javaScriptTypes.undefined !== res) yield res;
+            yield projector(x, grp || listFactory([]));
         }
-
-        function _findInnerGroup(grp) {
-            return comparer(grp.key, innerRes);
-        }
-
-        function _compareByKeys(innerItem) {
-            return comparer(xSelector(x), innerItem.key);
-        }
-    };
+    }
 }
 
 /**
@@ -131,6 +111,26 @@ function intersect(xs, ys, comparer = strictEquals) {
 }
 
 /**
+ * @type:
+ * @description:
+ * @param: {iterable} xs
+ * @param: {*} val
+ * @return: {generator}
+ */
+function intersperse(xs, val) {
+    return function *intersperseIterator() {
+        var it = xs[Symbol.iterator](),
+            next = it.next();
+
+        while (!next.done) {
+            yield next.value;
+            next = it.next();
+            if (!next.done) yield val;
+        }
+    };
+}
+
+/**
  * @description:
  * @param: {iterable} xs
  * @param: {iterable} ys
@@ -146,10 +146,8 @@ function join(xs, ys, xSelector, ySelector, projector, comparer = strictEquals) 
         for (let x of xs) {
             for (let y of ys) {
                 if (comparer(xSelector(x), ySelector(y))) {
-                    let res = projector(x, y);
-                    if (javaScriptTypes.undefined !== res) yield res;
+                    yield projector(x, y);
                 }
-
             }
         }
     };
@@ -185,14 +183,12 @@ function union(xs, ys, comparer = strictEquals) {
  */
 function zip(xs, ys, selector) {
     return function *zipIterator() {
-        var res,
-            idx = 0;
+        var idx = 0;
         var yArr = toArray(ys);
 
         for (let x of xs) {
             if (idx > yArr.length || !yArr.length) return;
-            res = selector(x, yArr[idx]);
-            if (not(strictEquals)(javaScriptTypes.undefined, res)) yield res;
+            yield selector(x, yArr[idx]);
             ++idx;
         }
     };
@@ -456,18 +452,12 @@ function objectContainsOnlyArrays(data) {
  * @param: {function} fn
  * @return: {flatMapIterator}
  */
-function flatMap(xs, fn) {
+function chain(xs, fn) {
     return function *flatMapIterator() {
+        var res;
         for (let x of xs) {
-            if (null != x && x.map && 'function' === typeof x.map) {
-                var res;
-                if (x.value && x.value.value) res = x.map(fn).data;
-                //if (list_core.isPrototypeOf(x)) res = x.mapWith(fn).data;
-                else res = x.map(fn);
-
-                yield res;
-            }
-            else yield fn(x);
+            res = fn(x);
+            yield Object.getPrototypeOf(xs).isPrototypeOf(res) ? res.value : res;
         }
     };
 }
@@ -772,30 +762,26 @@ function fill(val, start, end, xs) {
 
 /**
  * @description:
- * @param: {function} callback
- * @param: {object} context
- * @param: {Array} xs
- * @return: {generator}
+ * @param: {iterable} xs
+ * @param: {function} comparer
+ * @param: {*} context
+ * @return: {Number}
  */
-function indexOf(callback, context, xs) {
-    return function *indexOfIterator() {
-        for (let x of toArray(xs).findIndex(callback, context)) yield x;
-    };
+function findIndex(xs, comparer = strictEquals, context) {
+    return toArray(xs).findIndex(comparer, context || this);
 }
 
 /**
  * @description:
- * @param: {*} val
- * @param: {number} idx
- * @param: {Array} xs
- * @return: {generator}
+ * @param: {iterable} xs
+ * @param: {function} comparer
+ * @param: {*} context
+ * @return: {Number}
  */
-function lastIndexOf(val, idx, xs) {
-    return function *lastIndexOfIterator() {
-        for (let x of toArray(xs).lastIndexOf(val, idx)) yield x;
-    };
+function findLastIndex(xs, comparer = strictEquals, context) {
+    return toArray(xs).reverse().findIndex(comparer, context || this);
 }
 
-export { all, any, except, intersect, union, map, flatMap, groupBy, sortBy, addFront, concat, groupJoin, join, zip, filter,
+export { all, any, except, intersect, union, map, chain, groupBy, sortBy, addFront, concat, groupJoin, join, zip, filter, intersperse,
     contains, first, last, count, foldLeft, reduceRight, distinct, ofType, binarySearch, equals, take, takeWhile, skip, skipWhile, reverse,
-    copyWithin, fill, indexOf, lastIndexOf, repeat, foldRight };
+    copyWithin, fill, findIndex, findLastIndex, repeat, foldRight };

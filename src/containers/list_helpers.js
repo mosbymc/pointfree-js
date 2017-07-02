@@ -2,7 +2,10 @@ import { delegatesTo, isArray, isString } from '../functionalHelpers';
 import { generatorProto } from '../helpers';
 
 /**
- * @description:
+ * @description: This factory producing function is used by both the list functor and the
+ * list monad when creating a new list object. Based on the parameters passed, the factory
+ * function will create a new object that delegates to the appropriate type with whatever
+ * additional fields it needs, i.e. ._value, .data, [Symbol.iterator], etc.
  * @param: {object} baseListType
  * @param: {object} sortedListType
  * @param: {object} groupedListType

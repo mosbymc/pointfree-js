@@ -1,12 +1,11 @@
-import { all, any, except, intersect, union, map, flatMap, groupBy, sortBy, addFront, concat, groupJoin, join, zip, filter,
+import { all, any, except, intersect, union, map, groupBy, sortBy, addFront, concat, groupJoin, join, zip, filter, intersperse,
     contains, first, last, count, foldLeft, reduceRight, distinct, ofType, binarySearch, equals, take, takeWhile, skip, skipWhile, reverse,
-    copyWithin, fill, indexOf, lastIndexOf, repeat, foldRight } from '../list_iterators';
+    copyWithin, fill, findIndex, findLastIndex, repeat, foldRight } from '../list_iterators';
 import { sortDirection } from '../../helpers';
 import { wrap, defaultPredicate, delegatesTo, isArray } from '../../functionalHelpers';
 import { when } from '../../combinators';
 import { not } from '../../decorators';
 import { createListCreator } from '../list_helpers';
-
 
 /**
  * @description: Object that contains the core functionality of a List; both the m_list and ordered_m_list
@@ -27,6 +26,7 @@ import { createListCreator } from '../list_helpers';
  * groupByDescending: {function} _groupByDescending,
  * groupJoin: {function} _groupJoin,
  * intersect: {function} _intersect,
+ * intersperse: {function} _intersperse,
  * join: {function} _join,
  * map: {function} _map,
  * ofType: {function} _ofType,
@@ -42,12 +42,12 @@ import { createListCreator } from '../list_helpers';
  * contains: {function} _contains,
  * count: {function} _count,
  * equals: {function} _equals,
+ * findIndex: {function} _findIndex,
+ * findLastIndex: {function} _findLastIndex,
  * first: {function} _first,
  * foldLeft: {function} _foldl,
  * foldr: {function} _foldr,
- * indexOf: {function} _indexOf,
  * last: {function} _last,
- * lastIndexOf: {function} _lastIndexOf,
  * reduceRight: {function} _reduceRight,
  * toArray: {function} _toArray,
  * toEvaluatedList: {function} _toEvaluatedList,
@@ -75,7 +75,7 @@ var list_core = {
     /**
      * @description:
      * @param: {iterable} xs
-     * @return: {@see m_list}
+     * @return: {@see list_functor}
      */
     addFront: function _addFront(xs) {
         return this.of(this, addFront(this, xs));
@@ -86,7 +86,7 @@ var list_core = {
      * @param: {number} index
      * @param: {number} start
      * @param: {number} end
-     * @return: {@see list}
+     * @return: {@see list_functor}
      */
     copyWithin: function _copyWithin(index, start, end) {
         return this.of(this, copyWithin(index, start, end, this));
@@ -98,7 +98,7 @@ var list_core = {
      * a new queryable object delegator instance that contains all the requisite
      * information on how to perform the operation.
      * @param: {Array | *} ys
-     * @return: {@see m_list}
+     * @return: {@see list_functor}
      */
     concat: function _concat(...ys) {
         return this.of(this, concat(this, ys, ys.length));
@@ -108,7 +108,7 @@ var list_core = {
      * @type: (a -> boolean) -> List<b>
      * @description:
      * @param: {function} comparer
-     * @return: {@see m_list}
+     * @return: {@see list_functor}
      */
     distinct: function _distinct(comparer) {
         return this.of(this, distinct(this, comparer));
@@ -125,7 +125,7 @@ var list_core = {
      * equality comparer.
      * @param: {iterable} xs
      * @param: {function} comparer
-     * @return: {@see m_list}
+     * @return: {@see list_functor}
      */
     except: function _except(xs, comparer) {
         return this.of(this, except(this, xs, comparer));
@@ -136,7 +136,7 @@ var list_core = {
      * @param: {number} value
      * @param: {number} start
      * @param: {number} end
-     * @return: {@see list}
+     * @return: {@see list_functor}
      */
     fill: function _fill(value, start, end) {
         return this.of(this, fill(value, start, end, this));
@@ -145,7 +145,7 @@ var list_core = {
     /**
      * @description:
      * @param: {function} predicate
-     * @return: {@see m_list}
+     * @return: {@see list_functor}
      */
     filter: function _filter(predicate) {
         return this.of(this, filter(this, predicate));
@@ -155,7 +155,7 @@ var list_core = {
      * @description:
      * @param: {function} keySelector
      * @param: {function} comparer
-     * @return: {@see m_list}
+     * @return: {@see list_functor}
      */
     groupBy: function _groupBy(keySelector, comparer) {
         var groupObj = [{ keySelector: keySelector, comparer: comparer, direction: sortDirection.ascending }];
@@ -166,7 +166,7 @@ var list_core = {
      * @description:
      * @param: {function} keySelector
      * @param: {function} comparer
-     * @return: {@see m_list}
+     * @return: {@see list_functor}
      */
     groupByDescending: function _groupByDescending(keySelector, comparer) {
         var groupObj = [{ keySelector: keySelector, comparer: comparer, direction: sortDirection.descending }];
@@ -186,10 +186,10 @@ var list_core = {
      * @param: {function} ySelector
      * @param: {function} projector
      * @param: {function} comparer
-     * @return: {@see m_list}
+     * @return: {@see list_functor}
      */
     groupJoin: function _groupJoin(ys, xSelector, ySelector, projector, comparer) {
-        return this.of(this, groupJoin(createGroupedListDelegate, this, ys, xSelector, ySelector, projector, comparer));
+        return this.of(this, groupJoin(this, ys, xSelector, ySelector, projector, createGroupedListDelegate, comparer));
     },
 
     /**
@@ -202,10 +202,20 @@ var list_core = {
      * how to perform the operation.
      * @param: {iterable} xs
      * @param: {function} comparer
-     * @return: {@see m_list}
+     * @return: {@see list_functor}
      */
     intersect: function _intersect(xs, comparer) {
         return this.of(this, intersect(this, xs, comparer));
+    },
+
+    /**
+     * @type:
+     * @description:
+     * @param: {*{ val
+     * @return: {@see list_functor}
+     */
+    intersperse: function _intersperse(val) {
+        return this.of(this, intersperse(this, val));
     },
 
     /**
@@ -220,7 +230,7 @@ var list_core = {
      * @param: {function} ySelector
      * @param: {function} projector
      * @param: {function} comparer
-     * @return: {@see m_list}
+     * @return: {@see list_functor}
      */
     join: function _join(ys, xSelector, ySelector, projector, comparer) {
         return this.of(this, join(this, ys, xSelector, ySelector, projector, comparer));
@@ -229,7 +239,7 @@ var list_core = {
     /**
      * @description:
      * @param: {function} mapFunc
-     * @return: {@see m_list}
+     * @return: {@see list_functor}
      */
     map: function _map(mapFunc) {
         return this.of(this, map(this, mapFunc));
@@ -238,7 +248,7 @@ var list_core = {
     /**
      * @description:
      * @param: type
-     * @returns: {@see m_list}
+     * @returns: {@see list_functor}
      */
     ofType: function _ofType(type) {
         return this.of(this, ofType(this, type));
@@ -246,7 +256,7 @@ var list_core = {
 
     /**
      * @description:
-     * @return: {@see m_list}
+     * @return: {@see list_functor}
      */
     reverse: function _reverse() {
         return this.of(this, reverse(this));
@@ -259,7 +269,7 @@ var list_core = {
      * returned.
      * @param: {number} amt - The number of items in the source to skip before
      * returning the remainder.
-     * @return: {@see m_list}
+     * @return: {@see list_functor}
      */
     skip: function _skip(amt) {
         return this.of(this, skip(this, amt));
@@ -268,7 +278,7 @@ var list_core = {
     /**
      * @description:
      * @param: {function} predicate
-     * @return: {@see m_list}
+     * @return: {@see list_functor}
      */
     skipWhile: function _skipWhile(predicate = defaultPredicate) {
         return this.of(this, skipWhile(this, predicate));
@@ -277,7 +287,7 @@ var list_core = {
     /**
      * @description:
      * @param: {number} amt
-     * @return: {@see m_list}
+     * @return: {@see list_functor}
      */
     take: function _take(amt) {
         return this.of(this, take(this, amt));
@@ -286,7 +296,7 @@ var list_core = {
     /**
      * @description:
      * @param: {function} predicate
-     * @return: {@see m_list}
+     * @return: {@see list_functor}
      */
     takeWhile: function _takeWhile(predicate = defaultPredicate) {
         return this.of(this, takeWhile(this, predicate));
@@ -301,7 +311,7 @@ var list_core = {
      * contains all the requisite information on how to perform the operation.
      * @param: {iterable} xs
      * @param: {function} comparer
-     * @return: {@see m_list}
+     * @return: {@see list_functor}
      */
     union: function _union(xs, comparer) {
         return this.of(this, union(this, xs, comparer));
@@ -316,7 +326,7 @@ var list_core = {
      * contains all the requisite information on how to perform the operation.
      * @param: {function} selector
      * @param: {iterable} xs
-     * @return: {@see m_list}
+     * @return: {@see list_functor}
      */
     zip: function _zip(selector, xs) {
         return this.of(this, zip(this, selector, xs));
@@ -354,7 +364,7 @@ var list_core = {
 
     /**
      * @description:
-     * @return: {*}
+     * @return: {Number}
      */
     count: function _count() {
         return count(this);
@@ -368,6 +378,28 @@ var list_core = {
      */
     equals: function _equals(f, comparer) {
         return Object.getPrototypeOf(this).isPrototypeOf(f) && equals(this, f, comparer);
+    },
+
+    /**
+     * @type:
+     * @description:
+     * @param: {function} comparer
+     * @param: {*} context
+     * @return: {@see Number}
+     */
+    findIndex: function _findIndex(comparer, context) {
+        return this.of(this, findIndex(this, comparer, context));
+    },
+
+    /**
+     * @type:
+     * @description:
+     * @param: {function} comparer
+     * @param: {*} context
+     * @return: {Number}
+     */
+    findLastIndex: function _findLastIndex(comparer, context) {
+        return this.of(this, findLastIndex(this, comparer, context));
     },
 
     /**
@@ -403,31 +435,11 @@ var list_core = {
 
     /**
      * @description:
-     * @param: {function} callback
-     * @param: {*} context
-     * @return: {@see list}
-     */
-    indexOf: function _indexOf(callback, context) {
-        return this.of(this, indexOf(callback, context, this));
-    },
-
-    /**
-     * @description:
      * @param: {function} predicate
      * @return: {*}
      */
     last: function _last(predicate = defaultPredicate) {
         return last(this, predicate);
-    },
-
-    /**
-     * @description:
-     * @param: {*} value
-     * @param: {number} index
-     * @return: {@see list}
-     */
-    lastIndexOf: function _lastIndexOf(value, index) {
-        return this.of(this, lastIndexOf(value, index, this));
     },
 
     /**
@@ -458,7 +470,7 @@ var list_core = {
      * allow you to evaluate the List's data and store it in a new List that can
      * be iterated many times without needing to re-evaluate. It is effectively
      * a syntactical shortcut for: List.from(listInstance.data);
-     * @return: {@see m_list}
+     * @return: {@see list_functor}
      */
     toEvaluatedList: function _toEvaluatedList() {
         return List.from(this.data /* the .data property is a getter function that forces evaluation */);
@@ -516,7 +528,7 @@ var list_core = {
      * @param: {generator} iterator
      * @param: {Array} sortObj
      * @param: {string} key
-     * @return: {@see m_list}
+     * @return: {@see list_functor}
      */
     of: function _of(xs, iterator, sortObj, key) {
         return createListDelegateInstance(xs, iterator, sortObj, key);
@@ -559,14 +571,14 @@ list_core.contains.binary = function _binary(val, comparer) {
  * it has from the list_core object, also exposes .orderBy and .orderByDescending
  * functions. These functions allow a consumer to sort a List's data by
  * a given key.
- * @type: {list_core}
+ * @type: {@see list_core}
  */
 var list_functor = Object.create(list_core, {
     /**
      * @description:
      * @param: {function} keySelector
      * @param: {function} comparer
-     * @return: {@see m_list}
+     * @return: {@see ordered_list_functor}
      */
     sortBy: {
         value: function _orderBy(keySelector, comparer) {
@@ -578,7 +590,7 @@ var list_functor = Object.create(list_core, {
      * @description:
      * @param: {function} keySelector
      * @param: {function} comparer
-     * @return: {@see m_list}
+     * @return: {@see ordered_list_functor}
      */
     sortByDescending: {
         value: function _orderByDescending(keySelector, comparer) {
@@ -592,7 +604,7 @@ var list_functor = Object.create(list_core, {
  * @description: A list_core delegator object that, in addition to the delegatable functionality
  * it has from the queryable_core object, also exposes .thenBy and .thenByDescending
  * functions. These functions allow a consumer to sort more on than a single column.
- * @type: {list_core}
+ * @type: {@see list_core}
  */
 var ordered_list_functor = Object.create(list_core, {
     _appliedSorts: {
@@ -608,7 +620,7 @@ var ordered_list_functor = Object.create(list_core, {
      * @description:
      * @param: {function} keySelector
      * @param: {function} comparer
-     * @return: {@see ordered_list_a}
+     * @return: {@see ordered_list_functor}
      */
     thenBy: {
         value: function _thenBy(keySelector, comparer) {
@@ -620,7 +632,7 @@ var ordered_list_functor = Object.create(list_core, {
      * @description:
      * @param: {function} keySelector
      * @param: {function} comparer
-     * @return: {@see ordered_list_a}
+     * @return: {@see ordered_list_functor}
      */
     thenByDescending: {
         value: function thenByDescending(keySelector, comparer) {
@@ -664,7 +676,7 @@ var ordered_list_functor = Object.create(list_core, {
  * and, if it has an iterator defined, with set it as the underlying source of the List as is,
  * or, wrap the item in an array if there is no defined iterator.
  * @param: {*} source - Any type, any value; used as the underlying source of the List
- * @return: {@see _list_a} - A new List instance with the value provided as the underlying source.
+ * @return: {@see list_core} - A new List instance with the value provided as the underlying source.
  */
 function List(source) {
     //TODO: should I exclude strings from being used as a source directly, or allow it because

@@ -56,21 +56,6 @@ var identity_monad = Object.create(identity_functor, {
     traverse: {
         value: function _traverse(a, f) {
             return f(this.value).map(this.of);
-            /*return this.fold(function _fold(ys, x) {
-                return fn(x).map(function _map(x) {
-                    return function _map_(y) {
-                        return y.concat([x]).ap(ys), fa(this.empty);
-                    };
-                });
-            });*/
-            /*return this.fold(function _reductioAdAbsurdum(xs, x) {
-                fn(x).mapWith(function _map(x) {
-                    return function _map_(y) {
-                        return y.concat([x]);
-                    };
-                }).ap(xs);
-                return fa(this.empty);
-            });*/
         }
     },
     traverse3: {

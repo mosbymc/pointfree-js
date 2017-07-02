@@ -1,4 +1,4 @@
-import { disjunctionEqualMaker, pointMaker, stringMaker, valueOf } from '../containerHelpers';
+import { disjunctionEqualMaker, maybeFactoryHelper, pointMaker, stringMaker, valueOf, sharedMaybeFns } from '../containerHelpers';
 
 /**
  * @description:
@@ -6,19 +6,6 @@ import { disjunctionEqualMaker, pointMaker, stringMaker, valueOf } from '../cont
  * @return: {@see maybe_functor}
  */
 function Maybe(val) {
-    /*return Object.create(maybe_functor, {
-        _value: {
-            value: null == val ? null : val,
-            writable: false,
-            configurable: false
-        },
-        isJust: {
-            value: null != val
-        },
-        isNothing: {
-            value: null == val
-        }
-    });*/
     return null == val ?
         Object.create(nothing_functor, {
             _value: {
@@ -87,13 +74,20 @@ Maybe.Just = Maybe.of;
 Maybe.Nothing =  function _nothing() {
     return Maybe();
 };
-//Maybe.Just = Just;
-//Maybe.Nothing = Nothing;
+
 Maybe.isJust = function _isJust(m) {
     return m.isJust;
 };
 Maybe.isNothing = function _isNothing(m) {
     return m.isNothing;
+};
+
+var maybeCreator = maybeFactoryHelper(Maybe);
+
+var maybeOf = {
+    of: function _of(val) {
+        return Maybe(val);
+    }
 };
 
 //TODO: determine if there is any purpose in splitting a maybe into two types... if those sub-types
@@ -171,59 +165,13 @@ Nothing.is = f => nothing_functor.isPrototypeOf(f);
 //TODO: as argument and treat the new maybe container instance as a 'Just', regardless of the
 //TODO: actual underlying value. As 'null' and 'undefined' underlying values are traditionally
 //TODO: treated as 'Nothing' maybe values, this will cause a problem during mapping/flat-mapping/etc.
-var maybe_functor = {
-    get value() {
-        return this._value;
-    },
-    map: _map,
-    equals: _equals,
-    of: _of,
-    nothing: _nothing,
-    /**
-     * @description:
-     * @return: {*}
-     */
-    valueOf: _valueOf,
-    toString: _toString,
-    factory: Maybe
-};
-
-function _map(fn) {
-    //return this.of(fn(this.value));
-    return this.isNothing ? this.nothing() : this.of(fn(this.value));
-}
-
-function _equals(ma) {
-    return Object.getPrototypeOf(this).isPrototypeOf(ma) && this.value === ma.value;
-}
-
-function _of(val) {
-    return Maybe.of(val);
-}
-
-function _nothing() {
-    return Maybe();
-}
-
-function _valueOf() {
-    return this.value;
-}
-
-function _toString() {
-    //return `Maybe(${this.value})`;
-    return null == this.value ? `Nothing()` : `Just(${this.value})`;
-}
 
 var just_functor = {
     get value() {
         return this._value;
     },
-    map: function _map(fn) {
-        return this.of(fn(this.value));
-    },
-    bimap: function _bimap(f, g) {
-        return this.of(f(this.value));
-    },
+    map: sharedMaybeFns.justMap,
+    bimap: sharedMaybeFns.justBimap,
     factory: Just
 };
 
@@ -255,12 +203,8 @@ var nothing_functor = {
     get value() {
         return this._value;
     },
-    map: function _map() {
-        return this.of();
-    },
-    bimap: function _bimap(f, g) {
-        return this.of(g(this.value));
-    },
+    map: sharedMaybeFns.nothingMapMaker(Nothing),
+    bimap: sharedMaybeFns.nothingBimapMaker(Nothing),
     toString: function _toString() {
         return `Nothing()`;
     },
@@ -277,7 +221,7 @@ nothing_functor.equals = disjunctionEqualMaker(nothing_functor, 'isNothing');
  * @description:
  * @return:
  */
-nothing_functor.of = pointMaker(Nothing);
+nothing_functor.of = pointMaker(Just);
 
 /**
  * @description:

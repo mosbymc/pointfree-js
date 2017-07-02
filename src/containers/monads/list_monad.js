@@ -1,6 +1,6 @@
 import { list_functor, ordered_list_functor, list_core } from '../functors/list_functor';
 import { sortDirection } from '../../helpers';
-import { groupBy, flatMap } from '../list_iterators';
+import { groupBy, groupJoin, chain } from '../list_iterators';
 import { wrap } from '../../functionalHelpers';
 import { identity } from '../../combinators';
 import { createListCreator } from '../list_helpers';
@@ -98,7 +98,7 @@ var list_monad = Object.create(list_functor, {
          * @return: {@see m_list}
          */
         value: function _chain(fn) {
-            return this.of(flatMap(this, fn));
+            return this.of(chain(this, fn));
         }
     },
     groupBy: {
@@ -112,6 +112,11 @@ var list_monad = Object.create(list_functor, {
             var groupObj = [{ keySelector: keySelector, comparer: comparer, direction: sortDirection.descending }];
             return this.of(this, groupBy(this, groupObj, createGroupedListDelegate));
         },
+    },
+    groupJoin: {
+        value: function _groupJoin(ys, xSelector, ySelector, projector, comparer) {
+            return this.of(this, groupJoin(this, ys, xSelector, ySelector, projector, createGroupedListDelegate, comparer));
+        }
     },
     mjoin: {
         value: function _mjoin() {
@@ -190,14 +195,14 @@ list_monad.flapMap = list_monad.chain;
 list_monad.bind = list_monad.chain;
 
 var ordered_list_monad = Object.create(ordered_list_functor, {
+    /**
+     * @description:
+     * @param: {function} fn
+     * @return: {@see m_list}
+     */
     chain: {
-        /**
-         * @description:
-         * @param: {function} fn
-         * @return: {@see m_list}
-         */
         value: function _chain(fn) {
-            return this.of(flatMap(this, fn));
+            return this.of(chain(this, fn));
         }
     },
     groupBy: {
@@ -211,6 +216,11 @@ var ordered_list_monad = Object.create(ordered_list_functor, {
             var groupObj = [{ keySelector: keySelector, comparer: comparer, direction: sortDirection.descending }];
             return this.of(this, groupBy(this, groupObj, createGroupedListDelegate));
         },
+    },
+    groupJoin: {
+        value: function _groupJoin(ys, xSelector, ySelector, projector, comparer) {
+            return this.of(this, groupJoin(this, ys, xSelector, ySelector, projector, createGroupedListDelegate, comparer));
+        }
     },
     mjoin: {
         value: function _mjoin() {

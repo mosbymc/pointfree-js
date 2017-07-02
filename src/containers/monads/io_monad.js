@@ -1,5 +1,6 @@
 import { io_functor } from '../functors/io_functor';
 import { compose } from '../../combinators';
+import { apply, chainMaker, mjoin, pointMaker } from '../containerHelpers';
 
 function Io(val) {
     return Object.create(io_monad, {
@@ -23,18 +24,6 @@ Io.of = function _of(val) {
 Io.is = m => io_monad.isPrototypeOf(m);
 
 var io_monad = Object.create(io_functor, {
-    mjoin: {
-        value: function _mjoin() {
-            return this.value;
-        }
-    },
-    chain: {
-        value: function _chain(fn) {
-            return Io((function _flatMapIo(...args) {
-                return fn(this.value(...args)).value(...args);
-            }).bind(this));
-        }
-    },
     fold: {
         value: function _fold(fn, x) {
             return fn(this.value, x);
@@ -52,20 +41,15 @@ var io_monad = Object.create(io_functor, {
             });
         }
     },
-    apply: {
-        value: function _apply(ma) {
-            return ma.map(this.value);
-        }
-    },
-    of: {
-        value: function _of(val) {
-            return Io.of(val);
-        }
-    },
     factory: {
         value: Io
     }
 });
+
+io_monad.chain = chainMaker(io_monad);
+io_monad.mjoin = mjoin;
+io_monad.apply = apply;
+io_monad.of = pointMaker(Io);
 
 io_monad.ap =io_monad.apply;
 io_monad.fmap = io_monad.chain;

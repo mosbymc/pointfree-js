@@ -1,4 +1,5 @@
 import { future_functor } from '../functors/future_functor';
+import { apply, mjoin, pointMaker } from '../containerHelpers';
 
 function safeFork(reject, resolve) {
     return function _safeFork(val) {
@@ -52,11 +53,6 @@ Future.unit = function _unit(val) {
 };
 
 var future_monad = Object.create(future_functor, {
-    mjoin: {
-        value: function _mjoin() {
-            return this.value;
-        }
-    },
     chain: {
         //TODO: probably need to compose here, not actually map over the value; this is a temporary fill-in until
         //TODO: I have time to finish working on the Future
@@ -92,20 +88,15 @@ var future_monad = Object.create(future_functor, {
 
         }
     },
-    apply: {
-        value: function _apply(ma) {
-            return this.map(ma.value);
-        }
-    },
-    of: {
-        value: function _of(val) {
-            return Future.of(val);
-        }
-    },
     factory: {
         value: Future
     }
 });
+
+future_monad.mjoin = mjoin;
+future_monad.apply = apply;
+future_monad.of = pointMaker(Future);
+
 
 future_monad.ap = future_monad.apply;
 future_monad.fmap = future_monad.chain;

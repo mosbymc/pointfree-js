@@ -1,4 +1,5 @@
 import { constant_functor } from '../functors/constant_functor';
+import { apply, mjoin, pointMaker } from '../containerHelpers';
 
 function Constant(val) {
     return Object.create(constant_monad, {
@@ -28,11 +29,8 @@ Constant.is = m => constant_monad.isPrototypeOf(m);
 
 var constant_monad = Object.create(constant_functor, {
     chain: {
-        value: _chain
-    },
-    mjoin: {
-        value: function _mjoin() {
-            return this.value;
+        value: function _chain() {
+            return this;
         }
     },
     fold: {
@@ -50,29 +48,14 @@ var constant_monad = Object.create(constant_functor, {
             return this.of(this.value);
         }
     },
-    /**
-     * @description:
-     * @param: {monad} ma
-     * @return: {monad}
-     */
-    apply: {
-        value: function _apply(ma) {
-            return ma.map(this.value);
-        }
-    },
-    of: {
-        value: function _of(val) {
-            return Constant.of(val);
-        }
-    },
     factory: {
         value: Constant
     }
 });
 
-function _chain() {
-    return this;
-}
+constant_monad.mjoin = mjoin;
+constant_monad.apply = apply;
+constant_monad.of = pointMaker(Constant);
 
 constant_monad.ap =constant_monad.apply;
 constant_monad.fmap = constant_monad.chain;
