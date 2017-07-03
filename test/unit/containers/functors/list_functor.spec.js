@@ -189,7 +189,7 @@ describe('List functor test', function _testListFunctor() {
                 var list = List.from([1, 2, 3, 4, 5]),
                     arr = [6, 7, 8, 9, 10];
 
-                var addFrontIterator = list.addFront(arr),
+                var addFrontIterator = list.prepend(arr),
                     res = addFrontIterator.data;
 
                 res.should.be.an('array');

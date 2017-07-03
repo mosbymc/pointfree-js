@@ -76,25 +76,25 @@
 //TODO:         - Finally, as mentioned above, 'saving' the evaluated data of a queryable object kinda assumes a non-streaming version/usage of this library.
 //TODO:           While I don't want to extend my focus on more than is necessary to implement the core functionality, I think this library would be
 //TODO:           significantly more useful if it could handle both finite and potentially infinite (i.e. streaming) sets. The problem is that the concept
-//TODO:           of a 'pre-evaluated' queryable is ridiculous in a streaming context. Obviously, I could take the hacky way out and Just create two
-//TODO:           separate queryable object types; one for finite sets, and one for potentially infinite sets. But, not only is that hacky, ugly, and Just
+//TODO:           of a 'pre-evaluated' queryable is ridiculous in a streaming context. Obviously, I could take the hacky way out and just create two
+//TODO:           separate queryable object types; one for finite sets, and one for potentially infinite sets. But, not only is that hacky, ugly, and just
 //TODO:           plain lazy, but I also feel it reduces the usability practicality of this library if a user must learn not one, but two APIs for the
 //TODO:           two queryable objects, and when to use each one. In general, it is sacrificing consumer convenience for developer convenience, and I
-//TODO:           Just won't stand for it!
+//TODO:           just won't stand for it!
 //TODO:
 //TODO: 4) Every queryable collation 'method' should be capable of taking any enumerable object as an argument for the 'collection' parameter, including
 //TODO:    another queryable object. Utilizing generators and for-of loops should make this very possible. Only objects that have an iterator, built-in or
 //TODO:    otherwise, should be accepted. An object without an iterator, although enumerable, should not be accepted as a valid parameter. In light of this,
 //TODO:    I should probably change the 'collection' parameter in all collation 'methods' to 'enumerable' or something similar.
 
-//TODO: Ok. I think I finally getWith it. Took me ~9 months, but containers are starting to make sense. Linq is a functor, and, were it not for a couple
+//TODO: Ok. I think I finally get it. Took me ~9 months, but containers are starting to make sense. Linq is a functor, and, were it not for a couple
 //TODO: of methods that it is "missing", it would be a monad; same goes for Rx. I had no idea that containers and linq/Rx were one in the same thing.
-//TODO: Granted, linq is not Just a generic monad, it's a monad<List>. So if you wanted a Maybe, or a future_functor, or an IO, you'd still need to implement
+//TODO: Granted, linq is not just a generic monad, it's a monad<List>. So if you wanted a Maybe, or a Future, or an Io, you'd still need to implement
 //TODO: those data structures in C#. Essentially, if C# had given us IFunctor instead of IEnumerable, we could have created any tricked out functor
 //TODO: implementation by overriding some base methods, like a Maybe's null check before apply a fn to it's underlying. In other words, Rx and Linq
-//TODO: screwed us! Not really, but that's kinda my feeling. Granted, if it hand't taken me so long to understand "why containers", then Maybe I
-//TODO: wouldn't be as critical, but still, I could have an interface for a tricked out monad(functor), but instead I getWith a single implementation
-//TODO: of a monad and have to create all other versions myself since both Rx and linq basically "expect" to be sitting on top of a List.
+//TODO: screwed us! Not really, but that's kinda my feeling. Granted, if it hand't taken me so long to understand "why containers", then maybe I
+//TODO: wouldn't be as critical, but still, I could have an interface for a tricked out monad(functor), but instead I get a single implementation
+//TODO: of a monad and have to create all other versions myself since both Rx and linq basically "expect" to be sitting on top of a list.
 
 
  function union(previousFunc, collection, comparer) {

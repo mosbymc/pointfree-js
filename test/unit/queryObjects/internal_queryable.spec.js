@@ -27,7 +27,7 @@ beforeEach(function setSource() {
 
 describe('Test queryable', function testQueryable() {
     it('should create a new queryable delegate', function testObjectDelegation() {
-        var queryableAddFront = internal_queryable.addFront([1, 2, 3, 4, 5]),
+        var queryableAddFront = internal_queryable.prepend([1, 2, 3, 4, 5]),
             concatQueryable = internal_queryable.concat(testData.dataSource.data),
             exceptQueryable = internal_queryable.except(testData.dataSource.data),
             groupJoinQueryable = internal_queryable.groupJoin(testData.dataSource.data, nameSelector, nameSelector, nameProjector, comparer),

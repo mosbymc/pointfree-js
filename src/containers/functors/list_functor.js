@@ -1,4 +1,4 @@
-import { all, any, except, intersect, union, map, groupBy, sortBy, addFront, concat, groupJoin, join, zip, filter, intersperse,
+import { all, any, except, intersect, union, map, groupBy, sortBy, prepend, concat, groupJoin, join, zip, filter, intersperse,
     contains, first, last, count, foldLeft, reduceRight, distinct, ofType, binarySearch, equals, take, takeWhile, skip, skipWhile, reverse,
     copyWithin, fill, findIndex, findLastIndex, repeat, foldRight } from '../list_iterators';
 import { sortDirection } from '../../helpers';
@@ -15,7 +15,7 @@ import { createListCreator } from '../list_helpers';
  * object at creation if not specified.
  * @type {{
  * value: *,
- * addFront: {function} _addFront,
+ * append: {function} _concat,
  * copyWithin: {function} _copyWithin,
  * concat: {function} _concat,
  * distinct: {function} _distinct,
@@ -30,6 +30,7 @@ import { createListCreator } from '../list_helpers';
  * join: {function} _join,
  * map: {function} _map,
  * ofType: {function} _ofType,
+ * prepend: {function} _prepend,
  * reverse: {function} _reverse,
  * skip: {function} _skip,
  * skipWhile: {function} _skipWhile,
@@ -51,6 +52,7 @@ import { createListCreator } from '../list_helpers';
  * reduceRight: {function} _reduceRight,
  * toArray: {function} _toArray,
  * toEvaluatedList: {function} _toEvaluatedList,
+ * toMap: {function} _toMap,
  * toSet: {function} _toSet,
  * toString: {function} _toString,
  * valueOf: {function} _valueOf,
@@ -63,22 +65,12 @@ var list_core = {
     //Using getters for these properties because there's a chance the setting and/or getting
     //functionality could change; this will allow for a consistent interface while the
     //logic beneath changes
-
     /**
      * @description: Getter for the underlying source object of the List
      * @return: {*}
      */
     get value() {
         return this._value;
-    },
-
-    /**
-     * @description:
-     * @param: {iterable} xs
-     * @return: {@see list_functor}
-     */
-    addFront: function _addFront(xs) {
-        return this.of(this, addFront(this, xs));
     },
 
     /**
@@ -252,6 +244,15 @@ var list_core = {
      */
     ofType: function _ofType(type) {
         return this.of(this, ofType(this, type));
+    },
+
+    /**
+     * @description:
+     * @param: {iterable} xs
+     * @return: {@see list_functor}
+     */
+    prepend: function _prepend(xs) {
+        return this.of(this, prepend(this, xs));
     },
 
     /**
@@ -477,6 +478,17 @@ var list_core = {
     },
 
     /**
+     * @type:
+     * @description:
+     * @return: {Map}
+     */
+    toMap: function _toMap() {
+        return new Map(this.data.map(function _map(val, idx) {
+            return [idx, val];
+        }));
+    },
+
+    /**
      * @description:
      * @return: {Set}
      */
@@ -546,6 +558,8 @@ var list_core = {
         }
     },
 };
+
+list_core.append = list_core.concat;
 
 /**
  * @description: Performs the same functionality as list_core#contains, but utilizes

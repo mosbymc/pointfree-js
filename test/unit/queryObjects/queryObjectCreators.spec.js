@@ -63,8 +63,8 @@ describe('createNewQueryableDelegator', function testQueryableDelegatorObjectCre
 
 
         //COLLATION FUNCTIONS
-        queryDelegator.addFront.should.exist;
-        queryDelegator.addFront.should.be.a('function');
+        queryDelegator.prepend.should.exist;
+        queryDelegator.prepend.should.be.a('function');
         queryDelegator.concat.should.exist;
         queryDelegator.concat.should.be.a('function');
         queryDelegator.except.should.exist;
@@ -135,7 +135,7 @@ describe('createNewQueryableDelegator', function testQueryableDelegatorObjectCre
             mapDelegate = baseDelegate.map(function (item) { return item.State; }),
             deepMapDelegate = baseDelegate.deepMap(function(item) { return item.State; }),
             ofTypeDelegate = baseDelegate.ofType('object'),
-            addFrontDelegate = baseDelegate.addFront([1, 2, 3, 4, 5]),
+            addFrontDelegate = baseDelegate.prepend([1, 2, 3, 4, 5]),
             whereDelegate = baseDelegate.where(namePredicate),
             concatDelegate = baseDelegate.concat([1, 2, 3, 4]),
             exceptDelegate = baseDelegate.except(testData.dataSource.data),
@@ -267,8 +267,8 @@ describe('createNewOrderedQueryableDelegator', function testCreateNewQueryableDe
 
 
         //COLLATION FUNCTIONS
-        orderedQueryDelegator.addFront.should.exist;
-        orderedQueryDelegator.addFront.should.be.a('function');
+        orderedQueryDelegator.prepend.should.exist;
+        orderedQueryDelegator.prepend.should.be.a('function');
         orderedQueryDelegator.concat.should.exist;
         orderedQueryDelegator.concat.should.be.a('function');
         orderedQueryDelegator.except.should.exist;
@@ -335,7 +335,7 @@ describe('createNewOrderedQueryableDelegator', function testCreateNewQueryableDe
             mapDelegate = basedOrderedDelegate.map(function (item) { return item.State; }),
             deepMapDelegate = basedOrderedDelegate.deepMap(function(item) { return item.State; }),
             ofTypeDelegate = basedOrderedDelegate.ofType('object'),
-            addFrontDelegate = basedOrderedDelegate.addFront([1, 2, 3, 4, 5]),
+            addFrontDelegate = basedOrderedDelegate.prepend([1, 2, 3, 4, 5]),
             whereDelegate = basedOrderedDelegate.where(namePredicate),
             concatDelegate = basedOrderedDelegate.concat([1, 2, 3, 4]),
             exceptDelegate = basedOrderedDelegate.except(testData.dataSource.data),

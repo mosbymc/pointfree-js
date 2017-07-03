@@ -8,7 +8,7 @@ module.exports = function _gulpConfig() {
         tmpPlato = './tmpPlato/',
         platoScripts = [
             tmpPlato + 'collation/collationFunctions.js',
-            tmpPlato + 'collation/addFront.js',
+            tmpPlato + 'collation/prepend.js',
             tmpPlato + 'collation/concat.js',
             tmpPlato + 'collation/except.js',
             tmpPlato + 'collation/groupJoin.js',

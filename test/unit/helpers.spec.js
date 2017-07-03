@@ -3,7 +3,7 @@ import { testData } from '../testData';
 
 function checkClonedDataProps(orig, clone) {
     return Object.keys(orig).every(function checkEveryProp(key) {
-        if (typeof orig[key] !== 'object' && !Array.isArray(orig[key]))
+        if ('object' !== typeof orig[key] && !Array.isArray(orig[key]))
             return orig[key].should.eql(clone[key]);
         else if (Array.isArray(orig[key]))
             return checkClonedArrayIndices(orig[key], clone[key]);
@@ -13,7 +13,7 @@ function checkClonedDataProps(orig, clone) {
 
 function checkClonedArrayIndices(orig, clone) {
     return clone.every(function testValuesForEquality(item, idx) {
-        if (typeof item !== 'object')
+        if ('object' !== typeof item)
             return item.should.eql(orig[idx]);
         return checkClonedDataProps(orig[idx], item);
     });

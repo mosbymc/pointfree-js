@@ -4,7 +4,7 @@
 Object.defineProperty(exports, "__esModule", {
     value: true
 });
-exports.addFront = undefined;
+exports.prepend = undefined;
 
 var _functionalHelpers = require('../functionalHelpers');
 
@@ -23,7 +23,7 @@ function addFront(source, enumerable) {
     };
 }
 
-exports.addFront = addFront;
+exports.prepend = addFront;
 
 },{"../functionalHelpers":18,"../helpers":19}],2:[function(require,module,exports){
 'use strict';
@@ -31,9 +31,9 @@ exports.addFront = addFront;
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.zip = exports.union = exports.join = exports.intersect = exports.groupJoin = exports.except = exports.concat = exports.addFront = undefined;
+exports.zip = exports.union = exports.join = exports.intersect = exports.groupJoin = exports.except = exports.concat = exports.prepend = undefined;
 
-var _addFront = require('./addFront');
+var _addFront = require('./prepend');
 
 var _concat = require('./concat');
 
@@ -49,7 +49,7 @@ var _union = require('./union');
 
 var _zip = require('./zip');
 
-exports.addFront = _addFront.addFront;
+exports.prepend = _addFront.prepend;
 exports.concat = _concat.concat;
 exports.except = _except.except;
 exports.groupJoin = _groupJoin.groupJoin;
@@ -1650,7 +1650,7 @@ var _functionalHelpers = require('../functionalHelpers');
  * flatten: list_core._flatten,
  * deepFlatten: list_core._deepFlatten,
  * deepMap: list_core._deepMap,
- * addFront: list_core._addFront,
+ * prepend: list_core._addFront,
  * concat: list_core._concat,
  * except: list_core._except,
  * groupJoin: list_core._groupJoin,
@@ -1760,8 +1760,8 @@ var list_core = {
      * @param: enumerable
      * @returns: {*}
      */
-    addFront: function _addFront(enumerable) {
-        return createListDelegator(this, (0, _collationFunctions.addFront)(this, enumerable));
+    prepend: function _addFront(enumerable) {
+        return createListDelegator(this, (0, _collationFunctions.prepend)(this, enumerable));
     },
 
     /**
@@ -2812,7 +2812,7 @@ var _functionalHelpers = require('../functionalHelpers');
  * flatten: queryable_core._flatten,
  * deepFlatten: queryable_core._deepFlatten,
  * deepMap: queryable_core._deepMap,
- * addFront: queryable_core._addFront,
+ * prepend: queryable_core._addFront,
  * concat: queryable_core._concat,
  * except: queryable_core._except,
  * groupJoin: queryable_core._groupJoin,
@@ -2920,8 +2920,8 @@ var queryable_core = {
      * @param enumerable
      * @returns {*}
      */
-    addFront: function _addFront(enumerable) {
-        return (0, _queryDelegatorCreators.createNewQueryableDelegator)(this, (0, _collationFunctions.addFront)(this, enumerable));
+    prepend: function _addFront(enumerable) {
+        return (0, _queryDelegatorCreators.createNewQueryableDelegator)(this, (0, _collationFunctions.prepend)(this, enumerable));
     },
 
     /**

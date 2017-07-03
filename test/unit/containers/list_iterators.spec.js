@@ -1,4 +1,4 @@
-import { all, any, except, intersect, union, map, chain, groupBy, sortBy, addFront, concat, groupJoin, join, zip, filter,
+import { all, any, except, intersect, union, map, chain, groupBy, sortBy, prepend, concat, groupJoin, join, zip, filter,
     contains, first, last, count, foldLeft, reduceRight, distinct, ofType, binarySearch, equals, take, takeWhile, skip, skipWhile, reverse,
     copyWithin, fill, findIndex, lastIndexOf, repeat } from '../../../src/containers/list_iterators';
 import { createListCreator } from '../../../src/containers/list_helpers';
@@ -7,14 +7,14 @@ import { cacher, javaScriptTypes, sortDirection } from '../../../src/helpers';
 import { testData } from '../../testData';
 
 describe('Test List Iterators', function _testListIterators() {
-    describe('Test addFront...', function testAddFront() {
+    describe('Test prepend...', function testAddFront() {
         function *gen(data) {
             for (let item of data)
                 yield item;
         }
 
         it('should return test data x 2', function testConcatSourceWithItself() {
-            var addFrontIterable = addFront(testData.dataSource.data, testData.dataSource.data),
+            var addFrontIterable = prepend(testData.dataSource.data, testData.dataSource.data),
                 addFrontRes = Array.from(addFrontIterable());
 
             addFrontRes.should.have.lengthOf(testData.dataSource.data.length * 2);
@@ -23,7 +23,7 @@ describe('Test List Iterators', function _testListIterators() {
         });
 
         it('should concat sources of different value types', function testConcatWithDifferingValueTypes() {
-            var addFrontIterable = addFront(testData.dataSource.data, [1, 2, 3, 4, 5]),
+            var addFrontIterable = prepend(testData.dataSource.data, [1, 2, 3, 4, 5]),
                 addFrontRes = Array.from(addFrontIterable());
 
             addFrontRes.should.have.lengthOf(testData.dataSource.data.length + 5);
@@ -32,7 +32,7 @@ describe('Test List Iterators', function _testListIterators() {
         });
 
         it('should return test data when second param is empty array', function testConcatWithSecondParameterAnEmptyArray() {
-            var addFrontIterable = addFront(testData.dataSource.data, []),
+            var addFrontIterable = prepend(testData.dataSource.data, []),
                 addFrontRes = Array.from(addFrontIterable());
 
             addFrontRes.should.have.lengthOf(testData.dataSource.data.length);
@@ -40,7 +40,7 @@ describe('Test List Iterators', function _testListIterators() {
         });
 
         it('should return test data when first param is empty and second param is test data', function testConcatWithFirstParameterAnEmptyArray() {
-            var addFrontIterable = addFront([], testData.dataSource.data),
+            var addFrontIterable = prepend([], testData.dataSource.data),
                 addFrontRes = Array.from(addFrontIterable());
 
             addFrontRes.should.have.lengthOf(testData.dataSource.data.length);
@@ -48,7 +48,7 @@ describe('Test List Iterators', function _testListIterators() {
         });
 
         it('should return test data when first param is an empty generator', function testConcatWithFirstParameterAnEmptyGenerator() {
-            var addFrontIterable = addFront(gen([]), testData.dataSource.data),
+            var addFrontIterable = prepend(gen([]), testData.dataSource.data),
                 addFrontRes = Array.from(addFrontIterable());
 
             addFrontRes.should.have.lengthOf(testData.dataSource.data.length);
@@ -56,7 +56,7 @@ describe('Test List Iterators', function _testListIterators() {
         });
 
         it('should return test data when second param is an empty generator', function testConcatWithSecondParameterAnEmptyGenerator() {
-            var addFrontIterable = addFront(testData.dataSource.data, gen([])),
+            var addFrontIterable = prepend(testData.dataSource.data, gen([])),
                 addFrontRes = Array.from(addFrontIterable());
 
             addFrontRes.should.have.lengthOf(testData.dataSource.data.length);
@@ -64,7 +64,7 @@ describe('Test List Iterators', function _testListIterators() {
         });
 
         it('should return test data x 2 when fed two generators', function testConcatWithTwoGenerators() {
-            var addFrontIterable = addFront(gen(testData.dataSource.data), gen(testData.dataSource.data)),
+            var addFrontIterable = prepend(gen(testData.dataSource.data), gen(testData.dataSource.data)),
                 addFrontRes = Array.from(addFrontIterable());
 
             addFrontRes.should.have.lengthOf(testData.dataSource.data.length * 2);
@@ -144,7 +144,7 @@ describe('Test List Iterators', function _testListIterators() {
 
         var havePreviouslyViewed = cacher(comparer),
             uniqueFirstNames = testData.dataSource.data.filter(function findUniqueNames(item) {
-                return !havePreviouslyViewed(item) && item.FirstName !== 'Mark';
+                return !havePreviouslyViewed(item) && 'Mark' !== item.FirstName;
             });
 
         describe('... using default equality comparer', function testExceptWithDefaultComparer() {
@@ -479,29 +479,10 @@ describe('Test List Iterators', function _testListIterators() {
     describe('Test intersect...', function testIntersect() {
         function comparer(a, b) { return a.FirstName === b.FirstName; }
 
-        var havePreviouslyViewed = cacher(comparer),
-            uniqueFirstNames = testData.dataSource.data.filter(function findUniqueNames(item) {
-                return !havePreviouslyViewed(item);
-            });
-
         var firstHalf = testData.dataSource.data.slice(0, testData.dataSource.data.length / 2),
             evenIdxs = testData.dataSource.data.filter(function _getEvenIndexedItems(item, idx) { return idx % 2; }),
             oddIdxs = testData.dataSource.data.filter(function _getOddIndexedItems(item, idx) { return !(idx % 2); });
 
-        havePreviouslyViewed = cacher(comparer);
-        var firstHalfAndUniqueNames = firstHalf.filter(function _findUniqueNames(item) {
-            return !(havePreviouslyViewed(item));
-        });
-
-        havePreviouslyViewed = cacher(comparer);
-        var evensAndUniqueNames = evenIdxs.filter(function _findUniqueNames(item) {
-            return !(havePreviouslyViewed(item));
-        });
-
-        havePreviouslyViewed = cacher(comparer);
-        var oddsAndUniqueNames = oddIdxs.filter(function _findUniqueNames(item) {
-            return !(havePreviouslyViewed(item));
-        });
         describe('... using default equality comparer', function testIntersectWithDefaultEqualityComparer() {
             it('should return source with collection equals source', function testIntersectWithSelf() {
                 var intersectIterable = intersect(testData.dataSource.data, testData.dataSource.data),
@@ -899,10 +880,18 @@ describe('Test List Iterators', function _testListIterators() {
     describe('Test union...', function testUnion() {
         function comparer(a, b) { return a.FirstName === b.FirstName; }
 
-        var havePreviouslyViewed = cacher(comparer),
-            uniqueFirstNames = testData.dataSource.data.filter(function findUniqueNames(item) {
-                return !havePreviouslyViewed(item);
-            });
+        var viewed = [];
+
+        var uniqueFirstNames = testData.dataSource.data.filter(function findUniqueNames(item) {
+            if (!viewed.some(function _findDupe(it) {
+                    return item.FirstName === it.FirstName;
+                }))
+            {
+                viewed[viewed.length] = item;
+                return true;
+            }
+            return false;
+        });
 
         describe('... using default equality comparer', function testWithDefaultEqualityComparer() {
             it('should return source collection when unioned with itself', function unionWithSelf() {

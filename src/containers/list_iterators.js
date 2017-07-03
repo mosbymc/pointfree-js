@@ -1,6 +1,6 @@
 import { isArray, strictEquals, isObject, type } from '../functionalHelpers';
-import { apply, not } from '../decorators';
-import { when, ifElse, ifThisThenThat, curry } from '../combinators';
+import { not } from '../decorators';
+import { when, ifElse } from '../combinators';
 import { javaScriptTypes, sortDirection, cacher } from '../helpers';
 import { sortData } from  './sortHelpers';
 
@@ -12,9 +12,8 @@ var toArray = when(not(isArray), Array.from);
  * @param: {iterable} ys
  * @return: {generator}
  */
-function addFront(xs, ys) {
+function prepend(xs, ys) {
     return function *addFront() {
-        ys = toArray(ys);
         for (let y of ys) yield y;
 
         for (let x of xs) yield x;
@@ -38,7 +37,7 @@ function concat(xs, yss, argsCount) {
         }
         else {
             for (let ys of yss) {
-                for (let y of toArray(ys)) yield y;
+                for (let y of ys) yield y;
             }
         }
     };
@@ -161,9 +160,8 @@ function join(xs, ys, xSelector, ySelector, projector, comparer = strictEquals) 
  * @return {generator}
  */
 function union(xs, ys, comparer = strictEquals) {
-    var isInCache = cacher(comparer);
-
     return function *unionIterator() {
+        var isInCache = cacher(comparer);
         for (let x of xs) {
             if (!isInCache(x)) yield x;
         }
@@ -782,6 +780,6 @@ function findLastIndex(xs, comparer = strictEquals, context) {
     return toArray(xs).reverse().findIndex(comparer, context || this);
 }
 
-export { all, any, except, intersect, union, map, chain, groupBy, sortBy, addFront, concat, groupJoin, join, zip, filter, intersperse,
+export { all, any, except, intersect, union, map, chain, groupBy, sortBy, prepend, concat, groupJoin, join, zip, filter, intersperse,
     contains, first, last, count, foldLeft, reduceRight, distinct, ofType, binarySearch, equals, take, takeWhile, skip, skipWhile, reverse,
     copyWithin, fill, findIndex, findLastIndex, repeat, foldRight };
