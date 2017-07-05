@@ -277,7 +277,7 @@ describe('List functor test', function _testListFunctor() {
                     res = exceptList.data;
 
                 var resStandard = testData.dataSource.data.filter(function _filterVals(item) {
-                    return item.FirstName !== 'Phillip J.' && item.FirstName !== 'Hedonism';
+                    return 'Phillip J.' !== item.FirstName && 'Hedonism' !== item.FirstName;
                 });
 
                 res.should.be.an('array');
@@ -341,7 +341,7 @@ describe('List functor test', function _testListFunctor() {
                     res = intersectList.data;
 
                 var resStandard = testData.dataSource.data.filter(function _filterVals(item) {
-                    return item.FirstName === 'Phillip J.' || item.FirstName === 'Hedonism';
+                    return 'Phillip J.' === item.FirstName || 'Hedonism' === item.FirstName;
                 });
 
                 res.should.be.an('array');

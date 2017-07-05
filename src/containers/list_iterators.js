@@ -1,7 +1,7 @@
 import { isArray, strictEquals, isObject, type } from '../functionalHelpers';
 import { not } from '../decorators';
 import { when, ifElse } from '../combinators';
-import { javaScriptTypes, sortDirection, cacher } from '../helpers';
+import { javaScriptTypes, sortDirection, cacher, typeName } from '../helpers';
 import { sortData } from  './sortHelpers';
 
 var toArray = when(not(isArray), Array.from);
@@ -102,7 +102,7 @@ function intersect(xs, ys, comparer = strictEquals) {
     return function *intersectIterator() {
         ys = toArray(ys);
         for (let x of xs) {
-            if (javaScriptTypes.undefined !== x && ys.some(function _checkEquivalency(it) {
+            if (!strictEquals(javaScriptTypes.Undefined, x) && ys.some(function _checkEquivalency(it) {
                     return comparer(x, it);
                 })) yield x;
         }
@@ -199,7 +199,7 @@ function zip(xs, ys, selector) {
  * @return: {boolean}
  */
 function all(xs, predicate) {
-    return strictEquals(javaScriptTypes.function, type(predicate)) && toArray(xs).every(predicate);
+    return strictEquals(javaScriptTypes.Function, type(predicate)) && toArray(xs).every(predicate);
 }
 
 /**
@@ -209,7 +209,7 @@ function all(xs, predicate) {
  * @return: {boolean}
  */
 function any(xs, predicate) {
-    return strictEquals(javaScriptTypes.function, type(predicate)) ? toArray(xs).some(predicate) : 0 < toArray(xs).length;
+    return strictEquals(javaScriptTypes.Function, type(predicate)) ? toArray(xs).some(predicate) : 0 < toArray(xs).length;
 }
 
 /**
@@ -221,7 +221,7 @@ function any(xs, predicate) {
  */
 function contains(xs, val, comparer) {
     //TODO: see if there is any real performance increase by just using .includes when a comparer hasn't been passed
-    return strictEquals(javaScriptTypes.undefined, type(comparer)) ? toArray(xs).includes(val) : toArray(xs).some(x => comparer(x, val));
+    return strictEquals(javaScriptTypes.Undefined, type(comparer)) ? toArray(xs).includes(val) : toArray(xs).some(x => comparer(x, val));
 }
 
 /**
@@ -249,7 +249,7 @@ function binarySearch(xs, left, right, val, comparer) {
  * @return {Number}
  */
 function count(xs, predicate) {
-    return strictEquals(javaScriptTypes.undefined, type(predicate)) ?
+    return strictEquals(javaScriptTypes.Undefined, type(predicate)) ?
         toArray(xs).length : toArray(xs).filter(predicate).length;
 }
 
@@ -260,7 +260,7 @@ function count(xs, predicate) {
  * @return {*}
  */
 function first(xs, predicate) {
-    return strictEquals(javaScriptTypes.function, type(predicate)) ? toArray(xs).find(predicate) : toArray(xs)[0];
+    return strictEquals(javaScriptTypes.Function, type(predicate)) ? toArray(xs).find(predicate) : toArray(xs)[0];
 }
 
 /**
@@ -301,7 +301,7 @@ function reduceRight(xs, fn, initial = 0) {
  * @return: {*}
  */
 function last(xs, predicate) {
-    if (strictEquals(javaScriptTypes.function, type(predicate)))
+    if (strictEquals(javaScriptTypes.Function, type(predicate)))
         return toArray(xs).filter(predicate).slice(-1)[0];
     return toArray(xs).slice(-1)[0];
 }
@@ -337,13 +337,13 @@ function ofType(xs, dataType) {
             return key in dataType;
         }
 
-        if (dataType in javaScriptTypes) {
+        if (dataType in typeName) {
             for (let x of xs) {
-                if (javaScriptTypes[dataType] === typeof x) yield x;
+                if (typeName[dataType] === typeof x) yield x;
             }
         }
         else {
-            if (typeof dataType === javaScriptTypes.function) {
+            if (strictEquals(javaScriptTypes.Function, type(dataType))) {
                 for (let x of xs) {
                     if (x === dataType) yield x;
                 }
@@ -353,14 +353,19 @@ function ofType(xs, dataType) {
                     if (dataType === x) yield x;
                 }
             }
-            else {
+            else if (strictEquals(javaScriptTypes.Object, type(dataType)) && !isArray(dataType)) {
                 for (var objItem of xs) {
                     if (dataType.isPrototypeOf(objItem))
                         yield objItem;
-                    else if (javaScriptTypes.object === typeof objItem && null !== objItem &&
+                    else if (strictEquals(javaScriptTypes.Object, type(objItem)) && null !== objItem &&
                         Object.keys(dataType).every(_checkTypeKeys) && Object.keys(objItem).every(_checkItemKeys)) {
                         yield objItem;
                     }
+                }
+            }
+            else {
+                for (let x of xs) {
+                    yield x;
                 }
             }
         }
@@ -593,7 +598,7 @@ function map(xs, fn) {
     return function *mapIterator() {
         for (let x of xs) {
             let res = fn(x);
-            if (!strictEquals(javaScriptTypes.undefined, type(res))) yield res;
+            if (!strictEquals(javaScriptTypes.Undefined, type(res))) yield res;
         }
     };
 }
@@ -609,9 +614,7 @@ function sortBy(xs, orderObject) {
     return function *orderByIterator() {
         //gather all data from the xs before sorting
         var x_s = sortData(toArray(xs), orderObject);
-        for (let x of x_s) {
-            if (javaScriptTypes.undefined !== typeof x) yield x;
-        }
+        for (let x of x_s) yield x;
     };
 }
 
@@ -778,6 +781,10 @@ function findIndex(xs, comparer = strictEquals, context) {
  */
 function findLastIndex(xs, comparer = strictEquals, context) {
     return toArray(xs).reverse().findIndex(comparer, context || this);
+}
+
+function unfold() {
+
 }
 
 export { all, any, except, intersect, union, map, chain, groupBy, sortBy, prepend, concat, groupJoin, join, zip, filter, intersperse,

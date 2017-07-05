@@ -46,7 +46,7 @@ var debounceSubscriber = Object.create(subscriber, {
     },
     tearDownTimeout: {
         value: function _tearDownTimeout() {
-            if (this.id && javaScriptTypes.number === typeof this.id) {
+            if (this.id && javaScriptTypes.Number === typeof this.id) {
                 clearTimeout(this.id);
                 this.id = null;
             }

@@ -173,7 +173,7 @@ var isArray = data => Array.isArray(data);
  * @param: {boolean} bool
  * @return: {boolean}
  */
-var isBoolean = bool => javaScriptTypes.boolean === type(bool);
+var isBoolean = bool => javaScriptTypes.Boolean === type(bool);
 
 /**
  * isFunction :: a -> Boolean
@@ -181,7 +181,7 @@ var isBoolean = bool => javaScriptTypes.boolean === type(bool);
  * @param: {function} fn
  * @return: {boolean}
  */
-var isFunction = fn => javaScriptTypes.function === type(fn);
+var isFunction = fn => javaScriptTypes.Function === type(fn);
 
 /**
  * isObject :: a -> Boolean
@@ -189,7 +189,7 @@ var isFunction = fn => javaScriptTypes.function === type(fn);
  * @param: item
  * @return: {boolean}
  */
-var isObject = item => javaScriptTypes.object === type(item) && null !== item;
+var isObject = item => javaScriptTypes.Object === type(item) && null !== item;
 
 /**
  * @description:
@@ -210,7 +210,7 @@ var isNull = n => type(n) && null === n;
  * @param: {number} num
  * @return: {boolean}
  */
-var isNumber = num => javaScriptTypes.number == type(num);
+var isNumber = num => javaScriptTypes.Number == type(num);
 
 /**
  * @description:
@@ -224,21 +224,21 @@ var isSomething = x => null != x;
  * @param: {string} str
  * @return: {boolean}
  */
-var isString = str => javaScriptTypes.string === type(str);
+var isString = str => javaScriptTypes.String === type(str);
 
 /**
  * @description:
  * @param: {Symbol} sym
  * @return: {boolean}
  */
-var isSymbol = sym => javaScriptTypes.symbol === type(sym);
+var isSymbol = sym => javaScriptTypes.Symbol === type(sym);
 
 /**
  * @description:
  * @param: {*} u
  * @return: {boolean}
  */
-var isUndefined = u => javaScriptTypes.undefined === type(u);
+var isUndefined = u => javaScriptTypes.Undefined === type(u);
 
 /**
  * @description:

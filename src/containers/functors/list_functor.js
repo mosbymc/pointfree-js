@@ -695,6 +695,9 @@ var ordered_list_functor = Object.create(list_core, {
 function List(source) {
     //TODO: should I exclude strings from being used as a source directly, or allow it because
     //TODO: they have an iterator?
+
+    //TODO: I need to fix this for cases where a generator has been passed as the source - this can
+    //TODO: also work with the unfolding capability I want to add
     return createListDelegateInstance(source && source[Symbol.iterator] ? source : wrap(source));
 }
 

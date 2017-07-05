@@ -7,16 +7,26 @@ var generatorProto = Object.getPrototypeOf(function *_generator(){});
 
 /**
  * @description
- * @type {{function: string, object: string, boolean: string, number: string, symbol: string, string: string, undefined: string}}
+ * @type {{Function: string, object: string, boolean: string, number: string, symbol: string, string: string, undefined: string}}
  */
 var javaScriptTypes = {
-    'function': 'function',
-    'object': 'object',
-    'boolean': 'boolean',
-    'number': 'number',
-    'symbol': 'symbol',
-    'string': 'string',
-    'undefined': 'undefined'
+    Function: 'function',
+    Object: 'object',
+    Boolean: 'boolean',
+    Number: 'number',
+    Symbol: 'symbol',
+    String: 'string',
+    Undefined: 'undefined'
+};
+
+var typeName = {
+    'boolean': typeof true,
+    'function': typeof Function,
+    'number': typeof 0,
+    'object': typeof { a: 1 },
+    'string': typeof '',
+    'symbol': typeof Symbol.iterator,
+    'undefined': typeof void 0
 };
 
 /**
@@ -195,7 +205,7 @@ function genericCacher(collection, comparer) {
 function memoizer(fn, keyMaker) {
     var lookup = new Map();
     return function _memoized(...args) {
-        var key = javaScriptTypes.function === typeof keyMaker ? keyMaker(...args) : args;
+        var key = javaScriptTypes.Function === typeof keyMaker ? keyMaker(...args) : args;
         return lookup[key] || (lookup[key] = fn(...args));
     };
 }
@@ -206,7 +216,7 @@ function memoizer(fn, keyMaker) {
  * @returns: {*}
  */
 function deepClone(obj) {
-    if (null == obj || javaScriptTypes.object !== typeof obj)
+    if (null == obj || javaScriptTypes.Object !== typeof obj)
         return obj;
 
     if (Array.isArray(obj))
@@ -273,4 +283,4 @@ function emptyMonoidFactory(m) {
 */
 
 export { javaScriptTypes, sortDirection, observableStatus, sortComparer, cacher, memoizer,
-            deepClone, deepCopy, shallowClone, generatorProto, emptyObject, emptyMonoidFactory };
+            deepClone, deepCopy, shallowClone, generatorProto, emptyObject, emptyMonoidFactory, typeName };

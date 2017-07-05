@@ -208,6 +208,23 @@ var tryCatch = curry(function _tryCatch(catcher, tryer) {
  */
 var unary = (fn, arg) => curryN(this, 1, fn, undefined === arg ? [] : [arg]);
 
+function unfold(seed) {
+    return function *_unfold(fn) {
+
+    };
+}
+
+function unfoldWith(fn) {
+    return function *_unfold (value) {
+        let { next, element, done } = fn(value);
+
+        if (!done) {
+            yield element;
+            yield * _unfold(next);
+        }
+    }
+}
+
 /**
  * @description:
  * @param: {function} fn
