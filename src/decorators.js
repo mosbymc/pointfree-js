@@ -225,6 +225,17 @@ function unfoldWith(fn) {
     }
 }
 
+var hyloWith = curry(function _hylo(cata, ana, seed) {
+    let { next: n, element: acc, done } = ana(seed);
+    let { next, element } = ana(n); // not a monoid
+
+    while (!done) {
+        acc = cata(acc, element);
+        ({ next, element, done } = ana(next));
+    }
+    return acc
+});
+
 /**
  * @description:
  * @param: {function} fn
@@ -240,5 +251,5 @@ var voidFn = fn => (...args) => void fn(...args);
  */
 
 
-export { after, apply, before, binary, bindFunction, guardAfter, guardBefore, leftApply, maybe, not, once, repeat, rightApply,
+export { after, apply, before, binary, bindFunction, guardAfter, guardBefore, hyloWith, leftApply, maybe, not, once, repeat, rightApply,
         safe, tap, ternary, tryCatch, unary, voidFn };

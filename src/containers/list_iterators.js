@@ -1,5 +1,5 @@
 import { isArray, strictEquals, isObject, type } from '../functionalHelpers';
-import { not } from '../decorators';
+import { not, unfoldWith } from '../decorators';
 import { when, ifElse } from '../combinators';
 import { javaScriptTypes, sortDirection, cacher, typeName } from '../helpers';
 import { sortData } from  './sortHelpers';
@@ -783,10 +783,8 @@ function findLastIndex(xs, comparer = strictEquals, context) {
     return toArray(xs).reverse().findIndex(comparer, context || this);
 }
 
-function unfold() {
-
-}
+var unfold = unfoldWith;
 
 export { all, any, except, intersect, union, map, chain, groupBy, sortBy, prepend, concat, groupJoin, join, zip, filter, intersperse,
     contains, first, last, count, foldLeft, reduceRight, distinct, ofType, binarySearch, equals, take, takeWhile, skip, skipWhile, reverse,
-    copyWithin, fill, findIndex, findLastIndex, repeat, foldRight };
+    copyWithin, fill, findIndex, findLastIndex, repeat, foldRight, unfold };

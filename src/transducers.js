@@ -1,4 +1,4 @@
-import { compose } from './combinators'
+import { compose, curry } from './combinators'
 
 var mapping = (f) => (reducing) => (result, input) => reducing(result, f(input));
 
@@ -9,6 +9,17 @@ var transduce = (xform, reducing, initial, input) => input.reduce(xform(reducing
 var xform = compose(
     mapping((x) => x + 1),
     filtering((x) => 0 === x % 2));
+
+var xform2 = compose(
+    mapping(function _m(c) {
+        console.log('map', c);
+        return c + 1;
+    }),
+    filtering(function _f(c) {
+        console.log('filter', c);
+        return 0 === x % 2;
+    })
+);
 
 transduce(xform, (xs, x) => {
     xs.push(x);
@@ -104,3 +115,13 @@ var xs1 = compose(
     filtering(function _filterFunc(x) {
         return 0 === x % 2;
     }));
+
+
+var map = curry((mapFn, redFn) => (xs, x) => redFn(xs, mapFn(x)));
+var inc = reduce(map(add(1), concat), []);
+var filter = curry((predFn, redFn) => (xs, x) => predFn(x) ? redFn(xs, x) : xs);
+var greaterThanOne = reduce(filter(x => 1 < x, concat), []);
+
+
+var transduce2 = curry((xForm, f, init, coll) => reduce(xForm(f), init, coll));
+console.log(transduce2(map(add(1)), concat, [], [1, 2, 3, 4]));

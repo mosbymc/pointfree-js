@@ -1,7 +1,7 @@
 import { all, any, except, intersect, union, map, groupBy, sortBy, prepend, concat, groupJoin, join, zip, filter, intersperse,
     contains, first, last, count, foldLeft, reduceRight, distinct, ofType, binarySearch, equals, take, takeWhile, skip, skipWhile, reverse,
-    copyWithin, fill, findIndex, findLastIndex, repeat, foldRight } from '../list_iterators';
-import { sortDirection } from '../../helpers';
+    copyWithin, fill, findIndex, findLastIndex, repeat, foldRight, unfold } from '../list_iterators';
+import { sortDirection, generatorProto } from '../../helpers';
 import { wrap, defaultPredicate, delegatesTo, isArray } from '../../functionalHelpers';
 import { when } from '../../combinators';
 import { not } from '../../decorators';
@@ -698,6 +698,7 @@ function List(source) {
 
     //TODO: I need to fix this for cases where a generator has been passed as the source - this can
     //TODO: also work with the unfolding capability I want to add
+    if (delegatesTo(source, generatorProto)) return createListDelegateInstance(source());
     return createListDelegateInstance(source && source[Symbol.iterator] ? source : wrap(source));
 }
 
@@ -719,6 +720,17 @@ List.from = function _from(source) {
  * @return: {@see list_core}
  */
 List.of = List.from;
+
+/**
+ * @type:
+ * @description:
+ * @param: {function|generator} fn
+ * @param: {*} seed
+ * @return: {@see list_functor}
+ */
+List.unfold = function _unfold(fn, seed) {
+    return createListDelegateInstance(unfold(fn)(seed));
+};
 
 /**
  * @description:

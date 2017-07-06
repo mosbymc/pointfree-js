@@ -36,6 +36,8 @@ var c = curry(function _c(x, y, z) {
     return x(y)(z);
 });
 
+var rev = (...args) => args.reverse();
+
 /**
  * compose :: (b -> c) -> (a -> b) -> (a -> c)
  * @description:
@@ -45,7 +47,8 @@ var c = curry(function _c(x, y, z) {
  * @returns: {*}
  */
 function compose(...fns) {
-    return pipe(...fns.reverse());
+    fns = fns.reverse();
+    return pipe(...fns);
 }
 
 /**

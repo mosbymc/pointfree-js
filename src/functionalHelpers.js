@@ -409,7 +409,15 @@ var type = a => typeof a;
  */
 var wrap = data => [data];
 
+function reverse(...args) {
+    if (1 === args.length) {
+        if ('string' === typeof args[0]) return args[0].split('').reverse().join();
+        return args;
+    }
+    return args.reverse();
+}
+
 export { add, adjust, and, arraySet, concat, defaultPredicate, delegatesFrom, delegatesTo, divide, equals, falsey, flip,
         getWith, greaterThan, greaterThanOrEqual, isArray, isBoolean, isFunction, isObject, isNothing, isNull, isNumber,
         isSomething, isString, isSymbol, isUndefined, lessThan, lessThanOrEqual, modulus, multiple, negate, notEqual, noop,
-        nth, objectSet, once, or, set, strictEquals, strictNotEqual, subtract, truthy, type, wrap };
+        nth, objectSet, once, or, set, strictEquals, strictNotEqual, subtract, truthy, type, wrap, reverse };

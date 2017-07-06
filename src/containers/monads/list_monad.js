@@ -1,6 +1,6 @@
 import { list_functor, ordered_list_functor, list_core } from '../functors/list_functor';
 import { sortDirection } from '../../helpers';
-import { groupBy, groupJoin, chain } from '../list_iterators';
+import { groupBy, groupJoin, chain, unfold } from '../list_iterators';
 import { wrap } from '../../functionalHelpers';
 import { identity } from '../../combinators';
 import { createListCreator } from '../list_helpers';
@@ -36,6 +36,17 @@ List.from = function _from(source) {
  * @return: {@see list_monad}
  */
 List.of = List.from;
+
+/**
+ * @type:
+ * @description:
+ * @param: {function|generator} fn
+ * @param: {*} seed
+ * @return: {@see list_monad}
+ */
+List.unfold = function _unfold(fn, seed) {
+    return createListDelegateInstance(unfold(fn)(seed));
+};
 
 /**
  * @description:
