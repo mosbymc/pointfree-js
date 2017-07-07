@@ -1,4 +1,4 @@
-import { disjunctionEqualMaker, pointMaker, stringMaker, valueOf, sharedEitherFns } from '../containerHelpers';
+import { disjunctionEqualMaker, pointMaker, stringMaker, valueOf, get, orElse, getOrElse, sharedEitherFns } from '../containerHelpers';
 
 function Either(val, fork) {
     return 'right' === fork ?
@@ -100,7 +100,34 @@ var right_functor = {
      * @return: {@see either_functor}
      */
     map: sharedEitherFns.rightMap,
+    /**
+     * @type:
+     * @description:
+     * @param: {function} f
+     * @param: {function} g
+     * @return: {@see right_functor}
+     */
     bimap: sharedEitherFns.rightBiMap,
+    /**
+     * @type:
+     * @description:
+     * @return: {*}
+     */
+    get: get,
+    /**
+     * @type:
+     * @description:
+     * @param: {*} x
+     * @return: {*}
+     */
+    getOrElse: getOrElse,
+    /**
+     * @type:
+     * @description:
+     * @param: {function} f
+     * @return: {@see right_functor}
+     */
+    orElse: orElse,
     factory: Either
 };
 
@@ -145,12 +172,22 @@ var left_functor = {
      */
     bimap: sharedEitherFns.leftBimapMaker(Left),
     /**
+     * @type:
      * @description:
-     * @param: {functor} ma
-     * @return: {boolean}
+     * @param: {*} x
+     * @return: {*}
      */
-    equals: function _equals(ma) {
-        return Object.getPrototypeOf(this).isPrototypeOf(ma) && ma.isLeft && this.value === ma.value;
+    getOrElse: function _getOrElse(x) {
+        return x;
+    },
+    /**
+     * @type:
+     * @description:
+     * @param: {function} f
+     * @return: {*}
+     */
+    orElse: function _orElse(f) {
+        return f();
     },
     factory: Either
 };
@@ -159,7 +196,7 @@ var left_functor = {
  * @description:
  * @return:
  */
-//left_functor.equals = disjunctionEqualMaker(left_functor, 'isLeft');
+left_functor.equals = disjunctionEqualMaker(left_functor, 'isLeft');
 
 /**
  * @description:

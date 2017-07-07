@@ -1,4 +1,4 @@
-import { equalMaker, pointMaker, stringMaker, valueOf } from '../containerHelpers';
+import { equalMaker, pointMaker, stringMaker, valueOf, get, orElse, getOrElse } from '../containerHelpers';
 
 /**
  * @description:
@@ -45,7 +45,42 @@ var identity_functor = {
     map: function _map(fn) {
         return this.of(fn(this.value));
     },
-
+    /**
+     * @type:
+     * @description:
+     * @return: {*}
+     */
+    get: get,
+    /**
+     * @type:
+     * @description:
+     * @param: {function} f
+     * @return: {*}
+     */
+    orElse: orElse,
+    /**
+     * @type:
+     * @description:
+     * @param: {*} x
+     * @return: {*}
+     */
+    getOrElse: getOrElse,
+    /**
+     * @description:
+     * @param: {*} item
+     * @return: {@see identity_functor}
+     */
+    of: pointMaker(Identity),
+    /**
+     * @description:
+     * @return: {*}
+     */
+    valueOf: valueOf,
+    /**
+     * @description:
+     * @return: {string}
+     */
+    toString: stringMaker('Identity'),
     /**
      * @description:
      * @return:
@@ -59,25 +94,6 @@ var identity_functor = {
  * @return: {boolean}
  */
 identity_functor.equals = equalMaker(identity_functor);
-
-/**
- * @description:
- * @param: {*} item
- * @return: {@see identity_functor}
- */
-identity_functor.of = pointMaker(Identity);
-
-/**
- * @description:
- * @return: {*}
- */
-identity_functor.valueOf = valueOf;
-
-/**
- * @description:
- * @return: {string}
- */
-identity_functor.toString = stringMaker('Identity');
 
 
 //Since FantasyLand is the defacto standard for JavaScript algebraic data structures, and I want to maintain

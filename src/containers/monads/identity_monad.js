@@ -58,11 +58,6 @@ var identity_monad = Object.create(identity_functor, {
             return f(this.value).map(this.of);
         }
     },
-    traverse3: {
-        value: function _traverse3(a, f) {
-            return this.apply(f(this.value));
-        }
-    },
     empty: {
         value: function _empty() {
             return this.of(Object.create(emptyObject));

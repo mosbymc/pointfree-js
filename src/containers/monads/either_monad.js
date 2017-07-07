@@ -156,7 +156,7 @@ var left_monad = Object.create(left_functor, {
     },
     traverse: {
         value: function _traverse(a, f) {
-            return a.of(this.of(this.value));
+            return a.of(Left(this.value));
         }
     },
     factory: {

@@ -1,3 +1,15 @@
+function get() {
+    return this.value;
+}
+
+function orElse(f) {
+    return this.value;
+}
+
+function getOrElse(x) {
+    return this.value;
+}
+
 function apply(ma) {
     return ma.map(this.value);
 }
@@ -113,5 +125,5 @@ var sharedEitherFns = {
     leftBimapMaker
 };
 
-export { apply, chainMaker, disjunctionEqualMaker, equalMaker, maybeFactoryHelper, mjoin, pointMaker, stringMaker, valueOf,
+export { apply, chainMaker, disjunctionEqualMaker, equalMaker, maybeFactoryHelper, mjoin, pointMaker, stringMaker, valueOf, get, orElse, getOrElse,
         sharedMaybeFns, sharedEitherFns };

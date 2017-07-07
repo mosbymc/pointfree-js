@@ -172,6 +172,12 @@ var just_functor = {
     },
     map: sharedMaybeFns.justMap,
     bimap: sharedMaybeFns.justBimap,
+    getOrElse: function _getOrElse(x) {
+        return this.value;
+    },
+    orElse: function _orElse(f) {
+        return this;
+    },
     factory: Just
 };
 
@@ -205,6 +211,12 @@ var nothing_functor = {
     },
     map: sharedMaybeFns.nothingMapMaker(Nothing),
     bimap: sharedMaybeFns.nothingBimapMaker(Nothing),
+    getOrElse: function _getOrElse(x) {
+        return x;
+    },
+    orElse: function _orElse(f) {
+        return f();
+    },
     toString: function _toString() {
         return `Nothing()`;
     },

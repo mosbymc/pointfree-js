@@ -180,17 +180,6 @@ describe('Identity monad test', function _testIdentityMonad() {
             //Traversable Identity
             Identity(2).traverse(monads.Maybe, monads.Maybe.of).toString().should.eql(monads.Maybe.of(Identity(2)).toString());
 
-            function test(val) {
-                return monads.Maybe(5 + val);
-            }
-
-            var wq = Identity(10);
-
-            console.log(wq.traverse(monads.Maybe, test).toString());
-            var bpb = Identity(monads.Maybe(10));
-
-            console.log(bpb.traverse(monads.Maybe, test2).toString());
-
             function test2(val) {
                 return monads.Maybe(val.value + 5);
             }
@@ -210,8 +199,16 @@ describe('Identity monad test', function _testIdentityMonad() {
             }
             var nullableTraverse = fromNullable(traverseMap);
 
-            console.log(Identity(2).traverse(monads.Maybe, nullableTraverse));
-            console.log(Object.getPrototypeOf(Identity(2).traverse(monads.Maybe, nullableTraverse)));
+            function test4(val) {
+                return monads.Either(2 * val, 'right').traverse(Identity, test5);
+            }
+
+            function test5(val) {
+                return monads.Maybe(val + 2);
+            }
+
+            Identity(10).traverse(monads.Maybe, test4).toString().should.eql(monads.Just(Identity(monads.Right(22))).toString());
+
 
 
             //var yy = mona.of(identity(10));

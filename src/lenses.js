@@ -1,5 +1,6 @@
-import { arraySet, objectSet } from './functionalHelpers';
-import { curry, compose, identity, kestrel } from './combinators';
+import { arraySet, objectSet, isArray } from './functionalHelpers';
+import { curry, compose, identity, kestrel, when } from './combinators';
+import { Maybe } from './containers/monads/maybe_monad';
 
 /**
  * @description:
@@ -88,5 +89,21 @@ function lensPath(...path) {
         return 'string' === typeof p ? objectLens(p) : arrayLens(p);
     }));
 }
+
+var maybePath = curry(function _maybePath(path, obj) {
+    path = when(not(isArray), split('.'), path);
+    var val = obj,
+        idx = 0;
+    while (idx < path.length) {
+        if (null == val) return Maybe.Nothing();
+        val = val[path[idx]];
+        ++idx;
+    }
+    return Maybe(val);
+});
+
+var split = curry(function _split(delimiter, string) {
+    return string.split(delimiter);
+});
 
 export { arrayLens, objectLens, view, over, put, makeLenses, lensPath };

@@ -123,7 +123,7 @@ var nothing_monad = Object.create(nothing_functor, {
     },
     fold: {
         value: function _fold(fn, x) {
-            return this.of();
+            return Nothing();
         }
     },
     sequence: {
