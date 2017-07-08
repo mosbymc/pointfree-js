@@ -1,6 +1,9 @@
 import { arraySet, objectSet, isArray } from './functionalHelpers';
-import { curry, compose, identity, kestrel, when } from './combinators';
+import { curry, compose, kestrel, when } from './combinators';
 import { Maybe } from './containers/monads/maybe_monad';
+import { Identity } from './containers/monads/identity_monad';
+import { Constant } from './containers/monads/constant_monad';
+import { mapWith } from './pointlessContainers';
 
 /**
  * @description:
@@ -11,7 +14,7 @@ import { Maybe } from './containers/monads/maybe_monad';
  * @return: {Array}
  */
 var arrayLens = curry(function _arrayLens(idx, f, xs) {
-    return map(function (val) {
+    return mapWith(function (val) {
         return arraySet(idx, val, xs)
     }, f(xs[idx]));
 });
@@ -25,7 +28,7 @@ var arrayLens = curry(function _arrayLens(idx, f, xs) {
  * @return: {Object}
  */
 var objectLens = curry(function _objectLens(prop, f, xs) {
-    return map(function _map(rep) {
+    return mapWith(function _map(rep) {
         return objectSet(prop, rep, xs);
     }, f(xs[prop]));
 });
@@ -38,7 +41,7 @@ var objectLens = curry(function _objectLens(prop, f, xs) {
  * @return:
  */
 var view = curry(function _view(lens, target) {
-    return lens(kestrel)(target).value;
+    return lens(Constant)(target).value;
 });
 
 /**
@@ -47,11 +50,11 @@ var view = curry(function _view(lens, target) {
  * @param: {function} lens
  * @param: {function} mapFn
  * @param: {Object} target
- * @return:
+ * @return: {*}
  */
 var over = curry(function _over(lens, mapFn, target) {
     return lens(function _lens(y) {
-        return identity(mapFn(y));
+        return Identity(mapFn(y));
     })(target).value;
 });
 
@@ -61,11 +64,21 @@ var over = curry(function _over(lens, mapFn, target) {
  * @param: {function} lens
  * @param: {*} val
  * @param: {*} target
- * @return:
+ * @return: {*}
  */
 var put = curry(function _put(lens, val, target) {
     return over(lens, kestrel(val), target);
 });
+
+/**
+ * @type: {*}
+ * @description:
+ * @param: {function} lens
+ * @param: {*} val
+ * @param: {Object} targetData
+ * @return: {*}
+ */
+var set = curry((lens, val, targetData) => over(lens, kestrel(val), targetData));
 
 /**
  * @description:
@@ -90,6 +103,27 @@ function lensPath(...path) {
     }));
 }
 
+/**
+ * @type: {*}
+ * @description:
+ * @param: {function} getter
+ * @param: {function} setter
+ * @param: {String} key
+ * @param: {function} f
+ * @param: {Array} xs
+ * @return: {*}
+ */
+var lens = curry(function _lens(getter, setter, key, f, xs) {
+    return mapWith(replace => setter(key, replace, xs), f(getter(key, xs)));
+});
+
+/**
+ * @type" {*}
+ * @description:
+ * @param: {Array|String} path
+ * @param: {Object} obj
+ * @return: {*}
+ */
 var maybePath = curry(function _maybePath(path, obj) {
     path = when(not(isArray), split('.'), path);
     var val = obj,
@@ -102,8 +136,15 @@ var maybePath = curry(function _maybePath(path, obj) {
     return Maybe(val);
 });
 
+/**
+ * @type {*}
+ * @description:
+ * @param: {String} delimiter
+ * @param: {String} string
+ * @return: {Array}
+ */
 var split = curry(function _split(delimiter, string) {
     return string.split(delimiter);
 });
 
-export { arrayLens, objectLens, view, over, put, makeLenses, lensPath };
+export { arrayLens, objectLens, view, over, put, set, lens, maybePath, makeLenses, lensPath };
