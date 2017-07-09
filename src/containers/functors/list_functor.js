@@ -845,5 +845,17 @@ list_core.constructor = list_core.factory;
 list_core.fold = list_core.foldl;
 list_core.reduce = list_core.foldl;
 
+/**
+ * @description: Since the constant functor does not represent a disjunction, the List's
+ * bimap function property behaves just as its map function property. It is merely here as a
+ * convenience so that swapping out functors/monads does not break an application that is
+ * relying on its existence.
+ * @type: {{function}}
+ * @param: {function} f
+ * @param: {function} g
+ * @return: {@see list_core}
+ */
+list_core.bimap = list_core.map;
+
 
 export { List, list_core, list_functor, ordered_list_functor };

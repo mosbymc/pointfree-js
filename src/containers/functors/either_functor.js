@@ -128,6 +128,9 @@ var right_functor = {
      * @return: {@see right_functor}
      */
     orElse: orElse,
+    of: pointMaker(Right),
+    valueOf: valueOf,
+    toString: stringMaker('Right'),
     factory: Either
 };
 
@@ -136,24 +139,6 @@ var right_functor = {
  * @return:
  */
 right_functor.equals = disjunctionEqualMaker(right_functor, 'isRight');
-
-/**
- * @description:
- * @return:
- */
-right_functor.of = pointMaker(Right);
-
-/**
- * @description:
- * @return:
- */
-right_functor.valueOf = valueOf;
-
-/**
- * @description:
- * @return:
- */
-right_functor.toString = stringMaker('Right');
 
 var left_functor = {
     get value() {
@@ -189,6 +174,9 @@ var left_functor = {
     orElse: function _orElse(f) {
         return f();
     },
+    of: pointMaker(Right),
+    valueOf: valueOf,
+    toString: stringMaker('Left'),
     factory: Either
 };
 
@@ -197,27 +185,6 @@ var left_functor = {
  * @return:
  */
 left_functor.equals = disjunctionEqualMaker(left_functor, 'isLeft');
-
-/**
- * @description:
- * @return:
- */
-left_functor.of = pointMaker(Right);
-
-/**
- * @description:
- * @return:
- */
-left_functor.valueOf = valueOf;
-
-/**
- * @description:
- * @return:
- */
-left_functor.toString = stringMaker('Left');
-
-
-
 
 function fromNullable(x) {
     return null != x ? Right(x) : Left(x);

@@ -93,6 +93,18 @@ var constant_functor = {
 constant_functor.equals = equalMaker(constant_functor);
 
 /**
+ * @description: Since the constant functor does not represent a disjunction, the Constant's
+ * bimap function property behaves just as its map function property. It is merely here as a
+ * convenience so that swapping out functors/monads does not break an application that is
+ * relying on its existence.
+ * @type: {{function}}
+ * @param: {function} f
+ * @param: {function} g
+ * @return: {@see constant_functor}
+ */
+constant_functor.bimap = constant_functor.map;
+
+/**
  * @description: sigh.... awesome spec ya got there fantasy-land. Yup, good thing you guys understand
  * JS and aren't treating it like a static, strongly-typed, class-based language with inheritance...
  * cause, ya know... that would be ridiculous if we were going around pretending there is such a thing

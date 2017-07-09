@@ -87,30 +87,11 @@ var future_functor = {
     equals: function _equals(ma) {
         return Object.getPrototypeOf(this).isPrototypeOf(ma);
     },
+    of: pointMaker(Future),
+    valueOf: valueOf,
+    toString: stringMaker('Future'),
     factory: Future
 };
-
-/**
- * @description:
- * @return:
- */
-future_functor.of = pointMaker(Future);
-
-/**
- * @description:
- * @return:
- */
-future_functor.valueOf = valueOf;
-
-/**
- * @description:
- * @return:
- */
-future_functor.toString = stringMaker('Future');
-
-
-
-
 
 //Since FantasyLand is the defacto standard for JavaScript algebraic data structures, and I want to maintain
 //compliance with the standard, a .constructor property must be on the container delegators. In this case, its

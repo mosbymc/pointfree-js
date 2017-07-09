@@ -95,6 +95,18 @@ var identity_functor = {
  */
 identity_functor.equals = equalMaker(identity_functor);
 
+/**
+ * @description: Since the constant functor does not represent a disjunction, the Identity's
+ * bimap function property behaves just as its map function property. It is merely here as a
+ * convenience so that swapping out functors/monads does not break an application that is
+ * relying on its existence.
+ * @type: {{function}}
+ * @param: {function} f
+ * @param: {function} g
+ * @return: {@see identity_functor}
+ */
+identity_functor.bimap = identity_functor.map;
+
 
 //Since FantasyLand is the defacto standard for JavaScript algebraic data structures, and I want to maintain
 //compliance with the standard, a .constructor property must be on the container delegators. In this case, its

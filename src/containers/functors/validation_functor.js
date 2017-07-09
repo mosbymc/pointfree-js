@@ -20,6 +20,12 @@ Validation.of = function _of(val) {
 Validation.is = f => validation_functor.isPrototypeOf(f);
 
 var validation_functor = {
+    map: function _map(fn) {
+        return this.of(fn(this.value));
+    },
+    of: pointMaker(Validation),
+    valueOf: valueOf,
+    toString: stringMaker('Validation'),
     factory: Validation
 };
 
@@ -30,22 +36,16 @@ var validation_functor = {
 validation_functor.equals = equalMaker(validation_functor);
 
 /**
- * @description:
- * @return:
+ * @description: Since the constant functor does not represent a disjunction, the Validation's
+ * bimap function property behaves just as its map function property. It is merely here as a
+ * convenience so that swapping out functors/monads does not break an application that is
+ * relying on its existence.
+ * @type: {{function}}
+ * @param: {function} f
+ * @param: {function} g
+ * @return: {@see validation_functor}
  */
-validation_functor.of = pointMaker(Validation);
-
-/**
- * @description:
- * @return:
- */
-validation_functor.valueOf = valueOf;
-
-/**
- * @description:
- * @return:
- */
-validation_functor.toString = stringMaker('Validation');
+validation_functor.bimap = validation_functor.map;
 
 
 

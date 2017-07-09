@@ -51,6 +51,9 @@ var io_functor = {
     runIo: function _runIo(...args) {
         return this.value(...args);
     },
+    of: pointMaker(Io),
+    valueOf: valueOf,
+    toString: stringMaker('Io'),
     factory: Io
 };
 
@@ -61,22 +64,16 @@ var io_functor = {
 io_functor.equals = equalMaker(io_functor);
 
 /**
- * @description:
- * @return:
+ * @description: Since the constant functor does not represent a disjunction, the Io's
+ * bimap function property behaves just as its map function property. It is merely here as a
+ * convenience so that swapping out functors/monads does not break an application that is
+ * relying on its existence.
+ * @type: {{function}}
+ * @param: {function} f
+ * @param: {function} g
+ * @return: {@see io_functor}
  */
-io_functor.of = pointMaker(Io);
-
-/**
- * @description:
- * @return:
- */
-io_functor.valueOf = valueOf;
-
-/**
- * @description:
- * @return:
- */
-io_functor.toString = stringMaker('IO');
+io_functor.bimap = io_functor.map;
 
 
 

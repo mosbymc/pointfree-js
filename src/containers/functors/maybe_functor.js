@@ -178,6 +178,9 @@ var just_functor = {
     orElse: function _orElse(f) {
         return this;
     },
+    of: pointMaker(Just),
+    valueOf: valueOf,
+    toString: stringMaker('Just'),
     factory: Just
 };
 
@@ -186,24 +189,6 @@ var just_functor = {
  * @return:
  */
 just_functor.equals = disjunctionEqualMaker(just_functor, 'isJust');
-
-/**
- * @description:
- * @return:
- */
-just_functor.of = pointMaker(Just);
-
-/**
- * @description:
- * @return:
- */
-just_functor.valueOf = valueOf;
-
-/**
- * @description:
- * @return:
- */
-just_functor.toString = stringMaker('Just');
 
 var nothing_functor = {
     get value() {
@@ -217,6 +202,8 @@ var nothing_functor = {
     orElse: function _orElse(f) {
         return f();
     },
+    of: pointMaker(Just),
+    valueOf: valueOf,
     toString: function _toString() {
         return `Nothing()`;
     },
@@ -228,18 +215,6 @@ var nothing_functor = {
  * @return:
  */
 nothing_functor.equals = disjunctionEqualMaker(nothing_functor, 'isNothing');
-
-/**
- * @description:
- * @return:
- */
-nothing_functor.of = pointMaker(Just);
-
-/**
- * @description:
- * @return:
- */
-nothing_functor.valueOf = valueOf;
 
 
 //Since FantasyLand is the defacto standard for JavaScript algebraic data structures, and I want to maintain
