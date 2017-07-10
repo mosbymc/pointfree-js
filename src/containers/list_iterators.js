@@ -274,6 +274,14 @@ function foldLeft(xs, fn, initial = 0) {
     return toArray(xs).reduce(fn, initial);
 }
 
+/**
+ * @description:
+ * @type:
+ * @param: {Array} arr
+ * @param: {function} op
+ * @param: {*} acc
+ * @return: {*}
+ */
 function foldRight(arr, op, acc) {
     var len = arr.length,
         res = acc || arr[--len];
