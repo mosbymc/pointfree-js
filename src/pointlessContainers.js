@@ -107,6 +107,17 @@ var mcompose = function _mcompose(f, g) {
 
 /**
  * @description:
+ * @type: {*}
+ * @param: {*} val
+ * @param: {@see state_functor} fa
+ * @return: {@see state_functor}
+ */
+var put = curry(function _put(val, fa) {
+    return fa.put(val);
+});
+
+/**
+ * @description:
  * @type: {function}
  * @param: {function} f
  * @param: {functor} m1

@@ -12,6 +12,11 @@ function Io(item) {
             value: item,
             writable: false,
             configurable: false
+        },
+        run: {
+            value: item,
+            writable: false,
+            configurable: false
         }
     });
 }
@@ -46,10 +51,10 @@ var io_functor = {
         return this._value;
     },
     map: function _map(fn) {
-        return this.of(compose(fn, this.value));
+        return this.chain(a => Io.of(fn(a)));
     },
     runIo: function _runIo(...args) {
-        return this.value(...args);
+        return this.run(...args);
     },
     of: pointMaker(Io),
     valueOf: valueOf,
