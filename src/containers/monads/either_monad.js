@@ -126,6 +126,11 @@ var right_monad = Object.create(right_functor, {
             return f(this.value).map(this.of);
         }
     },
+    of: {
+        value: pointMaker(Right),
+        writable: false,
+        configurable: false
+    },
     factory: {
         value: Either
     }
@@ -134,7 +139,6 @@ var right_monad = Object.create(right_functor, {
 right_monad.chain = chainMaker(right_monad);
 right_monad.mjoin = mjoin;
 right_monad.apply = apply;
-right_monad.of = pointMaker(Right);
 
 
 var left_monad = Object.create(left_functor, {
@@ -159,6 +163,11 @@ var left_monad = Object.create(left_functor, {
             return a.of(Left(this.value));
         }
     },
+    of: {
+        value: pointMaker(Right),
+        writable: false,
+        configurable: false
+    },
     factory: {
         value: Either
     }
@@ -167,7 +176,6 @@ var left_monad = Object.create(left_functor, {
 left_monad.chain = chainMaker(left_monad);
 left_monad.mjoin = mjoin;
 left_monad.apply = apply;
-left_monad.of = pointMaker(Right);
 
 
 

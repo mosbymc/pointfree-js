@@ -103,6 +103,11 @@ var just_monad = Object.create(just_functor, {
             return Nothing();
         }
     },
+    of: {
+        value: pointMaker(Maybe),
+        writable: false,
+        configurable: false
+    },
     factory: {
         value: Maybe
     }
@@ -111,7 +116,6 @@ var just_monad = Object.create(just_functor, {
 just_monad.chain = chainMaker(just_monad);
 just_monad.mjoin = mjoin;
 just_monad.apply = apply;
-just_monad.of = pointMaker(Maybe);
 
 
 var nothing_monad = Object.create(nothing_functor, {
@@ -141,6 +145,11 @@ var nothing_monad = Object.create(nothing_functor, {
             return Nothing();
         }
     },
+    of: {
+        value: pointMaker(Maybe),
+        writable: false,
+        configurable: false
+    },
     factory: {
         value: Maybe
     }
@@ -149,7 +158,6 @@ var nothing_monad = Object.create(nothing_functor, {
 nothing_monad.chain = chainMaker(nothing_monad);
 nothing_monad.mjoin = mjoin;
 nothing_monad.apply = apply;
-nothing_monad.of = pointMaker(Maybe);
 
 
 

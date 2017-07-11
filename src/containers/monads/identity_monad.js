@@ -68,6 +68,11 @@ var identity_monad = Object.create(identity_functor, {
             return emptyObject.isPrototypeOf(this.value);
         }
     },
+    of: {
+        value: pointMaker(Identity),
+        writable: false,
+        configurable: false
+    },
     factory: {
         value: Identity
     }
@@ -76,7 +81,6 @@ var identity_monad = Object.create(identity_functor, {
 identity_monad.chain = chainMaker(identity_monad);
 identity_monad.mjoin = mjoin;
 identity_monad.apply = apply;
-identity_monad.of = pointMaker(Identity);
 
 identity_monad.ap = identity_monad.apply;
 identity_monad.fmap = identity_monad.chain;

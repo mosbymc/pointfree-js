@@ -41,6 +41,11 @@ var io_monad = Object.create(io_functor, {
             });
         }
     },
+    of: {
+        value: pointMaker(Io),
+        writable: false,
+        configurable: false
+    },
     factory: {
         value: Io
     }
@@ -49,7 +54,6 @@ var io_monad = Object.create(io_functor, {
 io_monad.chain = chainMaker(io_monad);
 io_monad.mjoin = mjoin;
 io_monad.apply = apply;
-io_monad.of = pointMaker(Io);
 
 io_monad.ap =io_monad.apply;
 io_monad.fmap = io_monad.chain;

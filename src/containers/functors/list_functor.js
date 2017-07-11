@@ -2,7 +2,7 @@ import { all, any, except, intersect, union, map, groupBy, sortBy, prepend, conc
     contains, first, last, count, foldLeft, reduceRight, distinct, ofType, binarySearch, equals, take, takeWhile, skip, skipWhile, reverse,
     copyWithin, fill, findIndex, findLastIndex, repeat, foldRight, unfold } from '../list_iterators';
 import { sortDirection, generatorProto } from '../../helpers';
-import { wrap, defaultPredicate, delegatesTo, isArray } from '../../functionalHelpers';
+import { wrap, defaultPredicate, delegatesTo, isArray, noop } from '../../functionalHelpers';
 import { when } from '../../combinators';
 import { not } from '../../decorators';
 import { createListCreator } from '../list_helpers';
@@ -48,6 +48,7 @@ import { createListCreator } from '../list_helpers';
  * first: {function} _first,
  * foldLeft: {function} _foldl,
  * foldr: {function} _foldr,
+ * isEmpty: {function} _isEmpty,
  * last: {function} _last,
  * reduceRight: {function} _reduceRight,
  * toArray: {function} _toArray,
@@ -435,6 +436,15 @@ var list_core = {
     },
 
     /**
+     * @type:
+     * @description:
+     * @return: {boolean}
+     */
+    isEmpty: function _isEmpty() {
+        return 0 === this.data.length;
+    },
+
+    /**
      * @description:
      * @param: {function} predicate
      * @return: {*}
@@ -690,7 +700,7 @@ var ordered_list_functor = Object.create(list_core, {
  * and, if it has an iterator defined, with set it as the underlying source of the List as is,
  * or, wrap the item in an array if there is no defined iterator.
  * @param: {*} source - Any type, any value; used as the underlying source of the List
- * @return: {@see list_core} - A new List instance with the value provided as the underlying source.
+ * @return: {@see list_functor} - A new List instance with the value provided as the underlying source.
  */
 function List(source) {
     //TODO: should I exclude strings from being used as a source directly, or allow it because
@@ -706,7 +716,7 @@ function List(source) {
  * @description: Convenience function for listCreate a new List instance; internally calls List.
  * @see: List
  * @param: {*} source - Any type, any value; used as the underlying source of the List
- * @return: {@see list_core} - A new List instance with the value provided as the underlying source.
+ * @return: {@see list_functor} - A new List instance with the value provided as the underlying source.
  */
 List.from = function _from(source) {
     return List(source);
@@ -717,9 +727,28 @@ List.from = function _from(source) {
  * @see: List.from
  * @type: {function}
  * @param: {*}
- * @return: {@see list_core}
+ * @return: {@see list_functor}
  */
 List.of = List.from;
+
+/**
+ * @type:
+ * @description:
+ * @return: {@see list_functor}
+ */
+List.empty = function _empty() {
+    return List([]);
+};
+
+/**
+ * @type:
+ * @description:
+ * @param: {*} val
+ * @return: {@see list_functor}
+ */
+List.just = function _just(val) {
+    return List([val]);
+};
 
 /**
  * @type:
@@ -740,13 +769,15 @@ List.unfold = function _unfold(fn, seed) {
 List.is = f => list_core.isPrototypeOf(f);
 
 /**
- * Generates a new list with the specified item repeated the specified number of times
+ * Generates a new list with the specified item repeated the specified number of times. Because
+ * this generates a list with the same item repeated n times, the resulting List is trivially
+ * sorted. Thus, a sorted List is returned rather than an unsorted list.
  * @param: {*} item
  * @param: {number} count
- * @return: {@see list_core}
+ * @return: {@see ordered_list_functor}
  */
 List.repeat = function _repeat(item, count) {
-    return List(repeat(item, count));
+    return createListDelegateInstance([], repeat(item, count), [{ keySelector: noop, comparer: noop, direction: sortDirection.descending }]);
 };
 
 /**

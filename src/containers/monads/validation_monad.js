@@ -23,6 +23,11 @@ Validation.of = function _of(val) {
 Validation.is = m => validation_monad.isPrototypeOf(m);
 
 var validation_monad = Object.create(validation_functor, {
+    of: {
+        value: pointMaker(Validation),
+        writable: false,
+        configurable: false
+    },
     factory: {
         value: Validation
     }
@@ -31,7 +36,6 @@ var validation_monad = Object.create(validation_functor, {
 validation_monad.chain = chainMaker(validation_monad);
 validation_monad.mjoin = mjoin;
 validation_monad.apply = apply;
-validation_monad.of = pointMaker(Validation);
 
 
 

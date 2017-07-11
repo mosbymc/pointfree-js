@@ -1,7 +1,7 @@
 import { list_functor, ordered_list_functor, list_core } from '../functors/list_functor';
 import { sortDirection } from '../../helpers';
-import { groupBy, groupJoin, chain, unfold } from '../list_iterators';
-import { wrap } from '../../functionalHelpers';
+import { groupBy, groupJoin, chain, unfold, repeat } from '../list_iterators';
+import { wrap, noop } from '../../functionalHelpers';
 import { identity } from '../../combinators';
 import { createListCreator } from '../list_helpers';
 
@@ -40,6 +40,25 @@ List.of = List.from;
 /**
  * @type:
  * @description:
+ * @return: {@see list_monad}
+ */
+List.empty = function _empty() {
+    return List([]);
+};
+
+/**
+ * @type:
+ * @description:
+ * @param: {*} val
+ * @return: {@see list_monad}
+ */
+List.just = function _just(val) {
+    return List([val]);
+};
+
+/**
+ * @type:
+ * @description:
  * @param: {function|generator} fn
  * @param: {*} seed
  * @return: {@see list_monad}
@@ -54,6 +73,18 @@ List.unfold = function _unfold(fn, seed) {
  * @return: {boolean}
  */
 List.is = m => list_monad.isPrototypeOf(m) || ordered_list_monad.isPrototypeOf(m);
+
+/**
+ * Generates a new list with the specified item repeated the specified number of times. Because
+ * this generates a list with the same item repeated n times, the resulting List is trivially
+ * sorted. Thus, a sorted List is returned rather than an unsorted list.
+ * @param: {*} item
+ * @param: {number} count
+ * @return: {@see ordered_list_monad}
+ */
+List.repeat = function _repeat(item, count) {
+    return createListDelegateInstance([], repeat(item, count), [{ keySelector: noop, comparer: noop, direction: sortDirection.descending }]);
+};
 
 /**
  * @description: Extension function that allows new functionality to be applied to

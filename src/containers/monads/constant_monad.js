@@ -48,6 +48,11 @@ var constant_monad = Object.create(constant_functor, {
             return this.of(this.value);
         }
     },
+    of: {
+        value: pointMaker(Constant),
+        writable: false,
+        configurable: false
+    },
     factory: {
         value: Constant
     }
@@ -55,7 +60,6 @@ var constant_monad = Object.create(constant_functor, {
 
 constant_monad.mjoin = mjoin;
 constant_monad.apply = apply;
-constant_monad.of = pointMaker(Constant);
 
 constant_monad.ap =constant_monad.apply;
 constant_monad.fmap = constant_monad.chain;

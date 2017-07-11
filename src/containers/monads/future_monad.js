@@ -1,4 +1,5 @@
 import { future_functor } from '../functors/future_functor';
+import { noop } from '../../functionalHelpers';
 import { apply, mjoin, pointMaker } from '../containerHelpers';
 
 function safeFork(reject, resolve) {
@@ -29,7 +30,7 @@ function Future(f) {
  */
 Future.of = function _of(val) {
     return 'function' === typeof val ? Future(val) :
-        Future((reject, resolve) => safeFork(reject, resolve(val)));
+        Future((_, resolve) => safeFork(noop, resolve(val)));
 };
 
 /**
@@ -88,6 +89,11 @@ var future_monad = Object.create(future_functor, {
 
         }
     },
+    of: {
+        value: pointMaker(Future),
+        writable: false,
+        configurable: false
+    },
     factory: {
         value: Future
     }
@@ -95,7 +101,6 @@ var future_monad = Object.create(future_functor, {
 
 future_monad.mjoin = mjoin;
 future_monad.apply = apply;
-future_monad.of = pointMaker(Future);
 
 
 future_monad.ap = future_monad.apply;
