@@ -62,6 +62,17 @@ var arraySet = curry(function _arraySet(idx, x, list) {
 });
 
 /**
+ * @type:
+ * @description:
+ * @param: {function} f
+ * @param: {function} g
+ * @return: {boolean}
+ */
+var both = curry(function _both(f, g) {
+    return !!(f() && g());
+});
+
+/**
  * @description:
  * @param: {Array} first
  * @param: {Array} rest
@@ -107,6 +118,17 @@ var delegatesTo = curry((delegator, delegate) => delegate.isPrototypeOf(delegato
  * @return: {number}
  */
 var divide = curry((x, y) => x / y);
+
+/**
+ * @type:
+ * @description:
+ * @param: {function} f
+ * @param: {function} g
+ * @return: {boolean}
+ */
+var either = curry(function _either(f, g) {
+    return !!(f() || g());
+});
 
 /**
  * @description:
@@ -159,6 +181,30 @@ var greaterThan = curry((x, y) => x > y);
  * @return: {boolean}
  */
 var greaterThanOrEqual = curry((x, y) => x >= y);
+
+/**
+ * @type:
+ * @description:
+ * @param: {string} prop
+ * @param: {object} obj
+ * @return: {boolean}
+ */
+var has = curry(function _has(prop, obj) {
+    return obj.hasOwnProperty(prop);
+});
+
+/**
+ * @type:
+ * @description:
+ * @param: {string} key
+ * @param: {object} obj
+ * @return: {boolean}
+ */
+var inObject = curry(function _inObject(prop, obj) {
+    return prop in obj;
+});
+
+var invoke = fn => fn();
 
 /**
  * isArray :: a -> Boolean
@@ -417,7 +463,8 @@ function reverse(...args) {
     return args.reverse();
 }
 
-export { add, adjust, and, arraySet, concat, defaultPredicate, delegatesFrom, delegatesTo, divide, equals, falsey, flip,
-        getWith, greaterThan, greaterThanOrEqual, isArray, isBoolean, isFunction, isObject, isNothing, isNull, isNumber,
-        isSomething, isString, isSymbol, isUndefined, lessThan, lessThanOrEqual, modulus, multiple, negate, notEqual, noop,
-        nth, objectSet, once, or, set, strictEquals, strictNotEqual, subtract, truthy, type, wrap, reverse };
+export { add, adjust, and, arraySet, both, concat, defaultPredicate, delegatesFrom, delegatesTo, divide, either, equals,
+        falsey, flip, getWith, greaterThan, greaterThanOrEqual, has, inObject, invoke, isArray, isBoolean, isFunction,
+        isObject, isNothing, isNull, isNumber, isSomething, isString, isSymbol, isUndefined, lessThan, lessThanOrEqual,
+        modulus, multiple, negate, notEqual, noop, nth, objectSet, once, or, set, strictEquals, strictNotEqual, subtract,
+        truthy, type, wrap, reverse };

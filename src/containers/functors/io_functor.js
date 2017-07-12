@@ -1,4 +1,6 @@
-import { compose, constant } from '../../combinators';
+import { constant } from '../../combinators';
+import { type, strictEquals } from '../../functionalHelpers';
+import { javaScriptTypes } from '../../helpers';
 import { equalMaker, pointMaker, stringMaker, valueOf } from '../containerHelpers';
 
 /**
@@ -26,9 +28,7 @@ function Io(item) {
  * @param: {function|*} item
  * @return: {@see io_functor}
  */
-Io.of = function _of(item) {
-    return 'function' === typeof item ? Io(item) : Io(constant(item));
-};
+Io.of =  item => strictEquals(javaScriptTypes.Function, type(item)) ? Io(item) : Io(constant(item));
 
 /**
  * @description:

@@ -22,6 +22,12 @@ function Constant(item) {
  */
 Constant.of = x => Constant(x);
 
+/**
+ * @type:
+ * @description:
+ * @param: {functor} f
+ * @return: {boolean}
+ */
 Constant.is = f => constant_functor.isPrototypeOf(f);
 
 /**

@@ -1,5 +1,12 @@
 import { disjunctionEqualMaker, pointMaker, stringMaker, valueOf, get, orElse, getOrElse, sharedEitherFns } from '../containerHelpers';
 
+/**
+ * @type:
+ * @description:
+ * @param: {*} val
+ * @param: {string} fork
+ * @return: {@see left_functor|@see right_functor}
+ */
 function Either(val, fork) {
     return 'right' === fork ?
         Object.create(right_functor, {
@@ -30,18 +37,60 @@ function Either(val, fork) {
         });
 }
 
+/**
+ * @type:
+ * @description:
+ * @param: {*} x
+ * @return: {@see right_functor}
+ */
 Either.of = x => Either(x, 'right');
 
+/**
+ * @type:
+ * @description:
+ * @param: {functor} f
+ * @return: {boolean}
+ */
 Either.is = f => Left.is(f) || Right.is(f);
 
+/**
+ * @type:
+ * @description:
+ * @param: {functor} f
+ * @return: {boolean}
+ */
 Either.isRight = f => f.isRight;
 
+/**
+ * @type:
+ * @description:
+ * @param: {functor} f
+ * @return: {boolean}
+ */
 Either.isLeft = f => f.isLeft;
 
+/**
+ * @type:
+ * @description:
+ * @param: {*} x
+ * @return: {@see right_functor}
+ */
 Either.Right = x => Either(x, 'right');
 
+/**
+ * @type:
+ * @description:
+ * @param: {*} x
+ * @return: {@see left_functor}
+ */
 Either.Left = x => Either(x);
 
+/**
+ * @type:
+ * @description:
+ * @param: {*} val
+ * @return: {@see left_functor}
+ */
 function Left(val) {
     return Object.create(left_functor, {
         _value: {
@@ -62,10 +111,28 @@ function Left(val) {
     });
 }
 
+/**
+ * @type:
+ * @description:
+ * @param: {*} x
+ * @return: {@see left_functor}
+ */
 Left.of = x => Left(x);
 
+/**
+ * @type:
+ * @description:
+ * @param: {functor} f
+ * @return: {boolean}
+ */
 Left.is = f => left_functor.isPrototypeOf(f);
 
+/**
+ * @type:
+ * @description:
+ * @param: {*} val
+ * @return: {@see right_functor}
+ */
 function Right(val) {
     return Object.create(right_functor, {
         _value: {
@@ -86,8 +153,20 @@ function Right(val) {
     });
 }
 
+/**
+ * @type:
+ * @description:
+ * @param: {functor} x
+ * @return: {boolean}
+ */
 Right.is = x => right_functor.isPrototypeOf(x);
 
+/**
+ * @type:
+ * @description:
+ * @param: {*} x
+ * @return: {@see right_functor}
+ */
 Right.of = x => Right(x);
 
 var right_functor = {

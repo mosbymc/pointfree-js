@@ -2,8 +2,8 @@ import { all, any, except, intersect, union, map, groupBy, sortBy, prepend, conc
     contains, first, last, count, foldLeft, reduceRight, distinct, ofType, binarySearch, equals, take, takeWhile, skip, skipWhile, reverse,
     copyWithin, fill, findIndex, findLastIndex, repeat, foldRight, unfold } from '../list_iterators';
 import { sortDirection, generatorProto } from '../../helpers';
-import { wrap, defaultPredicate, delegatesTo, isArray, noop } from '../../functionalHelpers';
-import { when } from '../../combinators';
+import { wrap, defaultPredicate, delegatesTo, delegatesFrom, isArray, noop, invoke } from '../../functionalHelpers';
+import { when, ifElse } from '../../combinators';
 import { not } from '../../decorators';
 import { createListCreator } from '../list_helpers';
 
@@ -696,138 +696,6 @@ var ordered_list_functor = Object.create(list_core, {
 //TODO: Lambda
 
 /**
- * @description: Creator function for a new List object. Takes any value/type as a parameter
- * and, if it has an iterator defined, with set it as the underlying source of the List as is,
- * or, wrap the item in an array if there is no defined iterator.
- * @param: {*} source - Any type, any value; used as the underlying source of the List
- * @return: {@see list_functor} - A new List instance with the value provided as the underlying source.
- */
-function List(source) {
-    //TODO: should I exclude strings from being used as a source directly, or allow it because
-    //TODO: they have an iterator?
-
-    //TODO: I need to fix this for cases where a generator has been passed as the source - this can
-    //TODO: also work with the unfolding capability I want to add
-    if (delegatesTo(source, generatorProto)) return createListDelegateInstance(source());
-    return createListDelegateInstance(source && source[Symbol.iterator] ? source : wrap(source));
-}
-
-/**
- * @description: Convenience function for listCreate a new List instance; internally calls List.
- * @see: List
- * @param: {*} source - Any type, any value; used as the underlying source of the List
- * @return: {@see list_functor} - A new List instance with the value provided as the underlying source.
- */
-List.from = function _from(source) {
-    return List(source);
-};
-
-/**
- * @description: Alias for List.from
- * @see: List.from
- * @type: {function}
- * @param: {*}
- * @return: {@see list_functor}
- */
-List.of = List.from;
-
-/**
- * @type:
- * @description:
- * @return: {@see list_functor}
- */
-List.empty = function _empty() {
-    return List([]);
-};
-
-/**
- * @type:
- * @description:
- * @param: {*} val
- * @return: {@see list_functor}
- */
-List.just = function _just(val) {
-    return List([val]);
-};
-
-/**
- * @type:
- * @description:
- * @param: {function|generator} fn
- * @param: {*} seed
- * @return: {@see list_functor}
- */
-List.unfold = function _unfold(fn, seed) {
-    return createListDelegateInstance(unfold(fn)(seed));
-};
-
-/**
- * @description:
- * @param: {functor} f
- * @return: {boolean}
- */
-List.is = f => list_core.isPrototypeOf(f);
-
-/**
- * Generates a new list with the specified item repeated the specified number of times. Because
- * this generates a list with the same item repeated n times, the resulting List is trivially
- * sorted. Thus, a sorted List is returned rather than an unsorted list.
- * @param: {*} item
- * @param: {number} count
- * @return: {@see ordered_list_functor}
- */
-List.repeat = function _repeat(item, count) {
-    return createListDelegateInstance([], repeat(item, count), [{ keySelector: noop, comparer: noop, direction: sortDirection.descending }]);
-};
-
-/**
- * @description: Extension function that allows new functionality to be applied to
- * the queryable object
- * @param: {string} propName - The name of the new property that should exist on the List; must be unique
- * @param: {function} fn - A function that defines the new List functionality and
- * will be called when this new List property is invoked.
- * @return: {@see List}
- *
- * NOTE: The fn parameter must be a non-generator function that takes one or more
- * arguments. If this new List function should be an immediately evaluated
- * function (like: take, any, reverse, etc.), it merely needs the accept one or more
- * arguments and know how to iterate the source. In the case of an immediately evaluated
- * function, the return type can be any javascript type. The first argument is always the
- * previous List instance that must be iterated. Additional arguments may be specified
- * if desired.
- *
- * If the function's evaluation should be deferred it needs to work a bit differently.
- * In this case, the function should accept one or more arguments, the first and only
- * required argument being the underlying source of the List object. This underlying
- * source can be anything with an iterator (generator, array, map, set, another queryable).
- * Any additional arguments that the function needs should be specified in the signature.
- * The return value of the function should be a generator that knows how to iterate the
- * underlying source. If the generator should operate like most List functions, i.e.
- * take a single item, process it, and then yield it out before asking for the next, a
- * for-of loop is the preferred method for employment. However, if the generator needs
- * all of the underlying data upfront (like orderBy and groupBy), Array.from is the
- * preferred method. Array.from will 'force' all the underlying List instances
- * to evaluate their data before it is handed over in full to the generator. The generator
- * can then act with full knowledge of the data and perform whatever operation is needed
- * before ultimately yielding out a single item at a time. If your extension function
- * needs to yield out all items at once, then that function is not a lazy evaluation
- * function and should be constructed like the immediately evaluated functions described
- * above.
- */
-List.extend = function _extend(propName, fn) {
-    if (!(propName in list_functor) && !(propName in ordered_list_functor)) {
-        list_core[propName] = function(...args) {
-            return createListDelegateInstance(this, fn(this, ...args));
-        };
-    }
-    return List;
-};
-
-function createGroupedListDelegate(source, key) {
-    return createListDelegateInstance(source, undefined, undefined, key);
-}
-
-/**
  * @description: Creates a new list_functor object delegate instance; list_functor type is determined by
  * the parameters passed to the function. If only the 'source' parameter is provided, a
  * 'basic' list_functor delegate object instance is created. If the source and iterator parameters
@@ -859,6 +727,149 @@ function createGroupedListDelegate(source, key) {
  * @return: {@see list_core}
  */
 var createListDelegateInstance = createListCreator(list_functor, ordered_list_functor, list_functor);
+
+/**
+ * @type:
+ * @description:
+ * @param: {*} source
+ * @return: {@see list_functor}
+ */
+var listFromNonGen = source => createListDelegateInstance(source && source[Symbol.iterator] ? source : wrap(source));
+
+/**
+ * @type:
+ * @description:
+ * @param: {generator} source
+ * @return: {@see list_functor}
+ */
+var listFromGen = source => createListDelegateInstance(invoke(source));
+
+/**
+ * @description: Creator function for a new List object. Takes any value/type as a parameter
+ * and, if it has an iterator defined, with set it as the underlying source of the List as is,
+ * or, wrap the item in an array if there is no defined iterator.
+ * @param: {*} source - Any type, any value; used as the underlying source of the List
+ * @return: {@see list_functor} - A new List instance with the value provided as the underlying source.
+ */
+//TODO: should I exclude strings from being used as a source directly, or allow it because
+//TODO: they have an iterator?
+function List(source) {
+    return ifElse(delegatesFrom(generatorProto), listFromGen, listFromNonGen, source);
+}
+
+/**
+ * @description: Convenience function for listCreate a new List instance; internally calls List.
+ * @see: List
+ * @param: {*} source - Any type, any value; used as the underlying source of the List
+ * @return: {@see list_functor} - A new List instance with the value provided as the underlying source.
+ */
+List.from = source => List(source);
+
+/**
+ * @description: Alias for List.from
+ * @see: List.from
+ * @type: {function}
+ * @param: {*}
+ * @return: {@see list_functor}
+ */
+List.of = List.from;
+
+//TODO: implement this so that a consumer can initiate a List as ordered
+List.ordered = source => source;
+
+/**
+ * @type:
+ * @description:
+ * @return: {@see list_functor}
+ */
+List.empty = () => List([]);
+
+/**
+ * @type:
+ * @description:
+ * @param: {*} val
+ * @return: {@see list_functor}
+ */
+List.just = val => List([val]);
+
+/**
+ * @type:
+ * @description:
+ * @param: {function|generator} fn
+ * @param: {*} seed
+ * @return: {@see list_functor}
+ */
+List.unfold = (fn, seed) => createListDelegateInstance(unfold(fn)(seed));
+
+/**
+ * @description:
+ * @param: {functor} f
+ * @return: {boolean}
+ */
+List.is = f => list_core.isPrototypeOf(f);
+
+/**
+ * Generates a new list with the specified item repeated the specified number of times. Because
+ * this generates a list with the same item repeated n times, the resulting List is trivially
+ * sorted. Thus, a sorted List is returned rather than an unsorted list.
+ * @param: {*} item
+ * @param: {number} count
+ * @return: {@see ordered_list_functor}
+ */
+List.repeat = function _repeat(item, count) {
+    return createListDelegateInstance([], repeat(item, count), [{ keySelector: noop, comparer: noop, direction: sortDirection.descending }]);
+};
+
+/**
+ * @description: Extension function that allows new functionality to be applied to
+ * the queryable object
+ * @param: {string} propName - The name of the new property that should exist on the List; must be unique
+ * @param: {function} fn - A function that defines the new List functionality and
+ * will be called when this new List property is invoked.
+ * @return: {@see List}
+ *
+ * NOTE: The fn parameter must be a non-generator function that takes one or more
+ * arguments. If this new List function should be an immediately evaluated
+ * function (like: foldl, any, reverse, etc.), it merely needs the accept one or more
+ * arguments and know how to iterate the source. In the case of an immediately evaluated
+ * function, the return type can be any javascript type. The first argument is always the
+ * previous List instance that must be iterated. Additional arguments may be specified
+ * if desired.
+ *
+ * If the function's evaluation should be deferred it needs to work a bit differently.
+ * In this case, the function should accept one or more arguments, the first and only
+ * required argument being the underlying source of the List object. This underlying
+ * source can be anything with an iterator (generator, array, map, set, another list, etc.).
+ * Any additional arguments that the function needs should be specified in the signature.
+ * The return value of the function should be a generator that knows how to iterate the
+ * underlying source. If the generator should operate like most List functions, i.e.
+ * take a single item, process it, and then yield it out before asking for the next, a
+ * for-of loop is the preferred method for employment. However, if the generator needs
+ * all of the underlying data upfront (like orderBy and groupBy), Array.from is the
+ * preferred method. Array.from will 'force' all the underlying List instances
+ * to evaluate their data before it is handed over in full to the generator. The generator
+ * can then act with full knowledge of the data and perform whatever operation is needed
+ * before ultimately yielding out a single item at a time. If your extension function
+ * needs to yield out all items at once, then that function is not a lazy evaluation
+ * function and should be constructed like the immediately evaluated functions described
+ * above.
+ */
+List.extend = function _extend(propName, fn) {
+    if (!(propName in list_functor) && !(propName in ordered_list_functor)) {
+        list_core[propName] = function(...args) {
+            return createListDelegateInstance(this, fn(this, ...args));
+        };
+    }
+    return List;
+};
+
+/*
+List.extend = (propName, fn) => when(both(second(inObject(list_functor)), second(inObject(ordered_list_functor)), noop, propName);
+ */
+
+function createGroupedListDelegate(source, key) {
+    return createListDelegateInstance(source, undefined, undefined, key);
+}
 
 
 

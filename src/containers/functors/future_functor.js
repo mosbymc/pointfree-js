@@ -1,6 +1,14 @@
-import { noop, once } from '../../functionalHelpers';
+import { noop, once, type, strictEquals } from '../../functionalHelpers';
+import { javaScriptTypes } from '../../helpers';
 import { pointMaker, valueOf } from '../containerHelpers';
 
+/**
+ * @type:
+ * @description:
+ * @param: {function} reject
+ * @param: {function} resolve
+ * @return: {function}
+ */
 function safeFork(reject, resolve) {
     return function _safeFork(val) {
         try {
@@ -31,6 +39,12 @@ function Future(fn) {
     });
 }
 
+/**
+ * @type:
+ * @description:
+ * @param: {functor} f
+ * @return: {boolean}
+ */
 Future.is = f => future_functor.isPrototypeOf(f);
 
 /**
@@ -38,36 +52,28 @@ Future.is = f => future_functor.isPrototypeOf(f);
  * @param: {function|*} val
  * @return: {@see future_functor}
  */
-Future.of = function _of(val) {
-    return 'function' === typeof val ? Future(val) :
-        Future((_, resolve) => safeFork(noop, resolve(val)));
-};
+Future.of = val => strictEquals(javaScriptTypes.Function, type(val)) ?
+    Future(val) : Future((_, resolve) => safeFork(noop, resolve(val)));
 
 /**
  * @description:
  * @param: {*} val
  * @return: {@see future_functor}
  */
-Future.reject = function _reject(val) {
-    return Future((reject, resolve) => reject(val));
-};
+Future.reject = val => Future((reject, resolve) => reject(val));
 
 /**
  * @description:
  * @param: {function} val
- * @return: {*}
+ * @return: {@see future_functor}
  */
-Future.unit = function _unit(val) {
-    return Future(val).complete();
-};
+Future.unit = val => Future(val).complete();
 
 /**
  * @description:
  * @return: {@see future_functor}
  */
-Future.empty = function _empty() {
-    return Future(noop);
-};
+Future.empty = () => Future(noop);
 
 var future_functor = {
     /**

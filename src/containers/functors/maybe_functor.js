@@ -1,9 +1,10 @@
 import { disjunctionEqualMaker, maybeFactoryHelper, pointMaker, stringMaker, valueOf, sharedMaybeFns } from '../containerHelpers';
 
 /**
+ * @type:
  * @description:
  * @param: {*} val
- * @return: {@see maybe_functor}
+ * @return: {@see just_functor|@see nothing_functor}
  */
 function Maybe(val) {
     return null == val ?
@@ -71,17 +72,28 @@ Maybe.Just = Maybe.of;
  * @description:
  * @return: {@see maybe_functor}
  */
-Maybe.Nothing =  function _nothing() {
-    return Maybe();
-};
+Maybe.Nothing =  () => Maybe();
 
-Maybe.isJust = function _isJust(m) {
-    return m.isJust;
-};
-Maybe.isNothing = function _isNothing(m) {
-    return m.isNothing;
-};
+/**
+ * @type:
+ * @description:
+ * @param: {functor} m
+ * @return: {boolean}
+ */
+Maybe.isJust = m => just_functor.isPrototypeOf(m);
 
+/**
+ * @type:
+ * @description:
+ * @param: {functor} m
+ * @return: {boolean}
+ */
+Maybe.isNothing = m => nothing_functor.isPrototypeOf(m);
+
+/**
+ * @type:
+ * @description:
+ */
 var maybeCreator = maybeFactoryHelper(Maybe);
 
 var maybeOf = {
@@ -94,6 +106,12 @@ var maybeOf = {
 //TODO: are not exposed, what benefit is derived from them? And if they are exposed (Just being Identity,
 //TODO: and Nothing being Constant(null)), then the maybe container has a direct dependency on the Identity
 //TODO: and Constant containers. This becomes an issue due to circular dependencies.
+/**
+ * @type:
+ * @description:
+ * @param: {*} val
+ * @return: {@see just_functor}
+ */
 function Just(val) {
     return Object.create(just_functor, {
             _value: {
@@ -110,6 +128,12 @@ function Just(val) {
         });
 }
 
+/**
+ * @type:
+ * @description:
+ * @param: {*} val
+ * @return: {@see just_functor}
+ */
 Just.of = function _of(val) {
     return Object.create(just_functor, {
         _value: {
@@ -127,12 +151,18 @@ Just.of = function _of(val) {
 };
 
 /**
+ * @type:
  * @description:
  * @param: {functor} f
  * @return: {boolean}
  */
 Just.is = f => just_functor.isPrototypeOf(f);
 
+/**
+ * @type:
+ * @description:
+ * @return: {@see nothing_functor}
+ */
 function Nothing() {
     return Object.create(nothing_functor, {
         _value: {
@@ -149,9 +179,15 @@ function Nothing() {
     });
 }
 
+/**
+ * @type:
+ * @description:
+ * @return: {@see nothing_functor}
+ */
 Nothing.of = Nothing;
 
 /**
+ * @type:
  * @description:
  * @param: {functor} f
  * @return: {boolean}
