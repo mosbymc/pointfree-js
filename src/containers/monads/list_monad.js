@@ -1,9 +1,25 @@
 import { list_functor, ordered_list_functor, list_core } from '../functors/list_functor';
-import { sortDirection } from '../../helpers';
+import { sortDirection, generatorProto } from '../../helpers';
 import { groupBy, groupJoin, chain, unfold, repeat } from '../list_iterators';
-import { wrap, noop } from '../../functionalHelpers';
-import { identity } from '../../combinators';
+import { wrap, noop, invoke,delegatesFrom } from '../../functionalHelpers';
+import { identity, ifElse } from '../../combinators';
 import { createListCreator } from '../list_helpers';
+
+/**
+ * @type:
+ * @description:
+ * @param: {*} source
+ * @return: {@see list_monad}
+ */
+var listFromNonGen = source => createListDelegateInstance(source && source[Symbol.iterator] ? source : wrap(source));
+
+/**
+ * @type:
+ * @description:
+ * @param: {generator} source
+ * @return: {@see list_monad}
+ */
+var listFromGen = source => createListDelegateInstance(invoke(source));
 
 /**
  * @description: Creator function for a new List object. Takes any value/type as a parameter
@@ -12,10 +28,10 @@ import { createListCreator } from '../list_helpers';
  * @param: {*} source - Any type, any value; used as the underlying source of the List
  * @return: {@see list_monad} - A new List instance with the value provided as the underlying source.
  */
+//TODO: should I exclude strings from being used as a source directly, or allow it because
+//TODO: they have an iterator?
 function List(source) {
-    //TODO: should I exclude strings from being used as a source directly, or allow it because
-    //TODO: they have an iterator?
-    return createListDelegateInstance(source && source[Symbol.iterator] ? source : wrap(source));
+    return ifElse(delegatesFrom(generatorProto), listFromGen, listFromNonGen, source);
 }
 
 /**
@@ -24,9 +40,7 @@ function List(source) {
  * @param: {*} source - Any type, any value; used as the underlying source of the List
  * @return: {@see list_monad} - A new List instance with the value provided as the underlying source.
  */
-List.from = function _from(source) {
-    return List(source);
-};
+List.from = source => List(source);
 
 /**
  * @description: Alias for List.from
@@ -37,14 +51,15 @@ List.from = function _from(source) {
  */
 List.of = List.from;
 
+//TODO: implement this so that a consumer can initiate a List as ordered
+List.ordered = source => source;
+
 /**
  * @type:
  * @description:
  * @return: {@see list_monad}
  */
-List.empty = function _empty() {
-    return List([]);
-};
+List.empty = () => List([]);
 
 /**
  * @type:
@@ -52,9 +67,7 @@ List.empty = function _empty() {
  * @param: {*} val
  * @return: {@see list_monad}
  */
-List.just = function _just(val) {
-    return List([val]);
-};
+List.just = val => List([val]);
 
 /**
  * @type:
@@ -63,9 +76,7 @@ List.just = function _just(val) {
  * @param: {*} seed
  * @return: {@see list_monad}
  */
-List.unfold = function _unfold(fn, seed) {
-    return createListDelegateInstance(unfold(fn)(seed));
-};
+List.unfold = (fn, seed) => createListDelegateInstance(unfold(fn)(seed));
 
 /**
  * @description:
@@ -320,7 +331,7 @@ var createListDelegateInstance = createListCreator(list_monad, ordered_list_mona
 //classes and inheritance. I do not recommend using the .constructor property at all since that just encourages
 //FantasyLand and others to continue either not learning how JavaScript actually works, or refusing to use it
 //as it was intended... you know, like Douglas Crockford and his "good parts", which is really just another
-//way of saying: "your too dumb to understand how JavaScript works, and I either don't know myself, or don't
+//way of saying: "you're too dumb to understand how JavaScript works, and I either don't know myself, or don't
 //care to know, so just stick with what I tell you to use."
 list_monad.constructor = list_monad.factory;
 ordered_list_monad.constructor = ordered_list_monad.factory;

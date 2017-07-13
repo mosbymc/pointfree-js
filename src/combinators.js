@@ -421,6 +421,25 @@ var whenNot = curry((predicate, transform, data) => !predicate(data) ? transform
 var y = fixedPoint;
 
 
+function applyWhenReady(fn) {
+    var values = [];
+    function _applyWhenReady(...args) {
+        values = values.concat(args);
+        return _applyWhenReady;
+    }
+
+    _applyWhenReady.invoke = function _invoke() {
+        fn(...values);
+    };
+
+    _applyWhenReady.reverseInvoke = function _reverseInvoke() {
+        fn(...values.reverse());
+    };
+
+    return _applyWhenReady;
+}
+
+
 
 
 
@@ -486,5 +505,5 @@ var xs1 = compose(
 //usage
 //reduce(dropping(3)(concat),[],[1,2,3,4,5]);//-> [4,5]
 
-export { all, any, c, compose, constant, curry, curryN, curryRight, filtering, filterReducer, first, fixedPoint, fork, identity,
+export { all, any, applyWhenReady, c, compose, constant, curry, curryN, curryRight, filtering, filterReducer, first, fixedPoint, fork, identity,
           ifElse, ifThisThenThat, kestrel, m, mapped, mapping, mapReducer, pipe, o, q, reduce, second, sequence, t, thrush, u, w, when, whenNot, y };

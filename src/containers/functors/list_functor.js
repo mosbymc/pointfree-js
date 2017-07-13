@@ -823,7 +823,7 @@ List.repeat = function _repeat(item, count) {
 /**
  * @description: Extension function that allows new functionality to be applied to
  * the queryable object
- * @param: {string} propName - The name of the new property that should exist on the List; must be unique
+ * @param: {string} prop - The name of the new property that should exist on the List; must be unique
  * @param: {function} fn - A function that defines the new List functionality and
  * will be called when this new List property is invoked.
  * @return: {@see List}
@@ -854,25 +854,18 @@ List.repeat = function _repeat(item, count) {
  * function and should be constructed like the immediately evaluated functions described
  * above.
  */
-List.extend = function _extend(propName, fn) {
-    if (!(propName in list_functor) && !(propName in ordered_list_functor)) {
-        list_core[propName] = function(...args) {
+List.extend = function _extend(prop, fn) {
+    if (!(prop in list_functor) && !(prop in ordered_list_functor)) {
+        list_core[prop] = function(...args) {
             return createListDelegateInstance(this, fn(this, ...args));
         };
     }
     return List;
 };
 
-/*
-List.extend = (propName, fn) => when(both(second(inObject(list_functor)), second(inObject(ordered_list_functor)), noop, propName);
- */
-
 function createGroupedListDelegate(source, key) {
     return createListDelegateInstance(source, undefined, undefined, key);
 }
-
-
-
 
 //Since FantasyLand is the defacto standard for JavaScript algebraic data structures, and I want to maintain
 //compliance with the standard, a .constructor property must be on the container delegators. In this case, its

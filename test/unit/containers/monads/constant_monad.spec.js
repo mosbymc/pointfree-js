@@ -177,11 +177,7 @@ describe('Constant monad tests', function _testConstantMonad() {
             }
 
             var wq = Constant(10);
-
-            console.log(wq.traverse(monads.Maybe, test).toString());
             var bpb = Constant(monads.Maybe(10));
-
-            console.log(bpb.traverse(monads.Maybe, test2).toString());
 
             function test2(val) {
                 return monads.Maybe(val.value + 5);
