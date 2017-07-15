@@ -14,11 +14,9 @@ function apply(ma) {
     return ma.map(this.value);
 }
 
-function chainMaker(type) {
-    return function _chain(fn) {
-        var val = fn(this.value);
-        return Object.getPrototypeOf(this).isPrototypeOf(val) ? val : this.of(val);
-    }
+function chain(fn) {
+    var val = fn(this.value);
+    return Object.getPrototypeOf(this).isPrototypeOf(val) ? val : this.of(val);
 }
 
 function disjunctionEqualMaker(type, prop) {
@@ -125,5 +123,5 @@ var sharedEitherFns = {
     leftBimapMaker
 };
 
-export { apply, chainMaker, disjunctionEqualMaker, equalMaker, maybeFactoryHelper, mjoin, pointMaker, stringMaker, valueOf, get, orElse, getOrElse,
+export { apply, chain, disjunctionEqualMaker, equalMaker, maybeFactoryHelper, mjoin, pointMaker, stringMaker, valueOf, get, orElse, getOrElse,
         sharedMaybeFns, sharedEitherFns };

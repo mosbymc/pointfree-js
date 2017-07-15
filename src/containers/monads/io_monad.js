@@ -1,6 +1,6 @@
 import { io_functor } from '../functors/io_functor';
 import { compose } from '../../combinators';
-import { apply, chainMaker, mjoin, pointMaker } from '../containerHelpers';
+import { apply, chain, mjoin, pointMaker } from '../containerHelpers';
 
 function Io(val) {
     return Object.create(io_monad, {
@@ -51,7 +51,7 @@ var io_monad = Object.create(io_functor, {
     }
 });
 
-io_monad.chain = chainMaker(io_monad);
+io_monad.chain = chain;
 io_monad.mjoin = mjoin;
 io_monad.apply = apply;
 

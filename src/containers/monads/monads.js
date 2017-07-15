@@ -7,7 +7,7 @@ import { List, list_monad, ordered_list_monad } from './list_monad';
 import { Maybe, Just, Nothing, just_monad, nothing_monad } from './maybe_monad';
 import { Validation, validation_monad } from './validation_monad';
 
-import { toContainerType, containerIterator } from '../../pointlessContainers';
+import { toContainerType, containerIterator, lifter } from '../../pointlessContainers';
 
 
 /*
@@ -200,6 +200,21 @@ validation_monad.mapToList = mapToList;
 validation_monad.mapToMaybe = mapToMaybe;
 validation_monad.mapToRight = mapToRight;
 validation_monad[Symbol.iterator] = containerIterator;
+
+
+Constant.lift = lifter(Constant);
+Either.lift = lifter(Either);
+Future.lift = lifter(Future);
+Identity.lift = lifter(Identity);
+Io.lift = lifter(Io);
+Just.lift = lifter(Just);
+Left.lift = lifter(Left);
+List.lift = lifter(List);
+Maybe.lift = lifter(Maybe);
+Nothing.lift = lifter(Nothing);
+Right.lift = lifter(Right);
+Validation.lift = lifter(Validation);
+
 
 var monads = {
     Constant,

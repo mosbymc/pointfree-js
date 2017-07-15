@@ -114,18 +114,18 @@ var maybeOf = {
  */
 function Just(val) {
     return Object.create(just_functor, {
-            _value: {
-                value: val,
-                writable: false,
-                configurable: false
-            },
-            isJust: {
-                value: true
-            },
-            isNothing: {
-                value: false
-            }
-        });
+        _value: {
+            value: val,
+            writable: false,
+            configurable: false
+        },
+        isJust: {
+            value: true
+        },
+        isNothing: {
+            value: false
+        }
+    });
 }
 
 /**

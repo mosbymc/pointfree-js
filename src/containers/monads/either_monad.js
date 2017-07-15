@@ -1,6 +1,6 @@
 import { right_functor, left_functor } from '../functors/either_functor';
 import { identity } from '../../combinators';
-import { apply, chainMaker, mjoin, pointMaker, sharedEitherFns } from '../containerHelpers';
+import { apply, chain, mjoin, pointMaker, sharedEitherFns } from '../containerHelpers';
 
 function Either(val, fork) {
     return 'right' === fork ?
@@ -136,7 +136,7 @@ var right_monad = Object.create(right_functor, {
     }
 });
 
-right_monad.chain = chainMaker(right_monad);
+right_monad.chain = chain;
 right_monad.mjoin = mjoin;
 right_monad.apply = apply;
 
@@ -173,7 +173,7 @@ var left_monad = Object.create(left_functor, {
     }
 });
 
-left_monad.chain = chainMaker(left_monad);
+left_monad.chain = chain;
 left_monad.mjoin = mjoin;
 left_monad.apply = apply;
 

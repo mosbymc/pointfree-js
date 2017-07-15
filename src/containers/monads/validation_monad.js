@@ -1,5 +1,5 @@
 import { validation_functor } from '../functors/validation_functor';
-import { apply, chainMaker, mjoin, pointMaker } from '../containerHelpers';
+import { apply, chain, mjoin, pointMaker } from '../containerHelpers';
 
 function Validation(val) {
     return Object.create(validation_monad, {
@@ -33,7 +33,7 @@ var validation_monad = Object.create(validation_functor, {
     }
 });
 
-validation_monad.chain = chainMaker(validation_monad);
+validation_monad.chain = chain;
 validation_monad.mjoin = mjoin;
 validation_monad.apply = apply;
 

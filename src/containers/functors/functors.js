@@ -7,7 +7,7 @@ import { List, list_core } from './list_functor';
 import { Maybe, Just, Nothing, just_functor, nothing_functor } from './maybe_functor';
 import { Validation, validation_functor } from './validation_functor';
 
-import { toContainerType, containerIterator } from '../../pointlessContainers';
+import { toContainerType, containerIterator, lifter } from '../../pointlessContainers';
 
 var mapToConstant = toContainerType(Constant),
     mapToEither = toContainerType(Either),
@@ -137,6 +137,19 @@ validation_functor.mapToList = mapToList;
 validation_functor.mapToMaybe = mapToMaybe;
 validation_functor.mapToRight = mapToRight;
 validation_functor[Symbol.iterator] = containerIterator;
+
+Constant.lift = lifter(Constant);
+Either.lift = lifter(Either);
+Future.lift = lifter(Future);
+Identity.lift = lifter(Identity);
+Io.lift = lifter(Io);
+Just.lift = lifter(Just);
+Left.lift = lifter(Left);
+List.lift = lifter(List);
+Maybe.lift = lifter(Maybe);
+Nothing.lift = lifter(Nothing);
+Right.lift = lifter(Right);
+Validation.lift = lifter(Validation);
 
 var functors = {
     Constant,

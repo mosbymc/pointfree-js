@@ -1,6 +1,6 @@
 import { just_functor, nothing_functor } from '../functors/maybe_functor';
 import { identity } from '../../combinators';
-import { apply, chainMaker, mjoin, pointMaker, sharedMaybeFns } from '../containerHelpers';
+import { apply, chain, mjoin, pointMaker, sharedMaybeFns } from '../containerHelpers';
 
 function Maybe(item) {
     return null != item ? Maybe.Just(item) : Maybe.Nothing();
@@ -113,7 +113,7 @@ var just_monad = Object.create(just_functor, {
     }
 });
 
-just_monad.chain = chainMaker(just_monad);
+just_monad.chain = chain;
 just_monad.mjoin = mjoin;
 just_monad.apply = apply;
 
@@ -155,7 +155,7 @@ var nothing_monad = Object.create(nothing_functor, {
     }
 });
 
-nothing_monad.chain = chainMaker(nothing_monad);
+nothing_monad.chain = chain;
 nothing_monad.mjoin = mjoin;
 nothing_monad.apply = apply;
 

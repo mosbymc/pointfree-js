@@ -1,7 +1,7 @@
 import { identity_functor } from '../functors/identity_functor';
 import { emptyObject } from '../../helpers';
 import { identity } from '../../combinators';
-import { apply, chainMaker, mjoin, pointMaker } from '../containerHelpers';
+import { apply, chain, mjoin, pointMaker } from '../containerHelpers';
 
 /**
  * @description:
@@ -78,7 +78,7 @@ var identity_monad = Object.create(identity_functor, {
     }
 });
 
-identity_monad.chain = chainMaker(identity_monad);
+identity_monad.chain = chain;
 identity_monad.mjoin = mjoin;
 identity_monad.apply = apply;
 

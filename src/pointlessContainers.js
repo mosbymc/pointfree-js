@@ -99,7 +99,7 @@ var bind = chain;
  * @description:
  * @param: {function} f
  * @param: g
- * @return {*}
+ * @return {function}
  */
 var mcompose = function _mcompose(f, g) {
     return compose(chain(f), g);
@@ -187,6 +187,14 @@ function toContainerType(type) {
         return type.of(fn(this.value));
     };
 }
+
+/**
+ * @type:
+ * @description:
+ * @param: {functor|monad} type
+ * @return: {function}
+ */
+var lifter = (type) => (fn) => (...args) => type.of(fn(...args));
 
 /**
  * @description:
@@ -320,5 +328,5 @@ var except = curry(function _except(xs, comparer, ys) {
     return ys.except(xs, comparer);
 });
 
-export { apply, ap, fmap, map, mapWith, flatMap, flatMapWith, lift2, lift3, lift4, liftN, mjoin, pluckWith, toContainerType,
+export { apply, ap, fmap, map, mapWith, flatMap, flatMapWith, lifter, lift2, lift3, lift4, liftN, mjoin, pluckWith, toContainerType,
             containerIterator, chain, bind, mcompose, filter, intersect, except };
