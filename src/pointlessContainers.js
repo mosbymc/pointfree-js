@@ -25,6 +25,13 @@ var apply = curry(function _apply(ma, mb) {
     return mb.apply(ma);
 });
 
+/**
+ * @type:
+ * @description:
+ * @param: {functor|monad} ma
+ * @param: {functor|monad} mb
+ * @return: {functor|monad mb}
+ */
 var ap = apply;
 
 /**
@@ -65,12 +72,16 @@ var map = curry(function _map(m, fn) {
  * @type: {function}
  * @param: {function} fn
  * @param: {functor} m
- * @return:
+ * @return: {functor|monad m}
  */
 var mapWith = curry(function _map(fn, m) {
     return m.map(fn);
 });
 
+/**
+ * @type:
+ * @description:
+ */
 var pluckWith = compose(mapWith, getWith);
 
 /**
@@ -93,21 +104,26 @@ var chain = curry(function _chain(f, m){
     return m.map(f).join(); // or compose(join, mapWith(f))(m)
 });
 
+/**
+ * @type:
+ * @description:
+ */
 var bind = chain;
 
 /**
+ * @type:
  * @description:
  * @param: {function} f
- * @param: g
- * @return {function}
+ * @param: {function} g
+ * @return: {function}
  */
 var mcompose = function _mcompose(f, g) {
     return compose(chain(f), g);
 };
 
 /**
+ * @type:
  * @description:
- * @type: {*}
  * @param: {*} val
  * @param: {@see state_functor} fa
  * @return: {@see state_functor}
@@ -117,8 +133,8 @@ var put = curry(function _put(val, fa) {
 });
 
 /**
+ * @type:
  * @description:
- * @type: {function}
  * @param: {function} f
  * @param: {functor} m1
  * @param: {functor} m2
@@ -129,8 +145,8 @@ var lift2 = curry(function _lift2(f, m1, m2) {
 });
 
 /**
+ * @type:
  * @description:
- * @type: {function}
  * @param: {function} f
  * @param: {functor} m1
  * @param: {functor} m2
@@ -142,8 +158,8 @@ var lift3 = curry(function _lift3(f, m1, m2, m3) {
 });
 
 /**
+ * @type:
  * @description:
- * @type: {function}
  * @param: {function} f
  * @param: {functor} m1
  * @param: {functor} m2
@@ -156,8 +172,8 @@ var lift4 = curry(function _lift4(f, m1, m2, m3, m4) {
 });
 
 /**
+ * @type:
  * @description:
- * @type: {function}
  * @param: {function} f
  * @param: {Ma} ...ms
  * @return: {Mb}
@@ -169,6 +185,7 @@ var liftN = curry(function _liftN(f, ...ms) {
 });
 
 /**
+ * @type:
  * @description:
  * @param: {functor} ma
  * @return: {functor}
@@ -178,8 +195,9 @@ function mjoin(ma) {
 }
 
 /**
+ * @type:
  * @description:
- * @param: type
+ * @param: {functor|monad} type
  * @return: {function}
  */
 function toContainerType(type) {
@@ -190,13 +208,6 @@ function toContainerType(type) {
 
 /**
  * @type:
- * @description:
- * @param: {functor|monad} type
- * @return: {function}
- */
-var lifter = (type) => (fn) => (...args) => type.of(fn(...args));
-
-/**
  * @description:
  * @return: {{next: _next}}
  */
@@ -220,6 +231,7 @@ function containerIterator() {
 }
 
 /**
+ * @type:
  * @description:
  * @param: {functor} ma
  * @return: {@see m_list}
@@ -229,6 +241,7 @@ function toList(ma) {
 }
 
 /**
+ * @type:
  * @description:
  * @param: {functor} ma
  * @return: {@see _maybe}
@@ -238,6 +251,7 @@ function toMaybe(ma) {
 }
 
 /**
+ * @type:
  * @description:
  * @param: {functor} ma
  * @return: {@see _future}
@@ -247,6 +261,7 @@ function toFuture(ma) {
 }
 
 /**
+ * @type:
  * @description:
  * @param: {functor} ma
  * @return: {@see _identity}
@@ -256,6 +271,7 @@ function toIdentity(ma) {
 }
 
 /**
+ * @type:
  * @description:
  * @param: {functor} ma
  * @return: {@see _just}
@@ -295,8 +311,8 @@ function _toMaybe() {
 //===========================================================================================//
 
 /**
+ * @type:
  * @description:
- * @type: {function}
  * @param: {function} predicate
  * @param: {Array} xs
  * @return: {Array}
@@ -306,8 +322,8 @@ var filter = curry(function _filter(predicate, xs) {
 });
 
 /**
+ * @type:
  * @description:
- * @type: {function}
  * @param: {Array} xs
  * @param: {function} comparer
  * @param: {Array} ys
@@ -318,8 +334,8 @@ var intersect = curry(function _intersect(xs, comparer, ys) {
 });
 
 /**
+ * @type:
  * @description:
- * @type: {function}
  * @param: {Array} xs
  * @param: {function} comparer
  * @param: {Array}
@@ -328,5 +344,5 @@ var except = curry(function _except(xs, comparer, ys) {
     return ys.except(xs, comparer);
 });
 
-export { apply, ap, fmap, map, mapWith, flatMap, flatMapWith, lifter, lift2, lift3, lift4, liftN, mjoin, pluckWith, toContainerType,
+export { apply, ap, fmap, map, mapWith, flatMap, flatMapWith, lift2, lift3, lift4, liftN, mjoin, pluckWith, toContainerType,
             containerIterator, chain, bind, mcompose, filter, intersect, except };

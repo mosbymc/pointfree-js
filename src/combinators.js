@@ -84,7 +84,7 @@ function constant(item) {
 }
 
 /**
- * curry :: (* -> a) -> (* -> a)
+ * @type: curry :: (* -> a) -> (* -> a)
  * @description:
  * @param: {function} fn
  * @return: {function|*}
@@ -95,13 +95,14 @@ function curry(fn) {
 }
 
 /**
+ * @type: curryN :: (* -> a) -> (* -> a)
  * @description: Curries a function to a specified arity
  * @param: {number} arity - The number of arguments to curry the function for
  * @param: {Array} received - An array of the arguments to be applied to the function
  * @param: {function} fn - The function to be curried
  * @return: {function | *} - Returns either a function waiting for more arguments to
- * be applied before invocation, or will return the result of the function invocation
- * if the specified number of arguments have been received
+ * be applied before invocation, or will return the result of the function applied
+ * to the supplied arguments is the specified number of arguments have been received.
  */
 function curryN(context, arity, fn, received = []) {
     return function _curryN(...rest) {
@@ -112,6 +113,7 @@ function curryN(context, arity, fn, received = []) {
 }
 
 /**
+ * @type:
  * @description:
  * @param: {function} fn
  * @return: {Function|*}
@@ -123,8 +125,8 @@ function curryRight(fn) {
 }
 
 /**
+ * @type:
  * @description:
- * @type: {function}
  * @param: {function} predicate
  * @param: {function} reduceFn
  * @param: {*} result
@@ -136,6 +138,7 @@ var filtering = curry(function _filtering2(predicate, reduceFn, result, input) {
 });
 
 /**
+ * @type:
  * @description:
  * @param: {function} predicate
  * @return: {function}
@@ -146,9 +149,16 @@ function filterReducer(predicate) {
     };
 }
 
+/**
+ * @type:
+ * @description:
+ * @param: {*}
+ * @return: {function}
+ */
 var first = constant;
 
 /**
+ * @type:
  * @description:
  * @param: {function} fn
  * @return {*}
@@ -163,8 +173,8 @@ function fixedPoint(fn) {
 }
 
 /**
+ * @type:
  * @description:
- * @type: {function}
  * @param: {function} join
  * @param: {function} fn1
  * @param: {function} fn2
@@ -175,21 +185,19 @@ var fork = curry((join, fn1, fn2) => {
 });
 
 /**
- * Identity :: a -> a
+ * @type: Identity :: a -> a
  * @description: Identity function; takes any item and returns same item when invoked
- *
  * @param: {*} item - Any value of any type
  * @returns: {*} - returns item
  */
 var identity = item => item;
 
 /**
- * ifElse :: Function -> ( Function -> ( Function -> (a -> b) ) )
+ * @type: ifElse :: Function -> ( Function -> ( Function -> (a -> b) ) )
  * @description: Takes a predicate function that is applied to the data; If a truthy value
  * is returned from the application, the provided ifFunc argument will be
  * invoked, passing the data as an argument, otherwise the elseFunc is
  * invoked with the data as an argument.
- * @type: {function}
  * @param: {function} predicate
  * @param: {function} ifFunc
  * @param: {function} elseFunc
@@ -200,8 +208,8 @@ var identity = item => item;
 var ifElse = curry((predicate, ifFunc, elseFunc, data) => predicate(data) ? ifFunc(data) : elseFunc(data));
 
 /**
+ * @type:
  * @description:
- * @type: {function}
  * @param: {function} predicate
  * @param: {function} ifFunc
  * @param: {*} ifArg
@@ -211,10 +219,9 @@ var ifElse = curry((predicate, ifFunc, elseFunc, data) => predicate(data) ? ifFu
 var ifThisThenThat = curry((predicate, ifFunc, ifArg, thatArg) => predicate(ifArg) ? ifFunc(thatArg) : thatArg);
 
 /**
- * kestrel :: a -> () -> a
+ * @type: kestrel :: a -> () -> a
  * @description:
  * @note: @see {@link constant}
- * @type: {function}
  * @param: {*} item
  * @returns: {function} - Returns a function, that when invoked, will
  * return the item passed to the constant function as an argument.
@@ -222,6 +229,7 @@ var ifThisThenThat = curry((predicate, ifFunc, ifArg, thatArg) => predicate(ifAr
 var kestrel = constant;
 
 /**
+ * @type:
  * @description:
  * @param: {function} a
  * @return: {*}
@@ -229,8 +237,8 @@ var kestrel = constant;
 var m = a => a(a);
 
 /**
+ * @type:
  * @description:
- * @type: {function}
  * @param: {function} f
  * @param: {object} x
  * @return: {identity<T>}
@@ -242,8 +250,8 @@ var mapped = curry(function _mapped(f, x) {
 });
 
 /**
+ * @type:
  * @description:
- * @type: {function}
  * @param: {function} mapFn
  * @param: {function} reduceFn
  * @param: {*} result
@@ -255,6 +263,7 @@ var mapping = curry(function _mapping2(mapFn, reduceFn, result, input) {
 });
 
 /**
+ * @type:
  * @description:
  * @param: {function} mapFn
  * @return: {function}
@@ -266,8 +275,8 @@ function mapReducer (mapFn) {
 }
 
 /**
+ * @type:
  * @description:
- * @type: {function}
  * @param: {function} a
  * @param: {function} b
  * @return: {*}
@@ -275,7 +284,7 @@ function mapReducer (mapFn) {
 var o = curry((a, b) => b(a(b)));
 
 /**
- * pipe :: [a] -> (b -> c)
+ * @type: pipe :: [a] -> (b -> c)
  * @description: -  Takes a List of functions as arguments and returns
  * a function waiting to be invoked with a single item. Once the returned
  * function is invoked, it will reduce the List of functions over the item,
@@ -300,8 +309,8 @@ function pipe(fn, ...fns) {
 }
 
 /**
+ * @type:
  * @description:
- * @type: {function}
  * @param: {function} a
  * @param: {function} b
  * @param: {*} c
@@ -311,8 +320,8 @@ var q = curry((a, b, c) => b(a(c)));
 
 //const reduce = (accFn, start, xs) => xs.reduce(accFn, start);
 /**
+ * @type:
  * @description:
- * @type: {function}
  * @param: {function} accFunc
  * @param: {*} start
  * @param: {Array} xs
@@ -348,9 +357,14 @@ var reduce = curry(function _reduce(accFunc, start, xs) {
     return xs.reduce(accFunc, start);
 });
 
+/**
+ * @type:
+ * @description:
+ */
 var second = constant(identity);
 
 /**
+ * @type:
  * @description:
  * @param: {Array} fns
  * @returns: {function}
@@ -364,19 +378,25 @@ function sequence(fns) {
 }
 
 /**
+ * @type:
  * @description:
- * @type: {function}
  * @param: {*} x
  * @param: {function} f
  * @return: {*}
  */
 var t = curry((x, f) => f(x));
 
+/**
+ * @type:
+ * @description:
+ * @refer: {t}
+ * @note: @see {@link t}
+ */
 var thrush = t;
 
 /**
+ * @type:
  * @description:
- * @type: {function}
  * @param: {function} a
  * @param: {function} b
  * @return: {*}
@@ -384,8 +404,8 @@ var thrush = t;
 var u = curry((a, b) => b(a(a)(b)));
 
 /**
+ * @type:
  * @description:
- * @type: {function}
  * @param: {function} a
  * @param: {*} b
  * @return: {*}
@@ -393,7 +413,7 @@ var u = curry((a, b) => b(a(a)(b)));
 var w = curry((a, b) => a(b)(b));
 
 /**
- * when :: Function -> (Function -> (a -> b))
+ * @type: when :: Function -> (Function -> (a -> b))
  * @description: Similar to ifElse, but no 'elseFunc' argument. Instead, if the application
  * of the predicate to the data returns truthy, the transform is applied to
  * the data. Otherwise, the data is returned without invoking the transform.
@@ -405,8 +425,8 @@ var w = curry((a, b) => a(b)(b));
 var when = curry((predicate, transform, data) => predicate(data) ? transform(data) : data);
 
 /**
+ * @type:
  * @description:
- * @type: {function}
  * @param: {function} predicate
  * @param: {function} transform
  * @param: {*} data
@@ -415,12 +435,17 @@ var when = curry((predicate, transform, data) => predicate(data) ? transform(dat
 var whenNot = curry((predicate, transform, data) => !predicate(data) ? transform(data) : data);
 
 /**
+ * @type:
  * @description:
- * @type: {@see fixedPoint}
  */
 var y = fixedPoint;
 
-
+/**
+ * @type:
+ * @description:
+ * @param: {function} fn
+ * @return: {function}
+ */
 function applyWhenReady(fn) {
     var values = [];
     function _applyWhenReady(...args) {
