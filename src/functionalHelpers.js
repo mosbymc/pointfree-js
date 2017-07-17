@@ -305,6 +305,19 @@ var lessThan = curry((x, y) => x < y);
 var lessThanOrEqual = curry((x, y) => x <= y);
 
 /**
+ * @type:
+ * @description:
+ * @param: {*} key
+ * @param: {*} val
+ * @param: {Map} map
+ * @return: {Map}
+ */
+var mapSet = curry(function _mapSet(key, val, map) {
+    map.set(key, val);
+    return map;
+});
+
+/**
  * @description:
  * @type: {function}
  * @param: {number} x
@@ -405,6 +418,18 @@ var set = curry(function _set(prop, val, obj) {
 });
 
 /**
+ * @type:
+ * @description:
+ * @param: {*} val
+ * @param: {Set} set
+ * @return: {Set}
+ */
+var setSet = curry(function _setSet(val, set) {
+    set.add(val);
+    return set;
+});
+
+/**
  * @description:
  * @type: {function}
  * @param: {*} x
@@ -466,5 +491,5 @@ function reverse(...args) {
 export { add, adjust, and, arraySet, both, concat, defaultPredicate, delegatesFrom, delegatesTo, divide, either, equals,
         falsey, flip, getWith, greaterThan, greaterThanOrEqual, has, inObject, invoke, isArray, isBoolean, isFunction,
         isObject, isNothing, isNull, isNumber, isSomething, isString, isSymbol, isUndefined, lessThan, lessThanOrEqual,
-        modulus, multiple, negate, notEqual, noop, nth, objectSet, once, or, set, strictEquals, strictNotEqual, subtract,
-        truthy, type, wrap, reverse };
+        mapSet, modulus, multiple, negate, notEqual, noop, nth, objectSet, once, or, set, setSet, strictEquals, strictNotEqual,
+        subtract, truthy, type, wrap, reverse };
