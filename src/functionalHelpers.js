@@ -405,6 +405,14 @@ function once(fn) {
 var or = curry((a, b) => !!(a || b));
 
 /**
+ * @type:
+ * @description:
+ * @param: {Array|String} xs
+ * @return: {Array|String}
+ */
+var reverse = xs => isArray(xs) ? xs.slice(0).reverse() : xs.split('').reverse().join('');
+
+/**
  * @description:
  * @type: {function}
  * @param: {string} prop
@@ -480,7 +488,7 @@ var type = a => typeof a;
  */
 var wrap = data => [data];
 
-function reverse(...args) {
+function reverse2(...args) {
     if (1 === args.length) {
         if ('string' === typeof args[0]) return args[0].split('').reverse().join();
         return args;
@@ -491,5 +499,5 @@ function reverse(...args) {
 export { add, adjust, and, arraySet, both, concat, defaultPredicate, delegatesFrom, delegatesTo, divide, either, equals,
         falsey, flip, getWith, greaterThan, greaterThanOrEqual, has, inObject, invoke, isArray, isBoolean, isFunction,
         isObject, isNothing, isNull, isNumber, isSomething, isString, isSymbol, isUndefined, lessThan, lessThanOrEqual,
-        mapSet, modulus, multiple, negate, notEqual, noop, nth, objectSet, once, or, set, setSet, strictEquals, strictNotEqual,
-        subtract, truthy, type, wrap, reverse };
+        mapSet, modulus, multiple, negate, notEqual, noop, nth, objectSet, once, or, reverse, set, setSet, strictEquals,
+        strictNotEqual, subtract, truthy, type, wrap };
