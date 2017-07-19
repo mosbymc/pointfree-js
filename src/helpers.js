@@ -211,6 +211,29 @@ function memoizer(fn, keyMaker) {
 }
 
 /**
+ * @type:
+ * @description:
+ * @param: {Object|Array|Function} obj
+ * @return: {Object|Array|Function}
+ */
+function deepCloneUltra(obj) {
+    if (null == obj || 'object' !== typeof obj)
+        return obj;
+
+    if (Array.isArray(obj))
+        return deepCopy(obj);
+
+    var ret = !(Object.getPrototypeOf(obj) === Object.prototype) ? Object.create(Object.getPrototypeOf(obj)) : {};
+    var propNames = Object.getOwnPropertyNames(obj);
+
+    var g = propNames.slice(1).reduce(function _reducePropNames(prop) {
+        return ret[prop] = deepCloneUltra(obj[prop]), ret;
+    }, propNames[0]);
+
+    return ret;
+}
+
+/**
  * @description:
  * @param: {*} obj
  * @returns: {*}

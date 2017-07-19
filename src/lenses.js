@@ -1,5 +1,6 @@
 import { arraySet, mapSet, objectSet, setSet, isArray } from './functionalHelpers';
 import { curry, compose, kestrel, when } from './combinators';
+import { deepClone } from './helpers';
 import { Maybe } from './containers/monads/maybe_monad';
 import { Identity } from './containers/monads/identity_monad';
 import { Constant } from './containers/monads/constant_monad';
@@ -106,7 +107,19 @@ function makeLenses(...paths) {
     return paths.reduce(function _pathReduce(cur, next) {
         var ol = objectLens(next);
         return put(ol, ol, cur);
-    }, { num: arrayLens });
+    }, {num: arrayLens});
+}
+
+function improvedLensPath(...paths) {
+    var innerLensDef = curry(function _innerLensDef(prop, fn, xs) {
+        return mapWith(function _map(rep) {
+            return objectSet(prop, rep, xs);
+        }, fn(xs[prop]));
+    });
+
+    return compose(...paths.map(function _pathsMap(p) {
+        innerLensDef(p);
+    }));
 }
 
 /**
@@ -120,6 +133,25 @@ function lensPath(...path) {
         return 'string' === typeof p ? objectLens(p) : arrayLens(p);
     }));
 }
+
+/**
+ * @type:
+ * @description:
+ * @param: {Array|String} path
+ * @param: {Object} obj
+ * @return: {*}
+ */
+var prismPath = curry(function _prismPath(path, obj) {
+    path = when(not(isArray), split('.'), path);
+    var val = obj,
+        idx = 0;
+    while (idx < path.length) {
+        if (null == val) return Maybe.Nothing();
+        val = val[path[idx]];
+        ++idx;
+    }
+    return Maybe(val);
+});
 
 /**
  * @type:
@@ -138,20 +170,15 @@ var lens = curry(function _lens(getter, setter, key, f, xs) {
 /**
  * @type:
  * @description:
- * @param: {Array|String} path
- * @param: {Object} obj
- * @return: {*}
+ * @param: {function} getter
+ * @param: {function} setter
+ * @param: {String} key
+ * @param: {function} f
+ * @param: {Array} xs
+ * @param: {*}
  */
-var maybePath = curry(function _maybePath(path, obj) {
-    path = when(not(isArray), split('.'), path);
-    var val = obj,
-        idx = 0;
-    while (idx < path.length) {
-        if (null == val) return Maybe.Nothing();
-        val = val[path[idx]];
-        ++idx;
-    }
-    return Maybe(val);
+var prism = curry(function _prism(getter, setter, key, f, xs) {
+    return mapWith(replace => setter(key, replace, xs), Maybe(f(getter(key, xs))));
 });
 
 /**
@@ -165,4 +192,4 @@ var split = curry(function _split(delimiter, string) {
     return string.split(delimiter);
 });
 
-export { arrayLens, objectLens, view, over, put, set, lens, maybePath, makeLenses, lensPath, unifiedLens };
+export { arrayLens, objectLens, view, over, put, set, lens, prismPath, makeLenses, lensPath, unifiedLens };

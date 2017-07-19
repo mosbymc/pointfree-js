@@ -1,12 +1,18 @@
-import { arrayLens, objectLens, view, over, put, set, lens, maybePath, makeLenses, lensPath } from '../../src/lenses';
+import { arrayLens, objectLens, view, over, put, set, lens, prismPath, makeLenses, lensPath } from '../../src/lenses';
 import { reverse } from '../../src/functionalHelpers';
 import { compose, curry } from '../../src/combinators';
 import { map, mapWith } from '../../src/pointlessContainers';
 import { functors } from '../../src/containers/functors/functors';
 
-var Identity = functors.Identity;
+var Identity = functors.Identity,
+    Future = functors.Future;
+
 function toUpper(str) {
     return str.toUpperCase();
+}
+
+function replace(regex, str) {
+    return str.replace(regex);
 }
 
 function _getValue(x) { return x.value }
@@ -47,6 +53,27 @@ describe('Test lenses', function _testLenses() {
                 .toString().should.eql('Identity(Just([object Object]))');
         });
 
+        it('should do even more stuff', function _testEvenMoreStuff() {
+            var addresses = lensPath('addresses');
+            var street = lensPath('street');
+            var allStreets = compose(addresses, mapped, street);
+
+            //  :: Int -> Task Error User
+            var getUser = id => Future((rej, res) => setTimeout(() => res(user), 400));
+
+            // profilePage :: User -> Html
+            var profilePage = compose(map(x => `<span>${x.street}<span>`), view(addresses));
+
+            // updateUser :: User -> User
+            var updateUser = over(allStreets, replace(/\d+/, '****'));
+
+            // renderProfile :: User -> Html
+            var renderProfile = compose(map(compose(profilePage, updateUser)), getUser);
+
+            console.log(Object.getPrototypeOf(renderProfile));
+            //renderProfile(1).fork(console.log, console.log);
+        });
+
         it('', function() {
             function capitalizeFirst(str) {
                 return str.toUpperCase();
@@ -66,16 +93,18 @@ describe('Test lenses', function _testLenses() {
             const firstCommentBody = lensPath('comments',0,'body');//assign lens to a resuable named variable
             console.log(over(firstCommentBody, capitalizeFirst)(bigBird));//then use
 
-            const mapped = curry(
-                (f, x) => Identity( mapWith( compose( x=>x.value, f), x) )
-            );
+            const mapped = curry((f, x) => Identity(mapWith(compose(x => x.value, f), x)));
             const mapTwice = compose(mapped, mapped);
-            console.log(over(mapTwice, x=>x+1, [[4, 6, 7], [5, 7, 8]]));
-            console.log(over(mapped, mapWith(x=>x+1), [[4, 6, 7], [5, 7, 8]]));
+            console.log(over(mapTwice, x => x + 1, [[4, 6, 7], [5, 7, 8]]));
+            console.log(over(mapped, mapWith(x => x + 1), [[4, 6, 7], [5, 7, 8]]));
 
 
             const dataset = {
-                entries: [{id:"1"},{id:"2"},{id:"3"}]
+                entries: [
+                    { id: "1" },
+                    { id: "2" },
+                    { id: "3" }
+                ]
             };
 
             const L = makeLenses('entries','id');
