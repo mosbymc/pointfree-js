@@ -115,7 +115,6 @@ describe('Test lenses', function _testLenses() {
             console.log(over(eachEntrysId, makeInt)(dataset));//boom: we fixed all the ids so they're Integers!
 
             console.log(over(L.entries, mapWith(over(L.id, x => parseInt(x, 10))), dataset));//same result, but eh, messy
-
         });
     });
 });

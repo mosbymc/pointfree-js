@@ -213,24 +213,74 @@ function memoizer(fn, keyMaker) {
 /**
  * @type:
  * @description:
- * @param: {Object|Array|Function} obj
- * @return: {Object|Array|Function}
+ * @param: {*} obj
+ * @return: {*}
  */
 function deepCloneUltra(obj) {
-    if (null == obj || 'object' !== typeof obj)
-        return obj;
+    var uniqueObjects = new Set();
+    uniqueObjects.add(obj);
 
-    if (Array.isArray(obj))
-        return deepCopy(obj);
+    return objectCloner(obj);
 
-    var ret = !(Object.getPrototypeOf(obj) === Object.prototype) ? Object.create(Object.getPrototypeOf(obj)) : {};
-    var propNames = Object.getOwnPropertyNames(obj);
+    /**
+     * @type:
+     * @description:
+     * @param: {*} obj
+     * @return: {*}
+     */
+    function objectCloner(obj) {
+        //if the 'obj' parameter is a primitive type, just return it; there's no way/need to copy
+        if (null == obj || 'object' !== typeof obj && 'function' !== typeof obj)
+            return obj;
 
-    var g = propNames.slice(1).reduce(function _reducePropNames(prop) {
-        return ret[prop] = deepCloneUltra(obj[prop]), ret;
-    }, propNames[0]);
+        //if we've already seen this 'object' before, we don't want to get caught
+        //in an infinite loop; just return the 'object'. Otherwise, add it to the
+        //set of viewed 'objects'
+        if (uniqueObjects.has(obj)) return obj;
+        uniqueObjects.add(obj);
 
-    return ret;
+        //if the obj parameter is a function, invoke the functionClone function and return its return...
+        if ('function' === typeof obj) return functionClone(obj);
+        //...else, reduce over the obj parameter's own keys after creating a new object that has its
+        //prototype delegating to the same object that the obj's prototype delegating to. This functionality
+        //will work for an array as well.
+        return Object.getOwnPropertyNames(obj).reduce(_reducePropNames.bind(Object.create(Object.getPrototypeOf(obj))), '');
+
+        //this is the function used in the reduce and is bound to the context of the return (cloned) object
+        function _reducePropNames(prev, curr) {
+            return this[curr] = objectCloner(obj[curr]), this;
+        }
+    }
+}
+
+
+/**
+ * @type:
+ * @description:
+ * @param: {function} fn
+ * @param: {Object} cxt
+ * @return: {function}
+ */
+function functionClone(fn, cxt = null) {
+    var clone = (function _clone(...args) {
+        return fn(...args);
+    }).bind(cxt);
+
+    Object.defineProperties(clone, {
+        'length': {
+            value: fn.length,
+            enumerable: false
+        },
+        'prototype': {
+            value: Object.create(fn.prototype)
+        }
+    });
+
+    Object.getOwnPropertyNames(test).reduce(function _reducePropName(prev, curr) {
+        return clone[curr] = deepCloneUltra(fn[curr]), clone;
+    }, '');
+
+    return clone;
 }
 
 /**
