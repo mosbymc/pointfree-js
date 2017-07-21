@@ -356,4 +356,4 @@ function emptyMonoidFactory(m) {
 */
 
 export { javaScriptTypes, sortDirection, observableStatus, sortComparer, cacher, memoizer,
-            deepClone, deepCopy, shallowClone, generatorProto, emptyObject, emptyMonoidFactory, typeName };
+            deepClone, deepCopy, shallowClone, generatorProto, emptyObject, emptyMonoidFactory, typeName, deepCloneUltra };

@@ -1,4 +1,4 @@
-import { cacher, deepClone, deepCopy } from '../../src/helpers';
+import { cacher, deepClone, deepCopy, deepCloneUltra } from '../../src/helpers';
 import { testData } from '../testData';
 
 function checkClonedDataProps(orig, clone) {
@@ -19,35 +19,154 @@ function checkClonedArrayIndices(orig, clone) {
     });
 }
 
-describe('deepClone', function testCloneData() {
-    it('should clone data', function testCloneData() {
-        var clonedData = deepClone(testData);
-        expect(checkClonedDataProps(testData, clonedData)).to.be.true;
+describe('test helpers', function _testHelpers() {
+    describe('deepClone', function testCloneData() {
+        it('should clone data', function testCloneData() {
+            var clonedData = deepClone(testData);
+            expect(checkClonedDataProps(testData, clonedData)).to.be.true;
+        });
     });
-});
 
-describe('deepCopy', function testCloneArray() {
-    it('should clone arrays', function testCloneArray() {
-        var clonedArr = deepCopy(testData.dataSource.data);
-        expect(checkClonedArrayIndices(testData.dataSource.data, clonedArr)).to.be.true;
+    describe('deepCopy', function testCloneArray() {
+        it('should clone arrays', function testCloneArray() {
+            var clonedArr = deepCopy(testData.dataSource.data);
+            expect(checkClonedArrayIndices(testData.dataSource.data, clonedArr)).to.be.true;
+        });
     });
-});
 
-describe('cacher', function testMemoizer() {
-    it('should remember unique values for each instance', function testMemoizer() {
-        function comparer(a, b) { return a === b; }
-        var mem1 = cacher(comparer),
-            mem2 = cacher(comparer),
-            mem3 = cacher(comparer);
+    describe('cacher', function testMemoizer() {
+        it('should remember unique values for each instance', function testMemoizer() {
+            function comparer(a, b) { return a === b; }
+            var mem1 = cacher(comparer),
+                mem2 = cacher(comparer),
+                mem3 = cacher(comparer);
 
-        testData.dataSource.data.forEach(function findUniques(item) {
-            mem1(item).should.not.be.true;
-            mem2(item).should.not.be.true;
-            mem1(item).should.be.true;
+            testData.dataSource.data.forEach(function findUniques(item) {
+                mem1(item).should.not.be.true;
+                mem2(item).should.not.be.true;
+                mem1(item).should.be.true;
+            });
+
+            [1, 1, 2, 2, 3, 3, 4, 4, 5, 5].forEach(function findUniques(item, idx) {
+                mem3(item).should.eql(!!(idx % 2));
+            });
+        });
+    });
+
+    describe('Test deepCloneUltra', function _testDeepCloneUltra() {
+        it('should clone a simple object', function _testSimpleObjectClone() {
+            var obj = {
+                a: 1,
+                b: 2,
+                c: '3',
+                d: false,
+                e: null,
+                f: undefined,
+                g: Symbol.iterator
+            };
+
+            var clonedObj = deepCloneUltra(obj);
+
+            Object.keys(clonedObj).should.eql(Object.keys(obj));
+            Object.getOwnPropertyNames(clonedObj).should.eql(Object.getOwnPropertyNames(obj));
+            clonedObj.a.should.eql(obj.a);
+            clonedObj.b.should.eql(obj.b);
+            clonedObj.c.should.eql(obj.c);
+            clonedObj.d.should.eql(obj.d);
+            expect(clonedObj.e).to.eql(obj.e);
+            expect(clonedObj.f).to.eql(obj.f);
+            expect(clonedObj.g).to.eql(obj.g);
+
+            Object.getPrototypeOf(clonedObj).should.eql(Object.getPrototypeOf(obj));
         });
 
-        [1, 1, 2, 2, 3, 3, 4, 4, 5, 5].forEach(function findUniques(item, idx) {
-            mem3(item).should.eql(!!(idx % 2));
+        it('should clone a simple array', function _testArrayCloning() {
+            var arr = [1, 2, 3, 4, 5],
+                clonedArr = deepCloneUltra(arr);
+
+            Object.getPrototypeOf(clonedArr).should.eql(Object.getPrototypeOf(arr));
+            Object.getOwnPropertyNames(clonedArr).forEach(function _checkEachKey(key) {
+                clonedArr[key].should.eql(arr[key]);
+            });
+        });
+
+        it('should clone a simple function', function _testSimpleFunctionClone() {
+            function func(){ return 10; }
+
+            var clonedFunc = deepCloneUltra(func);
+
+            Object.getPrototypeOf(clonedFunc).should.eql(Object.getPrototypeOf(func));
+            Object.getOwnPropertyNames(clonedFunc).forEach(function _checkEachKey(key) {
+                clonedFunc[key].should.eql(func[key]);
+            });
+            clonedFunc().should.eql(func());
+        });
+
+        it('should \'clone\' primitives', function _testPrimitiveClone() {
+            var cloneStr = deepCloneUltra('test'),
+                cloneNum = deepCloneUltra(2),
+                cloneBool = deepCloneUltra(false),
+                cloneNull = deepCloneUltra(null),
+                cloneUndefined = deepCloneUltra(),
+                cloneSymbol = deepCloneUltra(Symbol.iterator);
+
+            cloneStr.should.eql('test');
+            cloneNum.should.eql(2);
+            cloneBool.should.eql(false);
+            expect(cloneNull).to.be.null;
+            expect(cloneUndefined).to.be.undefined;
+            expect(cloneSymbol).to.eql(Symbol.iterator);
+        });
+
+        it('should clone objects with proper delegation', function _testDelegateCloning() {
+            var delegate = { a: 1, b: 2 },
+                delegator = Object.create(delegate);
+
+            var clonedDelegator = deepCloneUltra(delegator);
+
+            Object.keys(clonedDelegator).should.eql(Object.keys(delegator));
+            Object.getPrototypeOf(clonedDelegator).should.eql(delegate);
+        });
+
+        it('should clone complex/nested objects', function _testNestedObjectCloning() {
+            var delegateObj1 = {
+                a: 1,
+                b: function _b(val) { return val * 2; }
+            },
+                delegateObj2 = Object.create(delegateObj1, {
+                    c: {
+                        value: 3
+                    },
+                    d: {
+                        get: function _getFive() {
+                            return 5;
+                        }
+                    }
+                }),
+                delegator = Object.create(delegateObj2, {
+                    e: {
+                        value: 6
+                    },
+                    f: {
+                        value: '7'
+                    }
+                });
+
+            var clonedDelegator = deepCloneUltra(delegator);
+            Object.getPrototypeOf(clonedDelegator).should.eql(Object.getPrototypeOf(delegator));
+            Object.keys(clonedDelegator).should.eql(Object.keys(delegator));
+            clonedDelegator.d.should.eql(delegator.d);
+            clonedDelegator.b().should.eql(delegator.b());
+        });
+
+        it('should not get caught in infinite recursion', function _testCloneDoesNotLoopInfinitely() {
+            var obj = { a: 1, b: 2 };
+            obj.g = {c: 3, e: 4, f: obj};
+
+            var clonedObj = deepCloneUltra(obj);
+            clonedObj.a.should.eql(obj.a);
+            clonedObj.b.should.eql(obj.b);
+            clonedObj.g.should.eql(obj.g);
         });
     });
 });
