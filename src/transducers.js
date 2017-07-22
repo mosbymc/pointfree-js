@@ -1,11 +1,37 @@
 import { compose, curry } from './combinators'
 
+/**
+ * @type:
+ * @description:
+ * @param: {function} f
+ * @return: {*}
+ */
 var mapping = (f) => (reducing) => (result, input) => reducing(result, f(input));
 
+/**
+ * @type:
+ * @description:
+ * @param: {function} predicate
+ * @return: {*}
+ */
 var filtering = (predicate ) => (reducing) => (result, input) => predicate(input) ? reducing(result, input) : result;
 
+/**
+ * @type:
+ * @description:
+ * @param: {function} xform
+ * @param: {function} reducing
+ * @param: {*} initial
+ * @param: {*} input
+ * @return: {*}
+ */
 var transduce = (xform, reducing, initial, input) => input.reduce(xform(reducing), initial);
 
+/**
+ * @type:
+ * @description:
+ * @return:
+ */
 var xform = compose(
     mapping((x) => x + 1),
     filtering((x) => 0 === x % 2));
@@ -31,8 +57,14 @@ transduce(xform, (sum, x) => sum + x, 0, [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]);
 
 console.log(transduce(xform, (sum, x) => sum + x, 0, [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]));
 
-
-
+/**
+ * @type:
+ * @description:
+ * @param: txf
+ * @param: acc
+ * @param: xs
+ * @return: {*}
+ */
 var reduce = (txf, acc, xs) => {
     for (let item of xs){
         let next = txf(acc, item);//we could also pass an index or xs, but K.I.S.S.

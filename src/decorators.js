@@ -208,12 +208,24 @@ var tryCatch = curry(function _tryCatch(catcher, tryer) {
  */
 var unary = (fn, arg) => curryN(this, 1, fn, undefined === arg ? [] : [arg]);
 
+/**
+ * @type:
+ * @description:
+ * @param: {*} seed
+ * @return: {function}
+ */
 function unfold(seed) {
     return function *_unfold(fn) {
 
     };
 }
 
+/**
+ * @type:
+ * @description:
+ * @param: {function} fn
+ * @return: {function}
+ */
 function unfoldWith(fn) {
     return function *_unfold (value) {
         let { next, element, done } = fn(value);
@@ -225,6 +237,14 @@ function unfoldWith(fn) {
     }
 }
 
+/**
+ * @type:
+ * @description:
+ * @param: cata
+ * @param: ana
+ * @param: seed
+ * @return: {*}
+ */
 var hyloWith = curry(function _hylo(cata, ana, seed) {
     let { next: n, element: acc, done } = ana(seed);
     let { next, element } = ana(n); // not a monoid

@@ -464,11 +464,12 @@ function applyWhenReady(fn) {
     return _applyWhenReady;
 }
 
-
-
-
-
-
+/**
+ * @type:
+ * @description:
+ * @param: skips
+ * @return: {function}
+ */
 function dropGate(skips) {
     return function _dropGate(x) {
         return 0 > --skips;
@@ -488,7 +489,6 @@ function dropping2(skips) {
         };
     };
 }
-
 
 var x = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
     .reduce(mapping((x) => x + 1)((xs, x) => {

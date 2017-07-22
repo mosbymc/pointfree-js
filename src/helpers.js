@@ -123,6 +123,13 @@ function cacher(comparer) {
     return cacheChecker;
 }
 
+/**
+ * @type:
+ * @description:
+ * @param: {Generator|Array|Map|Set} collection
+ * @param: {function} comparer
+ * @return: {{contains, getValue}}
+ */
 function genericCacher(collection, comparer) {
     function createCacheChequer() {
         switch (createBitMask(...buildTypeBits(collection))) {
@@ -332,12 +339,6 @@ function shallowClone(obj) {
 
 var emptyObject = {};
 
-function emptyMonoidFactory(m) {
-    return function empty() {
-        return m(Object.create(emptyObject));
-    }
-}
-
 /**
  * @description:
  * @type: {function}
@@ -356,4 +357,4 @@ function emptyMonoidFactory(m) {
 */
 
 export { javaScriptTypes, sortDirection, observableStatus, sortComparer, cacher, memoizer,
-            deepClone, deepCopy, shallowClone, generatorProto, emptyObject, emptyMonoidFactory, typeName, deepCloneUltra };
+            deepClone, deepCopy, shallowClone, generatorProto, emptyObject, typeName, deepCloneUltra };

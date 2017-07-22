@@ -110,6 +110,12 @@ function makeLenses(...paths) {
     }, {num: arrayLens});
 }
 
+/**
+ * @type:
+ * @description:
+ * @param: {Array} paths
+ * @return: {function}
+ */
 function improvedLensPath(...paths) {
     var innerLensDef = curry(function _innerLensDef(prop, fn, xs) {
         return mapWith(function _map(rep) {
