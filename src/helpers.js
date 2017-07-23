@@ -223,7 +223,7 @@ function memoizer(fn, keyMaker) {
  * @param: {*} obj
  * @return: {*}
  */
-function deepCloneUltra(obj) {
+function deepClone(obj) {
     var uniqueObjects = new Set();
     uniqueObjects.add(obj);
 
@@ -292,25 +292,6 @@ function functionClone(fn, cxt = null) {
 
 /**
  * @description:
- * @param: {*} obj
- * @returns: {*}
- */
-function deepClone(obj) {
-    if (null == obj || javaScriptTypes.Object !== typeof obj)
-        return obj;
-
-    if (Array.isArray(obj))
-        return deepCopy(obj);
-
-    var temp = {};
-    Object.keys(obj).forEach(function _cloneGridData(field) {
-        temp[field] = deepClone(obj[field]);
-    });
-    return temp;
-}
-
-/**
- * @description:
  * @param: {Array} arr
  * @returns: {Array}
  */
@@ -357,4 +338,4 @@ var emptyObject = {};
 */
 
 export { javaScriptTypes, sortDirection, observableStatus, sortComparer, cacher, memoizer,
-            deepClone, deepCopy, shallowClone, generatorProto, emptyObject, typeName, deepCloneUltra };
+            deepClone, deepCopy, shallowClone, generatorProto, emptyObject, typeName };

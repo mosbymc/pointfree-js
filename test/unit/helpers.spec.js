@@ -1,4 +1,4 @@
-import { cacher, deepClone, deepCopy, deepCloneUltra } from '../../src/helpers';
+import { cacher, deepClone, deepCopy } from '../../src/helpers';
 import { testData } from '../testData';
 
 function checkClonedDataProps(orig, clone) {
@@ -20,12 +20,6 @@ function checkClonedArrayIndices(orig, clone) {
 }
 
 describe('test helpers', function _testHelpers() {
-    describe('deepClone', function testCloneData() {
-        it('should clone data', function testCloneData() {
-            var clonedData = deepClone(testData);
-            expect(checkClonedDataProps(testData, clonedData)).to.be.true;
-        });
-    });
 
     describe('deepCopy', function testCloneArray() {
         it('should clone arrays', function testCloneArray() {
@@ -65,7 +59,7 @@ describe('test helpers', function _testHelpers() {
                 g: Symbol.iterator
             };
 
-            var clonedObj = deepCloneUltra(obj);
+            var clonedObj = deepClone(obj);
 
             Object.keys(clonedObj).should.eql(Object.keys(obj));
             Object.getOwnPropertyNames(clonedObj).should.eql(Object.getOwnPropertyNames(obj));
@@ -82,7 +76,7 @@ describe('test helpers', function _testHelpers() {
 
         it('should clone a simple array', function _testArrayCloning() {
             var arr = [1, 2, 3, 4, 5],
-                clonedArr = deepCloneUltra(arr);
+                clonedArr = deepClone(arr);
 
             Object.getPrototypeOf(clonedArr).should.eql(Object.getPrototypeOf(arr));
             Object.getOwnPropertyNames(clonedArr).forEach(function _checkEachKey(key) {
@@ -93,7 +87,7 @@ describe('test helpers', function _testHelpers() {
         it('should clone a simple function', function _testSimpleFunctionClone() {
             function func(){ return 10; }
 
-            var clonedFunc = deepCloneUltra(func);
+            var clonedFunc = deepClone(func);
 
             Object.getPrototypeOf(clonedFunc).should.eql(Object.getPrototypeOf(func));
             Object.getOwnPropertyNames(clonedFunc).forEach(function _checkEachKey(key) {
@@ -103,12 +97,12 @@ describe('test helpers', function _testHelpers() {
         });
 
         it('should \'clone\' primitives', function _testPrimitiveClone() {
-            var cloneStr = deepCloneUltra('test'),
-                cloneNum = deepCloneUltra(2),
-                cloneBool = deepCloneUltra(false),
-                cloneNull = deepCloneUltra(null),
-                cloneUndefined = deepCloneUltra(),
-                cloneSymbol = deepCloneUltra(Symbol.iterator);
+            var cloneStr = deepClone('test'),
+                cloneNum = deepClone(2),
+                cloneBool = deepClone(false),
+                cloneNull = deepClone(null),
+                cloneUndefined = deepClone(),
+                cloneSymbol = deepClone(Symbol.iterator);
 
             cloneStr.should.eql('test');
             cloneNum.should.eql(2);
@@ -122,7 +116,7 @@ describe('test helpers', function _testHelpers() {
             var delegate = { a: 1, b: 2 },
                 delegator = Object.create(delegate);
 
-            var clonedDelegator = deepCloneUltra(delegator);
+            var clonedDelegator = deepClone(delegator);
 
             Object.keys(clonedDelegator).should.eql(Object.keys(delegator));
             Object.getPrototypeOf(clonedDelegator).should.eql(delegate);
@@ -152,7 +146,7 @@ describe('test helpers', function _testHelpers() {
                     }
                 });
 
-            var clonedDelegator = deepCloneUltra(delegator);
+            var clonedDelegator = deepClone(delegator);
             Object.getPrototypeOf(clonedDelegator).should.eql(Object.getPrototypeOf(delegator));
             Object.keys(clonedDelegator).should.eql(Object.keys(delegator));
             clonedDelegator.d.should.eql(delegator.d);
@@ -163,7 +157,7 @@ describe('test helpers', function _testHelpers() {
             var obj = { a: 1, b: 2 };
             obj.g = {c: 3, e: 4, f: obj};
 
-            var clonedObj = deepCloneUltra(obj);
+            var clonedObj = deepClone(obj);
             clonedObj.a.should.eql(obj.a);
             clonedObj.b.should.eql(obj.b);
             clonedObj.g.should.eql(obj.g);
