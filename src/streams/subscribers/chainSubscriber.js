@@ -1,6 +1,6 @@
 import { subscriber } from './subscriber';
 
-var deepMapSubscriber = Object.create(subscriber, {
+var chainSubscriber = Object.create(subscriber, {
     next: {
         value: function _next(item) {
             var mappedResult;
@@ -39,4 +39,4 @@ var deepMapSubscriber = Object.create(subscriber, {
     }
 });
 
-export { deepMapSubscriber };
+export { chainSubscriber };

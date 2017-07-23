@@ -1,6 +1,6 @@
-import { deepMapSubscriber } from '../subscribers/deepMapSubscriber';
+import { chainSubscriber } from '../subscribers/chainSubscriber';
 
-var deepMapOperator = {
+var chainOperator = {
     get transform() {
         return this._transform;
     },
@@ -12,8 +12,8 @@ var deepMapOperator = {
         return this;
     },
     subscribe: function _subscribe(subscriber, source) {
-        return source.subscribe(Object.create(deepMapSubscriber).init(subscriber, this.transform));
+        return source.subscribe(Object.create(chainSubscriber).init(subscriber, this.transform));
     }
 };
 
-export { deepMapOperator };
+export { chainOperator };

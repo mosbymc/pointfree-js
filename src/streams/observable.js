@@ -1,6 +1,6 @@
 import { observableStatus } from '../helpers';
 import { subscriber } from './subscribers/subscriber';
-import { debounceOperator, deepMapOperator, filterOperator, groupByOperator, itemBufferOperator, mapOperator, mergeOperator, timeBufferOperator } from './streamOperators/operators';
+import { debounceOperator, chainOperator, filterOperator, groupByOperator, itemBufferOperator, mapOperator, mergeOperator, timeBufferOperator } from './streamOperators/operators';
 import { generatorProto } from '../helpers';
 import { and, wrap, noop } from '../functionalHelpers';
 import { compose } from '../combinators';
@@ -38,8 +38,8 @@ var observable = {
      * @param fn
      * @returns {observable}
      */
-    deepMap: function _deepMap(fn) {
-        return this.lift(Object.create(deepMapOperator).init(fn));
+    chain: function _deepMap(fn) {
+        return this.lift(Object.create(chainOperator).init(fn));
     },
     /**
      *

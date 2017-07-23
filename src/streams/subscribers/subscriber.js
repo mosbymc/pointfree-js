@@ -1,5 +1,24 @@
 import { observableStatus } from '../../helpers';
 
+/**
+ * @type {
+ *  {
+ *      status, status,
+ *      count, count,
+ *      removeSubscriber: subscriber._removeSubscriber,
+ *      removeSubscription: subscriber._removeSubscription,
+ *      removeSubscriptions: subscriber._removeSubscriptions,
+ *      next: subscriber._next,
+ *      error: subscriber._error,
+ *      complete: subscriber._complete,
+ *      initialize: subscriber._initialize,
+ *      onError: subscriber._onError,
+ *      onComplete: subscriber._onComplete,
+ *      unsubscribe: subscriber._unsubscribe
+ *    }
+ *  }
+ *  @description:
+ */
 var subscriber = {
     get status() {
         return this._status || observableStatus.inactive;
@@ -16,9 +35,20 @@ var subscriber = {
     set count(cnt) {
         this._count = cnt || 0;
     },
+    /**
+     * @type:
+     * @description:
+     * @return: {@see subscriber}
+     */
     removeSubscriber: function _removeSubscriber() {
         this.subscriber = null;
+        return this;
     },
+    /**
+     * @type:
+     * @description:
+     * @param subscription
+     */
     removeSubscription: function _removeSubscription(subscription) {
         if (this.subscriptions.length) {
             this.subscriptions = this.subscriptions.filter(function _findSubscriber(sub) {
@@ -26,11 +56,24 @@ var subscriber = {
             });
         }
     },
+    /**
+     * @type:
+     * @description:
+     * @return: {@see subscriber}
+     */
     removeSubscriptions: function _removeSubscriptions() {
         this.subscriptions.length = 0;
+        return this;
     },
+    /**
+     * @type:
+     * @description:
+     * @param: {*} item
+     * @return: {@see subscriber}
+     */
     next: function _next(item) {
         this.subscriber.next(item);
+        return this;
         //Promise.resolve(item).then(this.then);
     },
     error: function _error(err) {
