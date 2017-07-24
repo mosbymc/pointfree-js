@@ -90,7 +90,7 @@ function constant(item) {
  * @return: {function|*}
  */
 function curry(fn) {
-    if (!fn.length || 1 === fn.length) return fn;
+    if (!fn.length || 1 >= fn.length) return fn;
     return curryN(this, fn.length, fn);
 }
 
@@ -102,14 +102,18 @@ function curry(fn) {
  * @param: {function} fn - The function to be curried
  * @return: {function | *} - Returns either a function waiting for more arguments to
  * be applied before invocation, or will return the result of the function applied
- * to the supplied arguments is the specified number of arguments have been received.
+ * to the supplied arguments if the specified number of arguments have been received.
  */
 function curryN(context, arity, fn, received = []) {
-    return function _curryN(...rest) {
+    if (fn.orig && fn.orig !== fn) return curryN(context, arity, fn.orig, received);
+    function _curryN(...rest) {
         var combined = received.concat(rest);
         if (arity > combined.length) return curryN(context, arity, fn, combined);
         return fn.call(context, ...combined.slice(0, arity));
-    };
+    }
+
+    _curryN.orig = fn;
+    return _curryN;
 }
 
 /**
@@ -402,6 +406,40 @@ var thrush = t;
  * @return: {*}
  */
 var u = curry((a, b) => b(a(a)(b)));
+
+/**
+ * @type:
+ * @description:
+ * @param: {function} fn
+ * @return: {function}
+ */
+function uncurry(fn) {
+    if (fn && fn.orig) return fn.orig;
+    return fn;
+}
+
+/**
+ * @type:
+ * @description:
+ * @param: {number} depth
+ * @param: {function} fn
+ * @return: {function|*}
+ */
+var uncurryN = curry(function uncurryN(depth, fn) {
+    return curryN(this, depth, function _uncurryN(...args) {
+        var currentDepth = 1;
+        var value = fn;
+        var idx = 0;
+        var endIdx;
+        while (currentDepth <= depth && 'function' === typeof value) {
+            endIdx = currentDepth === depth ? args.length : idx + value.length;
+            value = value.apply(this, args.slice(idx, endIdx));
+            currentDepth += 1;
+            idx = endIdx;
+        }
+        return value;
+    });
+});
 
 /**
  * @type:
