@@ -1,5 +1,6 @@
 import { functors } from '../../../../src/containers/functors/functors';
 import { identity_functor } from '../../../../src/containers/functors/identity_functor';
+import {orElse} from "../../../../src/containers/containerHelpers";
 
 var Identity = functors.Identity;
 
@@ -66,6 +67,41 @@ describe('Identity functor test', function _testIdentityFunctor() {
             expect('testing constant').to.eql(i7.value);
             expect(false).to.eql(i8.value);
         });
+
+        it('should return correct response when checking is a type is an Identity', function _testIdentityDotIs() {
+            var i = Identity(2),
+                m = functors.Maybe(2),
+                c = functors.Constant(null),
+                test1 = 2,
+                test2 = { a: 1 },
+                test3 = [1, 2, 3];
+
+            Identity.is(i).should.be.true;
+            Identity.is(m).should.be.false;
+            Identity.is(c).should.be.false;
+            Identity.is(test1).should.be.false;
+            Identity.is(test2).should.be.false;
+            Identity.is(test3).should.be.false;
+        });
+
+        it('should lift any function to return an Identity wrapped value', function _testIdentityDotLift() {
+            function t1() { return -1; }
+            function t2() { return '-1'; }
+            function t3(arg) { return arg; }
+
+            var res1 = Identity.lift(t1)(),
+                res2 = Identity.lift(t2)(),
+                res3 = Identity.lift(t3)(15);
+
+            res1.should.eql(Identity(-1));
+            res1.toString().should.eql('Identity(-1)');
+
+            res2.should.eql(Identity('-1'));
+            res2.toString().should.eql(res1.toString());
+
+            res3.should.eql(Identity(15));
+            res3.toString().should.eql('Identity(15)');
+        });
     });
 
     describe('Identity functor object tests', function _testIdentityFunctorObject() {
@@ -91,6 +127,45 @@ describe('Identity functor test', function _testIdentityFunctor() {
             }
 
             err2.should.be.true;
+        });
+
+        it('all get/getOrElse functions should return the underlying value of an Identity', function _testGetOrElse() {
+            function orElseFunc() { return 15; }
+            var orElseVal = orElseFunc();
+
+            var obj = { a: 1 },
+                arr = [1, 2, 3];
+
+            var nullI = Identity(null),
+                undefinedI = Identity(),
+                numberI = Identity(2),
+                stringI = Identity('2'),
+                objectI = Identity(obj),
+                arrayI = Identity(arr);
+
+            expect(nullI.get()).to.be.null;
+            expect(nullI.getOrElse(orElseFunc)).to.be.null;
+            expect(nullI.orElse(orElseVal)).to.be.null;
+
+            expect(undefinedI.get()).to.be.undefined;
+            expect(undefinedI.getOrElse(orElseFunc)).to.be.undefined;
+            expect(undefinedI.orElse(orElseVal)).to.be.undefined;
+
+            numberI.get().should.eql(2);
+            numberI.getOrElse(orElseFunc).should.eql(2);
+            numberI.orElse(orElseVal).should.eql(2);
+
+            stringI.get().should.eql('2');
+            stringI.getOrElse(orElseFunc).should.eql('2');
+            stringI.orElse(orElseVal).should.eql('2');
+
+            objectI.get().should.eql(obj);
+            objectI.getOrElse(orElseFunc).should.eql(obj);
+            objectI.orElse(orElseVal).should.eql(obj);
+
+            arrayI.get().should.eql(arr);
+            arrayI.getOrElse(orElseFunc).should.eql(arr);
+            arrayI.orElse(orElseVal).should.eql(arr);
         });
 
         it('should return a new identity functor instance with the mapped value', function _testIdentityFunctorMap() {

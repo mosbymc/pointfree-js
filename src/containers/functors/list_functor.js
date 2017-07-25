@@ -694,6 +694,7 @@ var ordered_list_functor = Object.create(list_core, {
 //TODO: ADS
 //TODO: Algebraic JavaScript - AJS
 //TODO: Lambda
+//TODO: Lambda calculus
 
 /**
  * @description: Creates a new list_functor object delegate instance; list_functor type is determined by

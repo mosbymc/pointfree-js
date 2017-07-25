@@ -16,7 +16,7 @@ module.exports = function _karmaConfig(config) {
         files: ['./src/**/*.js', './test/**/*.js'],
         preprocessors: {
             './test/testData.js': ['browserify'],
-            './test/**/*.js': ['browserify'],
+            './test/unit/**/*.js': ['browserify'],
             './src/**/*.js': ['browserify']
         },
         reporters: ['mocha', 'coverage', 'progress'],

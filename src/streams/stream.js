@@ -1,5 +1,4 @@
 import { observable } from './observable';
-import { queryable_core } from '../queryObjects/queryable';
 import { generatorProto } from '../helpers';
 import { isArray } from '../functionalHelpers';
 

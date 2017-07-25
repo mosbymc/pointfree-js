@@ -7,8 +7,7 @@ var gulp = require('gulp'),
     del = require('del'),
     browserSync = require('browser-sync'),
     port = process.env.port || config.defaultPort,
-    transpileDependencies = ['transpile-root', 'transpile-collation', 'transpile-evaluation', 'transpile-expressionParser',
-        'transpile-limitation', 'transpile-mutation', 'transpile-projection', 'transpile-queryObjects', 'transpile-transformation'];
+    transpileDependencies = ['transpile-root'];
 
 gulp.task('help', _.taskListing);
 gulp.task('default', ['help']);
@@ -167,54 +166,6 @@ gulp.task('transpile-root', function _transpileRoot() {
     return gulp.src(config.devRootJs)
         .pipe(_.babel())
         .pipe(gulp.dest(config.srcRootJs));
-});
-
-gulp.task('transpile-collation', function _transpileCollation() {
-    return gulp.src(config.devCollationJs)
-        .pipe(_.babel())
-        .pipe(gulp.dest(config.srcCollationJs));
-});
-
-gulp.task('transpile-evaluation', function _transpileEvaluation() {
-    return gulp.src(config.devEvaluationJs)
-        .pipe(_.babel())
-        .pipe(gulp.dest(config.srcEvaluationJs));
-});
-
-gulp.task('transpile-expressionParser', function _transpileExpressionParser() {
-    return gulp.src(config.devExpressionParserJs)
-        .pipe(_.babel())
-        .pipe(gulp.dest(config.srcExpressionParserJs));
-});
-
-gulp.task('transpile-limitation', function _transpileLimitation() {
-    return gulp.src(config.devLimitationJs)
-        .pipe(_.babel())
-        .pipe(gulp.dest(config.srcLimitationJs));
-});
-
-gulp.task('transpile-mutation', function _transpileMutation() {
-    return gulp.src(config.devMutationJs)
-        .pipe(_.babel())
-        .pipe(gulp.dest(config.srcMutationJs));
-});
-
-gulp.task('transpile-projection', function _transpileProjection() {
-    return gulp.src(config.devProjectionJs)
-        .pipe(_.babel())
-        .pipe(gulp.dest(config.srcProjectionJs));
-});
-
-gulp.task('transpile-queryObjects', function _transpileQueryObjects() {
-    return gulp.src(config.devQueryObjectJs)
-        .pipe(_.babel())
-        .pipe(gulp.dest(config.srcQueryObjectJs));
-});
-
-gulp.task('transpile-transformation', function _transpileTransformation() {
-    return gulp.src(config.devTransformationJs)
-        .pipe(_.babel())
-        .pipe(gulp.dest(config.srcTransformationJs));
 });
 
 gulp.task('transpile-testData', function _transpileTestData() {
