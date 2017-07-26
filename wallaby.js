@@ -30,7 +30,8 @@ module.exports = function _wallaby(wallaby) {
             { pattern: 'test/testData.js', load: true },
             '!test/**/*.spec.js',
             '!src/index.js',
-            '!playground.js'
+            '!playground.js',
+            '!test/test_helper.js'
         ],
 
         /*
@@ -40,9 +41,7 @@ module.exports = function _wallaby(wallaby) {
          */
         tests: [
             { pattern: 'test/**/*.spec.js', load: true },
-            '!test/integration/**/*.spec.js',
-            '!test/unit/queryObjects/*.spec.js',
-            '!test/unit/projection/*.spec.js'
+            '!test/integration/**/*.spec.js'
         ],
 
         /*

@@ -8,7 +8,8 @@
     "babs": "babel --version",
     "babel": "babel src --out-dir src",
     "build": "babel --out-dir dist",
-    "test": "karma start karma.conf.js",
+    "test": "set NODE_ENV=dev&& mocha test/unit/**/*.spec.js --require babel-polyfill test/test_helper --compilers js:babel-register --reporter mocha-lcov-reporter mocha-text-cov",
+    "karma_test": "karma start karma.conf.js",
     "cover": "nyc npm t"
   },
   "nyc": {
@@ -100,7 +101,9 @@
     "mocha": "^3.2.0",
     "mocha-babel": "^3.0.3",
     "mocha-clean": "^1.0.0",
+    "mocha-lcov-reporter": "^1.3.0",
     "mocha-sinon": "^2.0.0",
+    "mocha-text-cov": "^0.1.1",
     "node-qunit-phantomjs-istanbul": "^1.0.0",
     "nyc": "^10.0.0",
     "path": "^0.12.7",
