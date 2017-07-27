@@ -1,6 +1,6 @@
 {
   "name": "queryable-js",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "A JavaScript library for performing queries against lists with lazy evaluation and deferred execution.",
   "main": "app.js",
   "scripts": {
