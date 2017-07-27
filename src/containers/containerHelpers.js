@@ -10,6 +10,14 @@ function get() {
 /**
  * @type:
  * @description:
+ */
+function emptyGet() {
+    throw new Error('Cannot extract a null value.');
+}
+
+/**
+ * @type:
+ * @description:
  * @param: {function} f
  * @return: {*}
  */
@@ -20,11 +28,31 @@ function orElse(f) {
 /**
  * @type:
  * @description:
+ * @param: {function} f
+ * @return: {*}
+ */
+function emptyOrElse(f) {
+    return f();
+}
+
+/**
+ * @type:
+ * @description:
  * @param: {*} x
  * @return: {*}
  */
 function getOrElse(x) {
     return this.value;
+}
+
+/**
+ * @type:
+ * @description:
+ * @param: {*} x
+ * @return: {*}
+ */
+function emptyGetOrElse(x) {
+    return x;
 }
 
 /**
@@ -218,5 +246,5 @@ var sharedEitherFns = {
     leftBimapMaker
 };
 
-export { apply, chain, disjunctionEqualMaker, equalMaker, lifter, maybeFactoryHelper, mjoin, pointMaker, stringMaker, valueOf, get, orElse, getOrElse,
-        sharedMaybeFns, sharedEitherFns };
+export { apply, chain, disjunctionEqualMaker, equalMaker, lifter, maybeFactoryHelper, mjoin, pointMaker, stringMaker, valueOf,
+        get, emptyGet, orElse, emptyOrElse, getOrElse, emptyGetOrElse, sharedMaybeFns, sharedEitherFns };

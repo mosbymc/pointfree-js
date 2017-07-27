@@ -84,8 +84,8 @@ var just_monad = Object.create(just_functor, {
         value: sharedMaybeFns.justBimap
     },
     fold: {
-        value: function _fold(fn, acc) {
-            return fn(acc, this.value);
+        value: function _fold(fn) {
+            return fn(this.value);
         }
     },
     sequence: {
@@ -126,7 +126,7 @@ var nothing_monad = Object.create(nothing_functor, {
         value: sharedMaybeFns.nothingBimapMaker(Nothing)
     },
     fold: {
-        value: function _fold(fn, x) {
+        value: function _fold(fn) {
             return Nothing();
         }
     },

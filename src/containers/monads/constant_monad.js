@@ -34,8 +34,8 @@ var constant_monad = Object.create(constant_functor, {
         }
     },
     fold: {
-        value: function _fold() {
-            return this.value;
+        value: function _fold(f) {
+            return f(this.value);
         }
     },
     sequence: {

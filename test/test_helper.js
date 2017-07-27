@@ -1,4 +1,4 @@
-var chain = require('chai');
-var should = chain.should();
-var expect = chain.expect;
-var sinon = require('sinon');
+var chai = require('chai');
+global.should = chai.should();
+global.expect = chai.expect;
+global.sinon = require('sinon');

@@ -1,0 +1,12 @@
+{
+  "reporterEnabled": "spec, list",
+  "specReporterOptions": {
+    "output": "/reports/spec.txt"
+  },
+  "listReporterOptions": {
+    "output": "/reports/list.txt"
+  },
+  "mochaLcovReporterReporterOptions": {
+    "output": "/reports/coverage.lcov"
+  }
+}

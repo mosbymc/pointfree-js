@@ -112,8 +112,8 @@ var right_monad = Object.create(right_functor, {
         value: sharedEitherFns.rightBiMap
     },
     fold: {
-        value: function _fold(fn, acc) {
-            return fn(acc, this.value);
+        value: function _fold(fn) {
+            return fn(this.value);
         }
     },
     sequence: {
@@ -149,8 +149,8 @@ var left_monad = Object.create(left_functor, {
         value: sharedEitherFns.leftBimapMaker(Left)
     },
     fold: {
-        value: function _fold(fn, acc) {
-            return fn(acc, this.value);
+        value: function _fold(fn) {
+            return fn(this.value);
         }
     },
     sequence: {

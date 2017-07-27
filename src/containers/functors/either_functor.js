@@ -1,4 +1,15 @@
-import { disjunctionEqualMaker, pointMaker, stringMaker, valueOf, get, orElse, getOrElse, sharedEitherFns } from '../containerHelpers';
+import { disjunctionEqualMaker, pointMaker, stringMaker, valueOf,
+        get, emptyGet, orElse, emptyOrElse, getOrElse, emptyGetOrElse, sharedEitherFns } from '../containerHelpers';
+
+/**
+ * @type:
+ * @description:
+ * @param: {*} x
+ * @return: {@see left_functor|right_functor}
+ */
+function fromNullable(x) {
+    return null != x ? Right(x) : Left(x);
+}
 
 /**
  * @type:
@@ -84,6 +95,14 @@ Either.Right = x => Either(x, 'right');
  * @return: {@see left_functor}
  */
 Either.Left = x => Either(x);
+
+/**
+ * @type:
+ * @description:
+ * @param: {*} x
+ * @return: {@see left_functor|right_functor}
+ */
+Either.fromNullable = fromNullable;
 
 /**
  * @type:
@@ -238,21 +257,23 @@ var left_functor = {
     /**
      * @type:
      * @description:
+     * @return:
+     */
+    get: emptyGet,
+    /**
+     * @type:
+     * @description:
      * @param: {*} x
      * @return: {*}
      */
-    getOrElse: function _getOrElse(x) {
-        return x;
-    },
+    getOrElse: emptyGetOrElse,
     /**
      * @type:
      * @description:
      * @param: {function} f
      * @return: {*}
      */
-    orElse: function _orElse(f) {
-        return f();
-    },
+    orElse: emptyOrElse,
     of: pointMaker(Right),
     valueOf: valueOf,
     toString: stringMaker('Left'),
@@ -264,10 +285,6 @@ var left_functor = {
  * @return:
  */
 left_functor.equals = disjunctionEqualMaker(left_functor, 'isLeft');
-
-function fromNullable(x) {
-    return null != x ? Right(x) : Left(x);
-}
 
 
 

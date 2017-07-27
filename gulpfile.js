@@ -96,7 +96,7 @@ gulp.task('clean-yuidoc', function _clean_yuidoc(done) {
 gulp.task('lint', /*['plato'],*/ function _lint() {
     log('Linting source with JSCS and JSHint.');
     return gulp
-        .src(config.gridJs)
+        .src(config.src + '/**/*.js')
         .pipe(_.if(args.verbose, _.print()))
         .pipe(_.jshint())
         .pipe(_.jscs())
@@ -108,7 +108,7 @@ gulp.task('lint', /*['plato'],*/ function _lint() {
 gulp.task('jscs', ['lint'], function _jscs() {
     log('Linting source with JSCS and JSHint.');
     return gulp
-        .src(config.gridJs)
+        .src(config.src + '/**/*.js')
         .pipe(_.if(args.verbose, _.print()))
         .pipe(_.jscs())
         .pipe(_.jscs.reporter('fail'));

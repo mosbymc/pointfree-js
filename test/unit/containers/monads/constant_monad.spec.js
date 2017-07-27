@@ -67,6 +67,24 @@ describe('Constant monad tests', function _testConstantMonad() {
             expect('testing constant').to.eql(c7.value);
             expect(false).to.eql(c8.value);
         });
+
+        it('should return correct boolean value when #is is invoked', function _testConstantDotIs() {
+            var c = Constant(10),
+                m = monads.Maybe(10),
+                i = monads.Identity(10),
+                f = Constant.is,
+                n = null,
+                s = 'string',
+                b = false;
+
+            Constant.is(c).should.be.true;
+            Constant.is(m).should.be.false;
+            Constant.is(i).should.be.false;
+            Constant.is(f).should.be.false;
+            Constant.is(n).should.be.false;
+            Constant.is(s).should.be.false;
+            Constant.is(b).should.be.false;
+        });
     });
 
     describe('Constant monad object tests', function _testConstantMonadObject() {
@@ -127,6 +145,23 @@ describe('Constant monad tests', function _testConstantMonad() {
             //Object.getPrototypeOf(m1Res).should.eql(monads.Maybe(65));
             //Object.getPrototypeOf(m2Res).should.eql(monads.Maybe());
             //Object.getPrototypeOf(m3Res).should.eql(monads.Maybe(false));
+        });
+
+        it('should return underlying value when constant_functor#fold is invoked', function _testConstantDotFold() {
+            var c = Constant(10);
+
+            c.fold(x => x * 15).should.eql(150);
+        });
+
+        it('should return a constant<T> and ignore the point when #sequence is invoked', function _testConstantDotSequence() {
+            var c = Constant(10);
+            c.sequence(monads.Identity).toString().should.eql('Constant(10)');
+        });
+
+        it('should return a constant<T> and ignore the params when #traverse is invoked', function _testConstantDotTraverse() {
+            var c = Constant(1);
+
+            c.traverse(monads.Identity).toString().should.eql('Constant(1)');
         });
 
         it('should have a .constructor property that points to the factory function', function _testConstantMonadIsStupidViaFantasyLandSpecCompliance() {

@@ -1,4 +1,15 @@
-import { disjunctionEqualMaker, maybeFactoryHelper, pointMaker, stringMaker, valueOf, sharedMaybeFns } from '../containerHelpers';
+import { disjunctionEqualMaker, maybeFactoryHelper, pointMaker, stringMaker,
+        get, emptyGet, orElse, emptyOrElse, getOrElse, emptyGetOrElse, valueOf, sharedMaybeFns } from '../containerHelpers';
+
+/**
+ * @type:
+ * @description:
+ * @param: {*} x
+ * @return: {@see just_functor|nothing_functor}
+ */
+function fromNullable(x) {
+    return null != x ? Just(x) : Nothing();
+}
 
 /**
  * @type:
@@ -93,14 +104,10 @@ Maybe.isNothing = m => nothing_functor.isPrototypeOf(m);
 /**
  * @type:
  * @description:
+ * @param: {*} x
+ * @return: {@see just_functor|nothing_functor}
  */
-var maybeCreator = maybeFactoryHelper(Maybe);
-
-var maybeOf = {
-    of: function _of(val) {
-        return Maybe(val);
-    }
-};
+Maybe.fromNullable = fromNullable;
 
 //TODO: determine if there is any purpose in splitting a maybe into two types... if those sub-types
 //TODO: are not exposed, what benefit is derived from them? And if they are exposed (Just being Identity,
@@ -208,12 +215,9 @@ var just_functor = {
     },
     map: sharedMaybeFns.justMap,
     bimap: sharedMaybeFns.justBimap,
-    getOrElse: function _getOrElse(x) {
-        return this.value;
-    },
-    orElse: function _orElse(f) {
-        return this;
-    },
+    get: get,
+    getOrElse: getOrElse,
+    orElse: orElse,
     of: pointMaker(Just),
     valueOf: valueOf,
     toString: stringMaker('Just'),
@@ -232,12 +236,9 @@ var nothing_functor = {
     },
     map: sharedMaybeFns.nothingMapMaker(Nothing),
     bimap: sharedMaybeFns.nothingBimapMaker(Nothing),
-    getOrElse: function _getOrElse(x) {
-        return x;
-    },
-    orElse: function _orElse(f) {
-        return f();
-    },
+    get: emptyGet,
+    getOrElse: emptyGetOrElse,
+    orElse: emptyOrElse,
     of: pointMaker(Just),
     valueOf: valueOf,
     toString: function _toString() {

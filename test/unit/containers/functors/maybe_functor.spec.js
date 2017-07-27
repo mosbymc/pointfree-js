@@ -131,6 +131,48 @@ describe('Maybe functor tests', function _testMaybeFunctor() {
             expect(null).to.eql(i8.value);
         });
 
+        it('should return correct boolean value when #is is invoked', function _testMaybeDotIs() {
+            var m1 = Maybe(10),
+                m2 = Maybe(),
+                m3 = Maybe(null),
+                c = functors.Constant(10),
+                i = functors.Identity(10),
+                f = Maybe.is,
+                n = null,
+                s = 'string',
+                b = false;
+
+            Maybe.is(m1).should.be.true;
+            Maybe.is(m2).should.be.true;
+            Maybe.is(m3).should.be.true;
+            Maybe.is(c).should.be.false;
+            Maybe.is(i).should.be.false;
+            Maybe.is(f).should.be.false;
+            Maybe.is(n).should.be.false;
+            Maybe.is(s).should.be.false;
+            Maybe.is(b).should.be.false;
+
+            Nothing.is(m1).should.be.false;
+            Nothing.is(m2).should.be.true;
+            Nothing.is(m3).should.be.true;
+            Nothing.is(c).should.be.false;
+            Nothing.is(i).should.be.false;
+            Nothing.is(f).should.be.false;
+            Nothing.is(n).should.be.false;
+            Nothing.is(s).should.be.false;
+            Nothing.is(b).should.be.false;
+
+            Just.is(m1).should.be.true;
+            Just.is(m2).should.be.false;
+            Just.is(m3).should.be.false;
+            Just.is(c).should.be.false;
+            Just.is(i).should.be.false;
+            Just.is(f).should.be.false;
+            Just.is(n).should.be.false;
+            Just.is(s).should.be.false;
+            Just.is(b).should.be.false;
+        });
+
         it('should return correct results when isJust/isNothing is called on an either', function _testMaybeFactorIsLeftIsRightHelpers() {
             //var EitherSpy = sinon.spy(Maybe),
             var m1 = Maybe(1),
@@ -151,6 +193,20 @@ describe('Maybe functor tests', function _testMaybeFunctor() {
 
             Maybe.isJust(m4).should.be.false;
             Maybe.isNothing(m4).should.be.true;
+        });
+
+        it('should return a left or a right based on null value', function _testEitherDotFromNullable() {
+            var m1 = Maybe.fromNullable(null),
+                m2 = Maybe.fromNullable(1);
+
+            nothing_functor.isPrototypeOf(m1).should.be.true;
+            just_functor.isPrototypeOf(m2).should.be.true;
+
+            m1.isNothing.should.be.true;
+            m1.isJust.should.be.false;
+
+            m2.isNothing.should.be.false;
+            m2.isJust.should.be.true;
         });
 
         it('should return a maybe with the correct isJust/isNothing values set when using peripheral delegate creators', function _testMaybeperipheralCreators() {

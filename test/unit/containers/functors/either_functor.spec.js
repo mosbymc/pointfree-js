@@ -53,6 +53,76 @@ describe('Either functor tests', function _testEitherFunctor() {
             e4.isRight.should.be.true;
         });
 
+        it('should return a left or a right', function _testEitherDotLeftAndEitherDotRight() {
+            var r = Either.Right(10),
+                l = Either.Left(10);
+
+            right_functor.isPrototypeOf(r).should.be.true;
+            left_functor.isPrototypeOf(l).should.be.true;
+
+            r.isRight.should.be.true;
+            r.isLeft.should.be.false;
+
+            l.isRight.should.be.false;
+            l.isLeft.should.be.true;
+        });
+
+        it('should return a left or a right based on null value', function _testEitherDotFromNullable() {
+            var e1 = Either.fromNullable(null),
+                e2 = Either.fromNullable(1);
+
+            left_functor.isPrototypeOf(e1).should.be.true;
+            right_functor.isPrototypeOf(e2).should.be.true;
+
+            e1.isLeft.should.be.true;
+            e1.isRight.should.be.false;
+
+            e2.isLeft.should.be.false;
+            e2.isRight.should.be.true;
+        });
+
+        it('should return correct boolean value when #is is invoked', function _testEitherDotIs() {
+            var e1 = Either(10),
+                e2 = Either(10, 'left'),
+                e3 = Either(10, 'right'),
+                m = functors.Maybe(10),
+                i = functors.Identity(10),
+                f = Either.is,
+                n = null,
+                s = 'string',
+                b = false;
+
+            Either.is(e1).should.be.true;
+            Either.is(e2).should.be.true;
+            Either.is(e3).should.be.true;
+            Either.is(m).should.be.false;
+            Either.is(i).should.be.false;
+            Either.is(f).should.be.false;
+            Either.is(n).should.be.false;
+            Either.is(s).should.be.false;
+            Either.is(b).should.be.false;
+
+            Left.is(e1).should.be.true;
+            Left.is(e2).should.be.true;
+            Left.is(e3).should.be.false;
+            Left.is(m).should.be.false;
+            Left.is(i).should.be.false;
+            Left.is(f).should.be.false;
+            Left.is(n).should.be.false;
+            Left.is(s).should.be.false;
+            Left.is(b).should.be.false;
+
+            Right.is(e1).should.be.false;
+            Right.is(e2).should.be.false;
+            Right.is(e3).should.be.true;
+            Right.is(m).should.be.false;
+            Right.is(i).should.be.false;
+            Right.is(f).should.be.false;
+            Right.is(n).should.be.false;
+            Right.is(s).should.be.false;
+            Right.is(b).should.be.false;
+        });
+
         it('should return correct results when isLeft/isRight is called on an either', function _testEitherFactorIsLeftIsRightHelpers() {
             var EitherSpy = sinon.spy(Either),
                 e1 = Left(1),

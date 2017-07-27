@@ -66,6 +66,24 @@ describe('Constant functor tests', function _testConstantFunctor() {
             expect('testing constant').to.eql(c7.value);
             expect(false).to.eql(c8.value);
         });
+
+        it('should return correct boolean value when #is is invoked', function _testConstantDotIs() {
+            var c = Constant(10),
+                m = functors.Maybe(10),
+                i = functors.Identity(10),
+                f = Constant.is,
+                n = null,
+                s = 'string',
+                b = false;
+
+            Constant.is(c).should.be.true;
+            Constant.is(m).should.be.false;
+            Constant.is(i).should.be.false;
+            Constant.is(f).should.be.false;
+            Constant.is(n).should.be.false;
+            Constant.is(s).should.be.false;
+            Constant.is(b).should.be.false;
+        });
     });
 
     describe('Constant functor object tests', function _testConstantFunctorObject() {
