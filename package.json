@@ -1,12 +1,12 @@
 {
   "name": "queryable-js",
-  "version": "0.0.2",
+  "version": "0.0.1",
   "description": "A JavaScript library for performing queries against lists with lazy evaluation and deferred execution.",
   "main": "app.js",
   "scripts": {
     "yuidoc": "yuidoc",
     "babs": "babel --version",
-    "babel": "babel src --out-dir src",
+    "babel": "babel src --out-dir src && npm version patch",
     "build": "babel --out-dir dist",
     "test": "set NODE_ENV=test&& mocha test/unit/**/*.spec.js --require babel-polyfill test/test_helper --compilers js:babel-register --reporter mocha-multi-reporters --reporter-options configFile=config.json",
     "karma_test": "karma start karma.conf.js",
