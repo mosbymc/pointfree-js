@@ -8,36 +8,23 @@
     "babs": "babel --version",
     "babel": "babel src --out-dir src && npm version patch",
     "build": "babel --out-dir dist",
-    "test": "set NODE_ENV=test&& mocha test/unit/**/*.spec.js --require babel-polyfill test/test_helper --compilers js:babel-register --reporter mocha-multi-reporters --reporter-options configFile=config.json",
+    "test": "set NODE_ENV=test&& mocha test/unit/**/*.spec.js --require babel-polyfill test/test_helper --compilers js:babel-register",
     "karma_test": "karma start karma.conf.js",
     "clean": "npm run clean:build && npm run clean:test && npm run clean:plato",
     "clean:build": "npm run del build",
     "clean:test": "npm run del coverage",
     "clean:plato": "npm run del plato",
     "lint": "npm run lint && npm run jscs",
-    "cover": "nyc npm t"
+    "coverage": "nyc npm test"
   },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/mosbymc/queryable-js"
   },
   "nyc": {
-    "sourceMap": false,
-    "instrument": false,
-    "env": {
-      "dev": {
-        "plugins": [
-          [
-            "istanbul",
-            {
-              "include": [
-                "**/*.spec.js"
-              ]
-            }
-          ]
-        ]
-      }
-    }
+    "sourceMap": true,
+    "instrument": true,
+    "reporter": [ "text", "text-summary", "html", "lcov"]
   },
   "license": "MIT",
   "author": "Mark Mosby",
@@ -126,6 +113,7 @@
     "qunit": "^0.9.0",
     "sinon": "^1.17.6",
     "sinon-chai": "^2.8.0",
+    "source-map-support": "^0.4.15",
     "through2": "^2.0.3",
     "vinyl-buffer": "^1.0.0",
     "vinyl-source-stream": "^1.1.0",
