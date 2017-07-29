@@ -17,14 +17,14 @@
     "lint": "npm run lint && npm run jscs",
     "coverage": "nyc npm test"
   },
+  "nyc": {
+    "sourceMap": "inline",
+    "instrument": true,
+    "reporter": [ "text", "text-summary", "html", "lcov"]
+  },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/mosbymc/queryable-js"
-  },
-  "nyc": {
-    "sourceMap": true,
-    "instrument": true,
-    "reporter": [ "text", "text-summary", "html", "lcov"]
   },
   "license": "MIT",
   "author": "Mark Mosby",
