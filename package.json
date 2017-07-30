@@ -8,19 +8,30 @@
     "babs": "babel --version",
     "babel": "babel src --out-dir src && npm version patch",
     "build": "babel --out-dir dist",
-    "test": "set NODE_ENV=test&& mocha test/unit/**/*.spec.js --require babel-polyfill test/test_helper --compilers js:babel-register",
+    "test": "cross-env NODE_ENV=test mocha test/unit/**/*.spec.js ",
     "karma_test": "karma start karma.conf.js",
     "clean": "npm run clean:build && npm run clean:test && npm run clean:plato",
     "clean:build": "npm run del build",
     "clean:test": "npm run del coverage",
     "clean:plato": "npm run del plato",
     "lint": "npm run lint && npm run jscs",
-    "coverage": "nyc npm test"
+    "coverage": "set NODE_ENV=test && nyc npm test",
+    "coverage:report": "nyc report --reporter=text-lcov > coverage.lcov && codecov"
   },
   "nyc": {
-    "sourceMap": "inline",
-    "instrument": true,
-    "reporter": [ "text", "text-summary", "html", "lcov"]
+    "sourceMap": false,
+    "instrument": false,
+    "reporter": [
+      "text",
+      "text-summary",
+      "html",
+      "lcov"
+    ],
+    "require": [
+      "babel-polyfill",
+      "babel-register",
+      "./test/test_helper.js"
+    ]
   },
   "repository": {
     "type": "git",
@@ -50,7 +61,9 @@
     "browser-sync": "^2.11.1",
     "browserify": "^13.3.0",
     "chai": "^3.5.0",
+    "codecov.io": "^0.1.6",
     "concurrently": "^3.3.0",
+    "cross-env": "^5.0.1",
     "del": "^2.2.0",
     "gulp": "^3.9.1",
     "gulp-autoprefixer": "^3.1.0",
@@ -76,7 +89,6 @@
     "gulp-uglify": "^2.0.1",
     "gulp-util": "^3.0.7",
     "gulp-yuidoc": "^0.1.2",
-    "istanbul": "^0.4.2",
     "jscover": "^1.0.0",
     "jscs": "^3.0.7",
     "jshint": "^2.9.1",
@@ -103,7 +115,7 @@
     "mocha-sinon": "^2.0.0",
     "mocha-text-cov": "^0.1.1",
     "node-qunit-phantomjs-istanbul": "^1.0.0",
-    "nyc": "^10.0.0",
+    "nyc": "^11.1.0",
     "path": "^0.12.7",
     "phantomjs": "^2.1.7",
     "plato": "^1.5.0",

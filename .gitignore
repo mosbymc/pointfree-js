@@ -40,3 +40,4 @@ app.js
 tmp
 dev-build
 platoTmp
+.nyc_output
