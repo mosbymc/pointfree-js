@@ -1,6 +1,6 @@
-import { all, any, except, intersect, union, map, chain, groupBy, sortBy, prepend, concat, groupJoin, join, zip, filter,
-    contains, first, last, count, foldLeft, reduceRight, distinct, ofType, binarySearch, equals, take, takeWhile, skip, skipWhile, reverse,
-    copyWithin, fill, findIndex, lastIndexOf, repeat } from '../../../src/containers/list_iterators';
+import { all, any, except, intersect, union, map, chain, groupBy, sortBy, prepend, concat, groupJoin, join, zip, filter, intersperse,
+        contains, first, last, count, foldLeft, reduceRight, distinct, ofType, binarySearch, equals, take, takeWhile, skip, skipWhile, reverse,
+        copyWithin, fill, findIndex, findLastIndex, repeat, foldRight, unfold } from '../../../src/containers/list_iterators';
 import { createListCreator } from '../../../src/containers/list_helpers';
 import { list_functor, ordered_list_functor } from '../../../src/containers/functors/list_functor';
 import { cacher, javaScriptTypes, sortDirection, typeName } from '../../../src/helpers';
@@ -634,6 +634,42 @@ describe('Test List Iterators', function _testListIterators() {
                 intersectRes.should.have.lengthOf(testData.dataSource.data.length);
                 intersectRes.should.eql(testData.dataSource.data);
             });
+        });
+    });
+
+    describe('Test intersperse', function _testIntersperse() {
+        it('should should return an empty array when given an empty iterator', function _testReturnsEmptyArray() {
+            var intersperseIterable = intersperse([], 2),
+                intersperseRes = Array.from(intersperseIterable());
+
+            intersperseRes.should.be.an('array');
+            intersperseRes.should.have.lengthOf(0);
+        });
+
+        it('should intersperse a value within an array', function _testIntersperseWithAnArray() {
+            var intersperseIterable = intersperse([1, 2, 3, 4, 5], 0),
+                intersperseRes = Array.from(intersperseIterable());
+
+            intersperseRes.should.be.an('array');
+            intersperseRes.should.have.lengthOf(9);
+            intersperseRes.should.eql([1, 0, 2, 0, 3, 0, 4, 0, 5]);
+        });
+
+        it('should intersperse a value within a generator', function _testIntersperseWithAGenerator() {
+            function *gen() {
+                var i = 1;
+                while (6 > i) {
+                    yield i;
+                    i++;
+                }
+            }
+
+            var intersperseIterable = intersperse(gen(), 0),
+                intersperseRes = Array.from(intersperseIterable());
+
+            intersperseRes.should.be.an('array');
+            intersperseRes.should.have.lengthOf(9);
+            intersperseRes.should.eql([1, 0, 2, 0, 3, 0, 4, 0, 5]);
         });
     });
 

@@ -1,9 +1,19 @@
-import { after, apply, before, binary, bindFunction, guardAfter, guardBefore, leftApply, not, once, repeat, rightApply,
-    safe, tap, ternary, tryCatch, unary } from '../../src/decorators';
+import { after, apply, before, binary, bindFunction, guardAfter, guardBefore, hyloWith, leftApply, maybe, not, once, repeat, rightApply,
+        safe, tap, ternary, tryCatch, unary, voidFn } from '../../src/decorators';
 
 describe('Decorators Test', function _testDecorators() {
     describe('Test after', function _testAfter() {
-        //it();
+        it('Should call the function before the decorator', function _testDecorationCalledAfterFunction() {
+            function addTwo(num) { return num + 2; }
+            function multFive(num) { return num * 5; }
+            var func = sinon.spy(addTwo),
+                decorator = sinon.spy(multFive);
+
+            var res = after(func, decorator, 5);
+
+            res.should.eql(7);
+            expect(decorator.calledAfter(func)).to.be.true;
+        });
     });
 
     describe('Test apply', function _testApply() {
@@ -20,7 +30,17 @@ describe('Decorators Test', function _testDecorators() {
     });
 
     describe('Test before', function _testBefore() {
+        it('Should call the function after the decorator', function _testDecorationCalledBeforeFunction() {
+            function addTwo(num) { return num + 2; }
+            function multFive(num) { return num * 5; }
+            var func = sinon.spy(addTwo),
+                decorator = sinon.spy(multFive);
 
+            var res = before(func, decorator, 5);
+
+            res.should.eql(7);
+            expect(decorator.calledBefore(func)).to.be.true;
+        });
     });
 
     describe('Test binary', function _testBinary() {
@@ -53,6 +73,25 @@ describe('Decorators Test', function _testDecorators() {
 
             btRes.should.be.an('array');
             btRes.should.eql([1, 2]);
+        });
+    });
+
+    describe('Test bindFunction', function _testBindFunction() {
+        it('should bind a function to a context', function _testFunctionBinding() {
+            function addTwoToPropA() {
+                this.a += 2;
+                return this;
+            }
+
+            var obj = { a: 3 },
+                bindSpy = sinon.spy(addTwoToPropA);
+
+            var resFn = bindFunction(obj, bindSpy),
+                res = resFn();
+
+            res.should.be.an('object');
+            res.a.should.eql(5);
+            expect(bindSpy.calledOn(obj)).to.be.true;
         });
     });
 

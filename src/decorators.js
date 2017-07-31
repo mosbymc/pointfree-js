@@ -8,7 +8,7 @@ import { curry, curryN } from './combinators';
  * @param: {*} args
  * @return: {*}
  */
-var after = curry(function _after(fn, decoration, ...args) {
+var after = curryN(this, 3, function _after(fn, decoration, ...args) {
     var ret = fn(...args);
     decoration(...args);
     return ret;
@@ -29,7 +29,7 @@ var apply = fn => (...args) => () => fn(...args);
  * @param: {*} args
  * @return: {*};
  */
-var before = curry(function _before(fn, decoration, ...args) {
+var before = curryN(this, 3, function _before(fn, decoration, ...args) {
     decoration(...args);
     return fn(...args);
 });
@@ -272,4 +272,4 @@ var voidFn = fn => (...args) => void fn(...args);
 
 
 export { after, apply, before, binary, bindFunction, guardAfter, guardBefore, hyloWith, leftApply, maybe, not, once, repeat, rightApply,
-        safe, tap, ternary, tryCatch, unary, voidFn };
+        safe, tap, ternary, tryCatch, unary, unfold, unfoldWith, voidFn };
