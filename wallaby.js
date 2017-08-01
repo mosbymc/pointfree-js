@@ -31,7 +31,8 @@ module.exports = function _wallaby(wallaby) {
             '!test/**/*.spec.js',
             '!src/index.js',
             '!playground.js',
-            '!test/test_helper.js'
+            '!test/test_helper.js',
+            '!./observations.js'
         ],
 
         /*
@@ -73,6 +74,9 @@ module.exports = function _wallaby(wallaby) {
             global.should = chai.should();
             global.expect = chai.expect;
             global.sinon = require('sinon');
+            global.sinonChai = require('sinon-chai');
+            chai.should();
+            chai.use(sinonChai);
         }
     };
 };

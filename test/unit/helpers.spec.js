@@ -47,7 +47,7 @@ describe('test helpers', function _testHelpers() {
         });
     });
 
-    describe('Test deepCloneUltra', function _testDeepCloneUltra() {
+    describe('Test deepClone', function _testDeepClone() {
         it('should clone a simple object', function _testSimpleObjectClone() {
             var obj = {
                 a: 1,
@@ -118,14 +118,17 @@ describe('test helpers', function _testHelpers() {
 
             var clonedDelegator = deepClone(delegator);
 
-            Object.keys(clonedDelegator).should.eql(Object.keys(delegator));
+            Object.getOwnPropertyNames(clonedDelegator).should.eql(Object.getOwnPropertyNames(delegator));
             Object.getPrototypeOf(clonedDelegator).should.eql(delegate);
         });
 
         it('should clone complex/nested objects', function _testNestedObjectCloning() {
             var delegateObj1 = {
                 a: 1,
-                b: function _b(val) { return val * 2; }
+                b: function _b(val) { return val * 2; },
+                g: {
+                    h: 2
+                }
             },
                 delegateObj2 = Object.create(delegateObj1, {
                     c: {
@@ -148,7 +151,7 @@ describe('test helpers', function _testHelpers() {
 
             var clonedDelegator = deepClone(delegator);
             Object.getPrototypeOf(clonedDelegator).should.eql(Object.getPrototypeOf(delegator));
-            Object.keys(clonedDelegator).should.eql(Object.keys(delegator));
+            Object.getOwnPropertyNames(clonedDelegator).should.eql(Object.getOwnPropertyNames(delegator));
             clonedDelegator.d.should.eql(delegator.d);
             clonedDelegator.b().should.eql(delegator.b());
         });

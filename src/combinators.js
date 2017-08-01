@@ -33,6 +33,7 @@ function any(...fns) {
  * @return: {*}
  */
 var c = curry(function _c(x, y, z) {
+    console.log(x, y, z);
     return x(y)(z);
 });
 
@@ -59,7 +60,7 @@ function compose(...fns) {
  * @param: {function} cond
  * @return: {*}
  */
-var condition = curry((exp1, exp2, cond) => cond(x, exp1, exp2));
+var condition = curry((exp1, exp2, cond) => cond(exp1, exp2));
 
 var notFn = condition(constant(x => x), x => x);
 
@@ -569,4 +570,4 @@ var xs1 = compose(
 //reduce(dropping(3)(concat),[],[1,2,3,4,5]);//-> [4,5]
 
 export { all, any, applyWhenReady, c, compose, constant, curry, curryN, curryRight, filtering, filterReducer, first, fixedPoint, fork, identity,
-          ifElse, ifThisThenThat, kestrel, m, mapped, mapping, mapReducer, pipe, o, q, reduce, second, sequence, t, thrush, u, w, when, whenNot, y };
+          ifElse, ifThisThenThat, kestrel, m, mapped, mapping, mapReducer, pipe, o, q, reduce, rev, second, sequence, t, thrush, u, w, when, whenNot, y };

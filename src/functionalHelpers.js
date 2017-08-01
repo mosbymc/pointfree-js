@@ -78,12 +78,10 @@ var both = curry(function _both(f, g) {
  * @param: {Array} rest
  * @return: {string | Array}
  */
-function concat(first, ...rest) {
-    if (null == rest || !rest.length) return first;
-    return rest.reduce(function _concatStrings(cur, next) {
+var concat = first => (...rest) => null == rest || !rest.length ? first :
+    rest.reduce(function _concatStrings(cur, next) {
         return cur.concat(next);
     }, first);
-}
 
 /**
  * @description:
@@ -333,7 +331,7 @@ var modulus = curry((x, y) => x % y);
  * @param: {number} y
  * @return: {number}
  */
-var multiple = curry((x, y) => x * y);
+var multiply = curry((x, y) => x * y);
 
 /**
  * @description:
@@ -391,7 +389,12 @@ var objectSet = curry(function _objectSet(prop, val, obj) {
  */
 function once(fn) {
     var invoked = false;
-    return (...args) => invoked ? undefined : fn(...args);
+    return function _once(...args) {
+        if (!invoked) {
+            invoked = true;
+            fn(...args);
+        }
+    }
 }
 
 /**
@@ -499,5 +502,5 @@ function reverse2(...args) {
 export { add, adjust, and, arraySet, both, concat, defaultPredicate, delegatesFrom, delegatesTo, divide, either, equals,
         falsey, flip, getWith, greaterThan, greaterThanOrEqual, has, inObject, invoke, isArray, isBoolean, isFunction,
         isObject, isNothing, isNull, isNumber, isSomething, isString, isSymbol, isUndefined, lessThan, lessThanOrEqual,
-        mapSet, modulus, multiple, negate, notEqual, noop, nth, objectSet, once, or, reverse, set, setSet, strictEquals,
+        mapSet, modulus, multiply, negate, notEqual, noop, nth, objectSet, once, or, reverse, set, setSet, strictEquals,
         strictNotEqual, subtract, truthy, type, wrap };

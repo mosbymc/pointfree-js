@@ -1,4 +1,8 @@
-import { wrap, isArray, isObject, isFunction, or, and } from '../../src/functionalHelpers';
+import { add, adjust, and, arraySet, both, concat, defaultPredicate, delegatesFrom, delegatesTo, divide, either, equals,
+        falsey, flip, getWith, greaterThan, greaterThanOrEqual, has, inObject, invoke, isArray, isBoolean, isFunction,
+        isObject, isNothing, isNull, isNumber, isSomething, isString, isSymbol, isUndefined, lessThan, lessThanOrEqual,
+        mapSet, modulus, multiply, negate, notEqual, noop, nth, objectSet, once, or, reverse, set, setSet, strictEquals,
+        strictNotEqual, subtract, truthy, type, wrap } from '../../src/functionalHelpers';
 import { identity, curry, ifElse } from '../../src/combinators';
 import { not } from '../../src/decorators';
 import { testData } from '../testData';
@@ -13,61 +17,40 @@ afterEach(function _resetData() {
     });
 });
 
+describe('Test adjust', function _testAdjust() {
+    function _makeAdjustment(val) {
+        return val * 2;
+    }
+    var list = [1, 2, 3, 4, 5];
 
-describe('identity', function testIdentity() {
-    it('should return an empty array when passed an empty array', function testIdentityWithEmptyArray() {
-        var emptyArr = [],
-            identityResult = identity(emptyArr);
+    it('should return the list if the index is greater than the length', function _testAdjustWithGreaterIndex() {
 
-        identityResult.should.be.an('array');
-        identityResult.should.have.lengthOf(0);
-        identityResult.should.equal(emptyArr);
+        var res = adjust(_makeAdjustment, 5, list);
+
+        res.should.be.an('array');
+        res.should.eql(list);
     });
 
-    it('should return distinct values when called twice with different values', function testIdentityWithTwoValues() {
-        var simpleObj = { a: 1, b: 2 },
-            simpleObjResult = identity(simpleObj),
-            testDataResult = identity(testData.dataSource.data);
+    it('should return the list if the index is less than the negative length', function _testAdjustWithLesserIndex() {
 
-        simpleObjResult.should.eql(simpleObj);
-        testDataResult.should.eql(testData.dataSource.data);
+        var res = adjust(_makeAdjustment, -6, list);
+
+        res.should.be.an('array');
+        res.should.eql(list);
     });
 
-    it('should return same primitive values', function testIdentityWithPrimitiveValues() {
-        var primNumber = 5,
-            primString = 'Hello World',
-            primBoolean = false;
+    it('should update the value at the given index', function _testAdjustWithPositiveIndex() {
+        var res = adjust(_makeAdjustment, 2, list);
 
-        var numberResult = identity(primNumber),
-            stringResult = identity(primString),
-            booleanResult = identity(primBoolean);
-
-        numberResult.should.eql(primNumber);
-        stringResult.should.eql(primString);
-        booleanResult.should.eql(primBoolean);
-    });
-});
-
-describe('or', function testOr() {
-    it('should return a value of true', function testOrWithSingleAndDoubleTruthyValues() {
-        var firstOr = or(true, 1),
-            secondOr = or({}, []),
-            thirdOr = or(2, 2);
-
-        firstOr.should.be.a('boolean');
-        firstOr.should.eql(true);
-
-        secondOr.should.be.a('boolean');
-        secondOr.should.eql(true);
-
-        thirdOr.should.be.a('boolean');
-        thirdOr.should.eql(true);
+        res.should.be.an('array');
+        res.should.eql([1, 2, 6, 4, 5]);
     });
 
-    it('should return false when both functions return false', function testOrWithDoubleFalseyValues() {
-        var orResult = or(false, 0);
-        orResult.should.be.a('boolean');
-        orResult.should.eql(false);
+    it('should update the value at the given index starting from the end of the array', function _testAdjustWithNegativeIndex() {
+        var res = adjust(_makeAdjustment, -4, list);
+
+        res.should.be.an('array');
+        res.should.eql([1, 4, 3, 4, 5]);
     });
 });
 
@@ -100,6 +83,92 @@ describe('and', function testAnd() {
         firstAnd.should.be.a('boolean');
         firstAnd.should.eql(true);
         secondAnd.should.be.a('boolean');
+    });
+});
+
+describe('Test both', function _testBoth() {
+    it('should return the conjunction of two function invocations', function _testBoth() {
+        function one() { return true; }
+        function two() { return false; }
+
+        var res1 = both(one, two),
+            res2 = both(one, one),
+            res3 = both(two, two),
+            res4 = both(two, one);
+
+        res1.should.be.false;
+        res2.should.be.true;
+        res3.should.be.false;
+        res4.should.be.false;
+    });
+});
+
+describe('Test concat', function _testConcat() {
+    it('should  return first when rest is undefined', function _testConcatWithUndefinedRest() {
+        concat([1, 2, 3, 4, 5])().should.eql([1, 2, 3, 4, 5]);
+    });
+
+    it('should return first when rest has length zero', function _testConcatWithEmptyArray() {
+        concat([1, 2, 3, 4, 5])([]).should.eql([1, 2, 3, 4, 5]);
+    });
+
+    it('should concatenate arrays', function _testConcatWithArrays() {
+        concat([1, 2, 3, 4, 5])(6, 7, 8, 9).should.eql([1, 2, 3, 4, 5, 6, 7, 8, 9]);
+    });
+
+    it('should concatenate strings', function _testConcatWithStrings() {
+        concat('testing')(' 1, ', '2, ', '3...').should.eql('testing 1, 2, 3...');
+    });
+});
+
+describe('Test either', function _testEither() {
+    it('should return the union of two function invocations', function _testEither() {
+        function one() { return true; }
+        function two() { return false; }
+
+        var res1 = either(one, two),
+            res2 = either(one, one),
+            res3 = either(two, two),
+            res4 = either(two, one);
+
+        res1.should.be.true;
+        res2.should.be.true;
+        res3.should.be.false;
+        res4.should.be.true;
+    });
+});
+
+describe('identity', function testIdentity() {
+    it('should return an empty array when passed an empty array', function testIdentityWithEmptyArray() {
+        var emptyArr = [],
+            identityResult = identity(emptyArr);
+
+        identityResult.should.be.an('array');
+        identityResult.should.have.lengthOf(0);
+        identityResult.should.equal(emptyArr);
+    });
+
+    it('should return distinct values when called twice with different values', function testIdentityWithTwoValues() {
+        var simpleObj = { a: 1, b: 2 },
+            simpleObjResult = identity(simpleObj),
+            testDataResult = identity(testData.dataSource.data);
+
+        simpleObjResult.should.eql(simpleObj);
+        testDataResult.should.eql(testData.dataSource.data);
+    });
+
+    it('should return same primitive values', function testIdentityWithPrimitiveValues() {
+        var primNumber = 5,
+            primString = 'Hello World',
+            primBoolean = false;
+
+        var numberResult = identity(primNumber),
+            stringResult = identity(primString),
+            booleanResult = identity(primBoolean);
+
+        numberResult.should.eql(primNumber);
+        stringResult.should.eql(primString);
+        booleanResult.should.eql(primBoolean);
     });
 });
 
@@ -267,6 +336,80 @@ describe('ifElse', function testIfElse() {
         ifElseResult3.should.eql(2);
         ifElseResult4.should.be.a('number');
         ifElseResult4.should.eql(0);
+    });
+});
+
+describe('Test nth', function _testNth() {
+    it('should return the nth positive element in an array', function _testNthWithArrayAndPositiveNumber() {
+        nth(3, [1, 2, 3, 4, 5]).should.eql(4);
+    });
+
+    it('should return the nth positive character in a string', function _testNthWithStringAndPositiveNumber() {
+        nth(3, 'testing').should.eql('t');
+    });
+
+    it('should return the nth negative element in an array', function _testNthWithArrayAndNegativeNumber() {
+        nth(-3, [1, 2, 3, 4, 5]).should.eql(3);
+    });
+
+    it('should return the nth negative element in a string', function _testNthWithStringAndNegativeNumber() {
+        nth(-3, 'testing').should.eql('i');
+    });
+
+    it('should return undefined when index is out of bounds in an array', function _testNthWithArrayAndOutOfBoundsIndex() {
+        expect(nth(15, [1, 2, 3, 4, 5])).to.be.undefined;
+    });
+
+    it('should return an empty string when index is out of bounds in a string', function _testNthWithStringAndOutOfBoundsIndex() {
+        nth(15, 'testing').should.eql('');
+    });
+});
+
+describe('Test once', function _testOnce() {
+    it('should only allow a function to be executed once', function _testOnce() {
+        function _onlyOnce() { return true; }
+
+        var onlyOnceSpy = sinon.spy(_onlyOnce),
+            resFn = once(onlyOnceSpy);
+
+        resFn();
+        resFn();
+        resFn();
+
+        onlyOnceSpy.should.have.been.calledOnce;
+    });
+});
+
+describe('or', function testOr() {
+    it('should return a value of true', function testOrWithSingleAndDoubleTruthyValues() {
+        var firstOr = or(true, 1),
+            secondOr = or({}, []),
+            thirdOr = or(2, 2);
+
+        firstOr.should.be.a('boolean');
+        firstOr.should.eql(true);
+
+        secondOr.should.be.a('boolean');
+        secondOr.should.eql(true);
+
+        thirdOr.should.be.a('boolean');
+        thirdOr.should.eql(true);
+    });
+
+    it('should return false when both functions return false', function testOrWithDoubleFalseyValues() {
+        var orResult = or(false, 0);
+        orResult.should.be.a('boolean');
+        orResult.should.eql(false);
+    });
+});
+
+describe('Test reverse', function _testReverse() {
+    it('should reverse an array', function _testReverseWithAnArray() {
+        reverse([1, 2, 3, 4, 5]).should.eql([5, 4, 3, 2, 1]);
+    });
+
+    it('should reverse a string', function _testReverseWithAString() {
+        reverse('testing').should.eql('gnitset');
     });
 });
 

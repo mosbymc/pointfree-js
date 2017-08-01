@@ -52,11 +52,7 @@ var bindFunction = curry(function _bindFunction(context, fn) {
     return fn.bind(context);
 });
 
-/**
- * @description:
- * @param: {function} fns
- * @return: {function}
- */
+/*
 function guardAfter(...fns) {
     return function waitForArgs(...args) {
         if (fns.reverse().slice(1).every(function _functionRunner(fn) {
@@ -64,13 +60,14 @@ function guardAfter(...fns) {
             })) return fns[fns.length - 1](...args);
     };
 }
+*/
 
 /**
  * @description:
  * @param: {function} fns
  * @return: {function}
  */
-function guardBefore(...fns) {
+function guard(...fns) {
     return function waitForArgs(...args) {
         if (fns.slice(1).every(function _functionRunner(fn) {
                 return fn(...args);
@@ -91,7 +88,7 @@ var leftApply = fn => (...args) => fn(...args);
  * @param: {function} fn
  * @return: {*}
  */
-var maybe = (fn) => (...args) => null != args ? fn.call(this, ...args) : null;
+var maybe = (fn) => (...args) => 1 <= args.length && args.every(function _testNull(val) { return null != val; }) ? fn.call(this, ...args) : null;
 
 /**
  * not :: () -> !()
@@ -110,9 +107,9 @@ var not = fn => (...args) => !fn(...args);
  * @description:
  * @type: {function}
  */
-var not2point0 = curry(function _n(fn, ...args) {
+var not2point0 = curryN(this, 2, function _not2point0(fn, ...args) {
     if (args.length < fn.length) {
-        return curryN(this, (fn.length - args.length), function _not(...a) {
+        return curryN(this, fn.length, function _not(...a) {
             return !fn(...a);
         }, args);
     }
@@ -127,7 +124,11 @@ var not2point0 = curry(function _n(fn, ...args) {
 function once(fn) {
     var invoked = false;
     return function _once(...args) {
-        return invoked ? undefined : fn(...args);
+        if (!invoked) {
+            invoked = true;
+            return fn(...args);
+        }
+        return undefined;
     };
 }
 
@@ -206,7 +207,7 @@ var tryCatch = curry(function _tryCatch(catcher, tryer) {
  * @param: {function} fn
  * @return: {function}
  */
-var unary = (fn, arg) => curryN(this, 1, fn, undefined === arg ? [] : [arg]);
+var unary = (fn, arg) => undefined === arg ? curryN(this, 1, fn) : fn(arg);
 
 /**
  * @type:
@@ -271,5 +272,5 @@ var voidFn = fn => (...args) => void fn(...args);
  */
 
 
-export { after, apply, before, binary, bindFunction, guardAfter, guardBefore, hyloWith, leftApply, maybe, not, once, repeat, rightApply,
-        safe, tap, ternary, tryCatch, unary, unfold, unfoldWith, voidFn };
+export { after, apply, before, binary, bindFunction, guard, hyloWith, leftApply, maybe, not, once, repeat, rightApply,
+        safe, tap, ternary, tryCatch, unary, unfold, unfoldWith, voidFn, not2point0 };

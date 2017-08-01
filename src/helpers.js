@@ -225,7 +225,6 @@ function memoizer(fn, keyMaker) {
  */
 function deepClone(obj) {
     var uniqueObjects = new Set();
-    uniqueObjects.add(obj);
 
     return objectCloner(obj);
 
@@ -248,10 +247,14 @@ function deepClone(obj) {
 
         //if the obj parameter is a function, invoke the functionClone function and return its return...
         if ('function' === typeof obj) return functionClone(obj);
+
+        var ret = Object.create(Object.getPrototypeOf(obj));
         //...else, reduce over the obj parameter's own keys after creating a new object that has its
         //prototype delegating to the same object that the obj's prototype delegating to. This functionality
         //will work for an array as well.
-        return Object.getOwnPropertyNames(obj).reduce(_reducePropNames.bind(Object.create(Object.getPrototypeOf(obj))), '');
+        Object.getOwnPropertyNames(obj).reduce(_reducePropNames.bind(ret), '');
+
+        return ret;
 
         //this is the function used in the reduce and is bound to the context of the return (cloned) object
         function _reducePropNames(prev, curr) {
@@ -280,11 +283,16 @@ function functionClone(fn, cxt = null) {
         },
         'prototype': {
             value: Object.create(fn.prototype)
+        },
+        'name': {
+            writable: true
         }
     });
 
-    Object.getOwnPropertyNames(test).reduce(function _reducePropName(prev, curr) {
-        return clone[curr] = deepCloneUltra(fn[curr]), clone;
+    Object.getOwnPropertyNames(fn).reduce(function _reducePropName(prev, curr) {
+        if ('length' !== curr && 'prototype' !== curr)
+            return clone[curr] = deepClone(fn[curr]), clone;
+        return clone;
     }, '');
 
     return clone;

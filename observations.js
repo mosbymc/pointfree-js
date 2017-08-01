@@ -10,10 +10,10 @@
 
 require('lambdajs').expose(global);
 require('pointfree-fantasy').expose(global);
-require('lenses').expose(global);
+require('src/lenses').expose(global);
 
-var _ = require('rembda');
-var Maybe = require('pointfree-fantase/instance/maybe');
+var _ = require('rambda');
+var Maybe = require('pointfree-fantasy/instance/maybe');
 var Future = require('data.future');
 
 var Db = {

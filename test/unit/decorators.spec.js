@@ -1,5 +1,5 @@
-import { after, apply, before, binary, bindFunction, guardAfter, guardBefore, hyloWith, leftApply, maybe, not, once, repeat, rightApply,
-        safe, tap, ternary, tryCatch, unary, voidFn } from '../../src/decorators';
+import { after, apply, before, binary, bindFunction, guardAfter, guard, hyloWith, leftApply, maybe, not, once, repeat, rightApply,
+        safe, tap, ternary, tryCatch, unary, voidFn, not2point0 } from '../../src/decorators';
 
 describe('Decorators Test', function _testDecorators() {
     describe('Test after', function _testAfter() {
@@ -95,6 +95,245 @@ describe('Decorators Test', function _testDecorators() {
         });
     });
 
+    /*
+    describe('Test guardAfter', function _testGuardAfter() {
+        it('should run the first function last', function _testGuardAfterWithSuccessfulFns() {
+            function func1(o) { console.log(o); o.a *= 4; return o; }
+            function func2(o) { console.log(o); o.a += 15; return true; }
+            function func3(o) { console.log(o); o.a += 6; return true; }
+
+            var obj = { a: 1 },
+                guardAfterFn = guardAfter(func1, func2, func3),
+                guardAfterRes = guardAfterFn(obj);
+
+            guardAfterRes.should.be.a('object');
+            guardAfterRes.a.should.be.a('number');
+            guardAfterRes.a.should.eql(256);
+        });
+    });
+    */
+
+    describe('Test guard', function _testGuard() {
+        it('should run the first function last', function _testGuardWithSuccessfulFns() {
+            function func1(o) { o.a *= 4; return o; }
+            function func2(o) { o.a += 15; return true; }
+            function func3(o) { o.a += 6; return true; }
+
+            var func1Spy = sinon.spy(func1);
+
+            var obj = { a: 1 },
+                guardFn = guard(func1Spy, func2, func3),
+                guardRes = guardFn(obj);
+
+            guardRes.should.be.a('object');
+            guardRes.a.should.be.a('number');
+            guardRes.a.should.eql(88);
+            func1Spy.should.have.been.calledOnce;
+        });
+
+        it('should not run the guarded function when a guard fails', function _testGuardWithFailureFns() {
+            function func1(o) { o.a *= 4; return o; }
+            function func2(o) { o.a += 15; return false; }
+            function func3(o) { o.a += 6; return true; }
+
+            var func1Spy = sinon.spy(func1),
+                func2Spy = sinon.spy(func2),
+                func3Spy = sinon.spy(func3),
+                obj = { a: 1 },
+                guardFn = guard(func1Spy, func2Spy, func3Spy),
+                guardRes = guardFn(obj);
+
+            expect(guardRes).to.be.undefined;
+            func1Spy.should.not.have.been.called;
+            func2Spy.should.have.been.calledOnce;
+            func3Spy.should.not.have.been.called;
+        });
+    });
+
+    describe('Test leftApply', function _testLeftApply() {
+        it('Should return the result of normal function invocation with arguments', function _testLeftApply() {
+            function doStuff(arg1, arg2, arg3, arg4, arg5) {
+                return arg1 + arg2 * arg3 - arg4 / arg5;
+            }
+
+            var leftApplyFn = leftApply(doStuff),
+                leftApplyRes = leftApplyFn(1, 2, 3, 4, 5);
+
+            leftApplyRes.should.eql(6.2);
+        });
+    });
+
+    describe('Test maybe', function _testMaybe() {
+        function maybeFn(arg1, arg2) {
+            return arg1 + arg2;
+        }
+
+        it('should not invoke the function when args are null', function _testMaybeWithNullArgs() {
+            var maybeSpy = sinon.spy(maybeFn),
+                m = maybe(maybeSpy),
+                mRes = m(null);
+
+            maybeSpy.should.not.have.been.called;
+            expect(mRes).to.be.null;
+        });
+
+        it('should not invoke the function when args are undefined', function _testMaybeWithNoArgs() {
+            var maybeSpy = sinon.spy(maybeFn),
+                m = maybe(maybeSpy),
+                mRes = m();
+
+            maybeSpy.should.not.have.been.called;
+            expect(mRes).to.be.null;
+        });
+
+        it('should invoke the function when one or more arguments are provided', function _testMaybeWithTwoArgs() {
+            var maybeSpy = sinon.spy(maybeFn),
+                m = maybe(maybeSpy),
+                mRes = m(1, 3);
+
+            maybeSpy.should.have.been.calledOnce;
+            mRes.should.eql(4);
+        });
+    });
+
+    describe('Test not2PointOh', function _testNot2PointOh() {
+        it('should re-curry the provided function', function _testNotWithNotEnoughParams() {
+            function notMe(arg1, arg2, arg3) { return arg1 || arg2 || arg3; }
+
+            var wait1 = not2point0(notMe, true),
+                wait2 = wait1(true),
+                res = wait2(true);
+
+            res.should.be.false;
+        });
+
+        /*it('should just return the not-ed invocation of the function if provided all arguments initially', function _testNotWithAllParams() {
+            function notMe(arg1, arg2, arg3) { return arg1 || arg2 && arg3; }
+
+            var res = not2point0(notMe, false, false, true);
+            res.should.be.true;
+        });*/
+    });
+
+    describe('Test once', function _testOnce() {
+        it('should only be invoked once', function _ensureAFunctionIsInvokedOnlyOnce() {
+            function runMe() { return 1; }
+
+            var runMeSpy = sinon.spy(runMe),
+                runMeOnce = once(runMeSpy);
+            runMeOnce();
+            runMeOnce();
+
+            runMeSpy.should.have.been.calledOnce;
+        });
+    });
+
+    describe('Test repeat', function _testRepeat() {
+        it('should call a function the specified number of times', function _testRepeatTenTimes() {
+            function rep(val) { return val++; }
+
+            var repSpy = sinon.spy(rep);
+
+            var res = repeat(10, repSpy);
+
+            res.should.eql(10);
+            repSpy.callCount.should.eql(10);
+        });
+    });
+
+    describe('Test safe', function _testSafe() {
+        it('should prevent running a function when null/undefined arguments are passed', function _testSafeWillNullArg() {
+            function _t(arg) { return arg; }
+            var _tSpy = sinon.spy(_t),
+                safe_t = safe(_tSpy);
+
+            var res1 = safe_t(undefined, undefined);
+            var res2 = safe_t(null);
+
+            expect(res1).to.be.undefined;
+            expect(res2).to.be.undefined;
+
+            _tSpy.should.not.have.been.called;
+        });
+
+        it('should prevent running a function when no params are passed', function _testSafeWithNoArgs() {
+            function _t(arg) { return arg; }
+            var _tSpy = sinon.spy(_t),
+                safe_t = safe(_tSpy);
+
+            var res = safe_t();
+
+            expect(res).to.be.undefined;
+            _tSpy.should.not.have.been.called;
+        });
+
+        it('should successfully invoke a function when correct params are passed', function _testSafeWithGoodArgs() {
+            function _t(arg) { return arg; }
+            var _tSpy = sinon.spy(_t),
+                safe_t = safe(_tSpy);
+
+            var res = safe_t(10, 12, true, 'string');
+
+            res.should.eql(10);
+            _tSpy.should.have.been.calledOnce;
+        });
+    });
+
+    describe('Test ternary', function _testTernary() {
+        it('should make a nullary function ternary', function _testTernaryOnANullaryFunction() {
+            function _nullary() { return Array.prototype.slice.call(arguments); }
+
+            var res = ternary(_nullary)(1)(2)(3);
+
+            res.should.be.an('array');
+            res.should.eql([1, 2, 3]);
+        });
+
+        it('should leave a ternary function \'untouched\'', function _testTernaryOnATernaryFunction() {
+            function _ternary(arg1, arg2, arg3) { return Array.prototype.slice.call(arguments); }
+
+            var res = ternary(_ternary)(1)(2)(3);
+
+            res.should.be.an('array');
+            res.should.eql([1, 2, 3]);
+        });
+
+        it('should turn a quarternary function into a ternary function', function _testTernaryOnAQuaternaryFunction() {
+            function quarternary(arg1, arg2, arg3, arg4) { return Array.prototype.slice.call(arguments); }
+
+            var res = ternary(quarternary)(1)(2)(3);
+
+            res.should.be.an('array');
+            res.should.eql([1, 2, 3]);
+        });
+    });
+
+    describe('Test tryCatch', function _tryCatch() {
+        function catcher(ex, ...args) {
+            return args.concat(ex);
+        }
+
+        it('should not invoke the catcher if no exception is thrown', function _testTryCatchWithNoException() {
+            function tryer(x) {
+                return x;
+            }
+
+            var res = tryCatch(catcher, tryer)(1);
+            res.should.eql(1);
+        });
+
+        it('should invoke the catcher if the tryer throws', function _testTryCatchWithAnException() {
+            function tryer(x, y) {
+                throw new Error("exception!");
+            }
+
+            var res = tryCatch(catcher, tryer)(1, 2);
+
+            res.should.be.an('array');
+            res.should.eql([1, 2, new Error("exception!")]);
+        });
+    });
+
     describe('Test unary', function _testUnary() {
         it('should make all functions unary', function _unaryTest() {
             function nullary() { return Array.prototype.slice.call(arguments, 0); }
@@ -117,6 +356,26 @@ describe('Decorators Test', function _testDecorators() {
 
             utRes.should.be.an('array');
             utRes.should.eql([1]);
+        });
+
+        it('should allow a param to be passed in during decoration', function _testUnaryWithArg() {
+            function _duo(x, y) { return Array.prototype.slice.call(arguments); }
+
+            var res = unary(_duo, 2);
+
+            res.should.be.an('array');
+            res.should.eql([2]);
+        });
+    });
+
+    describe('Test voidFn', function _testVoidFn() {
+        it('should void the return value of a function', function _voidFnTest() {
+            function _test() { return true; }
+
+            var resFn = voidFn(_test),
+                res = resFn();
+
+            expect(res).to.be.undefined;
         });
     });
 });
