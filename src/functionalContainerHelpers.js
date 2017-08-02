@@ -28,7 +28,7 @@ function isEither(fa) {
  * @return: {boolean}
  */
 function isFunctor(fa) {
-    return !!(fa && fa.factory in functors);
+    return !!(fa && fa.factory && fa.factory === functors[fa.factory.name]);
 }
 
 /**
@@ -108,7 +108,7 @@ function isMaybe(fa) {
  * @return: {boolean}
  */
 function isMonad(ma) {
-    return !!(ma && ma.factory in monads);
+    return !!(ma && ma.factory && ma.factory === monads[ma.factory.name]);
 }
 
 /**

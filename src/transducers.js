@@ -6,15 +6,59 @@ import { compose, curry } from './combinators'
  * @param: {function} f
  * @return: {*}
  */
-var mapping = (f) => (reducing) => (result, input) => reducing(result, f(input));
+var mapping = curry(function _mapping(mapFn, reduceFn, result, input) {
+    return reduceFn(result, mapFn(input));
+});
 
 /**
  * @type:
  * @description:
  * @param: {function} predicate
+ * @param: {function} reduceFn
+ * @param: {*} result
+ * @param: {Array} input
  * @return: {*}
  */
-var filtering = (predicate ) => (reducing) => (result, input) => predicate(input) ? reducing(result, input) : result;
+var filtering = curry(function _filtering2(predicate, reduceFn, result, input) {
+    return predicate(input) ? reduceFn(result, input) : result;
+});
+
+/**
+ * @type:
+ * @description:
+ * @param: {function} mapFn
+ * @return: {function}
+ */
+function mapReducer (mapFn) {
+    return function _mapReducer(result, input) {
+        return result.concat(mapFn(input));
+    };
+}
+
+/**
+ * @type:
+ * @description:
+ * @param: {function} predicate
+ * @return: {function}
+ */
+function filterReducer(predicate) {
+    return function _filterReducer(result, input) {
+        return predicate(input) ? result.concat(input) : result;
+    };
+}
+
+/**
+ * @type:
+ * @description:
+ * @param: {} f
+ * @param: {} x
+ * @return: *
+ */
+var mapped = curry(function _mapped(f, x) {
+    return identity(map(compose(function _mCompose(x) {
+        return x.value;
+    }, f), x));
+});
 
 /**
  * @type:
@@ -26,36 +70,6 @@ var filtering = (predicate ) => (reducing) => (result, input) => predicate(input
  * @return: {*}
  */
 var transduce = (xform, reducing, initial, input) => input.reduce(xform(reducing), initial);
-
-/**
- * @type:
- * @description:
- * @return:
- */
-var xform = compose(
-    mapping((x) => x + 1),
-    filtering((x) => 0 === x % 2));
-
-var xform2 = compose(
-    mapping(function _m(c) {
-        console.log('map', c);
-        return c + 1;
-    }),
-    filtering(function _f(c) {
-        console.log('filter', c);
-        return 0 === x % 2;
-    })
-);
-
-transduce(xform, (xs, x) => {
-    xs.push(x);
-    return xs;
-}, [], [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]);
-// [2, 4, 6, 8, 10]
-
-transduce(xform, (sum, x) => sum + x, 0, [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]);
-
-console.log(transduce(xform, (sum, x) => sum + x, 0, [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]));
 
 /**
  * @type:
@@ -83,45 +97,7 @@ Object.defineProperty(reduce, 'stopper', {
     value: Symbol('stop reducing')//no possible computation could come up with this by accident
 });
 
-
-//types of transformations
-const mapping2 = transformFn => reducingFn =>
-    (acc, item) => reducingFn(acc, transformFn(item, acc));
-
-const filtering2 = testFn => reducingFn => (acc, item) =>
-    testFn(item, acc) ? reducingFn(acc, item) : acc;
-
-//defining particular mapping/filtering operations
-const divideByThree = mapping2(x => x / 3);// returns a transducer
-const keepOnlyIntegers = filtering2(x => 0 === x % 1);//returns a transducer
-
-//combining them
-const divBy3andOnlyIntegers = compose(divideByThree, keepOnlyIntegers);// transducers compose!
-
-
-//using the composed transducer in a reduce method with concat on a starting array
-[3,4,9,13,14,12].reduce( divBy3andOnlyIntegers(concat), []);//-> [ 1, 3, 4 ]
-
-//a transducer (composed or not) + a reducing function = a reducing function
-const divBy3andOnlyIntegersAndSum = compose(divideByThree, keepOnlyIntegers)(sum);
-
-//using the completed reducing function on a starting value
-reduce(divBy3andOnlyIntegersAndSum, 0, [3,4,9,13,14,12]);//-> (1+3+4) = 8
-
-
-function dropGate(skips) {
-    return function _dropGate(x) {
-        return 0 > --skips;
-    };
-}
-
-function dropping1(skips) {
-    return filtering(dropGate(skips));
-    //return compose(filtering, dropGate)(skips);
-    //return filtering(function _f(x) { return --skips < 0; });
-}
-
-function dropping2(skips) {
+function dropping(skips) {
     return function _dropping2(reducingFunc) {
         return function _dropping2_(acc, item) {
             return 0 <= --skips ? acc : reducingFunc(acc, item);
@@ -129,31 +105,27 @@ function dropping2(skips) {
     };
 }
 
+/*
+var taking = allows => reducerFn => (acc, item) => {
+    let result = reducerFn(acc, item);
+    return 0 < --allows ? result : { [reduce.stopper]: result };
+};
+*/
 
-var x = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
-    .reduce(mapping((x) => x + 1)((xs, x) => {
-        xs.push(x);
-        return xs;
-    }), [])
-    .reduce(filtering((x) => 0 === x % 2)((xs, x) => {
-        xs.push(x);
-        return xs;
-    }), []);
+var taking = allows => reducerFn => {
+    let _allows = allows;
+    return (acc, item) => {
+        return 0 < --_allows ? reducerFn(acc, item) : { [reduce.stopper]: reducerFn(acc, item) };
+    }
+};
 
-var xs1 = compose(
-    mapping(function _mapFunc(x) {
-        return x + 1;
-    }),
-    filtering(function _filterFunc(x) {
-        return 0 === x % 2;
-    }));
+//var map = curry((mapFn, redFn) => (xs, x) => redFn(xs, mapFn(x)));
+//var inc = reduce(map(add(1), concat), []);
 
+//var filter = curry((predFn, redFn) => (xs, x) => predFn(x) ? redFn(xs, x) : xs);
+//var greaterThanOne = reduce(filter(x => 1 < x, concat), []);
 
-var map = curry((mapFn, redFn) => (xs, x) => redFn(xs, mapFn(x)));
-var inc = reduce(map(add(1), concat), []);
-var filter = curry((predFn, redFn) => (xs, x) => predFn(x) ? redFn(xs, x) : xs);
-var greaterThanOne = reduce(filter(x => 1 < x, concat), []);
+//var transduce2 = curry((xForm, f, init, coll) => reduce(xForm(f), init, coll));
+//console.log(transduce2(map(add(1)), concat, [], [1, 2, 3, 4]));
 
-
-var transduce2 = curry((xForm, f, init, coll) => reduce(xForm(f), init, coll));
-console.log(transduce2(map(add(1)), concat, [], [1, 2, 3, 4]));
+export { mapping, filtering, mapReducer, filterReducer, mapped, transduce, reduce, dropping, taking };

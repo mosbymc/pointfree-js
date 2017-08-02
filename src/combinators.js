@@ -132,31 +132,6 @@ function curryRight(fn) {
 /**
  * @type:
  * @description:
- * @param: {function} predicate
- * @param: {function} reduceFn
- * @param: {*} result
- * @param: {*} input
- * @return: {*}
- */
-var filtering = curry(function _filtering2(predicate, reduceFn, result, input) {
-    return predicate(input) ? reduceFn(result, input) : result;
-});
-
-/**
- * @type:
- * @description:
- * @param: {function} predicate
- * @return: {function}
- */
-function filterReducer(predicate) {
-    return function _filterReducer(result, input) {
-        return predicate(input) ? result.concat(input) : result;
-    };
-}
-
-/**
- * @type:
- * @description:
  * @param: {*}
  * @return: {function}
  */
@@ -240,44 +215,6 @@ var kestrel = constant;
  * @return: {*}
  */
 var m = a => a(a);
-
-/**
- * @type:
- * @description:
- * @param: {function} f
- * @param: {object} x
- * @return: {identity<T>}
- */
-var mapped = curry(function _mapped(f, x) {
-    return identity(map(compose(function _mCompose(x) {
-        return x.value;
-    }, f), x));
-});
-
-/**
- * @type:
- * @description:
- * @param: {function} mapFn
- * @param: {function} reduceFn
- * @param: {*} result
- * @param: {*} input
- * @return: {*}
- */
-var mapping = curry(function _mapping2(mapFn, reduceFn, result, input) {
-    return reduceFn(result, mapFn(input));
-});
-
-/**
- * @type:
- * @description:
- * @param: {function} mapFn
- * @return: {function}
- */
-function mapReducer (mapFn) {
-    return function _mapReducer(result, input) {
-        return result.concat(mapFn(input));
-    };
-}
 
 /**
  * @type:
@@ -427,11 +364,13 @@ function uncurry(fn) {
  * @return: {function|*}
  */
 var uncurryN = curry(function uncurryN(depth, fn) {
+    console.log(depth, fn);
     return curryN(this, depth, function _uncurryN(...args) {
-        var currentDepth = 1;
-        var value = fn;
-        var idx = 0;
-        var endIdx;
+        console.log(args);
+        var currentDepth = 1,
+            value = fn,
+            idx = 0,
+            endIdx;
         while (currentDepth <= depth && 'function' === typeof value) {
             endIdx = currentDepth === depth ? args.length : idx + value.length;
             value = value.apply(this, args.slice(idx, endIdx));
@@ -492,82 +431,19 @@ function applyWhenReady(fn) {
         return _applyWhenReady;
     }
 
-    _applyWhenReady.invoke = function _invoke() {
-        fn(...values);
+    _applyWhenReady.apply = function _apply() {
+        return fn(...values);
     };
 
-    _applyWhenReady.reverseInvoke = function _reverseInvoke() {
-        fn(...values.reverse());
+    _applyWhenReady.leftApply = _applyWhenReady.apply;
+
+    _applyWhenReady.rightApply = function _rightApply() {
+        console.log(values);
+        return fn(...values.reverse());
     };
 
     return _applyWhenReady;
 }
 
-/**
- * @type:
- * @description:
- * @param: skips
- * @return: {function}
- */
-function dropGate(skips) {
-    return function _dropGate(x) {
-        return 0 > --skips;
-    };
-}
-
-function dropping1(skips) {
-    return filtering(dropGate(skips));
-    //return compose(filtering, dropGate)(skips);
-    //return filtering(function _f(x) { return --skips < 0; });
-}
-
-function dropping2(skips) {
-    return function _dropping2(reducingFunc) {
-        return function _dropping2_(acc, item) {
-            return 0 <= --skips ? acc : reducingFunc(acc, item);
-        };
-    };
-}
-
-var x = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
-    .reduce(mapping((x) => x + 1)((xs, x) => {
-        xs.push(x);
-        return xs;
-    }), [])
-    .reduce(filtering((x) => 0 === x % 2)((xs, x) => {
-        xs.push(x);
-        return xs;
-    }), []);
-
-var xs1 = compose(
-    mapping(function _mapFunc(x) {
-        return x + 1;
-    }),
-    filtering(function _filterFunc(x) {
-        return 0 === x % 2;
-    }));
-
-/*
- var g = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9].reduce(xs1(function _reduce(xs, xi) {
- xs[xs.length] = xi;
- return xs;
- }), []);
- */
-
-//var t = reduce(dropping1(3)(concat),[],[1,2,3,4,5]);//->
-//const dropGate = skips => x => --skips>=0 ? false : true;
-
-//const dropping = skips => filtering(dropGate(skips));
-//or...                => compose(filtering, dropGate)(skips);
-//or...                => filtering(x => --skips>=0 ? false : true);
-//or....
-/*
- const dropping = skips => reducingFn => (acc, item) => {
- return --skips >= 0 ? acc : reducingFn(acc, item);
- };*/
-
-//usage
-//reduce(dropping(3)(concat),[],[1,2,3,4,5]);//-> [4,5]
-
-export { all, any, applyWhenReady, c, compose, constant, curry, curryN, curryRight, filtering, filterReducer, first, fixedPoint, fork, identity,
-          ifElse, ifThisThenThat, kestrel, m, mapped, mapping, mapReducer, pipe, o, q, reduce, rev, second, sequence, t, thrush, u, w, when, whenNot, y };
+export { all, any, applyWhenReady, c, compose, constant, curry, curryN, curryRight, first, fixedPoint, fork, identity,
+          ifElse, ifThisThenThat, kestrel, m, pipe, o, q, reduce, rev, second, sequence, t, thrush, u, uncurry, uncurryN, w, when, whenNot, y };
