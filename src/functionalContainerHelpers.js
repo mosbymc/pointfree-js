@@ -68,7 +68,7 @@ function isIo(fa) {
  * @return {boolean}
  */
 function isJust(fa) {
-    return !!(fa.isJust && fa.factory === functors.Just || fa.factory === monads.Just);
+    return !!(fa.isJust && (fa.factory === functors.Maybe || fa.factory === monads.Maybe));
 }
 
 /**
@@ -78,7 +78,7 @@ function isJust(fa) {
  * @return: {boolean}
  */
 function isLeft(fa) {
-    return !!(fa.isLeft && fa.factory === functors.Either || fa.factor === monads.Either);
+    return !!(fa.isLeft && (fa.factory === functors.Either || fa.factory === monads.Either));
 }
 
 /**
@@ -88,7 +88,7 @@ function isLeft(fa) {
  * @return: {boolean}
  */
 function isList(fa) {
-    return fa.factory === functors.List || fa.factory === monads.List;
+    return (fa.factory === functors.List || fa.factory === monads.List);
 }
 
 /**
@@ -98,7 +98,8 @@ function isList(fa) {
  * @return: {boolean}
  */
 function isMaybe(fa) {
-    return (fa.factory === functors.Just || fa.factory === functors.Nothing || fa.factory === monads.Just || fa.factory === monads.Nothing);
+    return !!((fa.isNothing && (fa.factory === functors.Maybe || fa.factory === monads.Maybe)) ||
+        (fa.isJust && (fa.factory === functors.Maybe || fa.factory === monads.Maybe)));
 }
 
 /**

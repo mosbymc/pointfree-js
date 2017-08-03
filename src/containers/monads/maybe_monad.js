@@ -3,7 +3,33 @@ import { identity } from '../../combinators';
 import { apply, chain, mjoin, pointMaker, sharedMaybeFns } from '../containerHelpers';
 
 function Maybe(item) {
-    return null != item ? Maybe.Just(item) : Maybe.Nothing();
+    return null == item ?
+        Object.create(nothing_monad, {
+            _value: {
+                value: null,
+                writable: false,
+                configurable: false
+            },
+            isJust: {
+                value: false
+            },
+            isNothing: {
+                value: true
+            }
+        }) :
+        Object.create(just_monad, {
+            _value: {
+                value: item,
+                writable: false,
+                configurable: false
+            },
+            isJust: {
+                value: true
+            },
+            isNothing: {
+                value: false
+            }
+        });
 }
 
 /**
@@ -40,18 +66,18 @@ Maybe.Just = function _just(item) {
 
 Maybe.Nothing = function _nothing() {
     return Object.create(nothing_monad, {
-        _value: {
-            value: null,
-            writable: false,
-            configurable: false
-        },
-        isJust: {
-            value: false
-        },
-        isNothing: {
-            value: true
-        }
-    });
+            _value: {
+                value: null,
+                writable: false,
+                configurable: false
+            },
+            isJust: {
+                value: false
+            },
+            isNothing: {
+                value: true
+            }
+        });
 };
 
 var Just = Maybe.Just;

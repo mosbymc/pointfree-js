@@ -67,6 +67,24 @@ describe('Identity monad test', function _testIdentityMonad() {
             expect('testing constant').to.eql(i7.value);
             expect(false).to.eql(i8.value);
         });
+
+        it('should return correct boolean value when #is is invoked', function _testIdentityDotIs() {
+            var i = Identity(10),
+                m = monads.Maybe(10),
+                c = monads.Constant(10),
+                f = Identity.is,
+                n = null,
+                s = 'string',
+                b = false;
+
+            Identity.is(c).should.be.false;
+            Identity.is(m).should.be.false;
+            Identity.is(i).should.be.true;
+            Identity.is(f).should.be.false;
+            Identity.is(n).should.be.false;
+            Identity.is(s).should.be.false;
+            Identity.is(b).should.be.false;
+        });
     });
 
     describe('Identity monad object tests', function _testIdentityMonadObject() {
@@ -127,6 +145,22 @@ describe('Identity monad test', function _testIdentityMonad() {
             //Object.getPrototypeOf(m1Res).should.eql(monads.Maybe(65));
             //Object.getPrototypeOf(m2Res).should.eql(monads.Maybe());
             //Object.getPrototypeOf(m3Res).should.eql(monads.Maybe(false));
+        });
+
+        it('should return underlying value when constant_functor#fold is invoked', function _testConstantDotFold() {
+            Identity(10).fold(x => x * 15).should.eql(150);
+        });
+
+        it('should return a Just of an Identity of 10 when #sequence is invoked', function _testConstantDotSequence() {
+            Identity(10).sequence(monads.Maybe).toString().should.eql('Just(Identity(10))');
+        });
+
+        it('should return a Just of an Identity of 3 when #traverse is invoked', function _testConstantDotTraverse() {
+            function test(val) {
+                return monads.Maybe(val + 2);
+            }
+
+            Identity(1).traverse(monads.Maybe, test).toString().should.eql('Just(Identity(3))');
         });
 
         it('should have a .constructor property that points to the factory function', function _testIdentityMonadIsStupidViaFantasyLandSpecCompliance() {

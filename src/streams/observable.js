@@ -23,6 +23,14 @@ var observable = {
     set operator(op) {
         this._operator = op;
     },
+    setSource: function _setSource(src) {
+        this.source = src;
+        return this;
+    },
+    setOperator: function _setOperator(op) {
+        this.operator = op;
+        return this;
+    },
     /**
      *
      * @param fn
@@ -47,7 +55,8 @@ var observable = {
      * @returns {observable}
      */
     filter: function _filter(predicate) {
-        if (filterOperator.isPrototypeOf(this.operator)) return this.lift.call(this.source, Object.create(filterOperator).init(and(predicate, this.operator.predicate)));
+        if (filterOperator.isPrototypeOf(this.operator))
+            return this.lift.call(this.source, Object.create(filterOperator).init(and(predicate, this.operator.predicate)));
         return this.lift(Object.create(filterOperator).init(predicate));
     },
     /**
@@ -66,7 +75,8 @@ var observable = {
      * @returns {observable}
      */
     merge: function _merge(...observables) {
-        if (mergeOperator.isPrototypeOf(this.operator)) return this.lift.call(this.source, Object.create(mergeOperator).init([this].concat(observables, this.operator.observables)));
+        if (mergeOperator.isPrototypeOf(this.operator))
+            return this.lift.call(this.source, Object.create(mergeOperator).init([this].concat(observables, this.operator.observables)));
         return this.lift(Object.create(mergeOperator).init([this].concat(observables)));
     },
     /**
@@ -99,10 +109,7 @@ var observable = {
      * @returns {observable}
      */
     lift: function lift(operator) {
-        var o = Object.create(observable);
-        o.source = this;
-        o.operator = operator;
-        return o;
+        return Object.create(observable).setSource(this).setOperator(operator);
     },
     /**
      *
@@ -134,18 +141,42 @@ var observable = {
     },
     /**
      *
-     * @param src
+     * @param list
      * @param startingIdx
      * @returns {observable}
      */
-    fromList: function _fromList(src, startingIdx = 0) {
+    fromList: function _fromList(list, startingIdx = 0) {
         var o = Object.create(observable);
-        o.source = src;
+        o.source = list;
         o.idx = startingIdx;
         o.subscribe = function _subscribe(subscriber) {
             function unSub() {
                 this.status = observableStatus.complete;
             }
+
+            var runner = (function _runner() {
+                if (subscriber.status !== observableStatus.paused && subscriber.status !== observableStatus.complete &&
+                    this.idx < this.source.length) {
+                    Promise.resolve(this.source[this.idx++])
+                        .then(function _resolve(val) {
+                            subscriber.next(val);
+                            runner();
+                        });
+                }
+                else {
+                    var d = subscriber;
+                    while (d.subscriber.subscriber) d = d.subscriber;
+                    d.unsubscribe();
+                }
+            }).bind(this);
+
+            Promise.resolve()
+                .then(function _callRunner() {
+                    runner();
+                });
+
+            subscriber.unsubscribe = unSub;
+            return subscriber;
 
             /*
             var runner = (function _runner() {
@@ -171,12 +202,14 @@ var observable = {
                 .then(function _callRunner() {
                     runner();
                 });
-               */
+            */
 
+            /*
             Promise.resolve()
                 .then(function _callRunner() {
                     ((function _runner() {
-                        if (subscriber.status !== observableStatus.paused && subscriber.status !== observableStatus.complete && this.idx < this.source.length) {
+                        if (subscriber.status !== observableStatus.paused && subscriber.status !== observableStatus.complete &&
+                            this.idx < this.source.length) {
                             for (let item of source) {
                                 Promise.resolve(item)
                                     .then(function _resolve(val) {
@@ -194,11 +227,15 @@ var observable = {
                         }
                     }).bind(this))();
                 });
+            */
 
             subscriber.unsubscribe = unSub;
             return subscriber;
         };
         return o;
+    },
+    fromArray: function _fromArray(arr, startingIdx = 0) {
+
     },
     /**
      * Creates a new observable from a generator function

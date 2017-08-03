@@ -411,9 +411,8 @@ describe('Maybe functor tests', function _testMaybeFunctor() {
         });
 
         it('should have a .constructor property that points to the factory function', function _testMaybeFunctorIsStupidViaFantasyLandSpecCompliance() {
-            console.log(Just(1).factory);
-            Just(1).constructor.should.eql(Just);
-            Nothing().constructor.should.eql(Nothing);
+            Just(1).constructor.should.eql(Maybe);
+            Nothing().constructor.should.eql(Maybe);
         });
     });
 });

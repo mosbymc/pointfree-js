@@ -83,7 +83,7 @@ Maybe.Just = Maybe.of;
  * @description:
  * @return: {@see maybe_functor}
  */
-Maybe.Nothing =  () => Maybe();
+Maybe.Nothing = () => Maybe();
 
 /**
  * @type:
@@ -221,7 +221,7 @@ var just_functor = {
     of: pointMaker(Just),
     valueOf: valueOf,
     toString: stringMaker('Just'),
-    factory: Just
+    factory: Maybe
 };
 
 /**
@@ -244,7 +244,7 @@ var nothing_functor = {
     toString: function _toString() {
         return `Nothing()`;
     },
-    factory: Nothing
+    factory: Maybe
 };
 
 /**

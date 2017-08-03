@@ -29,10 +29,12 @@ module.exports = function _wallaby(wallaby) {
             { pattern : 'src/**/*.js', load: true },
             { pattern: 'test/testData.js', load: true },
             '!test/**/*.spec.js',
-            '!src/index.js',
             '!playground.js',
             '!test/test_helper.js',
-            '!./observations.js'
+            '!./observations.js',
+            '!./src/streams/stream_test_file.js',
+            '!./src/streams/stream.js',
+            '!./src/streams/source.js'
         ],
 
         /*

@@ -31,6 +31,11 @@
       "babel-polyfill",
       "babel-register",
       "./test/test_helper.js"
+    ],
+    "exclude": [
+      "./src/streams/source.js",
+      "./src/steams/stream.js",
+      "./src/streams/stream_test_files.js"
     ]
   },
   "repository": {
