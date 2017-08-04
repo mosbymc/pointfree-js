@@ -41,3 +41,9 @@ tmp
 dev-build
 platoTmp
 .nyc_output
+
+# Individual 'test' files
+playground.js
+wallaby.new.js
+wallaby.test.js
+observations.js

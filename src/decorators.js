@@ -105,19 +105,6 @@ var not = fn => (...args) => !fn(...args);
 
 /**
  * @description:
- * @type: {function}
- */
-var not2point0 = curryN(this, 2, function _not2point0(fn, ...args) {
-    if (args.length < fn.length) {
-        return curryN(this, fn.length, function _not(...a) {
-            return !fn(...a);
-        }, args);
-    }
-    return !fn(...args);
-});
-
-/**
- * @description:
  * @param: {function} fn
  * @returns: {function}
  */
@@ -273,4 +260,4 @@ var voidFn = fn => (...args) => void fn(...args);
 
 
 export { after, apply, before, binary, bindFunction, guard, hyloWith, leftApply, maybe, not, once, repeat, rightApply,
-        safe, tap, ternary, tryCatch, unary, unfold, unfoldWith, voidFn, not2point0 };
+        safe, tap, ternary, tryCatch, unary, unfold, unfoldWith, voidFn };

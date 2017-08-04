@@ -1,6 +1,5 @@
 import { functors } from '../../../../src/containers/functors/functors';
 import { identity_functor } from '../../../../src/containers/functors/identity_functor';
-import {orElse} from "../../../../src/containers/containerHelpers";
 
 var Identity = functors.Identity;
 

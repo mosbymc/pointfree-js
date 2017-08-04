@@ -67,6 +67,67 @@ describe('List functor test', function _testListFunctor() {
             expect('testing constant').to.eql(i7.value);
             expect([false]).to.eql(i8.value);
         });
+
+        it('should return an ordered list delegator', function _testOrderedListCreationFunctionProperties() {
+            var l1 = List.empty(),
+                l2 = List.just(1),
+                l3 = List.ordered([1, 2, 3, 4, 5], x => x);
+
+            ordered_list_functor.isPrototypeOf(l1).should.be.true;
+            ordered_list_functor.isPrototypeOf(l2).should.be.true;
+            ordered_list_functor.isPrototypeOf(l3).should.be.true;
+        });
+
+        it('should return a list from a generator source', function _testListFromGen() {
+            function *gen() {
+                var count = 0;
+                while (5 >= count) {
+                    yield count;
+                    count++;
+                }
+            }
+
+            List(gen)
+                .data.should.eql([0, 1, 2, 3, 4, 5]);
+        });
+
+        it('should return correct response when checking is a type is an Identity', function _testListDotIs() {
+            var l = List(2),
+                m = functors.Maybe(2),
+                c = functors.Constant(null),
+                test1 = 2,
+                test2 = { a: 1 },
+                test3 = [1, 2, 3];
+
+            List.is(l).should.be.true;
+            List.is(m).should.be.false;
+            List.is(c).should.be.false;
+            List.is(test1).should.be.false;
+            List.is(test2).should.be.false;
+            List.is(test3).should.be.false;
+        });
+
+        it('should return a new List delegate with the same value repeated x times', function _testListDotRepeat() {
+            List.repeat(1, 5)
+                .data.should.eql([1, 1, 1, 1, 1]);
+        });
+
+        it('should extend the List factory with new functionality', function _testListDotExtend() {
+            function extension() {
+                return function *_extension() {
+                    yield true;
+                }
+            }
+            var extensionSpy = sinon.spy(extension);
+
+            List.extend('true', extensionSpy);
+            var res = List([1]).true().data;
+
+            res.should.be.an('array');
+            res.should.have.lengthOf(1);
+            res[0].should.be.true;
+            extensionSpy.should.have.been.calledOnce;
+        });
     });
 
     describe('List functor object shared fields tests', function _testListFunctorSharedFields() {
@@ -197,6 +258,13 @@ describe('List functor test', function _testListFunctor() {
                 res.should.eql([6, 7, 8, 9, 10, 1, 2, 3, 4, 5]);
             });
 
+            it('should return a list of copied values', function _testCopyWithin() {
+                var list = List.from([1, 2, 3, 4, 5]),
+                    listRes = list.copyWithin(3, 0);
+
+                listRes.data.should.eql([1, 2, 3, 1, 2]);
+            });
+
             it('should return a single list_functor after concatenating the current list_functor with a new list_functor', function _testConcat() {
                 var list = List.from([1, 2, 3, 4, 5]),
                     arr = [6, 7, 8, 9, 10],
@@ -219,6 +287,26 @@ describe('List functor test', function _testListFunctor() {
                 res.should.be.an('array');
                 res.should.have.lengthOf(20);
                 res.should.eql([1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20]);
+            });
+
+            it('should return a list of distinct values', function _testDistinct() {
+                var list = List.from([1, 1, 1, 1, 1, 1, 1, 2, 2, 2, 2, 2]),
+                    listRes = list.distinct();
+
+                listRes.data.should.eql([1, 2]);
+            });
+
+            it('should fill the list with a single value', function _testFill() {
+                var list = List([1, 2, 3, 4, 5]),
+                    listRes = list.fill(1);
+
+                listRes.data.should.eql([1, 1, 1, 1, 1]);
+            });
+
+            it('should filter out values based on predicate', function _testFilter() {
+                List([0, 1, 2, 3, 4, 5, 6, 7, 8, 9])
+                    .filter(num => 0 !== num % 2)
+                    .data.should.eql([1, 3, 5, 7, 9]);
             });
 
             it('should return the list_functor except where the two intersect (numbers)', function _testExceptWithNumbers() {
@@ -285,6 +373,91 @@ describe('List functor test', function _testListFunctor() {
                 res.should.eql(resStandard);
             });
 
+            it('should group the test data on last name', function _testGroupBy() {
+                function selector(item) { return item.LastName; }
+                function comparer(a, b) { return a === b; }
+
+                var uniqueLastNames = [];
+                testData.dataSource.data.forEach(function _findUniqueStates(item) {
+                    if (!uniqueLastNames.some(function findDupe(it) {
+                            return it === item.LastName;
+                        }))
+                        uniqueLastNames.push(item.LastName);
+                });
+
+                List(testData.dataSource.data)
+                    .groupBy(selector, comparer)
+                    .data.should.lengthOf(uniqueLastNames.length);
+            });
+
+            it('should group the test data on last name', function _testGroupByDescending() {
+                function selector(item) { return item.LastName; }
+                function comparer(a, b) { return a === b; }
+
+                var uniqueLastNames = [];
+                testData.dataSource.data.forEach(function _findUniqueStates(item) {
+                    if (!uniqueLastNames.some(function findDupe(it) {
+                            return it === item.LastName;
+                        }))
+                        uniqueLastNames.push(item.LastName);
+                });
+
+                List(testData.dataSource.data)
+                    .groupByDescending(selector, comparer)
+                    .data.should.lengthOf(uniqueLastNames.length);
+            });
+
+            it('should group items on last name after joining with another list', function _testGroupJoin() {
+                var preViewed = {};
+                var uniqueCities = testData.dataSource.data.filter(function _gatherUniqueCities(item) {
+                    if (!(item.City in preViewed)) {
+                        preViewed[item.City] = true;
+                        return item.City;
+                    }
+                }).map(function _selectOnlyCities(item) {
+                    return item.City;
+                });
+
+                function primitiveSelector(item) {
+                    return item;
+                }
+
+                function citySelector(item) {
+                    return item.City;
+                }
+
+                function cityProjector(a, b) {
+                    //console.log(b.data);
+                    return {
+                        City: a.City,
+                        People: b.data
+                    };
+                }
+
+                List(testData.dataSource.data)
+                    .groupJoin(uniqueCities, citySelector, primitiveSelector, cityProjector)
+                    .data;
+                /*
+                var groupJoinIterable = groupJoin(uniqueCities, testData.dataSource.data, primitiveSelector, citySelector, cityProjector),
+                    groupJoinRes = Array.from(groupJoinIterable());
+
+                groupJoinRes.should.have.lengthOf(uniqueCities.length);
+                groupJoinRes.forEach(function _validateEntries(item) {
+                    item.should.have.keys('City', 'People');
+                    item.People.should.be.an('object');
+                    item.People.data.forEach(function _ensurePeopleLiveInCity(person) {
+                        item.City.should.eql(person.City);
+                    });
+                });
+                */
+            });
+
+            it('should intersperse a value within the list', function _testIntersperse() {
+                List([1, 2, 3, 4, 5])
+                    .intersperse(1)
+                    .data.should.eql([1, 1, 2, 1, 3, 1, 4, 1, 5]);
+            });
+
             it('should return the list_functor only where the two intersect (numbers)', function _testIntersectWithNumbers() {
                 var list = List.from([1, 2, 3, 4, 5]),
                     arr = [2, 4, 6, 8, 10],
@@ -348,6 +521,115 @@ describe('List functor test', function _testListFunctor() {
                 res.should.have.lengthOf(resStandard.length);
                 res.should.eql(resStandard);
             });
+
+            it('should join two arrays together', function _testJoin() {
+                function selector(item) {
+                    return item.FirstName;
+                }
+
+                function projector(a, b) {
+                    return {
+                        outerFirstName: a.FirstName,
+                        innerFirstName: b.FirstName
+                    }
+                }
+
+                var duplicateFirstNames = Array.prototype.concat.apply([], testData.dataSource.data.map(function _findDupes(item) {
+                    return Array.prototype.concat.apply([], testData.dataSource.data.filter(function _innerDupes(it) {
+                        return item.FirstName === it.FirstName;
+                    }));
+                }));
+
+                List(testData.dataSource.data)
+                    .join(testData.dataSource.data, selector, selector, projector)
+                    .data.should.have.lengthOf(duplicateFirstNames.length);
+            });
+
+            it('should filter values from a list that are not of the specified type', function _testOfType() {
+                List([1, 2, '3', '4', false, true, Symbol.for('test'), null, undefined, { a: 1 }])
+                    .ofType('number')
+                    .data.should.eql([1, 2]);
+            });
+
+            it('should reverse the underlying data', function _testReverse() {
+                List([1, 2, 3, 4, 5])
+                    .reverse()
+                    .data.should.eql([5, 4, 3, 2, 1]);
+            });
+
+            it('should skip the specified number of items', function _testSkip() {
+                List([1, 2, 3, 4, 5])
+                    .skip(3)
+                    .data.should.eql([4, 5]);
+
+                List([1, 2, 3, 4, 5])
+                    .skip()
+                    .data.should.eql([1, 2, 3, 4, 5]);
+            });
+
+            it('should skip values until the first time predicate returns false', function _testSkipWhile() {
+                List([1, 2, 3, 4, 5])
+                    .skipWhile(x => 1 === x % 2)
+                    .data.should.eql([2, 3, 4, 5]);
+            });
+
+            it('should take the specified number of items', function _testTake() {
+                List(testData.dataSource.data)
+                    .take(15)
+                    .data.should.have.lengthOf(15);
+            });
+
+            it('should take values until the first time the predicate returns false', function _testTakeWhile() {
+                List([1, 2, 3, 4, 5])
+                    .takeWhile(x => 0 !== x % 2)
+                    .data.should.eql([1]);
+            });
+
+            it('should produce a set of unique items from both collections', function _testUnion() {
+                List([1, 2, 3, 4, 5, 6])
+                    .union([5, 6, 7, 8, 9, 10])
+                    .data.should.eql([1, 2, 3, 4, 5, 6, 7, 8, 9, 10]);
+            });
+
+            it('should zip two lists together', function _testZip() {
+                List(testData.dataSource.data)
+                    .zip((function _selector(x, y) { return { x: x.FirstName, y: y }; }), [1, 2, 3, 4, 5, 6, 7])
+                    .data.should.eql([
+                        { x: 'Phillip J.', y: 1 },
+                        { x: 'Hedonism', y: 2 },
+                        { x: 'Hypnotoad', y: 3 },
+                        { x: 'Robot', y: 4 },
+                        { x: '9', y: 5 },
+                        { x: 'Crushinator', y: 6 },
+                        { x: 'Lrrr', y: 7 }
+                    ]);
+            });
+
+            it('should sort a list in ascending order', function _testSortBy() {
+                List([10, 9, 8, 7, 6, 5, 4, 3, 2, 1])
+                    .sortBy(x => x)
+                    .data.should.eql([1, 2, 3, 4, 5, 6, 7, 8, 9, 10]);
+            });
+
+            it('should sort a list in descending order', function _testSortByDescending() {
+                List([1, 2, 3, 4, 5, 6, 7, 8, 9, 10])
+                    .sortByDescending(x => x)
+                    .data.should.eql([10, 9, 8, 7, 6, 5, 4, 3, 2, 1]);
+            });
+
+            it('should sort a list in ascending order twice', function _testThenBy() {
+                List([[10, 1], [10, 5], [10, 2], [9, 9], [9, 3], [8, 1], [9, 10], [8, 0], [7, 2], [7, 1]])
+                    .sortBy(x => x[0])
+                    .thenBy(x => x[1])
+                    .data.should.eql([[7, 1], [7, 2], [8, 0], [8, 1], [9, 3], [9, 9], [9, 10], [10, 1], [10, 2], [10, 5]]);
+            });
+
+            it('should sort a list in ascending order and then descending order', function _testThenByDescending() {
+                List([[10, 1], [10, 5], [10, 2], [9, 9], [9, 3], [8, 1], [9, 10], [8, 0], [7, 2], [7, 1]])
+                    .sortBy(x => x[0])
+                    .thenByDescending(x => x[1])
+                    .data.should.eql([[7, 2], [7, 1], [8, 1], [8, 0], [9, 10], [9, 9], [9, 3], [10, 5], [10, 2], [10, 1]]);
+            });
         });
 
         describe('Immediately Evaluated list_functor functions', function _testImmediatelyEvaluatedListFunctions() {
@@ -358,6 +640,262 @@ describe('List functor test', function _testListFunctor() {
 
                 res1.should.be.true;
                 res2.should.be.false;
+            });
+
+            it('should return a boolean indicating if all data in the list passes predicate', function _testAll() {
+                List([1, 2, 3, 4, 5])
+                    .all(x => 10 < x)
+                    .should.be.false;
+
+                List([1, 2, 3, 4, 5])
+                    .all(x => 0 <= x)
+                    .should.be.true;
+            });
+
+            it('should return a boolean indicating if any data in the list passes the predicate', function _testAny() {
+                List([1, 2, 3, 4, 5])
+                    .any(x => 4 < x)
+                    .should.be.true;
+
+                List([1, 2, 3, 4, 5])
+                    .any(x => 6 < x)
+                    .should.be.false;
+            });
+
+            it('should return the number of items contained in the list', function _testCount() {
+                function *gen(data) {
+                    for (let item of data)
+                        yield item;
+                }
+
+                List([1, 2, 3, 4, 5])
+                    .count()
+                    .should.eql(5);
+
+                List(gen([1, 2, 3, 4, 5]))
+                    .count()
+                    .should.eql(5);
+            });
+
+            it('should return a boolean indicating if two lists are equivalent', function _testEqual() {
+                List([1, 2, 3, 4, 5])
+                    .equals(List([1, 2, 3, 4, 5], (x, y) => x === y))
+                    .should.be.true;
+            });
+
+            it('should return the index of the item', function _testFindIndex() {
+                List([1, 2, 3, 4, 5])
+                    .findIndex(x => 3 === x)
+                    .should.eql(2);
+            });
+
+            it('should return the last index of the item', function _testFindLastIndex() {
+                List([1, 1, 2, 2, 3, 3, 4, 5, 1])
+                    .findLastIndex(x => 1 === x)
+                    .should.eql(9);
+            });
+
+            it('should return the first item in the list that matches the predicate', function _testFirst() {
+                List(testData.dataSource.data)
+                    .first(x => 'New New York' === x.City)
+                    .should.eql({
+                    FirstName: 'Phillip J.',
+                    LastName: 'Fry',
+                    Phone: '999-999-9999',
+                    Email: 'mmm@mmm.net',
+                    Address: '999 Peachtree St.',
+                    City: 'New New York',
+                    State: 'NY',
+                    Zip: '80808',
+                    drillDownData:
+                        [ { MechanicName: 'Headless Body of Agnew',
+                            Make: 'Honda',
+                            Model: 'Civic ES',
+                            Year: '2003',
+                            Doors: '3',
+                            EngineType: '4 Cylinder',
+                            EngineSize: 1.6 },
+                            { MechanicName: 'Headless Body of Agnew',
+                                Make: 'Acura',
+                                Model: 'Integra',
+                                Year: '1996',
+                                Doors: '3',
+                                EngineType: '4 Cylinder',
+                                EngineSize: 1.8 },
+                            { MechanicName: 'Joey Mousepad',
+                                Make: 'BMW',
+                                Model: 'Z4',
+                                Year: '2003',
+                                Doors: '1',
+                                EngineType: '6 Cylinder',
+                                EngineSize: 2.2 },
+                            { MechanicName: 'Joey Mousepad',
+                                Make: 'Nissan',
+                                Model: 'Pathfinder',
+                                Year: '2002',
+                                Doors: '5',
+                                EngineType: 'V6',
+                                EngineSize: 3.5 } ] });
+
+                List([1, 2, 3, 4, 5])
+                    .first()
+                    .should.eql(1);
+            });
+
+            it('should fold the list from the left', function _testFoldL() {
+                List([1, 2, 3, 4, 5])
+                    .foldl((acc, x) => acc / x, 1)
+                    .should.eql(0.008333333333333333);
+            });
+
+            it('should fold the list from the right', function _testFoldR() {
+                List([1, 2, 3, 4, 5])
+                    .foldr((x, acc) => x / acc, 1)
+                    .should.eql(1.875);
+            });
+
+            it('should return a boolean indicating if the list has no items', function _testIsEmpty() {
+                List([1, 2, 3, 4])
+                    .isEmpty().should.be.false;
+
+                List.empty().isEmpty().should.be.true;
+            });
+
+            it('should return the last item in the list that matches the predicate', function _testLast() {
+                List(testData.dataSource.data)
+                    .last(x => 'New New York' === x.City)
+                    .should.eql({
+                    FirstName: 'Turanga',
+                    LastName: 'Leela',
+                    Phone: '999-999-9999',
+                    Email: 'leela@turange.net',
+                    Address: '9271 Some St.',
+                    City: 'New New York',
+                    State: 'NY',
+                    Zip: '89898',
+                    drillDownData:
+                        [ { MechanicName: 'Clamps',
+                            Make: 'Honda',
+                            Model: 'Civic ES',
+                            Year: '2003',
+                            Doors: '3',
+                            EngineType: '4 Cylinder',
+                            EngineSize: 1.6 },
+                            { MechanicName: 'Clamps',
+                                Make: 'Acura',
+                                Model: 'Integra',
+                                Year: '1996',
+                                Doors: '3',
+                                EngineType: '4 Cylinder',
+                                EngineSize: 1.8 },
+                            { MechanicName: 'Joey Mousepad',
+                                Make: 'BMW',
+                                Model: 'Z4',
+                                Year: '2003',
+                                Doors: '1',
+                                EngineType: '6 Cylinder',
+                                EngineSize: 2.2 },
+                            { MechanicName: 'Headless Body of Agnew',
+                                Make: 'Nissan',
+                                Model: 'Pathfinder',
+                                Year: '2002',
+                                Doors: '5',
+                                EngineType: 'V6',
+                                EngineSize: 3.5 } ] });
+
+                List([1, 2, 3, 4, 5])
+                    .last()
+                    .should.eql(5);
+            });
+
+            it('should return a right-based reduction', function _testReduceRight() {
+                List([1, 2, 3, 4, 5])
+                    .reduceRight((acc, x) => acc / x)
+                    .should.eql(0.20833333333333334);
+            });
+
+            it('should return the underlying data as an array', function _testToArray() {
+                List([1, 2, 3, 4, 5])
+                    .toArray()
+                    .should.eql([1, 2, 3, 4, 5]);
+            });
+
+            it('should return a list that has evaluated its underlying data', function _testToEvaluatedList() {
+                var mapperSpy = sinon.spy(x => x * 2),
+                    filterSpy = sinon.spy(x => 4 < x);
+
+                var list = List([1, 2, 3, 4, 5])
+                    .map(mapperSpy)
+                    .filter(filterSpy)
+                    .toEvaluatedList()
+                    .toEvaluatedList();
+
+                //The second call to #toEvaluatedList does not cause a re-evaluation
+                //of the pipeline since the first invocation returned a List whose
+                //underlying is simply an array - the pipeline is gone...
+                mapperSpy.should.have.been.callCount(5);
+                filterSpy.should.have.been.callCount(5);
+            });
+
+            //TODO: need to update this - chai is not comparing maps correctly
+            it('should return the underlying data as a map', function _testToMap() {
+                console.log(List([1, 2, 3, 4, 5])
+                    .toMap());
+                List([1, 2, 3, 4, 5])
+                    .toMap()
+                    .should.eql(new Map())
+            });
+
+            it('should return the underlying data as a set', function _testToSet() {
+                List([1, 2, 3, 4, 5])
+                    .toSet()
+                    .should.eql(new Set([1, 2, 3, 4, 5]));
+            });
+
+            describe('Test contains', function _testContains() {
+                var containsComparer = (x, y) => x > y ? 1 : x === y ? 0 : -1,
+                    sortComparer = (x, y) => x > y;
+                it('should run a binary search on an ordered list', function _testContainsOnAnOrderedList() {
+                    var containsComparerSpy = sinon.spy(containsComparer);
+
+                    List([1, 3, 8, 15, 21, 22, 37, 86, 112, 114, 118, 190, 257, 299, 315, 899])
+                        .sortBy(x => x, sortComparer)
+                        .contains(21, containsComparerSpy)
+                        .should.be.true;
+
+                    containsComparerSpy.should.have.been.callCount(4);
+                });
+
+                it('should return false on a binary search when the list does not contain the specified value', function _testContainsOnAnOrderedListWithoutSearchValue() {
+                    var containsComparerSpy = sinon.spy(containsComparer);
+
+                    List([1, 3, 8, 15, 21, 22, 37, 86, 112, 114, 118, 190, 257, 299, 315, 899])
+                        .sortBy(x => x, sortComparer)
+                        .contains(23, containsComparerSpy)
+                        .should.be.false;
+
+                    containsComparerSpy.should.have.been.callCount(4);
+                });
+
+                it('should run a brute force search on an unordered list that contains the specified value', function _testContainsOnAnUnorderedList() {
+                    var spyComparer = sinon.spy((x, y) => x === y);
+
+                    List([1, 3, 8, 15, 21, 22, 37, 86, 112, 114, 118, 190, 257, 299, 315, 899])
+                        .contains(22, spyComparer)
+                        .should.be.true;
+
+                    spyComparer.should.have.been.callCount(6);
+                });
+
+                it('should run a brute force search on an unordered list that does not contain the specified value', function _testContainsOnAnUnorderedList() {
+                    var spyComparer = sinon.spy((x, y) => x === y);
+
+                    List([1, 3, 8, 15, 21, 22, 37, 86, 112, 114, 118, 190, 257, 299, 315, 899])
+                        .contains(14, spyComparer)
+                        .should.be.false;
+
+                    spyComparer.should.have.been.callCount(16);
+                });
             });
         });
     });

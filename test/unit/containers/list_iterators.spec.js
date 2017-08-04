@@ -1,5 +1,5 @@
 import { all, any, except, intersect, union, map, chain, groupBy, sortBy, prepend, concat, groupJoin, join, zip, filter, intersperse,
-        contains, first, last, count, foldLeft, reduceRight, distinct, ofType, binarySearch, equals, take, takeWhile, skip, skipWhile, reverse,
+        contains, first, last, count, foldLeft, reduceRight, distinct, ofType, binarySearch, equals, takeWhile, skipWhile, reverse,
         copyWithin, fill, findIndex, findLastIndex, repeat, foldRight, unfold } from '../../../src/containers/list_iterators';
 import { createListCreator } from '../../../src/containers/list_helpers';
 import { list_functor, ordered_list_functor } from '../../../src/containers/functors/list_functor';

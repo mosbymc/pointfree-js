@@ -185,7 +185,7 @@ function zip(xs, ys, selector) {
         var yArr = toArray(ys);
 
         for (let x of xs) {
-            if (idx > yArr.length || !yArr.length) return;
+            if (idx >= yArr.length || !yArr.length) return;
             yield selector(x, yArr[idx]);
             ++idx;
         }
@@ -221,7 +221,18 @@ function any(xs, predicate) {
  */
 function contains(xs, val, comparer) {
     //TODO: see if there is any real performance increase by just using .includes when a comparer hasn't been passed
-    return strictEquals(javaScriptTypes.Undefined, type(comparer)) ? toArray(xs).includes(val) : toArray(xs).some(x => comparer(x, val));
+    return strictEquals(javaScriptTypes.Undefined, type(comparer)) ? toArray(xs).includes(val) : toArray(xs).some((x) => comparer(x, val));
+}
+
+/**
+ * @description:
+ * @param: {iterable} xs
+ * @param: {*} val
+ * @param: {function} comparer
+ * @return {boolean}
+ */
+function binarySearch(xs, val, comparer) {
+    return binarySearchRec(xs, 0, xs.length - 1, val, comparer);
 }
 
 /**
@@ -233,13 +244,13 @@ function contains(xs, val, comparer) {
  * @param: {function} comparer
  * @return {boolean}
  */
-function binarySearch(xs, left, right, val, comparer) {
+function binarySearchRec(xs, left, right, val, comparer) {
     if (left > right) return false;
-    var mid = (left + (right - left)) / 2,
+    var mid = Math.floor((left + right) / 2),
         res = comparer(val, xs[mid]);
     if (0 === res) return true;
-    else if (0 < res) return binarySearch(xs, left, mid - 1, val, comparer);
-    else return binarySearch(xs, mid + 1, right, val, comparer);
+    if (0 < res) return binarySearchRec(xs, mid + 1, right, val, comparer);
+    return binarySearchRec(xs, left, mid - 1, val, comparer);
 }
 
 /**
@@ -283,10 +294,11 @@ function foldLeft(xs, fn, initial = 0) {
  * @return: {*}
  */
 function foldRight(arr, op, acc) {
-    var len = arr.length,
-        res = acc || arr[--len];
+    var list = toArray(arr),
+        len = list.length,
+        res = acc || list[--len];
     while (0 < len) {
-        res = op(arr[--len], res, len, arr);
+        res = op(list[--len], res, len, list);
     }
     return res;
 }
@@ -298,8 +310,8 @@ function foldRight(arr, op, acc) {
  * @param: {*} initial
  * @return: {*}
  */
-function reduceRight(xs, fn, initial = 0) {
-    return toArray(xs).reduceRight(fn, initial);
+function reduceRight(xs, fn, initial) {
+    return null == initial ? toArray(xs).reduceRight(fn) : toArray(xs).reduceRight(fn, initial);
 }
 
 /**
@@ -321,11 +333,11 @@ function last(xs, predicate) {
  * @return: {generator}
  */
 function distinct(xs, comparer = strictEquals) {
-    var isInCache = cacher(comparer);
+    var cached = cacher(comparer);
 
     return function *distinctIterator() {
         for (let x of xs) {
-            if (!isInCache(x)) yield x;
+            if (!cached(x)) yield x;
         }
     };
 }
@@ -646,25 +658,6 @@ function equals(xs, ys, comparer = strictEquals) {
 /**
  * @description:
  * @param: {iterable} xs
- * @param: {number} amt
- * @return {generator}
- */
-function take(xs, amt) {
-    return function *takeIterator() {
-        if (!amt) return [];
-        var idx = 0;
-
-        for (let x of xs) {
-            if (idx < amt) yield x;
-            else break;
-            ++idx;
-        }
-    };
-}
-
-/**
- * @description:
- * @param: {iterable} xs
  * @param: {function} predicate
  * @return {generator}
  */
@@ -673,25 +666,6 @@ function takeWhile(xs, predicate) {
         for (let x of xs) {
             if (predicate(x)) yield x;
             else break;
-        }
-    };
-}
-
-/**
- * @description:
- * @param: {iterable} xs
- * @param: {number} amt
- * @return {generator}
- */
-function skip(xs, amt) {
-    return function *skipIterator() {
-        var count = 0;
-
-        for (let x of xs) {
-            if (count > amt) {
-                ++count;
-                yield x;
-            }
         }
     };
 }
@@ -773,26 +747,24 @@ function fill(val, start, end, xs) {
  * @description:
  * @param: {iterable} xs
  * @param: {function} comparer
- * @param: {*} context
  * @return: {Number}
  */
-function findIndex(xs, comparer = strictEquals, context) {
-    return toArray(xs).findIndex(comparer, context || this);
+function findIndex(xs, comparer = strictEquals) {
+    return toArray(xs).findIndex(comparer);
 }
 
 /**
  * @description:
  * @param: {iterable} xs
  * @param: {function} comparer
- * @param: {*} context
  * @return: {Number}
  */
-function findLastIndex(xs, comparer = strictEquals, context) {
-    return toArray(xs).reverse().findIndex(comparer, context || this);
+function findLastIndex(xs, comparer = strictEquals) {
+    return toArray(xs).length - toArray(xs).reverse().findIndex(comparer);
 }
 
 var unfold = unfoldWith;
 
 export { all, any, except, intersect, union, map, chain, groupBy, sortBy, prepend, concat, groupJoin, join, zip, filter, intersperse,
-    contains, first, last, count, foldLeft, reduceRight, distinct, ofType, binarySearch, equals, take, takeWhile, skip, skipWhile, reverse,
+    contains, first, last, count, foldLeft, reduceRight, distinct, ofType, binarySearch, equals, takeWhile, skipWhile, reverse,
     copyWithin, fill, findIndex, findLastIndex, repeat, foldRight, unfold };

@@ -35,8 +35,32 @@ function createListCreator(baseListType, sortedListType, groupedListType) {
                     }
                 });
             /**
-             * @description: case 3 = Both an iterator and a sort object were passed. Create an
-             * ordered list type object instance, setting the iterator to the version provided and
+             * @description: case 2 = Only a sort object was passed in. The list is presumed to be either
+             * trivially sorted via List.just or List.empty, or was initialized as an ordered list. Create
+             * an ordered list type object instance, setting the _appliedSorts field as the sortObj param.
+             */
+            case 2:
+                return Object.create(sortedListType, {
+                    _value: {
+                        value: source,
+                        writable: false,
+                        configurable: false
+                    },
+                    data: {
+                        get: function _getData() {
+                            return Array.from(this);
+                        }
+                    },
+                    _appliedSorts: {
+                        value: sortObj,
+                        writable: false,
+                        configurable: false
+                    },
+                });
+            /**
+             * @description: case 3 = Both an iterator and a sort object were passed in. The consumer
+             * invoked the sortBy/sortByDescending or thenBy/thenByDescending function properties. Create
+             * an ordered list type object instance, setting the iterator to the version provided (if any) and
              * the _appliedSorts field as the sortObj param.
              */
             case 3:
@@ -116,4 +140,11 @@ function createListCreator(baseListType, sortedListType, groupedListType) {
     }
 }
 
-export { createListCreator };
+function taker_skipper(amt) {
+    var count = -1;
+    return function _skipAmt() {
+        return ++count < amt;
+    };
+}
+
+export { createListCreator, taker_skipper };

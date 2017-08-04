@@ -1,11 +1,11 @@
 import { all, any, except, intersect, union, map, groupBy, sortBy, prepend, concat, groupJoin, join, zip, filter, intersperse,
-    contains, first, last, count, foldLeft, reduceRight, distinct, ofType, binarySearch, equals, take, takeWhile, skip, skipWhile, reverse,
+    contains, first, last, count, foldLeft, reduceRight, distinct, ofType, binarySearch, equals, takeWhile, skipWhile, reverse,
     copyWithin, fill, findIndex, findLastIndex, repeat, foldRight, unfold } from '../list_iterators';
 import { sortDirection, generatorProto } from '../../helpers';
 import { wrap, defaultPredicate, delegatesTo, delegatesFrom, isArray, noop, invoke } from '../../functionalHelpers';
-import { when, ifElse } from '../../combinators';
+import { when, ifElse, identity } from '../../combinators';
 import { not } from '../../decorators';
-import { createListCreator } from '../list_helpers';
+import { createListCreator, taker_skipper } from '../list_helpers';
 
 /**
  * @description: Object that contains the core functionality of a List; both the m_list and ordered_m_list
@@ -274,7 +274,7 @@ var list_core = {
      * @return: {@see list_functor}
      */
     skip: function _skip(amt) {
-        return this.of(this, skip(this, amt));
+        return this.skipWhile(taker_skipper(amt));
     },
 
     /**
@@ -292,7 +292,7 @@ var list_core = {
      * @return: {@see list_functor}
      */
     take: function _take(amt) {
-        return this.of(this, take(this, amt));
+        return this.takeWhile(taker_skipper(amt));
     },
 
     /**
@@ -331,7 +331,7 @@ var list_core = {
      * @return: {@see list_functor}
      */
     zip: function _zip(selector, xs) {
-        return this.of(this, zip(this, selector, xs));
+        return this.of(this, zip(this, xs, selector));
     },
 
     /**
@@ -356,16 +356,6 @@ var list_core = {
 
     /**
      * @description:
-     * @param: {*} val
-     * @param: {function} comparer
-     * @return: {boolean}
-     */
-    contains: function _contains(val, comparer) {
-        return contains(this, val, comparer);
-    },
-
-    /**
-     * @description:
      * @return: {Number}
      */
     count: function _count() {
@@ -386,22 +376,20 @@ var list_core = {
      * @type:
      * @description:
      * @param: {function} comparer
-     * @param: {*} context
      * @return: {@see Number}
      */
-    findIndex: function _findIndex(comparer, context) {
-        return this.of(this, findIndex(this, comparer, context));
+    findIndex: function _findIndex(comparer) {
+        return findIndex(this, comparer);
     },
 
     /**
      * @type:
      * @description:
      * @param: {function} comparer
-     * @param: {*} context
      * @return: {Number}
      */
-    findLastIndex: function _findLastIndex(comparer, context) {
-        return this.of(this, findLastIndex(this, comparer, context));
+    findLastIndex: function _findLastIndex(comparer) {
+        return findLastIndex(this, comparer);
     },
 
     /**
@@ -572,25 +560,6 @@ var list_core = {
 list_core.append = list_core.concat;
 
 /**
- * @description: Performs the same functionality as list_core#contains, but utilizes
- * a binary searching algorithm rather than a sequential search. If this function is called
- * an a non-ordered List, it will internally delegate to list_core#contains instead. This
- * function should not be called on a sorted List for look for a value that is not the
- * primary field on which the List's data is sorted on as an incorrect result will likely
- * be returned.
- * @param: {*} val - The value that should be searched for
- * @param: {function} comparer - The function used to compare values in the List to
- * the 'val' parameter
- * @return {boolean} - Returns true if the List contains the searched for value, false
- * otherwise.
- */
-list_core.contains.binary = function _binary(val, comparer) {
-    if (delegatesTo(source, ordered_list_functor) && 'undefined' === typeof comparer)
-        return binarySearch(when(not(isArray), Array.from, source), val, comparer);
-    return list_core.contains(val, comparer);
-};
-
-/**
  * @description: A list_core delegator object that, in addition to the delegatable functionality
  * it has from the list_core object, also exposes .orderBy and .orderByDescending
  * functions. These functions allow a consumer to sort a List's data by
@@ -605,7 +574,7 @@ var list_functor = Object.create(list_core, {
      * @return: {@see ordered_list_functor}
      */
     sortBy: {
-        value: function _orderBy(keySelector, comparer) {
+        value: function _orderBy(keySelector, comparer = defaultPredicate) {
             var sortObj = [{ keySelector: keySelector, comparer: comparer, direction: sortDirection.ascending }];
             return this.of(this, sortBy(this, sortObj), sortObj);
         }
@@ -617,9 +586,20 @@ var list_functor = Object.create(list_core, {
      * @return: {@see ordered_list_functor}
      */
     sortByDescending: {
-        value: function _orderByDescending(keySelector, comparer) {
+        value: function _orderByDescending(keySelector, comparer = defaultPredicate) {
             var sortObj = [{ keySelector: keySelector, comparer: comparer, direction: sortDirection.descending }];
             return this.of(this, sortBy(this, sortObj), sortObj);
+        }
+    },
+    /**
+     * @description:
+     * @param: {*} val
+     * @param: {function} comparer
+     * @return: {boolean}
+     */
+    contains: {
+        value: function _contains(val, comparer) {
+            return contains(this, val, comparer);
         }
     }
 });
@@ -647,7 +627,7 @@ var ordered_list_functor = Object.create(list_core, {
      * @return: {@see ordered_list_functor}
      */
     thenBy: {
-        value: function _thenBy(keySelector, comparer) {
+        value: function _thenBy(keySelector, comparer = defaultPredicate) {
             var sortObj = this._appliedSorts.concat({ keySelector: keySelector, comparer: comparer, direction: sortDirection.ascending });
             return this.of(this.value, sortBy(this, sortObj), sortObj);
         }
@@ -659,9 +639,27 @@ var ordered_list_functor = Object.create(list_core, {
      * @return: {@see ordered_list_functor}
      */
     thenByDescending: {
-        value: function thenByDescending(keySelector, comparer) {
+        value: function thenByDescending(keySelector, comparer = defaultPredicate) {
             var sortObj = this._appliedSorts.concat({ keySelector: keySelector, comparer: comparer, direction: sortDirection.descending });
             return this.of(this.value, sortBy(this, sortObj), sortObj);
+        }
+    },
+    /**
+     * @description: Performs the same functionality as list_core#contains, but utilizes
+     * a binary searching algorithm rather than a sequential search. If this function is called
+     * an a non-ordered List, it will internally delegate to list_core#contains instead. This
+     * function should not be called on a sorted List for look for a value that is not the
+     * primary field on which the List's data is sorted on as an incorrect result will likely
+     * be returned.
+     * @param: {*} val - The value that should be searched for
+     * @param: {function} comparer - The function used to compare values in the List to
+     * the 'val' parameter
+     * @return {boolean} - Returns true if the List contains the searched for value, false
+     * otherwise.
+     */
+    contains: {
+        value: function _contains(val, comparer) {
+            return binarySearch(when(not(isArray), Array.from, this.value), val, comparer);
         }
     }
 });
@@ -776,14 +774,16 @@ List.from = source => List(source);
 List.of = List.from;
 
 //TODO: implement this so that a consumer can initiate a List as ordered
-List.ordered = source => source;
+List.ordered = (source, selector, comparer = defaultPredicate) => createListDelegateInstance(source, null,
+    [{ keySelector: selector, comparer: comparer, direction: sortDirection.ascending }]);
 
 /**
  * @type:
  * @description:
  * @return: {@see list_functor}
  */
-List.empty = () => List([]);
+List.empty = () => createListDelegateInstance([], null,
+    [{ keySelector: identity, comparer: defaultPredicate, direction: sortDirection.ascending }]);
 
 /**
  * @type:
@@ -791,7 +791,8 @@ List.empty = () => List([]);
  * @param: {*} val
  * @return: {@see list_functor}
  */
-List.just = val => List([val]);
+List.just = val => createListDelegateInstance([val], null,
+    [{ keySelector: identity, comparer: defaultPredicate, direction: sortDirection.ascending }]);
 
 /**
  * @type:

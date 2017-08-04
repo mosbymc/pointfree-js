@@ -1,5 +1,5 @@
-import { after, apply, before, binary, bindFunction, guardAfter, guard, hyloWith, leftApply, maybe, not, once, repeat, rightApply,
-        safe, tap, ternary, tryCatch, unary, voidFn, not2point0 } from '../../src/decorators';
+import { after, apply, before, binary, bindFunction, /*guardAfter,*/ guard, hyloWith, leftApply, maybe, not, once, repeat, rightApply,
+        safe, tap, ternary, tryCatch, unary, voidFn } from '../../src/decorators';
 
 describe('Decorators Test', function _testDecorators() {
     describe('Test after', function _testAfter() {
@@ -194,25 +194,6 @@ describe('Decorators Test', function _testDecorators() {
             maybeSpy.should.have.been.calledOnce;
             mRes.should.eql(4);
         });
-    });
-
-    describe('Test not2PointOh', function _testNot2PointOh() {
-        it('should re-curry the provided function', function _testNotWithNotEnoughParams() {
-            function notMe(arg1, arg2, arg3) { return arg1 || arg2 || arg3; }
-
-            var wait1 = not2point0(notMe, true),
-                wait2 = wait1(true),
-                res = wait2(true);
-
-            res.should.be.false;
-        });
-
-        /*it('should just return the not-ed invocation of the function if provided all arguments initially', function _testNotWithAllParams() {
-            function notMe(arg1, arg2, arg3) { return arg1 || arg2 && arg3; }
-
-            var res = not2point0(notMe, false, false, true);
-            res.should.be.true;
-        });*/
     });
 
     describe('Test once', function _testOnce() {
