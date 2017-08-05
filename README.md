@@ -1,4 +1,4 @@
-# queryable-js
+# pointfree-js
 [![Build Status](https://travis-ci.org/ecozoic/proxify.svg?branch=master)](https://travis-ci.org/ecozoic/proxify)
 [![Dependency Status](https://david-dm.org/ecozoic/proxify.svg)](https://david-dm.org/ecozoic/proxify)
 [![devDependency Status](https://david-dm.org/ecozoic/proxify/dev-status.png)](https://david-dm.org/ecozoic/proxify#info=devDependencies)
