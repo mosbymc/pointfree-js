@@ -664,9 +664,6 @@ var ordered_list_functor = Object.create(list_core, {
     }
 });
 
-//TODO: functional
-//TODO: functional programming
-//TODO: FP
 //TODO: monad
 //TODO: functor
 //TODO: monoid
@@ -674,8 +671,6 @@ var ordered_list_functor = Object.create(list_core, {
 //TODO: decorator
 //TODO: combinator
 //TODO: transducer
-//TODO: JavaScript
-//TODO: JS
 //TODO: JunctionalS
 //TODO: JunctorS
 //TODO: lanoitcunf
@@ -690,9 +685,40 @@ var ordered_list_functor = Object.create(list_core, {
 //TODO: Junctional FavaScript
 //TODO: Algebraic Data Structures
 //TODO: ADS
-//TODO: Algebraic JavaScript - AJS
+
+
+
+//TODO: JavaScript
+//TODO: JS
+//TODO: EcmaScript
+//TODO: es-20FP
+//TODO: functional
+//TODO: functional programming
+//TODO: FP
 //TODO: Lambda
 //TODO: Lambda calculus
+//TODO: category theory
+//TODO: higher order (functions)
+//TODO: first class functions
+//TODO: lazy (evaluation)
+//TODO: deferred execution
+//TODO: pure
+//TODO: composable
+//TODO: referential transparency
+//TODO: pointfree/pointless
+
+
+//TODO: Pointfree Functional programming - PF-FP
+//TODO: pointfree-js pfjs
+
+//TODO: Algebraic JavaScript - AJS
+//TODO: Functional JavaScript - FJS
+//TODO: Deferred Laziness
+//TODO: First-class Laziness
+//TODO: Algebraic Laziness
+
+
+
 
 /**
  * @description: Creates a new list_functor object delegate instance; list_functor type is determined by

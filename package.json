@@ -1,7 +1,7 @@
 {
-  "name": "queryable-js",
+  "name": "pointfree-js",
   "version": "0.0.1",
-  "description": "A JavaScript library for performing queries against lists with lazy evaluation and deferred execution.",
+  "description": "A JavaScript library that bring together many aspects of functional programming into a single environment",
   "main": "app.js",
   "scripts": {
     "yuidoc": "yuidoc",
