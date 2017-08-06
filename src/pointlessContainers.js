@@ -15,168 +15,180 @@ import { getWith } from './functionalHelpers';
 //TODO: But the more separation between containers, the more they have to 'import' each other.
 
 /**
- * @description:
- * @type: {function}
- * @param: {functor} ma
- * @param: {functor} mb
- * @return: {functor}
+ * @sig
+ * @description d
+ * @type {function}
+ * @param {Object} ma - a
+ * @param {Object} mb - b
+ * @return {Object} - c
  */
 var apply = curry(function _apply(ma, mb) {
     return mb.apply(ma);
 });
 
 /**
- * @type:
- * @description:
- * @param: {functor|monad} ma
- * @param: {functor|monad} mb
- * @return: {functor|monad mb}
+ * @sig
+ * @description d
+ * @param {Object} ma - a
+ * @param {Object} mb - b
+ * @return {Object} - c
  */
 var ap = apply;
 
 /**
- * @type:
- * @description:
- * @param: {Monad a} m
- * @param: {function} fn :: (a) -> Monad b
- * @return: {Monad b}
+ * @sig
+ * @description d
+ * @type {function}
+ * @param {Object} m - a
+ * @param {function} fn :: (a) -> Monad b - b
+ * @return {Object} - c
  */
 var flatMap = curry(function _flatMap(m, fn) {
     return m.flatMap(fn);
 });
 
 /**
- * @description:
- * @type: {function}
- * @param: {function} fn
- * @param: {functor} m
- * @return: {functor}
+ * @sig
+ * @description d
+ * @type {function}
+ * @param {function} fn - a
+ * @param {Object} m - b
+ * @return {Object} - c
  */
 var flatMapWith = curry(function _flatMapWith(fn, m) {
     return m.flatMap(fn);
 });
 
 /**
- * @type:
- * @description:
- * @param: {Monad a} m
- * @param: {function} fn :: (a) -> b
- * @return: {Monad b}
+ * @sig
+ * @description d
+ * @type {function}
+ * @param {Object} m - a
+ * @param {function} fn :: (a) -> b
+ * @return {Object} - b
  */
 var map = curry(function _map(m, fn) {
     return m.map(fn);
 });
 
 /**
- * @description:
- * @type: {function}
- * @param: {function} fn
- * @param: {functor} m
- * @return: {functor|monad m}
+ * @sig
+ * @description d
+ * @type {function}
+ * @param {function} fn - a
+ * @param {Object} m - b
+ * @return {Object} - c
  */
 var mapWith = curry(function _map(fn, m) {
     return m.map(fn);
 });
 
 /**
- * @type:
- * @description:
+ * @sig
+ * @description d
  */
 var pluckWith = compose(mapWith, getWith);
 
 /**
- * @description:
+ * @sig
+ * @description d
  * @type {function} @see mapWith
- * @param: {function} fn
- * @param: {functor} m
- * @return:
+ * @param {function} fn - a
+ * @param {Object} m - b
+ * @return {*} c
  */
 var fmap = mapWith;
 
 /**
- * @description:
- * @type: {function}
- * @param: {function} f
- * @param: {functor} m
- * @return:
+ * @sig
+ * @description d
+ * @type {function}
+ * @param {function} f - a
+ * @param {Object} m - b
+ * @return {*} - c
  */
 var chain = curry(function _chain(f, m){
     return m.map(f).join(); // or compose(join, mapWith(f))(m)
 });
 
 /**
- * @type:
- * @description:
+ * @sig
+ * @description d
  */
 var bind = chain;
 
 /**
- * @type:
- * @description:
- * @param: {function} f
- * @param: {function} g
- * @return: {function}
+ * @sig
+ * @description d
+ * @param {function} f - a
+ * @param {function} g - b
+ * @return {function} - c
  */
 var mcompose = function _mcompose(f, g) {
     return compose(chain(f), g);
 };
 
 /**
- * @type:
- * @description:
- * @param: {*} val
- * @param: {@see state_functor} fa
- * @return: {@see state_functor}
+ * @sig
+ * @description d
+ * @type {function}
+ * @param {*} val - a
+ * @param {Object} fa - b
+ * @return {Object} - c
  */
 var put = curry(function _put(val, fa) {
     return fa.put(val);
 });
 
 /**
- * @type:
- * @description:
- * @param: {function} f
- * @param: {functor} m1
- * @param: {functor} m2
- * @return: {Mb}
+ * @sig
+ * @description d
+ * @type {function}
+ * @param {function} f - a
+ * @param {Object} m1 - b
+ * @param {Object} m2 - c
+ * @return {Object} - c
  */
 var lift2 = curry(function _lift2(f, m1, m2) {
     return m1.map(f).apply(m2);
 });
 
 /**
- * @type:
- * @description:
- * @param: {function} f
- * @param: {functor} m1
- * @param: {functor} m2
- * @param: {functor} m3
- * @return: {Mb}
+ * @sig
+ * @description d
+ * @type {function}
+ * @param {function} f - a
+ * @param {Object} m1 - b
+ * @param {Object} m2 - c
+ * @param {Object} m3 - d
+ * @return {Object} - e
  */
 var lift3 = curry(function _lift3(f, m1, m2, m3) {
     return lift2(f, m1, m2).apply(m3);
 });
 
 /**
- * @type:
- * @description:
- * @param: {function} f
- * @param: {functor} m1
- * @param: {functor} m2
- * @param: {functor} m3
- * @param: {functor} m4
- * @return: {Mb}
+ * @sig
+ * @description d
+ * @type {function}
+ * @param {function} f - a
+ * @param {Object} m1 - b
+ * @param {Object} m2 - c
+ * @param {Object} m3 - d
+ * @param {Object} m4 - e
+ * @return {Object} - f
  */
 var lift4 = curry(function _lift4(f, m1, m2, m3, m4) {
     return lift3(f, m1, m2, m3).apply(m4);
 });
 
 /**
- * @type:
- * @description:
- * @param: {function} f
- * @param: {Ma} ...ms
- * @return: {Mb}
+ * @sig
+ * @description d
+ * @type {function}
+ * @param {function} f - a
+ * @param {Object} ...ms - b
+ * @return {Object} - c
  */
 var liftN = curry(function _liftN(f, ...ms) {
     return ms.slice(1).reduce(function _apply(curM, nextM) {
@@ -185,20 +197,20 @@ var liftN = curry(function _liftN(f, ...ms) {
 });
 
 /**
- * @type:
- * @description:
- * @param: {functor} ma
- * @return: {functor}
+ * @sig
+ * @description d
+ * @param {Object} ma - a
+ * @return {Object} - b
  */
 function mjoin(ma) {
     return ma.join();
 }
 
 /**
- * @type:
- * @description:
- * @param: {functor|monad} type
- * @return: {function}
+ * @sig
+ * @description d
+ * @param {Object} type - a
+ * @return {function} - b
  */
 function toContainerType(type) {
     return function toType(fn = identity) {
@@ -207,9 +219,9 @@ function toContainerType(type) {
 }
 
 /**
- * @type:
- * @description:
- * @return: {{next: _next}}
+ * @sig
+ * @description d
+ * @return {Object} - a
  */
 function containerIterator() {
     let first = true,
@@ -231,50 +243,50 @@ function containerIterator() {
 }
 
 /**
- * @type:
- * @description:
- * @param: {functor} ma
- * @return: {@see m_list}
+ * @sig
+ * @description d
+ * @param {Object} ma - a
+ * @return {Object} - b
  */
 function toList(ma) {
     return List(mjoin(ma));
 }
 
 /**
- * @type:
- * @description:
- * @param: {functor} ma
- * @return: {@see _maybe}
+ * @sig
+ * @description d
+ * @param {Object} ma - a
+ * @return {Object} - b
  */
 function toMaybe(ma) {
     //return Maybe(mjoin(ma));
 }
 
 /**
- * @type:
- * @description:
- * @param: {functor} ma
- * @return: {@see _future}
+ * @sig
+ * @description d
+ * @param {Object} ma - a
+ * @return {Object} - b
  */
 function toFuture(ma) {
     //return Future(mjoin(ma));
 }
 
 /**
- * @type:
- * @description:
- * @param: {functor} ma
- * @return: {@see _identity}
+ * @sig
+ * @description d
+ * @param {Object} ma - a
+ * @return {Object} - b
  */
 function toIdentity(ma) {
     //return Identity(mjoin(ma));
 }
 
 /**
- * @type:
- * @description:
- * @param: {functor} ma
- * @return: {@see _just}
+ * @sig
+ * @description d
+ * @param {Object} ma - a
+ * @return {Object} - b
  */
 function toJust(ma) {
     //return Just(mjoin(ma));
@@ -311,34 +323,37 @@ function _toMaybe() {
 //===========================================================================================//
 
 /**
- * @type:
- * @description:
- * @param: {function} predicate
- * @param: {Array} xs
- * @return: {Array}
+ * @sig
+ * @description d
+ * @type {function}
+ * @param {function} predicate - a
+ * @param {Array} xs - b
+ * @return {Array} - c
  */
 var filter = curry(function _filter(predicate, xs) {
     xs.filter(predicate);
 });
 
 /**
- * @type:
- * @description:
- * @param: {Array} xs
- * @param: {function} comparer
- * @param: {Array} ys
- * @return: {Array}
+ * @sig
+ * @description d
+ * @type {function}
+ * @param {Array} xs - a
+ * @param {function} comparer - b
+ * @param {Array} ys - c
+ * @return {Array} - d
  */
 var intersect = curry(function _intersect(xs, comparer, ys) {
     return ys.intersect(xs, comparer);
 });
 
 /**
- * @type:
- * @description:
- * @param: {Array} xs
- * @param: {function} comparer
- * @param: {Array}
+ * @sig
+ * @description d
+ * @param {Array} xs - a
+ * @param {function} comparer - b
+ * @param {Array} - c
+ * @return {*} - d
  */
 var except = curry(function _except(xs, comparer, ys) {
     return ys.except(xs, comparer);

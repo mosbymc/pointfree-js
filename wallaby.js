@@ -8,7 +8,7 @@ module.exports = function _wallaby(wallaby) {
         /*
          name: the name of the project; displayed in the wallaby code coverage application
          */
-        name: 'queryable-js',
+        name: 'pointfree-js',
 
         /*
          framework: the test framework being used; defaults to jasmine

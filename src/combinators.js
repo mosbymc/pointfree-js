@@ -65,7 +65,7 @@ var condition = curry((exp1, exp2, cond) => cond(exp1, exp2));
 var notFn = condition(constant(x => x), x => x);
 
 var n = function _n(x, y, z) {
-    return function (...args) {
+    return function _n_(...args) {
         console.log(x, y, z);
         x ? y(...args) : z(...args);
     };

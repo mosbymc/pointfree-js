@@ -1,33 +1,35 @@
 import { compose, curry } from './combinators'
 
 /**
- * @type:
- * @description:
- * @param: {function} f
- * @return: {*}
+ * @sig
+ * @description d
+ * @type {function}
+ * @param {function} f - a
+ * @return {*} - b
  */
 var mapping = curry(function _mapping(mapFn, reduceFn, result, input) {
     return reduceFn(result, mapFn(input));
 });
 
 /**
- * @type:
- * @description:
- * @param: {function} predicate
- * @param: {function} reduceFn
- * @param: {*} result
- * @param: {Array} input
- * @return: {*}
+ * @sig
+ * @description d
+ * @type {function}
+ * @param {function} predicate - a
+ * @param {function} reduceFn - b
+ * @param {*} result - c
+ * @param {Array} input - d
+ * @return {*} - d
  */
 var filtering = curry(function _filtering2(predicate, reduceFn, result, input) {
     return predicate(input) ? reduceFn(result, input) : result;
 });
 
 /**
- * @type:
- * @description:
- * @param: {function} mapFn
- * @return: {function}
+ * @sig
+ * @description d
+ * @param {function} mapFn - a
+ * @return {function} - b
  */
 function mapReducer (mapFn) {
     return function _mapReducer(result, input) {
@@ -36,10 +38,10 @@ function mapReducer (mapFn) {
 }
 
 /**
- * @type:
- * @description:
- * @param: {function} predicate
- * @return: {function}
+ * @sig
+ * @description d
+ * @param {function} predicate - a
+ * @return {function} - b
  */
 function filterReducer(predicate) {
     return function _filterReducer(result, input) {
@@ -48,11 +50,12 @@ function filterReducer(predicate) {
 }
 
 /**
- * @type:
- * @description:
- * @param: {} f
- * @param: {} x
- * @return: *
+ * @sig
+ * @description d
+ * @type {function}
+ * @param {function} f - a
+ * @param {*} x - b
+ * @return {*} - c
  */
 var mapped = curry(function _mapped(f, x) {
     return identity(map(compose(function _mCompose(x) {
@@ -61,23 +64,23 @@ var mapped = curry(function _mapped(f, x) {
 });
 
 /**
- * @type:
- * @description:
- * @param: {function} xform
- * @param: {function} reducing
- * @param: {*} initial
- * @param: {*} input
- * @return: {*}
+ * @sig
+ * @description d
+ * @param {function} xform - a
+ * @param {function} reducing - b
+ * @param {*} initial - c
+ * @param {*} input - d
+ * @return {*} - e
  */
 var transduce = (xform, reducing, initial, input) => input.reduce(xform(reducing), initial);
 
 /**
- * @type:
- * @description:
- * @param: txf
- * @param: acc
- * @param: xs
- * @return: {*}
+ * @sig
+ * @description d
+ * @param {*} txf - a
+ * @param {*} acc - b
+ * @param {*} xs - c
+ * @return {*} - d
  */
 var reduce = (txf, acc, xs) => {
     for (let item of xs){
@@ -97,6 +100,12 @@ Object.defineProperty(reduce, 'stopper', {
     value: Symbol('stop reducing')//no possible computation could come up with this by accident
 });
 
+/**
+ * @sig
+ * @description d
+ * @param {number} skips - a
+ * @return {function} - b
+ */
 function dropping(skips) {
     return function _dropping2(reducingFunc) {
         return function _dropping2_(acc, item) {
@@ -112,11 +121,17 @@ var taking = allows => reducerFn => (acc, item) => {
 };
 */
 
+/**
+ * @sig
+ * @description d
+ * @param {*} allows - a
+ * @return {function} - b
+ */
 var taking = allows => reducerFn => {
     let _allows = allows;
     return (acc, item) => {
         return 0 < --_allows ? reducerFn(acc, item) : { [reduce.stopper]: reducerFn(acc, item) };
-    }
+    };
 };
 
 //var map = curry((mapFn, redFn) => (xs, x) => redFn(xs, mapFn(x)));

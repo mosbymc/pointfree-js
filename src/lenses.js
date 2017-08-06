@@ -7,26 +7,28 @@ import { Constant } from './containers/monads/constant_monad';
 import { mapWith } from './pointlessContainers';
 
 /**
- * @type:
- * @description:
- * @param: {number} idx
- * @param: {function} f
- * @param: {Array} xs
- * @return: {Array}
+ * @sig
+ * @description d
+ * @type {function}
+ * @param {number} idx - a
+ * @param {function} f - b
+ * @param {Array} xs - c
+ * @return {Array} - c
  */
 var arrayLens = curry(function _arrayLens(idx, f, xs) {
-    return mapWith(function (val) {
-        return arraySet(idx, val, xs)
+    return mapWith(function _mapWith(val) {
+        return arraySet(idx, val, xs);
     }, f(xs[idx]));
 });
 
 /**
- * @type:
- * @description:
- * @param: {string} prop
- * @param: {function} f
- * @param: {Object} xs
- * @return: {Object}
+ * @sig
+ * @description d
+ * @type {function}
+ * @param {string} prop - a
+ * @param {function} f - b
+ * @param {Object} xs - c
+ * @return {Object} - c
  */
 var objectLens = curry(function _objectLens(prop, f, xs) {
     return mapWith(function _map(rep) {
@@ -35,12 +37,13 @@ var objectLens = curry(function _objectLens(prop, f, xs) {
 });
 
 /**
- * @type:
- * @description:
- * @param: {string} prop
- * @param: {function} f
- * @param: {Array|Object} xs
- * @return: {*}
+ * @sig
+ * @description d
+ * @type {function}
+ * @param {string} prop - a
+ * @param {function} f - b
+ * @param {Array|Object} xs - c
+ * @return {*} - d
  */
 var unifiedLens = curry(function _unifiedLens(prop, f, xs) {
     return mapWith(function _mapWith(value) {
@@ -51,23 +54,25 @@ var unifiedLens = curry(function _unifiedLens(prop, f, xs) {
 });
 
 /**
- * @type:
- * @description:
- * @param: {function} lens
- * @param: {Object} target
- * @return:
+ * @sig
+ * @description d
+ * @type {function}
+ * @param {function} lens - a
+ * @param {Object} target - b
+ * @return {*} - c
  */
 var view = curry(function _view(lens, target) {
     return lens(Constant)(target).value;
 });
 
 /**
- * @type:
- * @description:
- * @param: {function} lens
- * @param: {function} mapFn
- * @param: {Object} target
- * @return: {*}
+ * @sig
+ * @description d
+ * @type {function}
+ * @param {function} lens - a
+ * @param {function} mapFn - b
+ * @param {Object} target - c
+ * @return {*} - d
  */
 var over = curry(function _over(lens, mapFn, target) {
     return lens(function _lens(y) {
@@ -76,32 +81,34 @@ var over = curry(function _over(lens, mapFn, target) {
 });
 
 /**
- * @type:
- * @description:
- * @param: {function} lens
- * @param: {*} val
- * @param: {*} target
- * @return: {*}
+ * @sig
+ * @description d
+ * @type {function}
+ * @param {function} lens - a
+ * @param {*} val - b
+ * @param {*} target - c
+ * @return {*} - d
  */
 var put = curry(function _put(lens, val, target) {
     return over(lens, kestrel(val), target);
 });
 
 /**
- * @type:
- * @description:
- * @param: {function} lens
- * @param: {*} val
- * @param: {Object} targetData
- * @return: {*}
+ * @sig
+ * @description d
+ * @type {function}
+ * @param {function} lens - a
+ * @param {*} val - b
+ * @param {Object} targetData - c
+ * @return {*} - c
  */
 var set = curry((lens, val, targetData) => over(lens, kestrel(val), targetData));
 
 /**
- * @type:
- * @description:
- * @param: {Array} paths
- * @return: {*}
+ * @sig
+ * @description d
+ * @param {Array} paths - a
+ * @return {*} - b
  */
 function makeLenses(...paths) {
     return paths.reduce(function _pathReduce(cur, next) {
@@ -111,10 +118,10 @@ function makeLenses(...paths) {
 }
 
 /**
- * @type:
- * @description:
- * @param: {Array} paths
- * @return: {function}
+ * @sig
+ * @description d
+ * @param {Array} paths - a
+ * @return {function} - b
  */
 function improvedLensPath(...paths) {
     var innerLensDef = curry(function _innerLensDef(prop, fn, xs) {
@@ -129,10 +136,10 @@ function improvedLensPath(...paths) {
 }
 
 /**
- * @type:
- * @description:
- * @param: {Array} path
- * @return: {*}
+ * @sig
+ * @description d
+ * @param {Array} path - a
+ * @return {*} - b
  */
 function lensPath(...path) {
     return compose(...path.map(function _pathMap(p) {
@@ -141,11 +148,12 @@ function lensPath(...path) {
 }
 
 /**
- * @type:
- * @description:
- * @param: {Array|String} path
- * @param: {Object} obj
- * @return: {*}
+ * @sig
+ * @description d
+ * @type {function}
+ * @param {Array|String} path - a
+ * @param {Object} obj - b
+ * @return {*} - c
  */
 var prismPath = curry(function _prismPath(path, obj) {
     path = when(not(isArray), split('.'), path);
@@ -160,39 +168,43 @@ var prismPath = curry(function _prismPath(path, obj) {
 });
 
 /**
- * @type:
- * @description:
- * @param: {function} getter
- * @param: {function} setter
- * @param: {String} key
- * @param: {function} f
- * @param: {Array} xs
- * @return: {*}
+ * @sig
+ * @description d
+ * @type {function}
+ * @param {function} getter - a
+ * @param {function} setter - b
+ * @param {String} key - c
+ * @param {function} f - d
+ * @param {Array} xs - e
+ * @return {*} - f
  */
 var lens = curry(function _lens(getter, setter, key, f, xs) {
     return mapWith(replace => setter(key, replace, xs), f(getter(key, xs)));
 });
 
 /**
- * @type:
- * @description:
- * @param: {function} getter
- * @param: {function} setter
- * @param: {String} key
- * @param: {function} f
- * @param: {Array} xs
- * @param: {*}
+ * @sig
+ * @description d
+ * @type {function}
+ * @param {function} getter - a
+ * @param {function} setter - b
+ * @param {String} key - c
+ * @param {function} f - d
+ * @param {Array} xs - e
+ * @param {*} - f
+ * @return {*} - g
  */
 var prism = curry(function _prism(getter, setter, key, f, xs) {
     return mapWith(replace => setter(key, replace, xs), Maybe(f(getter(key, xs))));
 });
 
 /**
- * @type:
- * @description:
- * @param: {String} delimiter
- * @param: {String} string
- * @return: {Array}
+ * @sig
+ * @description d
+ * @type {function}
+ * @param {String} delimiter - a
+ * @param {String} string - b
+ * @return {Array} - c
  */
 var split = curry(function _split(delimiter, string) {
     return string.split(delimiter);

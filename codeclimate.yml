@@ -1,0 +1,17 @@
+engines:
+  duplication:
+    enabled: true
+  nodesecurity:
+    enabled: true
+
+exclude_paths:
+  - ".nyc_output"
+  - "coverage"
+  - "dev"
+  - "node_modules"
+  - "plato"
+  - "reports"
+  - "routes"
+
+ratings:
+ - "src"

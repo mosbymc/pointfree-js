@@ -7,10 +7,11 @@ import { sortData } from  './sortHelpers';
 var toArray = when(not(isArray), Array.from);
 
 /**
- * @description:
- * @param: {iterable} xs
- * @param: {iterable} ys
- * @return: {generator}
+ * @sig 
+ * @description -
+ * @param {Array|generator} xs - some stuff
+ * @param {Array|generator} ys - some other stuff
+ * @return {generator} - some other other stuff
  */
 function prepend(xs, ys) {
     return function *addFront() {
@@ -21,11 +22,12 @@ function prepend(xs, ys) {
 }
 
 /**
- * @description:
- * @param: {iterable} xs
- * @param: {Array} yss
- * @param: {number} argsCount
- * @return: {generator}
+ * @sig:
+ * @description description
+ * @param {Array|generator} xs - x
+ * @param {Array|generator} yss - y
+ * @param {number} argsCount - z
+ * @return {generator} - a
  */
 function concat(xs, yss, argsCount) {
     return function *concatIterator() {
@@ -44,11 +46,12 @@ function concat(xs, yss, argsCount) {
 }
 
 /**
- * @description:
- * @param: {iterable} xs
- * @param: {iterable} ys
- * @param: {function} comparer
- * @return {generator}
+ * @sig
+ * @description d
+ * @param {Array|generator} xs - x
+ * @param {Array|generator} ys - y
+ * @param {function} comparer - z
+ * @return {generator} - a
  */
 function except(xs, ys, comparer = strictEquals) {
     ys = toArray(ys);
@@ -62,15 +65,16 @@ function except(xs, ys, comparer = strictEquals) {
 }
 
 /**
- * @description:
- * @param: {iterable} xs
- * @param: {iterable} ys
- * @param: {function} xSelector
- * @param: {function} ySelector
- * @param: {function} projector
- * @param: {function} listFactory
- * @param: {function} comparer
- * @return {generator}
+ * @sig
+ * @description d
+ * @param {Array|generator} xs - a
+ * @param {Array|generator} ys - b
+ * @param {function} xSelector - c
+ * @param {function} ySelector - d
+ * @param {function} projector - e
+ * @param {function} listFactory - f
+ * @param {function} comparer - g
+ * @return {generator} - h
  */
 function groupJoin(xs, ys, xSelector, ySelector, projector, listFactory, comparer = strictEquals) {
     return function *groupJoinIterator() {
@@ -88,15 +92,16 @@ function groupJoin(xs, ys, xSelector, ySelector, projector, listFactory, compare
 
             yield projector(x, grp || listFactory([]));
         }
-    }
+    };
 }
 
 /**
- * @description:
- * @param: {iterable} xs
- * @param: {iterable} ys
- * @param: {function} comparer
- * @return {generator}
+ * @sig
+ * @description d
+ * @param {Array|generator} xs - a
+ * @param {Array|generator} ys - b
+ * @param {function} comparer - c
+ * @return {generator} - d
  */
 function intersect(xs, ys, comparer = strictEquals) {
     return function *intersectIterator() {
@@ -110,11 +115,11 @@ function intersect(xs, ys, comparer = strictEquals) {
 }
 
 /**
- * @type:
- * @description:
- * @param: {iterable} xs
- * @param: {*} val
- * @return: {generator}
+ * @sig
+ * @description d
+ * @param {Array|generator} xs - a
+ * @param {*} val - b
+ * @return {generator} - c
  */
 function intersperse(xs, val) {
     return function *intersperseIterator() {
@@ -130,14 +135,15 @@ function intersperse(xs, val) {
 }
 
 /**
- * @description:
- * @param: {iterable} xs
- * @param: {iterable} ys
- * @param: {function} xSelector
- * @param: {function} ySelector
- * @param: {function} projector
- * @param: {function} comparer
- * @return {generator}
+ * @sig
+ * @description d
+ * @param {Array|generator} xs - a
+ * @param {Array|generator} ys - b
+ * @param {function} xSelector - c
+ * @param {function} ySelector - d
+ * @param {function} projector - e
+ * @param {function} comparer - f
+ * @return {generator} - g
  */
 function join(xs, ys, xSelector, ySelector, projector, comparer = strictEquals) {
     return function *joinIterator() {
@@ -153,11 +159,12 @@ function join(xs, ys, xSelector, ySelector, projector, comparer = strictEquals) 
 }
 
 /**
- * @description:
- * @param: {iterable} xs
- * @param: {iterable} ys
- * @param: {function} comparer
- * @return {generator}
+ * @sig
+ * @description
+ * @param {Array|generator} xs - a
+ * @param {Array|generator} ys - b
+ * @param {function} comparer - c
+ * @return {generator} - d
  */
 function union(xs, ys, comparer = strictEquals) {
     return function *unionIterator() {
@@ -173,11 +180,12 @@ function union(xs, ys, comparer = strictEquals) {
 }
 
 /**
- * @description:
- * @param: {iterable} xs
- * @param: {iterable} ys
- * @param: {function} selector
- * @return {generator}
+ * @sig
+ * @description d
+ * @param {Array|generator} xs - a
+ * @param {Array|generator} ys - b
+ * @param {function} selector - c
+ * @return {generator} - d
  */
 function zip(xs, ys, selector) {
     return function *zipIterator() {
@@ -193,31 +201,34 @@ function zip(xs, ys, selector) {
 }
 
 /**
- * @description:
- * @param: {iterable} xs
- * @param: {function} predicate
- * @return: {boolean}
+ * @sig
+ * @description d
+ * @param {Array|generator} xs - a
+ * @param {function} predicate - b
+ * @return {boolean} - c
  */
 function all(xs, predicate) {
     return strictEquals(javaScriptTypes.Function, type(predicate)) && toArray(xs).every(predicate);
 }
 
 /**
- * @description:
- * @param: {iterable} xs
- * @param: {function} predicate
- * @return: {boolean}
+ * @sig
+ * @description d
+ * @param {Array|generator} xs - a
+ * @param {function} predicate - b
+ * @return {boolean} - c
  */
 function any(xs, predicate) {
     return strictEquals(javaScriptTypes.Function, type(predicate)) ? toArray(xs).some(predicate) : 0 < toArray(xs).length;
 }
 
 /**
- * @description:
- * @param: {iterable} xs
- * @param: {*} val
- * @param: {function} comparer
- * @return: {*}
+ * @sig
+ * @description d
+ * @param {Array|generator} xs - a
+ * @param {*} val - b
+ * @param {function} comparer - c
+ * @return {*} - d
  */
 function contains(xs, val, comparer) {
     //TODO: see if there is any real performance increase by just using .includes when a comparer hasn't been passed
@@ -225,24 +236,26 @@ function contains(xs, val, comparer) {
 }
 
 /**
- * @description:
- * @param: {iterable} xs
- * @param: {*} val
- * @param: {function} comparer
- * @return {boolean}
+ * @sig
+ * @description d
+ * @param {Array|generator} xs - a
+ * @param {*} val - b
+ * @param {function} comparer - c
+ * @return {boolean} - d
  */
 function binarySearch(xs, val, comparer) {
     return binarySearchRec(xs, 0, xs.length - 1, val, comparer);
 }
 
 /**
- * @description:
- * @param: {iterable} xs
- * @param: {number} left
- * @param: {number} right
- * @param: {*} val
- * @param: {function} comparer
- * @return {boolean}
+ * @sig
+ * @description d
+ * @param {Array|generator} xs - a
+ * @param {number} left - b
+ * @param {number} right - c
+ * @param {*} val - d
+ * @param {function} comparer - e
+ * @return {boolean} - f
  */
 function binarySearchRec(xs, left, right, val, comparer) {
     if (left > right) return false;
@@ -254,10 +267,11 @@ function binarySearchRec(xs, left, right, val, comparer) {
 }
 
 /**
- * @description:
- * @param: {iterable} xs
- * @param: {function} predicate
- * @return {Number}
+ * @sig
+ * @description d
+ * @param {Array|generator} xs - a
+ * @param {function} predicate - b
+ * @return {Number} - c
  */
 function count(xs, predicate) {
     return strictEquals(javaScriptTypes.Undefined, type(predicate)) ?
@@ -265,33 +279,35 @@ function count(xs, predicate) {
 }
 
 /**
- * @description:
- * @param: {iterable} xs
- * @param: {function} predicate
- * @return {*}
+ * @sig
+ * @description d
+ * @param {Array|generator} xs - a
+ * @param {function} predicate - b
+ * @return {*} - c
  */
 function first(xs, predicate) {
     return strictEquals(javaScriptTypes.Function, type(predicate)) ? toArray(xs).find(predicate) : toArray(xs)[0];
 }
 
 /**
- * @description:
- * @param: {iterable} xs
- * @param: {function} fn
- * @param: {*} initial
- * @return: {*}
+ * @sig
+ * @description d
+ * @param {Array|generator} xs - a
+ * @param {function} fn - b
+ * @param {*} initial - c
+ * @return {*} - d
  */
 function foldLeft(xs, fn, initial = 0) {
     return toArray(xs).reduce(fn, initial);
 }
 
 /**
- * @description:
- * @type:
- * @param: {Array} arr
- * @param: {function} op
- * @param: {*} acc
- * @return: {*}
+ * @sig
+ * @description d
+ * @param {Array} arr - a
+ * @param {function} op - b
+ * @param {*} acc - c
+ * @return {*} - d
  */
 function foldRight(arr, op, acc) {
     var list = toArray(arr),
@@ -304,21 +320,23 @@ function foldRight(arr, op, acc) {
 }
 
 /**
- * @description:
- * @param: {iterable} xs
- * @param: {function} fn
- * @param: {*} initial
- * @return: {*}
+ * @sig
+ * @description s
+ * @param {Array|generator} xs - a
+ * @param {function} fn - b
+ * @param {*} initial - c
+ * @return {*} - d
  */
 function reduceRight(xs, fn, initial) {
     return null == initial ? toArray(xs).reduceRight(fn) : toArray(xs).reduceRight(fn, initial);
 }
 
 /**
- * @description:
- * @param: {iterable} xs
- * @param: {function} predicate
- * @return: {*}
+ * @sig
+ * @description d
+ * @param {Array|generator} xs - a
+ * @param {function} predicate - b
+ * @return {*} - c
  */
 function last(xs, predicate) {
     if (strictEquals(javaScriptTypes.Function, type(predicate)))
@@ -327,10 +345,11 @@ function last(xs, predicate) {
 }
 
 /**
- * @description:
- * @param: {iterable} xs
- * @param: {function} comparer
- * @return: {generator}
+ * @sig
+ * @description d
+ * @param {Array|generator} xs - a
+ * @param {function} comparer - b
+ * @return {generator} - c
  */
 function distinct(xs, comparer = strictEquals) {
     var cached = cacher(comparer);
@@ -343,10 +362,11 @@ function distinct(xs, comparer = strictEquals) {
 }
 
 /**
- * @description:
- * @param: {iterable} xs
- * @param: {string} dataType
- * @return: {generator}
+ * @sig
+ * @description d
+ * @param {Array|generator} xs - a
+ * @param {string} dataType - b
+ * @return {generator} - c
  */
 function ofType(xs, dataType) {
     return function *ofTypeIterator() {
@@ -393,10 +413,11 @@ function ofType(xs, dataType) {
 }
 
 /**
- * @description:
- * @param: {iterable} xs
- * @param: {function} predicate
- * @return: {generator}
+ * @sig
+ * @description d
+ * @param {Array|generator} xs - a
+ * @param {function} predicate - b
+ * @return {generator} - c
  */
 function filter(xs, predicate) {
     return function *filterIterator() {
@@ -407,9 +428,10 @@ function filter(xs, predicate) {
 }
 
 /**
- * @description:
- * @param: {iterable} xs
- * @return: {generator}
+ * @sig
+ * @description d
+ * @param {Array|generator} xs - a
+ * @return {generator} - b
  */
 function deepFlatten(xs) {
     return function *iterator() {
@@ -428,18 +450,20 @@ function deepFlatten(xs) {
 }
 
 /**
- * @description:
- * @param: {*} data
- * @return:
+ * @sig
+ * @description d
+ * @param {*} data - a
+ * @return {*} b
  */
 function flatteningFunc(data) {
     return ifElse(isArray, mapData, when(isObject, when(objectContainsOnlyArrays, getObjectKeysAsArray)), data);
 }
 
 /**
- * @description:
- * @param: {*} data
- * @return: {*}
+ * @sig
+ * @description d
+ * @param {*} data - a
+ * @return {*} - b
  */
 function mapData(data) {
     return Array.prototype.concat.apply([], data.map(function flattenArray(item) {
@@ -448,9 +472,10 @@ function mapData(data) {
 }
 
 /**
- * @description:
- * @param: {*} data
- * @return: {Array}
+ * @sig
+ * @description d
+ * @param {*} data - a
+ * @return {Array} - b
  */
 function getObjectKeysAsArray(data) {
     return Object.keys(data).map(function _flattenKeys(key) {
@@ -459,9 +484,10 @@ function getObjectKeysAsArray(data) {
 }
 
 /**
- * @description:
- * @param: {*} data
- * @return: {boolean}
+ * @sig
+ * @description d
+ * @param {*} data - a
+ * @return {boolean} - b
  */
 function objectContainsOnlyArrays(data) {
     return Object.keys(data).every(function _isMadeOfArrays(key) {
@@ -470,10 +496,11 @@ function objectContainsOnlyArrays(data) {
 }
 
 /**
- * @description:
- * @param: {*} xs
- * @param: {function} fn
- * @return: {flatMapIterator}
+ * @sig
+ * @description d
+ * @param {*} xs - a
+ * @param {function} fn - b
+ * @return {generator} - c
  */
 function chain(xs, fn) {
     return function *flatMapIterator() {
@@ -510,9 +537,10 @@ function chain(xs, fn) {
  */
 
 /**
- * @description:
- * @param: {iterable} xs
- * @return: {generator}
+ * @sig
+ * @description d
+ * @param {Array|generator} xs - a
+ * @return {generator} - b
  */
 function flatten(xs) {
     return function *flattenIterator() {
@@ -529,11 +557,12 @@ function flatten(xs) {
 }
 
 /**
- * @description:
- * @param: {iterable} xs
- * @param: {object} groupObject
- * @param: {function} queryableConstructor
- * @return: {generator}
+ * @sig
+ * @description d
+ * @param {Array|generator} xs - a
+ * @param {object} groupObject - b
+ * @param {function} queryableConstructor - c
+ * @return {generator} - d
  */
 function groupBy(xs, groupObject, queryableConstructor) {
     return function *groupByIterator() {
@@ -544,12 +573,13 @@ function groupBy(xs, groupObject, queryableConstructor) {
 }
 
 /**
- * @description:
- * @param: {*} data
- * @param: {number} depth
- * @param: {string} key
- * @param: {function} queryableConstructor
- * @return: {Array}
+ * @sig
+ * @description d
+ * @param {*} data - a
+ * @param {number} depth - b
+ * @param {string} key - c
+ * @param {function} queryableConstructor - d
+ * @return {Array} - e
  */
 function nestLists(data, depth, key, queryableConstructor) {
     if (isArray(data)) {
@@ -565,10 +595,11 @@ function nestLists(data, depth, key, queryableConstructor) {
 }
 
 /**
- * @description:
- * @param: {*} xs
- * @param: {object} groupObject
- * @return: {Array}
+ * @sig
+ * @description d
+ * @param {*} xs - a
+ * @param {object} groupObject - b
+ * @return {Array} - c
  */
 function groupData(xs, groupObject) {
     var sortedData = sortData(xs, groupObject),
@@ -585,10 +616,11 @@ function groupData(xs, groupObject) {
 }
 
 /**
- * @description:
- * @param: {Array} arr
- * @param: {string} field
- * @return: {Array}
+ * @sig
+ * @description d
+ * @param {Array} arr - a
+ * @param {string} field - b
+ * @return {Array} - c
  */
 function findGroup(arr, field) {
     var grp;
@@ -609,10 +641,11 @@ function findGroup(arr, field) {
 }
 
 /**
- * @description:
- * @param: {iterable} xs
- * @param: {function} fn
- * @return: {generator}
+ * @sig
+ * @description d
+ * @param {Array|generator} xs - a
+ * @param {function} fn - b
+ * @return {generator} - c
  */
 function map(xs, fn) {
     return function *mapIterator() {
@@ -624,11 +657,11 @@ function map(xs, fn) {
 }
 
 /**
- * @description:
- * @param: {iterable} xs
- * @param: {Array} orderObject
- * @param: {function} comparer
- * @return: {generator}
+ * @sig
+ * @description d
+ * @param {Array|generator} xs - a
+ * @param {Array} orderObject - b
+ * @return {generator} - d
  */
 function sortBy(xs, orderObject) {
     return function *orderByIterator() {
@@ -639,11 +672,12 @@ function sortBy(xs, orderObject) {
 }
 
 /**
- * @description:
- * @param: {@see m_list} xs
- * @param: {@see m_list} ys
- * @param: {function} comparer
- * @return: {boolean}
+ * @sig
+ * @description d
+ * @param {list_core} xs - a
+ * @param {list_core} ys - b
+ * @param {function} comparer - c
+ * @return {boolean} - d
  */
 function equals(xs, ys, comparer = strictEquals) {
     var x_s = xs.data,
@@ -656,10 +690,11 @@ function equals(xs, ys, comparer = strictEquals) {
 }
 
 /**
- * @description:
- * @param: {iterable} xs
- * @param: {function} predicate
- * @return {generator}
+ * @sig
+ * @description d
+ * @param {Array|generator} xs - a
+ * @param {function} predicate - b
+ * @return {generator} - c
  */
 function takeWhile(xs, predicate) {
     return function *takeWhileIterator() {
@@ -671,10 +706,11 @@ function takeWhile(xs, predicate) {
 }
 
 /**
- * @description:
- * @param: {iterable} xs
- * @param: {function} predicate
- * @return: {generator}
+ * @sig
+ * @description d
+ * @param {Array|generator} xs - a
+ * @param {function} predicate - b
+ * @return {generator} - c
  */
 function skipWhile(xs, predicate) {
     return function *skipWhileIterator() {
@@ -692,9 +728,10 @@ function skipWhile(xs, predicate) {
 }
 
 /**
- * @description:
- * @param: {iterable} xs
- * @return: {generator}
+ * @sig
+ * @description d
+ * @param {Array|generator} xs - a
+ * @return {generator} - b
  */
 function reverse(xs) {
     return function *reverseIterator() {
@@ -703,10 +740,11 @@ function reverse(xs) {
 }
 
 /**
- * @description:
- * @param: {*} item
- * @param: {number} count
- * @return: {generator}
+ * @sig
+ * @description d
+ * @param {*} item - a
+ * @param {number} count - b
+ * @return {generator} - c
  */
 function repeat(item, count) {
     return function *repeatIterator() {
@@ -717,11 +755,13 @@ function repeat(item, count) {
 }
 
 /**
- * @description:
- * @param: {number} idx
- * @param: {number} start
- * @param: {number} end
- * @returns {generator}
+ * @sig
+ * @description d
+ * @param {number} idx - a
+ * @param {number} start - b
+ * @param {number} end - c
+ * @param {list_core} xs - d
+ * @returns {generator} - e
  */
 function copyWithin(idx, start, end, xs) {
     return function *copyWithinIterator() {
@@ -730,12 +770,13 @@ function copyWithin(idx, start, end, xs) {
 }
 
 /**
- * @description:
- * @param: {*} val
- * @param: {number} start
- * @param: {number} end
- * @param: {Array} xs
- * @return: {generator}
+ * @sig
+ * @description d
+ * @param {*} val - a
+ * @param {number} start - b
+ * @param {number} end - c
+ * @param {Array} xs - d
+ * @return {generator} - e
  */
 function fill(val, start, end, xs) {
     return function *fillIterator() {
@@ -744,20 +785,22 @@ function fill(val, start, end, xs) {
 }
 
 /**
- * @description:
- * @param: {iterable} xs
- * @param: {function} comparer
- * @return: {Number}
+ * @sig
+ * @description d
+ * @param {Array|generator} xs - a
+ * @param {function} comparer - b
+ * @return {Number} - c
  */
 function findIndex(xs, comparer = strictEquals) {
     return toArray(xs).findIndex(comparer);
 }
 
 /**
- * @description:
- * @param: {iterable} xs
- * @param: {function} comparer
- * @return: {Number}
+ * @sig
+ * @description d
+ * @param {Array|generator} xs - a
+ * @param {function} comparer - b
+ * @return {Number} - c
  */
 function findLastIndex(xs, comparer = strictEquals) {
     return toArray(xs).length - toArray(xs).reverse().findIndex(comparer);

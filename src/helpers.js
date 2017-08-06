@@ -1,13 +1,20 @@
 /**
- * @description: - Prototype of a generator; used to detect if a function
+ * @description - Prototype of a generator; used to detect if a function
  * argument is a generator or a regular function.
- * @type: {Object}
+ * @typedef {Object}
  */
 var generatorProto = Object.getPrototypeOf(function *_generator(){});
 
 /**
- * @description
- * @type {{Function: string, object: string, boolean: string, number: string, symbol: string, string: string, undefined: string}}
+ * @description d
+ * @typedef {Object}
+ * @property {string} Function
+ * @property {string} Object
+ * @property {string} Boolean
+ * @property {string} Number
+ * @property {string} Symbol
+ * @property {string} String
+ * @property {string} Undefined
  */
 var javaScriptTypes = {
     Function: 'function',
@@ -23,15 +30,14 @@ var typeName = {
     'boolean': typeof true,
     'function': typeof Function,
     'number': typeof 0,
-    'object': typeof { a: 1 },
+    'object': typeof{ a: 1 },
     'string': typeof '',
     'symbol': typeof Symbol.iterator,
     'undefined': typeof void 0
 };
 
 /**
- * @description:
- * @type: {{Array: [*], ArrayBuffer: [*], Map: [*], WeakMap: [*], Set: [*], WeakSet: [*]}}
+ * @description d
  */
 var collectionTypes = {
     'Generator': [generatorProto],
@@ -55,8 +61,7 @@ var collectionTypes = {
 };
 
 /**
- * @description:
- * @type: {{inactive: number, active: number, paused: number, complete: number}}
+ * @description d
  */
 var observableStatus = {
     inactive: 0,
@@ -66,8 +71,7 @@ var observableStatus = {
 };
 
 /**
- * @description:
- * @type: {{ascending: number, descending: number}}
+ * @description d
  */
 var sortDirection = {
     ascending: 1,
@@ -75,11 +79,12 @@ var sortDirection = {
 };
 
 /**
- * @description:
- * @param: {*} x
- * @param: {*} y
- * @param: {string} dir
- * @returns: {number}
+ * @sig
+ * @description d
+ * @param {*} x - a
+ * @param {*} y - b
+ * @param {string} dir - c
+ * @return {number} - d
  */
 function sortComparer(x, y, dir) {
     var t = x > y ? 1 : x === y ? 0 : -1;
@@ -87,9 +92,10 @@ function sortComparer(x, y, dir) {
 }
 
 /**
- * @description:
- * @param: {function} comparer
- * @return: {function}
+ * @sig
+ * @description d
+ * @param {function} comparer - a
+ * @return {function} - b
  */
 /*function cacheChecker(item) {
  console.log(((undefined !== item && items.some(function _checkEquality(it) {
@@ -124,11 +130,11 @@ function cacher(comparer) {
 }
 
 /**
- * @type:
- * @description:
- * @param: {Generator|Array|Map|Set} collection
- * @param: {function} comparer
- * @return: {{contains, getValue}}
+ * @sig
+ * @description d
+ * @param {Generator|Array|Map|Set} collection - a
+ * @param {function} comparer - b
+ * @return {{contains, getValue}} - c
  */
 function genericCacher(collection, comparer) {
     function createCacheChequer() {
@@ -204,10 +210,11 @@ function genericCacher(collection, comparer) {
 }
 
 /**
- * @description:
- * @param: {function} fn
- * @param: {function} keyMaker
- * @return {function}
+ * @sig
+ * @description d
+ * @param {function} fn - a
+ * @param {function} keyMaker - b
+ * @return {function} - c
  */
 function memoizer(fn, keyMaker) {
     var lookup = new Map();
@@ -218,10 +225,10 @@ function memoizer(fn, keyMaker) {
 }
 
 /**
- * @type:
- * @description:
- * @param: {*} obj
- * @return: {*}
+ * @sig
+ * @description d
+ * @param {*} obj - a
+ * @return {*} - b
  */
 function deepClone(obj) {
     var uniqueObjects = new Set();
@@ -229,10 +236,10 @@ function deepClone(obj) {
     return objectCloner(obj);
 
     /**
-     * @type:
-     * @description:
-     * @param: {*} obj
-     * @return: {*}
+     * @sig
+     * @description d
+     * @param {*} obj - a
+     * @return {*} - b
      */
     function objectCloner(obj) {
         //if the 'obj' parameter is a primitive type, just return it; there's no way/need to copy
@@ -265,11 +272,11 @@ function deepClone(obj) {
 
 
 /**
- * @type:
- * @description:
- * @param: {function} fn
- * @param: {Object} cxt
- * @return: {function}
+ * @sig
+ * @description d
+ * @param {function} fn - a
+ * @param {Object} cxt - b
+ * @return {function} - c
  */
 function functionClone(fn, cxt = null) {
     var clone = (function _clone(...args) {
@@ -299,9 +306,10 @@ function functionClone(fn, cxt = null) {
 }
 
 /**
- * @description:
- * @param: {Array} arr
- * @returns: {Array}
+ * @sig
+ * @description d
+ * @param {Array} arr - a
+ * @return {Array} - b
  */
 function deepCopy(arr) {
     var length = arr.length,
@@ -314,9 +322,10 @@ function deepCopy(arr) {
 }
 
 /**
- * @description:
- * @param: {object} obj
- * @returns: {object}
+ * @sig
+ * @description d
+ * @param {object} obj - a
+ * @return {object} - b
  */
 function shallowClone(obj) {
     var clone = {};
@@ -329,11 +338,11 @@ function shallowClone(obj) {
 var emptyObject = {};
 
 /**
- * @description:
- * @type: {function}
- * @param: {number} len
- * @param: {function} fn
- * @returns: {function}
+ * @sig
+ * @description d
+ * @param {number} len - a
+ * @param {function} fn - b
+ * @return {function} - c
  */
 /*var alterFunctionLength = curry(function _alterFunctionLength(len, fn) {
     return Object.defineProperty(
