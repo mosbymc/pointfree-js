@@ -33,9 +33,10 @@ function Maybe(item) {
 }
 
 /**
- * @description:
- * @param: {*} item
- * @return: {@see maybe_monad}
+ * @sig
+ * @description d
+ * @param {*} item - a
+ * @return {just_monad} - b
  */
 Maybe.of = function _of(item) {
     return Object.create(just_monad, {
@@ -54,9 +55,10 @@ Maybe.of = function _of(item) {
 };
 
 /**
- * @description:
- * @param: {monad} m
- * @return: {boolean}
+ * @sig
+ * @description d
+ * @param {Object} m - a
+ * @return {boolean} - b
  */
 Maybe.is = m => just_monad.isPrototypeOf(m) || nothing_monad.isPrototypeOf(m);
 
@@ -85,9 +87,10 @@ var Just = Maybe.Just;
 Just.of = Just;
 
 /**
- * @description:
- * @param: {monad} m
- * @return: {boolean}
+ * @sig
+ * @description d
+ * @param {Object} m - a
+ * @return {boolean} - b
  */
 Just.is = m => just_monad.isPrototypeOf(m);
 
@@ -96,9 +99,10 @@ var Nothing = Maybe.Nothing;
 Nothing.of = Nothing;
 
 /**
- * @description:
- * @param: {monad} m
- * @return: {boolean}
+ * @sig
+ * @description d
+ * @param {Object} m - a
+ * @return {boolean} - b
  */
 Nothing.is = m => nothing_monad.isPrototypeOf(m);
 
@@ -185,8 +189,6 @@ nothing_monad.chain = chain;
 nothing_monad.mjoin = mjoin;
 nothing_monad.apply = apply;
 
-
-
 just_monad.ap = just_monad.apply;
 just_monad.fmap = just_monad.chain;
 just_monad.flapMap = just_monad.chain;
@@ -198,8 +200,6 @@ nothing_monad.fmap = nothing_monad.chain;
 nothing_monad.flapMap = nothing_monad.chain;
 nothing_monad.bind = nothing_monad.chain;
 nothing_monad.reduce = nothing_monad.fold;
-
-
 
 //Since FantasyLand is the defacto standard for JavaScript algebraic data structures, and I want to maintain
 //compliance with the standard, a .constructor property must be on the container delegators. In this case, its

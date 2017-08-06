@@ -2,21 +2,21 @@ import { disjunctionEqualMaker, pointMaker, stringMaker, valueOf,
         get, emptyGet, orElse, emptyOrElse, getOrElse, emptyGetOrElse, sharedEitherFns } from '../containerHelpers';
 
 /**
- * @type:
- * @description:
- * @param: {*} x
- * @return: {@see left_functor|right_functor}
+ * @sig
+ * @description d
+ * @param {*} x - a
+ * @return {left_functor|right_functor} - b
  */
 function fromNullable(x) {
     return null != x ? Right(x) : Left(x);
 }
 
 /**
- * @type:
- * @description:
- * @param: {*} val
- * @param: {string} fork
- * @return: {@see left_functor|@see right_functor}
+ * @sig
+ * @description d
+ * @param {*} val - a
+ * @param {string} fork - b
+ * @return {left_functor|right_functor} - c
  */
 function Either(val, fork) {
     return 'right' === fork ?
@@ -49,66 +49,66 @@ function Either(val, fork) {
 }
 
 /**
- * @type:
- * @description:
- * @param: {*} x
- * @return: {@see right_functor}
+ * @sig
+ * @description d
+ * @param {*} x - a
+ * @return {right_functor} - b
  */
 Either.of = x => Either(x, 'right');
 
 /**
- * @type:
- * @description:
- * @param: {functor} f
- * @return: {boolean}
+ * @sig
+ * @description d
+ * @param {Object} f - a
+ * @return {boolean} - b
  */
 Either.is = f => Left.is(f) || Right.is(f);
 
 /**
- * @type:
- * @description:
- * @param: {functor} f
- * @return: {boolean}
+ * @sig
+ * @description d
+ * @param {Object} f - a
+ * @return {boolean} - b
  */
 Either.isRight = f => f.isRight;
 
 /**
- * @type:
- * @description:
- * @param: {functor} f
- * @return: {boolean}
+ * @sig
+ * @description d
+ * @param {Object} f - a
+ * @return {boolean} - b
  */
 Either.isLeft = f => f.isLeft;
 
 /**
- * @type:
- * @description:
- * @param: {*} x
- * @return: {@see right_functor}
+ * @sig
+ * @description d
+ * @param {*} x - a
+ * @return {right_functor} - b
  */
 Either.Right = x => Either(x, 'right');
 
 /**
- * @type:
- * @description:
- * @param: {*} x
- * @return: {@see left_functor}
+ * @sig
+ * @description d
+ * @param {*} x - a
+ * @return {left_functor} - b
  */
 Either.Left = x => Either(x);
 
 /**
- * @type:
- * @description:
- * @param: {*} x
- * @return: {@see left_functor|right_functor}
+ * @sig
+ * @description d
+ * @param {*} x - a
+ * @return {left_functor|right_functor} - b
  */
 Either.fromNullable = fromNullable;
 
 /**
- * @type:
- * @description:
- * @param: {*} val
- * @return: {@see left_functor}
+ * @sig
+ * @description d
+ * @param {*} val - a
+ * @return {left_functor} - b
  */
 function Left(val) {
     return Object.create(left_functor, {
@@ -131,26 +131,26 @@ function Left(val) {
 }
 
 /**
- * @type:
- * @description:
- * @param: {*} x
- * @return: {@see left_functor}
+ * @sig
+ * @description d
+ * @param {*} x - a
+ * @return {left_functor} - b
  */
 Left.of = x => Left(x);
 
 /**
- * @type:
- * @description:
- * @param: {functor} f
- * @return: {boolean}
+ * @sig
+ * @description d
+ * @param {Object} f - a
+ * @return {boolean} - b
  */
 Left.is = f => left_functor.isPrototypeOf(f);
 
 /**
- * @type:
- * @description:
- * @param: {*} val
- * @return: {@see right_functor}
+ * @sig
+ * @description d
+ * @param {*} val - a
+ * @return {right_functor} - b
  */
 function Right(val) {
     return Object.create(right_functor, {
@@ -173,18 +173,18 @@ function Right(val) {
 }
 
 /**
- * @type:
- * @description:
- * @param: {functor} x
- * @return: {boolean}
+ * @sig
+ * @description d
+ * @param {Object} x - a
+ * @return {boolean} - b
  */
 Right.is = x => right_functor.isPrototypeOf(x);
 
 /**
- * @type:
- * @description:
- * @param: {*} x
- * @return: {@see right_functor}
+ * @sig
+ * @description d
+ * @param {*} x - a
+ * @return {right_functor} - b
  */
 Right.of = x => Right(x);
 
@@ -193,37 +193,37 @@ var right_functor = {
         return this._value;
     },
     /**
-     * @description:
-     * @param: {function|undefined} fn
-     * @return: {@see either_functor}
+     * @description d
+     * @param {function|undefined} fn - a
+     * @return {right_functor} - b
      */
     map: sharedEitherFns.rightMap,
     /**
-     * @type:
-     * @description:
-     * @param: {function} f
-     * @param: {function} g
-     * @return: {@see right_functor}
+     * @sig
+     * @description d
+     * @param {function} f - a
+     * @param {function} g - b
+     * @return {right_functor} - c
      */
     bimap: sharedEitherFns.rightBiMap,
     /**
-     * @type:
-     * @description:
-     * @return: {*}
+     * @sig
+     * @description d
+     * @return {*} - a
      */
     get: get,
     /**
-     * @type:
-     * @description:
-     * @param: {*} x
-     * @return: {*}
+     * @sig
+     * @description d
+     * @param {*} x - a
+     * @return {*} - b
      */
     getOrElse: getOrElse,
     /**
-     * @type:
-     * @description:
-     * @param: {function} f
-     * @return: {@see right_functor}
+     * @sig
+     * @description d
+     * @param {function} f - a
+     * @return {right_functor} - b
      */
     orElse: orElse,
     of: pointMaker(Right),
@@ -233,8 +233,8 @@ var right_functor = {
 };
 
 /**
- * @description:
- * @return:
+ * @description
+ * @return
  */
 right_functor.equals = disjunctionEqualMaker(right_functor, 'isRight');
 
@@ -243,35 +243,36 @@ var left_functor = {
         return this._value;
     },
     /**
-     * @description:
-     * @return: {@see either_functor}
+     * @description d
+     * @return {left_functor} - b
      */
     map: sharedEitherFns.leftMapMaker(Left),
     /**
-     * @description:
-     * @param: {function} f
-     * @param: {function} g
-     * @return: {@see left_functor}
+     * @sig
+     * @description d
+     * @param {function} f - a
+     * @param {function} g - b
+     * @return {left_functor} - c
      */
     bimap: sharedEitherFns.leftBimapMaker(Left),
     /**
-     * @type:
-     * @description:
-     * @return:
+     * @sig
+     * @description d
+     * @return {*} - a
      */
     get: emptyGet,
     /**
-     * @type:
-     * @description:
-     * @param: {*} x
-     * @return: {*}
+     * @sig
+     * @description d
+     * @param {*} x - a
+     * @return {*} - b
      */
     getOrElse: emptyGetOrElse,
     /**
-     * @type:
-     * @description:
-     * @param: {function} f
-     * @return: {*}
+     * @sig
+     * @description d
+     * @param {function} f - a
+     * @return {*} - b
      */
     orElse: emptyOrElse,
     of: pointMaker(Right),
@@ -281,11 +282,11 @@ var left_functor = {
 };
 
 /**
- * @description:
- * @return:
+ * @sig
+ * @description d
+ * @return {boolean} - a
  */
 left_functor.equals = disjunctionEqualMaker(left_functor, 'isLeft');
-
 
 
 //Since FantasyLand is the defacto standard for JavaScript algebraic data structures, and I want to maintain
@@ -299,7 +300,6 @@ left_functor.equals = disjunctionEqualMaker(left_functor, 'isLeft');
 //care to know, so just stick with what I tell you to use."
 right_functor.constructor = right_functor.factory;
 left_functor.constructor = left_functor.factory;
-
 
 
 export { Either, Left, Right, right_functor, left_functor };

@@ -12,18 +12,20 @@ function Constant(val) {
 }
 
 /**
- * @description:
- * @param: {*} item
- * @return: {@see constant_monad}
+ * @sig
+ * @description d
+ * @param {*} item - a
+ * @return {constant_monad} - b
  */
 Constant.of = function _of(item) {
     return Constant(item);
 };
 
 /**
- * @description:
- * @param: {monad} m
- * @return: {boolean}
+ * @sig
+ * @description d
+ * @param {Object} m - a
+ * @return {boolean} - b
  */
 Constant.is = m => constant_monad.isPrototypeOf(m);
 
@@ -66,9 +68,6 @@ constant_monad.fmap = constant_monad.chain;
 constant_monad.flapMap = constant_monad.chain;
 constant_monad.bind = constant_monad.chain;
 constant_monad.reduce = constant_monad.fold;
-
-
-
 
 //Since FantasyLand is the defacto standard for JavaScript algebraic data structures, and I want to maintain
 //compliance with the standard, a .constructor property must be on the container delegators. In this case, its

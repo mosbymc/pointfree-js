@@ -5,7 +5,6 @@ var xor = (x, y) => !!(x ^ y);
 var xnor = (x, y) => x && y || !x && !y;
 
 
-
 var sumGroup = groupFactory((x, y) => x + y, (x, y) => x - y, x => -x, 0, 'Sum');
 
 var multGroup = groupFactory((x, y) => x * y, (x, y) => x * (1 / y), x => 1 / x, 1, 'Multiply');
@@ -17,8 +16,6 @@ var xorGroup = groupFactory(xor, (x, y) => !(x ^ y), x => x, false, 'Xor');
 var xnorGroup = groupFactory(xnor, xnor, x => x, false, 'Xnor');
 
 
-
-
 var allGroup = groupFactory(_all, x => x, undefined, 'All');
 
 var anyGroup = groupFactory((x, y) => !!(x || y), x => !x, undefined, 'Any');
@@ -26,8 +23,6 @@ var anyGroup = groupFactory((x, y) => !!(x || y), x => !x, undefined, 'Any');
 function _all(x, y) {
     return !!(x && y);
 }
-
-
 
 
 var subGroup = groupFactory((x, y) => x - y, x => -x, 0, 'Sub');

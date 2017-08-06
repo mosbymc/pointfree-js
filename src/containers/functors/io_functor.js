@@ -4,9 +4,10 @@ import { javaScriptTypes } from '../../helpers';
 import { equalMaker, pointMaker, stringMaker, valueOf } from '../containerHelpers';
 
 /**
- * @description:
- * @param: {function} item
- * @return: {@see io_functor}
+ * @sig
+ * @description d
+ * @param {function} item - a
+ * @return {io_functor} - b
  */
 function Io(item) {
     return Object.create(io_functor, {
@@ -24,27 +25,24 @@ function Io(item) {
 }
 
 /**
- * @description:
- * @param: {function|*} item
- * @return: {@see io_functor}
+ * @sig
+ * @description d
+ * @param {function|*} item - a
+ * @return {io_functor} - b
  */
 Io.of =  item => strictEquals(javaScriptTypes.Function, type(item)) ? Io(item) : Io(constant(item));
 
 /**
- * @description:
- * @param: {functor} f
- * @return: {boolean}
+ * @sig
+ * @description d
+ * @param {Object} f - a
+ * @return {boolean} - b
  */
 Io.is = f => io_functor.isPrototypeOf(f);
 
  /**
- * @description:
- * @type {{
- * value,
- * map: {function} io_functor._map,
- * of: {function} io_functor._of,
- * toString: {function} io_functor._toString
- * }}
+ * @description d
+ * @typedef {Object}
  */
 var io_functor = {
     get value() {
@@ -79,8 +77,6 @@ io_functor.equals = equalMaker(io_functor);
  * @return: {@see io_functor}
  */
 io_functor.bimap = io_functor.map;
-
-
 
 
 //Since FantasyLand is the defacto standard for JavaScript algebraic data structures, and I want to maintain

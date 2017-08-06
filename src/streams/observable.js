@@ -32,9 +32,10 @@ var observable = {
         return this;
     },
     /**
-     *
-     * @param fn
-     * @returns {observable}
+     * @sig
+     * @description d
+     * @param {function} fn - a
+     * @return {observable} - b
      */
     map: function _map(fn) {
         if (mapOperator.isPrototypeOf(this.operator))
@@ -42,17 +43,19 @@ var observable = {
         return this.lift(Object.create(mapOperator).init(fn));
     },
     /**
-     *
-     * @param fn
-     * @returns {observable}
+     * @sig
+     * @description d
+     * @param {function} fn - a
+     * @return {observable} - b
      */
     chain: function _deepMap(fn) {
         return this.lift(Object.create(chainOperator).init(fn));
     },
     /**
-     *
-     * @param predicate
-     * @returns {observable}
+     * @sig
+     * @description d
+     * @param {function} predicate - a
+     * @return {observable} - b
      */
     filter: function _filter(predicate) {
         if (filterOperator.isPrototypeOf(this.operator))
@@ -60,19 +63,21 @@ var observable = {
         return this.lift(Object.create(filterOperator).init(predicate));
     },
     /**
-     *
-     * @param keySelector
-     * @param comparer
-     * @param bufferAmt
-     * @returns {observable}
+     * @sig
+     * @description d
+     * @param {function} keySelector - a
+     * @param {function} comparer - b
+     * @param {number} bufferAmt - c
+     * @return {observable} - d
      */
     groupBy: function _groupBy(keySelector, comparer, bufferAmt = 0) {
         return this.lift(Object.create(groupByOperator).init(keySelector, comparer, bufferAmt))
     },
     /**
-     *
-     * @param observables
-     * @returns {observable}
+     * @sig
+     * @description d
+     * @param {Array} observables - a
+     * @return {observable} - b
      */
     merge: function _merge(...observables) {
         if (mergeOperator.isPrototypeOf(this.operator))
@@ -80,42 +85,47 @@ var observable = {
         return this.lift(Object.create(mergeOperator).init([this].concat(observables)));
     },
     /**
-     *
-     * @param count
-     * @returns {observable}
+     * @sig
+     * @description d
+     * @param {Number} count - a
+     * @return {observable} - b
      */
     itemBuffer: function _itemBuffer(count) {
         return this.lift(Object.create(itemBufferOperator).init(count));
     },
     /**
-     *
-     * @param amt
-     * @returns {observable}
+     * @sig
+     * @description d
+     * @param {Number} amt - a
+     * @return {observable} - b
      */
     timeBuffer: function _timeBuffer(amt) {
         return this.lift(Object.create(timeBufferOperator).init(amt));
     },
     /**
-     *
-     * @param amt
-     * @returns {*|observable}
+     * @sig
+     * @description d
+     * @param {Number} amt - a
+     * @return {*|observable} - b
      */
     debounce: function _debounce(amt) {
         return this.lift(Object.create(debounceOperator).init(amt));
     },
     /**
-     *
-     * @param operator
-     * @returns {observable}
+     * @sig
+     * @description d
+     * @param {function} operator - a
+     * @return {observable} - b
      */
     lift: function lift(operator) {
         return Object.create(observable).setSource(this).setOperator(operator);
     },
     /**
-     *
-     * @param src
-     * @param evt
-     * @returns {observable}
+     * @sig
+     * @description d
+     * @param {*} src - a
+     * @param {string} evt - b
+     * @return {observable} - c
      */
     fromEvent: function _fromEvent(src, evt) {
         var o = Object.create(observable);
@@ -140,10 +150,11 @@ var observable = {
         return o;
     },
     /**
-     *
-     * @param list
-     * @param startingIdx
-     * @returns {observable}
+     * @sig
+     * @description d
+     * @param {Array} list - a
+     * @param {Number} startingIdx - b
+     * @return {observable} - c
      */
     fromList: function _fromList(list, startingIdx = 0) {
         var o = Object.create(observable);
@@ -229,8 +240,8 @@ var observable = {
                 });
             */
 
-            subscriber.unsubscribe = unSub;
-            return subscriber;
+            //subscriber.unsubscribe = unSub;
+            //return subscriber;
         };
         return o;
     },
@@ -238,9 +249,10 @@ var observable = {
 
     },
     /**
-     * Creates a new observable from a generator function
-     * @param src
-     * @returns {observable}
+     * @sig
+     * @description Creates a new observable from a generator function
+     * @param {*} src - a
+     * @return {observable} - b
      */
     fromGenerator: function _fromGenerator(src) {
         var o = Object.create(observable);
@@ -267,16 +279,18 @@ var observable = {
         return o;
     },
     /**
-     *
-     * @param src
-     * @returns {observable} - Returns a new observable
+     * @sig
+     * @description d
+     * @param {*} src - a
+     * @return {observable} - Returns a new observable
      */
     from: function _from(src) {
         if (generatorProto.isPrototypeOf(src)) return this.fromGenerator(src);
         return this.fromList(src[Symbol.iterator] ? src : wrap(src));
     },
     /**
-     * Creates a new subscriber for this observable. Takes three function handlers;
+     * @sig
+     * @description Creates a new subscriber for this observable. Takes three function handlers;
      * a 'next' handler that receives each item after having passed through the lower
      * level subscribers, an 'error' handler that is called if an exception is thrown
      * while the stream is active, and a complete handler that is called whenever the
@@ -284,7 +298,7 @@ var observable = {
      * @param {function} next - A function handler
      * @param {function} error - A function handler
      * @param {function} complete - A function handler
-     * @returns {subscriber}
+     * @return {subscriber} - a
      */
     subscribe: function _subscribe(next, error, complete) {
         var s = Object.create(subscriber).initialize(next, error, complete);
@@ -292,9 +306,10 @@ var observable = {
         return s;
     },
     /**
-     *
-     * @param next
-     * @returns {*}
+     * @sig
+     * @description d
+     * @param {function} next - a
+     * @return {*} - b
      */
     onValue: function _onValue(next) {
         var s = Object.create(subscriber).initialize(next, noop, noop);

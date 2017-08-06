@@ -429,8 +429,6 @@ itemBufferSubscriber.init = function _init(subscriber, count) {
     return this;
 };
 
-
-
 function functionBinder(context, funcs) {
     if ('function' === typeof funcs)
         return funcs.bind(context);
@@ -483,8 +481,6 @@ function climbPrototypeChain(obj) {
     }
     return fields;
 }
-
-
 
 
 //Functors
@@ -541,7 +537,7 @@ var kestrel = curry(function _k(val) {
     };
 });
 
-var fork = curry(function(lastly, f, g, x) {
+var fork = curry(function _fork(lastly, f, g, x) {
     return lastly(f(x), g(x));
 });
 

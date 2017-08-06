@@ -4,25 +4,28 @@ import { binary, rightApply } from '../decorators';
 var e = binary(rightApply(identity));
 
 /**
- * @description: Takes a function that can perform the desired type of concatenation and an optional
+ * @sig
+ * @description Takes a function that can perform the desired type of concatenation and an optional
  * string that describes the type of group that is being created. The 'type' parameter is used in
  * the .toString() functionality only for representing the created group's type. The function returns
  * a new function, that, when invoked, will return a group with the concatenation function originally
  * provided as the means of concatenation. The resulting group adheres to the FantasyLand spec for monoids
  * and in addition allows for inverse concat operations to be performed, thus making the resulting data
  * structure a group, not a semigroup or monoid.
- * @param: {function} concatFn
- * @param: {function} inverseFn
- * @param: {*} e
- * @param: {string} type
- * @return: {@see group}
+ * @param {function} concatFn - a
+ * @param {function} inverseConcatFn - b
+ * @param {function} invertFn - c
+ * @param {*} identity - d
+ * @param {string} type - e
+ * @return {group} - f
  */
 function groupFactory(concatFn, inverseConcatFn, invertFn, identity, type) {
     /**
-     * @description:
-     * @param: {*} x
-     * @param: {*} prev
-     * @return: {@see group}
+     * @sig
+     * @description d
+     * @param {*} x - a
+     * @param {*} prev - b
+     * @return {group} - c
      * @private
      */
     function _internalGroupCreator(x, prev) {
@@ -92,9 +95,10 @@ function groupFactory(concatFn, inverseConcatFn, invertFn, identity, type) {
     }
 
     /**
-     * @description:
-     * @param: {*} x - The initial value of the new semigroup/monoid
-     * @return: {@see group}
+     * @sig
+     * @description d
+     * @param {*} x - The initial value of the new semigroup/monoid
+     * @return {group} - a
      */
     function _group(x) {
         return Object.create(group, {
@@ -198,8 +202,9 @@ function groupFactory(concatFn, inverseConcatFn, invertFn, identity, type) {
     }
 
     /**
-     * @description:
-     * @return: {string}
+     * @sig
+     * @description d
+     * @return {string} - a
      */
     function toString() {
         return (Object.is(-0, this.value)) ? '-0' :
@@ -207,9 +212,10 @@ function groupFactory(concatFn, inverseConcatFn, invertFn, identity, type) {
     }
 
     /**
-     * @description:
-     * @param: {*} x
-     * @return: {@see group}
+     * @sig
+     * @description d
+     * @param {*} x - a
+     * @return {group} - b
      * @private
      */
     function _concat(x) {
@@ -218,9 +224,10 @@ function groupFactory(concatFn, inverseConcatFn, invertFn, identity, type) {
     }
 
     /**
-     * @description:
-     * @param: {Array} others
-     * @return: {@see group}
+     * @sig
+     * @description d
+     * @param {Array} others - a
+     * @return {group} - b
      * @private
      */
     function _concatAll(...xs) {
@@ -229,9 +236,10 @@ function groupFactory(concatFn, inverseConcatFn, invertFn, identity, type) {
     }
 
     /**
-     * @description:
-     * @param: {*} x
-     * @return: {@see group}
+     * @sig
+     * @description d
+     * @param {*} x - a
+     * @return {group} - b
      * @private
      */
     function _inverseConcat(x) {
@@ -240,9 +248,10 @@ function groupFactory(concatFn, inverseConcatFn, invertFn, identity, type) {
     }
 
     /**
-     * @description:
-     * @param: {Array} xs
-     * @return: {@see group}
+     * @sig
+     * @description d
+     * @param {Array} xs - a
+     * @return {group} - b
      * @private
      */
     function _inverseConcatAll(...xs) {
@@ -251,8 +260,9 @@ function groupFactory(concatFn, inverseConcatFn, invertFn, identity, type) {
     }
 
     /**
-     * @description:
-     * @return: {@see group}
+     * @sig
+     * @description d
+     * @return {group} - a
      * @private
      */
     function _undo() {
@@ -264,8 +274,9 @@ function groupFactory(concatFn, inverseConcatFn, invertFn, identity, type) {
     }
 
     /**
-     * @description:
-     * @return: {@see group}
+     * @sig
+     * @description d
+     * @return {group} - a
      */
     _group.identity = function _identity() {
         var g = _group(identity);
@@ -274,16 +285,16 @@ function groupFactory(concatFn, inverseConcatFn, invertFn, identity, type) {
     };
 
     /**
-     * @description:
-     * @type: {function}
-     * @return: {@see group}
+     * @sig
+     * @description d
+     * @return {group} - a
      */
     _group.empty = _group.identity;
 
     /**
-     * @description:
-     * @type: {function}
-     * @return: {@see group}
+     * @sig
+     * @description d
+     * @return {group} - a
      */
     _group.unit = _group.identity;
 
@@ -291,8 +302,11 @@ function groupFactory(concatFn, inverseConcatFn, invertFn, identity, type) {
 }
 
 /**
- *
- * @type {{value, previous, valueOf: group._valueOf}}
+ * @description
+ * @typedef {Object}
+ * @property {function} value
+ * @property {function} previous
+ * @property {function} valueOf
  */
 var group = {
     get value() {
@@ -305,18 +319,6 @@ var group = {
         return this._value;
     }
 };
-
-
-
-
-
-
-
-
-
-
-
-
 
 // p1 = { name: first('Nico'), isPaid: all2(true), points: sum(10), friends: ['Franklin'] },
 //  p2 = { name: first('Nico'), isPaid: all2(false), points: sum(2), friends: ['Gatsby'] };

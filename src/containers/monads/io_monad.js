@@ -17,9 +17,10 @@ Io.of = function _of(val) {
 };
 
 /**
- * @description:
- * @param: {monad} m
- * @return: {boolean}
+ * @sig
+ * @description d
+ * @param {Object} m - a
+ * @return {boolean} - b
  */
 Io.is = m => io_monad.isPrototypeOf(m);
 
@@ -60,8 +61,6 @@ io_monad.fmap = io_monad.chain;
 io_monad.flapMap = io_monad.chain;
 io_monad.bind = io_monad.chain;
 io_monad.reduce = io_monad.fold;
-
-
 
 //Since FantasyLand is the defacto standard for JavaScript algebraic data structures, and I want to maintain
 //compliance with the standard, a .constructor property must be on the container delegators. In this case, its

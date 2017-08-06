@@ -1,9 +1,10 @@
 import { equalMaker, pointMaker, stringMaker, valueOf, get, orElse, getOrElse } from '../containerHelpers';
 
 /**
- * @description:
- * @param: {*} item
- * @return: {@see identity_functor}
+ * @sig
+ * @description d
+ * @param {*} item - a
+ * @return {identity_functor} - b
  */
 function Identity(item) {
     return Object.create(identity_functor, {
@@ -16,94 +17,104 @@ function Identity(item) {
 }
 
 /**
- * @description:
- * @param: {*} item
- * @return: {@see identity_functor}
+ * @sig
+ * @description d
+ * @param {*} x - a
+ * @return {identity_functor} - b
  */
 Identity.of = x => Identity(x);
 
 /**
- * @description:
- * @param: {functor} f
- * @return: {boolean}
+ * @sig
+ * @description d
+ * @param {Object} f - a
+ * @return {boolean} - b
  */
 Identity.is = f => identity_functor.isPrototypeOf(f);
 
 var identity_functor = {
     /**
-     * @description:
-     * @return: {@see identity_functor}
+     * @sig
+     * @description d
+     * @return {*} - a
      */
     get value() {
         return this._value;
     },
     /**
-     * @description:
-     * @param: {function} fn
-     * @return: {@see identity_functor}
+     * @sig
+     * @description d
+     * @param {function} fn - a
+     * @return {identity_functor} - b
      */
     map: function _map(fn) {
         return this.of(fn(this.value));
     },
     /**
-     * @type:
-     * @description:
-     * @return: {*}
+     * @sig
+     * @description d
+     * @return {*} - a
      */
     get: get,
     /**
-     * @type:
-     * @description:
-     * @param: {function} f
-     * @return: {*}
+     * @sig
+     * @description d
+     * @param {function} f - a
+     * @return {*} - b
      */
     orElse: orElse,
     /**
-     * @type:
-     * @description:
-     * @param: {*} x
-     * @return: {*}
+     * @sig
+     * @description d
+     * @param {*} x - a
+     * @return {*} - b
      */
     getOrElse: getOrElse,
     /**
-     * @description:
-     * @param: {*} item
-     * @return: {@see identity_functor}
+     * @sig
+     * @description d
+     * @param {*} item - a
+     * @return {identity_functor} - b
      */
     of: pointMaker(Identity),
     /**
-     * @description:
-     * @return: {*}
+     * @sig
+     * @description d
+     * @return {*} - a
      */
     valueOf: valueOf,
     /**
-     * @description:
-     * @return: {string}
+     * @sig
+     * @description d
+     * @return {string} - a
      */
     toString: stringMaker('Identity'),
     /**
-     * @description:
-     * @return:
+     * @sig
+     * @description d
+     * @return {Identity} - a
      */
     factory: Identity
 };
 
 /**
- * @description:
- * @param: {functor} ma
- * @return: {boolean}
+ * @sig
+ * @description d
+ * @param {Object} ma - a
+ * @return {boolean} - b
  */
 identity_functor.equals = equalMaker(identity_functor);
 
 /**
- * @description: Since the constant functor does not represent a disjunction, the Identity's
+ * @sig
+ * @description Since the constant functor does not represent a disjunction, the Identity's
  * bimap function property behaves just as its map function property. It is merely here as a
  * convenience so that swapping out functors/monads does not break an application that is
  * relying on its existence.
- * @type: {{function}}
- * @param: {function} f
- * @param: {function} g
- * @return: {@see identity_functor}
+ * @type {function}
+ * @param {function} f - a
+ * @param {function} g - b
+ * @return {identity_functor} - c
  */
 identity_functor.bimap = identity_functor.map;
 

@@ -36,18 +36,19 @@ var subscriber = {
         this._count = cnt || 0;
     },
     /**
-     * @type:
-     * @description:
-     * @return: {@see subscriber}
+     * @sig
+     * @description d
+     * @return {subscriber} - a
      */
     removeSubscriber: function _removeSubscriber() {
         this.subscriber = null;
         return this;
     },
     /**
-     * @type:
-     * @description:
-     * @param subscription
+     * @sig
+     * @description d
+     * @param {Object} subscription - a
+     * @return {subscription} - b
      */
     removeSubscription: function _removeSubscription(subscription) {
         if (this.subscriptions.length) {
@@ -57,19 +58,19 @@ var subscriber = {
         }
     },
     /**
-     * @type:
-     * @description:
-     * @return: {@see subscriber}
+     * @sig
+     * @description d
+     * @return {subscriber} - a
      */
     removeSubscriptions: function _removeSubscriptions() {
         this.subscriptions.length = 0;
         return this;
     },
     /**
-     * @type:
-     * @description:
-     * @param: {*} item
-     * @return: {@see subscriber}
+     * @sig
+     * @description d
+     * @param {*} item - a
+     * @return {subscriber} - b
      */
     next: function _next(item) {
         this.subscriber.next(item);

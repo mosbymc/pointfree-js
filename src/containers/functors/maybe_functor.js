@@ -2,20 +2,20 @@ import { disjunctionEqualMaker, maybeFactoryHelper, pointMaker, stringMaker,
         get, emptyGet, orElse, emptyOrElse, getOrElse, emptyGetOrElse, valueOf, sharedMaybeFns } from '../containerHelpers';
 
 /**
- * @type:
- * @description:
- * @param: {*} x
- * @return: {@see just_functor|nothing_functor}
+ * @sig
+ * @description d
+ * @param {*} x - a
+ * @return {just_functor|nothing_functor} - b
  */
 function fromNullable(x) {
     return null != x ? Just(x) : Nothing();
 }
 
 /**
- * @type:
- * @description:
- * @param: {*} val
- * @return: {@see just_functor|@see nothing_functor}
+ * @sig
+ * @description d
+ * @param {*} val - a
+ * @return {just_functor|nothing_functor} - b
  */
 function Maybe(val) {
     return null == val ?
@@ -44,9 +44,10 @@ function Maybe(val) {
 }
 
 /**
- * @description:
- * @param: {*} val
- * @return: {@see maybe_functor}
+ * @sig
+ * @description d
+ * @param {*} val - a
+ * @return {just_functor} - b
  */
 Maybe.of = function _of(val) {
     return Object.create(just_functor, {
@@ -65,47 +66,49 @@ Maybe.of = function _of(val) {
 };
 
 /**
- * @description:
- * @param: {functor} f
- * @return: {boolean}
+ * @sig
+ * @description d
+ * @param {Object} f - a
+ * @return {boolean} - b
  */
 Maybe.is = f => just_functor.isPrototypeOf(f) || nothing_functor.isPrototypeOf(f);
 
 /**
- * @description:
- * @param {*} val
- * @return: {@see maybe_functor}
- * @type {function}
+ * @sig
+ * @description d
+ * @param {*} val - a
+ * @return {just_functor} - b
  */
 Maybe.Just = Maybe.of;
 
 /**
- * @description:
- * @return: {@see maybe_functor}
+ * @sig
+ * @description d
+ * @return {nothing_functor} - a
  */
 Maybe.Nothing = () => Maybe();
 
 /**
- * @type:
- * @description:
- * @param: {functor} m
- * @return: {boolean}
+ * @sig
+ * @description d
+ * @param {Object} m - a
+ * @return {boolean} - b
  */
 Maybe.isJust = m => just_functor.isPrototypeOf(m);
 
 /**
- * @type:
- * @description:
- * @param: {functor} m
- * @return: {boolean}
+ * @sig
+ * @description d
+ * @param {Object} m - a
+ * @return {boolean} - b
  */
 Maybe.isNothing = m => nothing_functor.isPrototypeOf(m);
 
 /**
- * @type:
- * @description:
- * @param: {*} x
- * @return: {@see just_functor|nothing_functor}
+ * @sig
+ * @description d
+ * @param {*} x - a
+ * @return {just_functor|nothing_functor} - b
  */
 Maybe.fromNullable = fromNullable;
 
@@ -114,10 +117,10 @@ Maybe.fromNullable = fromNullable;
 //TODO: and Nothing being Constant(null)), then the maybe container has a direct dependency on the Identity
 //TODO: and Constant containers. This becomes an issue due to circular dependencies.
 /**
- * @type:
- * @description:
- * @param: {*} val
- * @return: {@see just_functor}
+ * @sig
+ * @description d
+ * @param {*} val - a
+ * @return {just_functor} - b
  */
 function Just(val) {
     return Object.create(just_functor, {
@@ -136,10 +139,10 @@ function Just(val) {
 }
 
 /**
- * @type:
- * @description:
- * @param: {*} val
- * @return: {@see just_functor}
+ * @sig
+ * @description d
+ * @param {*} val - a
+ * @return {just_functor} - b
  */
 Just.of = function _of(val) {
     return Object.create(just_functor, {
@@ -158,17 +161,17 @@ Just.of = function _of(val) {
 };
 
 /**
- * @type:
- * @description:
- * @param: {functor} f
- * @return: {boolean}
+ * @sig
+ * @description d
+ * @param {Object} f - a
+ * @return {boolean} - b
  */
 Just.is = f => just_functor.isPrototypeOf(f);
 
 /**
- * @type:
- * @description:
- * @return: {@see nothing_functor}
+ * @sig
+ * @description d
+ * @return {nothing_functor} - a
  */
 function Nothing() {
     return Object.create(nothing_functor, {
@@ -187,17 +190,17 @@ function Nothing() {
 }
 
 /**
- * @type:
- * @description:
- * @return: {@see nothing_functor}
+ * @sig
+ * @description d
+ * @return {nothing_functor} - a
  */
 Nothing.of = Nothing;
 
 /**
- * @type:
- * @description:
- * @param: {functor} f
- * @return: {boolean}
+ * @sig
+ * @description d
+ * @param {Object} f - a
+ * @return {boolean} - b
  */
 Nothing.is = f => nothing_functor.isPrototypeOf(f);
 
@@ -242,7 +245,7 @@ var nothing_functor = {
     of: pointMaker(Just),
     valueOf: valueOf,
     toString: function _toString() {
-        return `Nothing()`;
+        return 'Nothing()';
     },
     factory: Maybe
 };

@@ -13,9 +13,10 @@ Validation.of = function _of(val) {
 };
 
 /**
- * @description:
- * @param: {functor} f
- * @return: {boolean}
+ * @sig
+ * @description d
+ * @param {Object} f - a
+ * @return {boolean} - b
  */
 Validation.is = f => validation_functor.isPrototypeOf(f);
 
@@ -30,25 +31,24 @@ var validation_functor = {
 };
 
 /**
- * @description:
- * @return:
+ * @sig
+ * @description d
+ * @return {boolean} - a
  */
 validation_functor.equals = equalMaker(validation_functor);
 
 /**
- * @description: Since the constant functor does not represent a disjunction, the Validation's
+ * @sig
+ * @description Since the constant functor does not represent a disjunction, the Validation's
  * bimap function property behaves just as its map function property. It is merely here as a
  * convenience so that swapping out functors/monads does not break an application that is
  * relying on its existence.
- * @type: {{function}}
- * @param: {function} f
- * @param: {function} g
- * @return: {@see validation_functor}
+ * @type {function}
+ * @param {function} f - a
+ * @param {function} g - b
+ * @return {validation_functor} - c
  */
 validation_functor.bimap = validation_functor.map;
-
-
-
 
 //Since FantasyLand is the defacto standard for JavaScript algebraic data structures, and I want to maintain
 //compliance with the standard, a .constructor property must be on the container delegators. In this case, its

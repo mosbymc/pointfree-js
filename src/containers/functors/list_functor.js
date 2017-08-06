@@ -402,10 +402,11 @@ var list_core = {
      * @sig
      * @description d
      * @protected
-     * @return {Number} - a
+     * @param {function} predicate - a
+     * @return {Number} -  b
      */
-    count: function _count() {
-        return count(this);
+    count: function _count(predicate) {
+        return count(this, predicate);
     },
 
     /**
@@ -609,9 +610,9 @@ var list_core = {
      * @description d
      * @protected
      * @param {*} xs - a
-     * @param {generator} iterator - b
-     * @param {Array} sortObj - c
-     * @param {string} key - d
+     * @param {generator} [iterator] - b
+     * @param {Array} [sortObj] - c
+     * @param {string} [key] - d
      * @return {list_functor} - e
      */
     of: function _of(xs, iterator, sortObj, key) {

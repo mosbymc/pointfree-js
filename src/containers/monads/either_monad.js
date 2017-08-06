@@ -45,9 +45,10 @@ Either.of = function _of(val) {
 };
 
 /**
- * @description:
- * @param: {monad} m
- * @return: {boolean}
+ * @sig
+ * @description d
+ * @param {Object} m - a
+ * @return {boolean} - b
  */
 Either.is = m => left_monad.isPrototypeOf(m) || right_monad.isPrototypeOf(m);
 
@@ -72,16 +73,18 @@ function Left(val) {
 }
 
 /**
- * @description:
- * @param: {*} val
- * @return: {@see left_monad}
+ * @sig
+ * @description d
+ * @param {*} val - a
+ * @return {left_monad} - b
  */
 Left.of = val => Left(val);
 
 /**
- * @description:
- * @param: {monad} m
- * @return: {boolean}
+ * @sig
+ * @description d
+ * @param {Object} m - a
+ * @return {boolean} - b
  */
 Left.is = m => left_monad.isPrototypeOf(m);
 
@@ -90,16 +93,18 @@ function Right(val) {
 }
 
 /**
- * @description:
- * @param: {*} val
- * @return: {@see right_monad}
+ * @sig
+ * @description d
+ * @param {*} val - a
+ * @return {right_monad} - b
  */
 Right.of = val => Right(val);
 
 /**
- * @description:
- * @param: {monad} m
- * @return: {boolean}
+ * @sig
+ * @description d
+ * @param {Object} m - a
+ * @return {boolean} - b
  */
 Right.is = m => right_monad.isPrototypeOf(m);
 
@@ -177,8 +182,6 @@ left_monad.chain = chain;
 left_monad.mjoin = mjoin;
 left_monad.apply = apply;
 
-
-
 right_monad.ap = right_monad.apply;
 left_monad.ap = left_monad.apply;
 right_monad.flatMap = right_monad.chain;
@@ -187,8 +190,6 @@ right_monad.bind = right_monad.chain;
 left_monad.bind = left_monad.chain;
 right_monad.reduce = right_monad.fold;
 left_monad.reduce = left_monad.fold;
-
-
 
 //Since FantasyLand is the defacto standard for JavaScript algebraic data structures, and I want to maintain
 //compliance with the standard, a .constructor property must be on the container delegators. In this case, its

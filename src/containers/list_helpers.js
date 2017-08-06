@@ -2,14 +2,15 @@ import { delegatesTo, isArray, isString } from '../functionalHelpers';
 import { generatorProto } from '../helpers';
 
 /**
- * @description: This factory producing function is used by both the list functor and the
+ * @sig
+ * @description This factory producing function is used by both the list functor and the
  * list monad when creating a new list object. Based on the parameters passed, the factory
  * function will create a new object that delegates to the appropriate type with whatever
  * additional fields it needs, i.e. ._value, .data, [Symbol.iterator], etc.
- * @param: {object} baseListType
- * @param: {object} sortedListType
- * @param: {object} groupedListType
- * @return: {function}
+ * @param {object} baseListType - a
+ * @param {object} sortedListType - b
+ * @param {object} groupedListType - c
+ * @return {function} - d
  */
 function createListCreator(baseListType, sortedListType, groupedListType) {
     return function createListDelegateInstance(source, iterator, sortObj, key) {
@@ -55,7 +56,7 @@ function createListCreator(baseListType, sortedListType, groupedListType) {
                         value: sortObj,
                         writable: false,
                         configurable: false
-                    },
+                    }
                 });
             /**
              * @description: case 3 = Both an iterator and a sort object were passed in. The consumer

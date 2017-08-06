@@ -27,8 +27,9 @@ State.is = function _is(fa) {
 
 var state_functor = {
     /**
-     * @description:
-     * @return: {@see identity_functor}
+     * @sig
+     * @description d
+     * @return {identity_functor} - a
      */
     get value() {
         return this._value;
@@ -43,39 +44,42 @@ var state_functor = {
 
     },
     /**
-     * @type:
-     * @description:
-     * @return: {*}
+     * @sig
+     * @description d
+     * @return {*} - a
      */
     get: get,
     /**
-     * @type:
-     * @description:
-     * @param: {function} f
-     * @return: {*}
+     * @sig
+     * @description d
+     * @param {function} f - a
+     * @return {*} - b
      */
     orElse: orElse,
     /**
-     * @type:
-     * @description:
-     * @param: {*} x
-     * @return: {*}
+     * @sig
+     * @description d
+     * @param {*} x - a
+     * @return {*} - b
      */
     getOrElse: getOrElse,
     /**
-     * @description:
-     * @param: {*} item
-     * @return: {@see identity_functor}
+     * @sig
+     * @description d
+     * @param {*} item - a
+     * @return {identity_functor} - b
      */
     of: pointMaker(State),
     /**
-     * @description:
-     * @return: {*}
+     * @sig
+     * @description d
+     * @return {*} - a
      */
     valueOf: valueOf,
     /**
-     * @description:
-     * @return: {string}
+     * @sig
+     * @description d
+     * @return {string} - a
      */
     toString: stringMaker('State'),
     factory: State

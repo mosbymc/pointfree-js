@@ -16,9 +16,10 @@ Validation.of = function _of(val) {
 };
 
 /**
- * @description:
- * @param: {monad} m
- * @return: {boolean}
+ * @sig
+ * @description d
+ * @param {Object} m - a
+ * @return {boolean} - b
  */
 Validation.is = m => validation_monad.isPrototypeOf(m);
 
@@ -36,8 +37,6 @@ var validation_monad = Object.create(validation_functor, {
 validation_monad.chain = chain;
 validation_monad.mjoin = mjoin;
 validation_monad.apply = apply;
-
-
 
 //Since FantasyLand is the defacto standard for JavaScript algebraic data structures, and I want to maintain
 //compliance with the standard, a .constructor property must be on the container delegators. In this case, its

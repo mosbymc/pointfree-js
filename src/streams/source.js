@@ -40,7 +40,7 @@ function genWrapper(source) {
                 .then(function _resolve() {
                     return item;
                 });
-    }
+    };
 }
 
 var t = [1, 2, 3, 4, 5];
@@ -98,14 +98,14 @@ WebSocket.prototype.observer = function _observer(generator) {
     }
 
     function cleanUp() {
-        this.removeEventListener("message", message);
-        this.removeEventListener("error", error);
-        this.removeEventListener("close", close);
+        this.removeEventListener('message', message);
+        this.removeEventListener('error', error);
+        this.removeEventListener('close', close);
     }
 
-    this.addEventListener("message", message);
-    this.addEventListener("error", error);
-    this.addEventListener("close", close);
+    this.addEventListener('message', message);
+    this.addEventListener('error', error);
+    this.addEventListener('close', close);
 };
 
 function *g(n, e, d) {
@@ -146,7 +146,7 @@ function handler(item) {
     return new Promise(function _promise(resolve, reject) {
         if (500 < item.screenX && 500 < item.screenY)
             resolve({ x: item.screenX, y: item.screenY });
-        else reject("Error: screenX: " + item.screenX + " screenY: " + item.screenY);
+        else reject('Error: screenX: ' + item.screenX + ' screenY: ' + item.screenY);
     });
 }
 
@@ -159,7 +159,7 @@ function error(item) {
 }
 
 function done() {
-    console.log("done");
+    console.log('done');
 }
 
 dr(document, 'click', handler, g, next, error, done);

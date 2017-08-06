@@ -3,11 +3,11 @@ import { javaScriptTypes } from '../../helpers';
 import { pointMaker, valueOf } from '../containerHelpers';
 
 /**
- * @type:
- * @description:
- * @param: {function} reject
- * @param: {function} resolve
- * @return: {function}
+ * @sig
+ * @description d
+ * @param {function} reject - a
+ * @param {function} resolve - b
+ * @return {function} - c
  */
 function safeFork(reject, resolve) {
     return function _safeFork(val) {
@@ -17,13 +17,14 @@ function safeFork(reject, resolve) {
         catch(ex) {
             reject(ex);
         }
-    }
+    };
 }
 
 /**
- * @description:
- * @param: {function} fn
- * @return: {@see future_functor}
+ * @sig
+ * @description d
+ * @param {function} fn - a
+ * @return {future_functor} - b
  */
 function Future(fn) {
     return Object.create(future_functor, {
@@ -40,45 +41,50 @@ function Future(fn) {
 }
 
 /**
- * @type:
- * @description:
- * @param: {functor} f
- * @return: {boolean}
+ * @sig
+ * @description d
+ * @param {Object} f - a
+ * @return {boolean} - b
  */
 Future.is = f => future_functor.isPrototypeOf(f);
 
 /**
- * @description:
- * @param: {function|*} val
- * @return: {@see future_functor}
+ * @sig
+ * @description d
+ * @param {function|*} val - a
+ * @return {future_functor} - b
  */
 Future.of = val => strictEquals(javaScriptTypes.Function, type(val)) ?
     Future(val) : Future((_, resolve) => safeFork(noop, resolve(val)));
 
 /**
- * @description:
- * @param: {*} val
- * @return: {@see future_functor}
+ * @sig
+ * @description d
+ * @param {*} val - a
+ * @return {future_functor} - b
  */
 Future.reject = val => Future((reject, resolve) => reject(val));
 
 /**
- * @description:
- * @param: {function} val
- * @return: {@see future_functor}
+ * @sig
+ * @description d
+ * @param {function} val - a
+ * @return {future_functor} - b
  */
 Future.unit = val => Future(val).complete();
 
 /**
- * @description:
- * @return: {@see future_functor}
+ * @sig
+ * @description d
+ * @return {future_functor} - a
  */
 Future.empty = () => Future(noop);
 
 var future_functor = {
     /**
-     * @description:
-     * @return: {@see future_functor}
+     * @sig
+     * @description d
+     * @return {*} - a
      */
     get value() {
         return this._value;

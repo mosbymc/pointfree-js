@@ -1,20 +1,23 @@
 var emptyObj = Object.create({});
 
 /**
- * @description: Takes a function that can perform the desired type of concatenation and an optional
+ * @sig
+ * @description Takes a function that can perform the desired type of concatenation and an optional
  * string that describes the type of monoid that is being created. The 'type' parameter is used in
  * the .toString() functionality only for representing the created monoid's type. The function returns
  * a new function, that, when invoked, will return a monoid with the concatenation function originally
  * provided as the means of concatenation. The resulting monoid adheres to the FantasyLand spec.
- * @param: {function} concatFn
- * @param: {string} type
- * @returns {_monoid}
+ * @param {function} concatFn - a
+ * @param {string} type - b
+ * @param {*} empty - c
+ * @return {_monoid} - d
  */
 function monoidFactory(concatFn, type, empty) {
     /**
-     * @description:
-     * @param: {*} x - The initial value of the new semigroup/monoid
-     * @return: {Object}
+     * @sig
+     * @description d
+     * @param {*} x - The initial value of the new semigroup/monoid
+     * @return {Object} - a
      */
     function _monoid(x) {
         return Object.create({}, {
@@ -83,8 +86,9 @@ function monoidFactory(concatFn, type, empty) {
     }
 
     /**
-     * @description:
-     * @return: {string}
+     * @sig
+     * @description d
+     * @return {string} - a
      */
     function toString() {
         if (this.isEmpty) return 'empty';
@@ -93,8 +97,9 @@ function monoidFactory(concatFn, type, empty) {
     }
 
     /**
-     * @description:
-     * @return: {Object}
+     * @sig
+     * @description d
+     * @return {Object} - a
      */
     _monoid.empty = function _empty() {
         return _monoid(Object.create(emptyObj));
@@ -125,7 +130,7 @@ function monadMonoid(concatFn, m) {
                 }, this);
             }
         }
-    })
+    });
 }
 
 // p1 = { name: first('Nico'), isPaid: all2(true), points: sum(10), friends: ['Franklin'] },
@@ -154,16 +159,18 @@ function structure(obj) {
 
 var monoid = {
     /**
-     * @description:
-     * @return: {undefined|*}
+     * @sig
+     * @description d
+     * @return {undefined|*} - a
      */
     get value() {
         return this.isEmpty ? undefined : this._value;
     },
     /**
-     * @description:
-     * @param: {Array} others
-     * @return:
+     * @sig
+     * @description d
+     * @param {Array} others - a
+     * @return {*} - b
      */
     concatAll: function _concatAll(...others) {
         return others.filter(function _filterEmpty(m) {
@@ -173,8 +180,9 @@ var monoid = {
         }, this);
     },
     /**
-     * @description:
-     * @return: {string}
+     * @sig
+     * @description d
+     * @return {string} - a
      */
     toString: function _toString() {
         return `${type}(${toString.call(this)})`;

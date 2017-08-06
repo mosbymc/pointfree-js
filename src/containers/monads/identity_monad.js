@@ -4,9 +4,10 @@ import { identity } from '../../combinators';
 import { apply, chain, mjoin, pointMaker } from '../containerHelpers';
 
 /**
- * @description:
- * @param: {*} item
- * @return: {@see identity_monad}
+ * @sig
+ * @description d
+ * @param {*} item - a
+ * @return {identity_monad} - b
  */
 function Identity(item) {
     return Object.create(identity_monad, {
@@ -19,24 +20,27 @@ function Identity(item) {
 }
 
 /**
- * @description:
- * @param: {*} item
- * @return: {@see identity_monad}
+ * @sig
+ * @description d
+ * @param {*} item - a
+ * @return {identity_monad} - b
  */
 Identity.of = function _of(item) {
     return Identity(item);
 };
 
 /**
- * @description:
- * @param: {monad} m
- * @return: {boolean}
+ * @sig
+ * @description d
+ * @param {Object} m - a
+ * @return {boolean} - b
  */
 Identity.is = m => identity_monad.isPrototypeOf(m);
 
 /**
- * @description:
- * @return: {@see identity_monad}
+ * @sig
+ * @description d
+ * @return {identity_monad} - a
  */
 Identity.empty = function _empty() {
     return this.of(Object.create(emptyObject));

@@ -1,9 +1,10 @@
 import { equalMaker, pointMaker, stringMaker, valueOf, get, orElse, getOrElse } from '../containerHelpers';
 
 /**
- * @description:
- * @param: {*} item
- * @return: {@see constant_functor}
+ * @sig
+ * @description d
+ * @param {*} item - a
+ * @return {constant_functor} - b
  */
 function Constant(item) {
     return Object.create(constant_functor, {
@@ -16,97 +17,106 @@ function Constant(item) {
 }
 
 /**
- * @description:
- * @param: {*} item
- * @return: {@see constant_functor}
+ * @sig
+ * @description d
+ * @param {*} x - a
+ * @return {constant_functor} - b
  */
 Constant.of = x => Constant(x);
 
 /**
- * @type:
- * @description:
- * @param: {functor} f
- * @return: {boolean}
+ * @sig
+ * @description d
+ * @param {function} f - a
+ * @return {boolean} - b
  */
 Constant.is = f => constant_functor.isPrototypeOf(f);
 
 /**
- * @description:
- * @type {{
- * map: {function} _map,
- * apply: {function} _apply,
- * flatMapWith: {function} _flatMap,
- * mjoin: {function} _mjoin,
- * of: {function} _of,
- * toString: {function} _toString
- * }}
+ * @description d
+ * @typedef {Object}
+ * @property {function} value
+ * @property {function} map
+ * @property {function} get
+ * @property {function} orElse
+ * @property {function} getOrElse
+ * @property {function} valueOf
+ * @property {function} of
+ * @property {function} toString
+ * @property {function} factory
  */
 var constant_functor = {
     get value() {
         return this._value;
     },
     /**
-     * @description:
-     * @return: {@see constant_functor}
+     * @sig
+     * @description d
+     * @return {constant_functor} - a
      */
     map: function _map() {
         return this.of(this.value);
     },
     /**
-     * @type:
-     * @description:
-     * @return: {*}
+     * @sig
+     * @description d
+     * @return {*} - a
      */
     get: get,
     /**
-     * @type:
-     * @description:
-     * @param: {function} f
-     * @return: {*}
+     * @sig
+     * @description d
+     * @param {function} f - a
+     * @return {*} - b
      */
     orElse: orElse,
     /**
-     * @type:
-     * @description:
-     * @param: {*} x
-     * @return: {*}
+     * @sig
+     * @description d
+     * @param {*} x - a
+     * @return {*} - b
      */
     getOrElse: getOrElse,
     /**
-     * @description:
-     * @return: {*}
+     * @sig
+     * @description d
+     * @return {*} - a
      */
     valueOf: valueOf,
     /**
-     * @description:
-     * @param: {*} item
-     * @return: {@see constant_functor}
+     * @sig
+     * @description d
+     * @param {*} item - a
+     * @return {constant_functor} - b
      */
     of: pointMaker(Constant),
     /**
-     * @description:
-     * @return: {string}
+     * @sig
+     * @description d
+     * @return {string} - a
      */
     toString: stringMaker('Constant'),
     factory: Constant
 };
 
 /**
- * @description:
- * @param: {functor} ma
- * @return: {boolean}
+ * @sig
+ * @description d
+ * @param {Object} ma - a
+ * @return {boolean} - b
  */
 constant_functor.equals = equalMaker(constant_functor);
 
 /**
- * @description: Since the constant functor does not represent a disjunction, the Constant's
+ * @sig
+ * @description Since the constant functor does not represent a disjunction, the Constant's
  * bimap function property behaves just as its map function property. It is merely here as a
  * convenience so that swapping out functors/monads does not break an application that is
  * relying on its existence.
- * @type: {{function}}
- * @param: {function} f
- * @param: {function} g
- * @return: {@see constant_functor}
+ * @type {function}
+ * @param {function} f - a
+ * @param {function} g - b
+ * @return {constant_functor} - c
  */
 constant_functor.bimap = constant_functor.map;
 

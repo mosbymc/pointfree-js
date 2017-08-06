@@ -10,7 +10,7 @@ function safeFork(reject, resolve) {
         catch(ex) {
             reject(ex);
         }
-    }
+    };
 }
 
 function Future(f) {
@@ -24,9 +24,10 @@ function Future(f) {
 }
 
 /**
- * @description:
- * @param: {function|*} val
- * @return: {@see future_functor}
+ * @sig
+ * @description d
+ * @param {function|*} val - a
+ * @return {future_functor} - b
  */
 Future.of = function _of(val) {
     return 'function' === typeof val ? Future(val) :
@@ -34,16 +35,18 @@ Future.of = function _of(val) {
 };
 
 /**
- * @description:
- * @param: {monad} m
- * @return: {boolean}
+ * @sig
+ * @description d
+ * @param {Object} m - a
+ * @return {boolean} - b
  */
 Future.is = m => future_monad.isPrototypeOf(m);
 
 /**
- * @description:
- * @param: {*} val
- * @return: {@see future_functor}
+ * @sig
+ * @description d
+ * @param {*} val - a
+ * @return {future_functor} - b
  */
 Future.reject = function _reject(val) {
     return Future((reject, resolve) => reject(val));
@@ -84,9 +87,6 @@ var future_monad = Object.create(future_functor, {
                 }).ap(xs);
                 return fa(this.empty);
             });
-
-
-
         }
     },
     of: {
@@ -108,9 +108,6 @@ future_monad.fmap = future_monad.chain;
 future_monad.flapMap = future_monad.chain;
 future_monad.bind = future_monad.chain;
 future_monad.reduce = future_monad.fold;
-
-
-
 
 //Since FantasyLand is the defacto standard for JavaScript algebraic data structures, and I want to maintain
 //compliance with the standard, a .constructor property must be on the container delegators. In this case, its

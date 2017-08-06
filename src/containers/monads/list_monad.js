@@ -6,27 +6,28 @@ import { identity, ifElse } from '../../combinators';
 import { createListCreator } from '../list_helpers';
 
 /**
- * @type:
- * @description:
- * @param: {*} source
- * @return: {@see list_monad}
+ * @sig
+ * @description d
+ * @param {*} source - a
+ * @return {list_monad} - b
  */
 var listFromNonGen = source => createListDelegateInstance(source && source[Symbol.iterator] ? source : wrap(source));
 
 /**
- * @type:
- * @description:
- * @param: {generator} source
- * @return: {@see list_monad}
+ * @sig
+ * @description d
+ * @param {generator} source - a
+ * @return {list_monad} - b
  */
 var listFromGen = source => createListDelegateInstance(invoke(source));
 
 /**
- * @description: Creator function for a new List object. Takes any value/type as a parameter
+ * @sig
+ * @description Creator function for a new List object. Takes any value/type as a parameter
  * and, if it has an iterator defined, with set it as the underlying source of the List as is,
  * or, wrap the item in an array if there is no defined iterator.
- * @param: {*} source - Any type, any value; used as the underlying source of the List
- * @return: {@see list_monad} - A new List instance with the value provided as the underlying source.
+ * @param {*} source - Any type, any value; used as the underlying source of the List
+ * @return {list_monad} - A new List instance with the value provided as the underlying source.
  */
 //TODO: should I exclude strings from being used as a source directly, or allow it because
 //TODO: they have an iterator?
@@ -35,19 +36,21 @@ function List(source) {
 }
 
 /**
- * @description: Convenience function for create a new List instance; internally calls List.
- * @see: List
- * @param: {*} source - Any type, any value; used as the underlying source of the List
- * @return: {@see list_monad} - A new List instance with the value provided as the underlying source.
+ * @sig
+ * @description Convenience function for create a new List instance; internally calls List.
+ * @see List
+ * @param {*} source - Any type, any value; used as the underlying source of the List
+ * @return {list_monad} - A new List instance with the value provided as the underlying source.
  */
 List.from = source => List(source);
 
 /**
- * @description: Alias for List.from
- * @see: List.from
- * @type: {function}
- * @param: {*}
- * @return: {@see list_monad}
+ * @sig
+ * @description Alias for List.from
+ * @see List.from
+ * @type {function}
+ * @param {*} - a
+ * @return {list_monad} - b
  */
 List.of = List.from;
 
@@ -55,57 +58,60 @@ List.of = List.from;
 List.ordered = source => source;
 
 /**
- * @type:
- * @description:
- * @return: {@see list_monad}
+ * @sig
+ * @description d
+ * @return {list_monad} - a
  */
 List.empty = () => List([]);
 
 /**
- * @type:
- * @description:
- * @param: {*} val
- * @return: {@see list_monad}
+ * @sig
+ * @description d
+ * @param {*} val - a
+ * @return {list_monad} - b
  */
 List.just = val => List([val]);
 
 /**
- * @type:
- * @description:
- * @param: {function|generator} fn
- * @param: {*} seed
- * @return: {@see list_monad}
+ * @sig
+ * @description d
+ * @param {function|generator} fn - a
+ * @param {*} seed - b
+ * @return {list_monad} - c
  */
 List.unfold = (fn, seed) => createListDelegateInstance(unfold(fn)(seed));
 
 /**
- * @description:
- * @param: {monad} m
- * @return: {boolean}
+ * @sig
+ * @description d
+ * @param {Object} m - a
+ * @return {boolean} - b
  */
 List.is = m => list_monad.isPrototypeOf(m) || ordered_list_monad.isPrototypeOf(m);
 
 /**
- * Generates a new list with the specified item repeated the specified number of times. Because
+ * @sig
+ * @description Generates a new list with the specified item repeated the specified number of times. Because
  * this generates a list with the same item repeated n times, the resulting List is trivially
  * sorted. Thus, a sorted List is returned rather than an unsorted list.
- * @param: {*} item
- * @param: {number} count
- * @return: {@see ordered_list_monad}
+ * @param {*} item - a
+ * @param {number} count - b
+ * @return {ordered_list_monad} - c
  */
 List.repeat = function _repeat(item, count) {
     return createListDelegateInstance([], repeat(item, count), [{ keySelector: noop, comparer: noop, direction: sortDirection.descending }]);
 };
 
 /**
- * @description: Extension function that allows new functionality to be applied to
+ * @sig
+ * @summary Extension function that allows new functionality to be applied to
  * the queryable object
- * @param: {string} propName - The name of the new property that should exist on the List; must be unique
- * @param: {function} fn - A function that defines the new List functionality and
+ * @param {string} propName - The name of the new property that should exist on the List; must be unique
+ * @param {function} fn - A function that defines the new List functionality and
  * will be called when this new List property is invoked.
- * @return: {@see List}
+ * @return {List} - a
  *
- * NOTE: The fn parameter must be a non-generator function that takes one or more
+ * @description The fn parameter must be a non-generator function that takes one or more
  * arguments. If this new List function should be an immediately evaluated
  * function (like: take, any, reverse, etc.), it merely needs the accept one or more
  * arguments and know how to iterate the source. In the case of an immediately evaluated
@@ -136,7 +142,7 @@ List.extend = function _extend(propName, fn) {
         //TODO: this should probably be changed, other wise I am altering the applicative list_functor in
         //TODO: addition to the monadic list_functor. I'll also need to recreate the 'toEvaluatedList' function
         //TODO: since using it on a monadic list_functor would result in a list_a, not a list_m.
-        list_core[propName] = function(...args) {
+        list_core[propName] = function _extension(...args) {
             return createListDelegateInstance(this, fn(this, ...args));
         };
     }
@@ -146,9 +152,10 @@ List.extend = function _extend(propName, fn) {
 var list_monad = Object.create(list_functor, {
     chain: {
         /**
-         * @description:
-         * @param: {function} fn
-         * @return: {@see m_list}
+         * @sig
+         * @description d
+         * @param {function} fn - a
+         * @return {list_monad} - b
          */
         value: function _chain(fn) {
             return this.of(chain(this, fn));
@@ -164,7 +171,7 @@ var list_monad = Object.create(list_functor, {
         value: function _groupByDescending(keySelector, comparer) {
             var groupObj = [{ keySelector: keySelector, comparer: comparer, direction: sortDirection.descending }];
             return this.of(this, groupBy(this, groupObj, createGroupedListDelegate));
-        },
+        }
     },
     groupJoin: {
         value: function _groupJoin(ys, xSelector, ySelector, projector, comparer) {
@@ -221,11 +228,12 @@ var list_monad = Object.create(list_functor, {
         }
     },
     /**
-     * @description: Applies a function contained in another functor to the source
+     * @sig
+     * @description Applies a function contained in another functor to the source
      * of this List object instance's underlying source. A new List object instance
      * is returned.
-     * @param: {monad} ma
-     * @return: {@see list_monad}
+     * @param {Object} ma - a
+     * @return {list_monad} - b
      */
     apply: {
         value: function _apply(ma) {
@@ -268,7 +276,7 @@ var ordered_list_monad = Object.create(ordered_list_functor, {
         value: function _groupByDescending(keySelector, comparer) {
             var groupObj = [{ keySelector: keySelector, comparer: comparer, direction: sortDirection.descending }];
             return this.of(this, groupBy(this, groupObj, createGroupedListDelegate));
-        },
+        }
     },
     groupJoin: {
         value: function _groupJoin(ys, xSelector, ySelector, projector, comparer) {
@@ -293,7 +301,7 @@ var ordered_list_monad = Object.create(ordered_list_functor, {
     traverse: {
         value: function _traverse(fa, fn) {
             return this.reduce((ys, x) =>
-                fn(x).map(x => y => y.concat([x])).apply(ys), fa.of(this.empty))
+                fn(x).map(x => y => y.concat([x])).apply(ys), fa.of(this.empty));
         }
     },
     apply: {
@@ -321,8 +329,6 @@ function createGroupedListDelegate(source, key) {
     return createListDelegateInstance(source, undefined, undefined, key);
 }
 var createListDelegateInstance = createListCreator(list_monad, ordered_list_monad, list_monad);
-
-
 
 //Since FantasyLand is the defacto standard for JavaScript algebraic data structures, and I want to maintain
 //compliance with the standard, a .constructor property must be on the container delegators. In this case, its
