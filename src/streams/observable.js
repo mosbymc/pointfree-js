@@ -71,7 +71,7 @@ var observable = {
      * @return {observable} - d
      */
     groupBy: function _groupBy(keySelector, comparer, bufferAmt = 0) {
-        return this.lift(Object.create(groupByOperator).init(keySelector, comparer, bufferAmt))
+        return this.lift(Object.create(groupByOperator).init(keySelector, comparer, bufferAmt));
     },
     /**
      * @sig

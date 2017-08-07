@@ -92,7 +92,8 @@ var pluckWith = compose(mapWith, getWith);
 /**
  * @sig
  * @description d
- * @type {function} @see mapWith
+ * @type {function}
+ * @see mapWith
  * @param {function} fn - a
  * @param {Object} m - b
  * @return {*} c
@@ -313,8 +314,6 @@ function _toList() {
 function _toMaybe() {
     //return Maybe.from(this.value);
 }
-
-
 
 //===========================================================================================//
 //===========================================================================================//

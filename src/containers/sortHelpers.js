@@ -85,7 +85,7 @@ function merge(left, right, keySelector, comparer, direction) {
     if (!left.length) return right;
     if (!right.length) return left;
 
-    if (comparer(keySelector(left[0]), keySelector(right[0]), direction) > -1)
+    if (-1 < comparer(keySelector(left[0]), keySelector(right[0]), direction))
         return [deepClone(left[0])].concat(merge(left.slice(1, left.length), right, keySelector, comparer, direction));
     return [deepClone(right[0])].concat(merge(left, right.slice(1, right.length), keySelector, comparer, direction));
 }

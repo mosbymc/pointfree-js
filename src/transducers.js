@@ -1,4 +1,4 @@
-import { compose, curry } from './combinators'
+import { compose, curry } from './combinators';
 
 /**
  * @sig
