@@ -12,15 +12,20 @@ engines:
     enabled: true
 
 exclude_paths:
-- "coverage"
-- "dev_browser"
-- "documentation"
-- "node_modules"
-- "plato"
-- "routes"
-- "dist"
-- "test"
-- "misc"
+- "coverage/"
+- "dev_browser/"
+- "documentation/"
+- "node_modules/"
+- "plato/"
+- "routes/"
+- "dist/"
+- "test/"
+- "misc/"
+- "index.js"
+- "app.js"
+- "gulpfile.js"
+- "gulp.config.js"
+- "wallaby.js"
 
 ratings:
   paths:
