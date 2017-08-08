@@ -20,6 +20,9 @@ exclude_paths:
 - "routes"
 - "dist"
 - "test"
+- "src/streams/stream_test_file.js"
+- "src/streams/stream.js"
+- "src/streams/source.js"
 
 ratings:
   paths:
