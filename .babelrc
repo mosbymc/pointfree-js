@@ -1,5 +1,15 @@
 {
   "env": {
+    "build": {
+      "sourceMaps": true,
+      "presets": [
+        "es2015"
+      ],
+      "plugins": [
+        "transform-es2015-modules-commonjs",
+        "babel-polyfill"
+      ]
+    },
     "test": {
       "sourceMaps": "inline",
       "plugins": [
@@ -40,12 +50,6 @@
       "plugins": [
         "transform-es2015-modules-commonjs",
         "babel-plugin-transform-runtime"
-      ]
-    },
-    "build": {
-      "sourceMaps": true,
-      "plugins": [
-        "transform-es2015-modules-commonjs"
       ]
     }
   }

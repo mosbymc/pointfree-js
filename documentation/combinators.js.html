@@ -27,9 +27,10 @@
     <section>
         <article>
             <pre class="prettyprint source linenums"><code>/**
- * @description:
- * @param: {Array} fns - One or more comma separated function arguments
- * @return: {function}
+ * @sig
+ * @description d
+ * @param {Array} fns - One or more comma separated function arguments
+ * @return {function} - a
  */
 function all(...fns) {
     return function _all(...args) {
@@ -40,9 +41,10 @@ function all(...fns) {
 }
 
 /**
- * @description:
- * @param: {Array} fns - One or more comma separated function arguments
- * @return: {function}
+ * @sig
+ * @description d
+ * @param {Array} fns - One or more comma separated function arguments
+ * @return {function} - a
  */
 function any(...fns) {
     return function _any(...args) {
@@ -53,12 +55,13 @@ function any(...fns) {
 }
 
 /**
- * @description:
- * @type: {function}
- * @param: {function} x
- * @param: {*} y
- * @param: {*} z
- * @return: {*}
+ * @sig
+ * @description d
+ * @type {function}
+ * @param {function} x
+ * @param {*} y - a
+ * @param {*} z - b
+ * @return {*} - c
  */
 var c = curry(function _c(x, y, z) {
     console.log(x, y, z);
@@ -68,12 +71,12 @@ var c = curry(function _c(x, y, z) {
 var rev = (...args) => args.reverse();
 
 /**
- * compose :: (b -> c) -> (a -> b) -> (a -> c)
- * @description:
- * @type: {function}
+ * @sig compose :: (b -> c) -> (a -> b) -> (a -> c)
+ * @description d
+ * @type {function}
  * @note: @see {@link pipe}
- * @param: {Array} fns
- * @returns: {*}
+ * @param {Array} fns - a
+ * @return {*} - b
  */
 function compose(...fns) {
     fns = fns.reverse();
@@ -81,12 +84,13 @@ function compose(...fns) {
 }
 
 /**
- * @description:
- * @type: {function}
- * @param: {function} exp1
- * @param: {function} exp2
- * @param: {function} cond
- * @return: {*}
+ * @sig
+ * @description d
+ * @type {function}
+ * @param {function} exp1 - a
+ * @param {function} exp2 - b
+ * @param {function} cond - c
+ * @return {*} - d
  */
 var condition = curry((exp1, exp2, cond) => cond(exp1, exp2));
 
@@ -100,10 +104,10 @@ var n = function _n(x, y, z) {
 };
 
 /**
- * constant :: a -> () -> a
- * @description:
- * @param: {*} item
- * @returns: {function} - Returns a function, that when invoked, will
+ * @sig constant :: a -> () -> a
+ * @description d
+ * @param {*} item - a
+ * @return {function} - Returns a function, that when invoked, will
  * return the item passed to the constant function as an argument.
  */
 function constant(item) {
@@ -113,10 +117,10 @@ function constant(item) {
 }
 
 /**
- * @type: curry :: (* -> a) -> (* -> a)
- * @description:
- * @param: {function} fn
- * @return: {function|*}
+ * @sig curry :: (* -> a) -> (* -> a)
+ * @description d
+ * @param {function} fn - a
+ * @return {function|*} - b
  */
 function curry(fn) {
     if (!fn.length || 1 >= fn.length) return fn;
@@ -124,12 +128,13 @@ function curry(fn) {
 }
 
 /**
- * @type: curryN :: (* -> a) -> (* -> a)
- * @description: Curries a function to a specified arity
- * @param: {number} arity - The number of arguments to curry the function for
- * @param: {Array} received - An array of the arguments to be applied to the function
- * @param: {function} fn - The function to be curried
- * @return: {function | *} - Returns either a function waiting for more arguments to
+ * @sig curryN :: (* -> a) -> (* -> a)
+ * @description Curries a function to a specified arity
+ * @param {Object} context - The context the curried function should be invoked with
+ * @param {number} arity - The number of arguments to curry the function for
+ * @param {function} fn - The function to be curried
+ * @param {Array} received - An array of the arguments to be applied to the function
+ * @return {function | *} - Returns either a function waiting for more arguments to
  * be applied before invocation, or will return the result of the function applied
  * to the supplied arguments if the specified number of arguments have been received.
  */
@@ -146,10 +151,10 @@ function curryN(context, arity, fn, received = []) {
 }
 
 /**
- * @type:
- * @description:
- * @param: {function} fn
- * @return: {Function|*}
+ * @sig
+ * @description d
+ * @param {function} fn - a
+ * @return {Function|*} - b
  */
 function curryRight(fn) {
     return curryN(this, fn.length, function _wrapper(...args) {
@@ -158,18 +163,18 @@ function curryRight(fn) {
 }
 
 /**
- * @type:
- * @description:
- * @param: {*}
- * @return: {function}
+ * @sig
+ * @description d
+ * @param {*} - a
+ * @return {function} - b
  */
 var first = constant;
 
 /**
- * @type:
- * @description:
- * @param: {function} fn
- * @return {*}
+ * @sig
+ * @description d
+ * @param {function} fn - a
+ * @return {*} - b
  */
 function fixedPoint(fn) {
     function _fixedPoint(x) {
@@ -181,93 +186,97 @@ function fixedPoint(fn) {
 }
 
 /**
- * @type:
- * @description:
- * @param: {function} join
- * @param: {function} fn1
- * @param: {function} fn2
- * @returns: {function}
+ * @sig
+ * @description d
+ * @param {function} join - a
+ * @param {function} fn1 - b
+ * @param {function} fn2 - c
+ * @return {function} - d
  */
 var fork = curry((join, fn1, fn2) => {
     return (...args) => join(fn1(...args), fn2(...args));
 });
 
 /**
- * @type: Identity :: a -> a
- * @description: Identity function; takes any item and returns same item when invoked
- * @param: {*} item - Any value of any type
- * @returns: {*} - returns item
+ * @sig Identity :: a -> a
+ * @description Identity function; takes any item and returns same item when invoked
+ * @param {*} item - Any value of any type
+ * @return {*} - returns item
  */
 var identity = item => item;
 
 /**
- * @type: ifElse :: Function -> ( Function -> ( Function -> (a -> b) ) )
- * @description: Takes a predicate function that is applied to the data; If a truthy value
+ * @sig ifElse :: Function -> ( Function -> ( Function -> (a -> b) ) )
+ * @description Takes a predicate function that is applied to the data; If a truthy value
  * is returned from the application, the provided ifFunc argument will be
  * invoked, passing the data as an argument, otherwise the elseFunc is
  * invoked with the data as an argument.
- * @param: {function} predicate
- * @param: {function} ifFunc
- * @param: {function} elseFunc
- * @param: {*} data
- * @return: {*} - returns the result of invoking the ifFunc or elseFunc
+ * @type {function}
+ * @param {function} predicate - a
+ * @param {function} ifFunc - b
+ * @param {function} elseFunc - c
+ * @param {*} data - d
+ * @return {*} - returns the result of invoking the ifFunc or elseFunc
  * on the data
  */
 var ifElse = curry((predicate, ifFunc, elseFunc, data) => predicate(data) ? ifFunc(data) : elseFunc(data));
 
 /**
- * @type:
- * @description:
- * @param: {function} predicate
- * @param: {function} ifFunc
- * @param: {*} ifArg
- * @param: {*} thatArg
- * @return: {*}
+ * @sig
+ * @description d
+ * @type {function}
+ * @param {function} predicate - a
+ * @param {function} ifFunc - b
+ * @param {*} ifArg - c
+ * @param {*} thatArg - d
+ * @return {*} - e
  */
 var ifThisThenThat = curry((predicate, ifFunc, ifArg, thatArg) => predicate(ifArg) ? ifFunc(thatArg) : thatArg);
 
 /**
- * @type: kestrel :: a -> () -> a
- * @description:
- * @note: @see {@link constant}
- * @param: {*} item
- * @returns: {function} - Returns a function, that when invoked, will
+ * @sig kestrel :: a -> () -> a
+ * @description d
+ * @type {function}
+ * @note @see {@link constant}
+ * @param {*} item - a
+ * @return {function} - Returns a function, that when invoked, will
  * return the item passed to the constant function as an argument.
  */
 var kestrel = constant;
 
 /**
- * @type:
- * @description:
- * @param: {function} a
- * @return: {*}
+ * @sig
+ * @description d
+ * @param {function} a - a
+ * @return {*} - b
  */
 var m = a => a(a);
 
 /**
- * @type:
- * @description:
- * @param: {function} a
- * @param: {function} b
- * @return: {*}
+ * @sig
+ * @description d
+ * @type {function}
+ * @param {function} a - a
+ * @param {function} b - b
+ * @return {*} - c
  */
 var o = curry((a, b) => b(a(b)));
 
 /**
- * @type: pipe :: [a] -> (b -> c)
- * @description: -  Takes a List of functions as arguments and returns
+ * @sig pipe :: [a] -> (b -> c)
+ * @description -  Takes a List of functions as arguments and returns
  * a function waiting to be invoked with a single item. Once the returned
  * function is invoked, it will reduce the List of functions over the item,
  * starting with the first function in the List and working through
  * sequentially. Performs a similar functionality to compose, but applies
  * the functions in reverse order to that of compose.
- * @refer: {compose}
- * @note: @see {@link compose}
- * @param: {function} fn - The function to run initially; may be any arity.
- * @param: {Array} fns - The remaining functions in the pipeline. Each receives
+ * @refer {compose}
+ * @note @see {@link compose}
+ * @param {function} fn - The function to run initially; may be any arity.
+ * @param {Array} fns - The remaining functions in the pipeline. Each receives
  * its input from the output of the previous function. Therefore each of these
  * functions must be unary.
- * @returns: {function} - Returns a function waiting for the item over which
+ * @return {function} - Returns a function waiting for the item over which
  * to reduce the functions.
  */
 function pipe(fn, ...fns) {
@@ -290,12 +299,13 @@ var q = curry((a, b, c) => b(a(c)));
 
 //const reduce = (accFn, start, xs) => xs.reduce(accFn, start);
 /**
- * @type:
- * @description:
- * @param: {function} accFunc
- * @param: {*} start
- * @param: {Array} xs
- * @return: {Array};
+ * @sig
+ * @description d
+ * @type {function}
+ * @param {function} accFunc - a
+ * @param {*} start - b
+ * @param {Array} xs - c
+ * @return {Array} - d
  */
 var reduce = curry(function _reduce(accFunc, start, xs) {
     /*
@@ -328,16 +338,18 @@ var reduce = curry(function _reduce(accFunc, start, xs) {
 });
 
 /**
- * @type:
- * @description:
+ * @sig
+ * @description d
+ * @type {function}
+ * @return {*} - a
  */
 var second = constant(identity);
 
 /**
- * @type:
- * @description:
- * @param: {Array} fns
- * @returns: {function}
+ * @sig
+ * @description d
+ * @param {Array} fns - a
+ * @return {function} - b
  */
 function sequence(fns) {
     return function _sequence(...args) {
@@ -348,36 +360,38 @@ function sequence(fns) {
 }
 
 /**
- * @type:
- * @description:
- * @param: {*} x
- * @param: {function} f
- * @return: {*}
+ * @sig
+ * @description d
+ * @type {function}
+ * @param {*} x - a
+ * @param {function} f = b
+ * @return {*} - c
  */
 var t = curry((x, f) => f(x));
 
 /**
- * @type:
- * @description:
- * @refer: {t}
- * @note: @see {@link t}
+ * @sig
+ * @description d
+ * @refer {t}
+ * @note @see {@link t}
  */
 var thrush = t;
 
 /**
- * @type:
- * @description:
- * @param: {function} a
- * @param: {function} b
- * @return: {*}
+ * @sig
+ * @description d
+ * @type {function}
+ * @param {function} a - a
+ * @param {function} b - b
+ * @return {*} - c
  */
 var u = curry((a, b) => b(a(a)(b)));
 
 /**
- * @type:
- * @description:
- * @param: {function} fn
- * @return: {function}
+ * @sig
+ * @description d
+ * @param {function} fn - a
+ * @return {function} - b
  */
 function uncurry(fn) {
     if (fn &amp;&amp; fn.orig) return fn.orig;
@@ -385,11 +399,12 @@ function uncurry(fn) {
 }
 
 /**
- * @type:
- * @description:
- * @param: {number} depth
- * @param: {function} fn
- * @return: {function|*}
+ * @sig
+ * @description d
+ * @type {function}
+ * @param {number} depth - a
+ * @param {function} fn - b
+ * @return {function|*} - c
  */
 var uncurryN = curry(function uncurryN(depth, fn) {
     console.log(depth, fn);
@@ -410,47 +425,50 @@ var uncurryN = curry(function uncurryN(depth, fn) {
 });
 
 /**
- * @type:
- * @description:
- * @param: {function} a
- * @param: {*} b
- * @return: {*}
+ * @sig
+ * @description d
+ * @type {function}
+ * @param {function} a - a
+ * @param {*} b - b
+ * @return {*} - c
  */
 var w = curry((a, b) => a(b)(b));
 
 /**
- * @type: when :: Function -> (Function -> (a -> b))
- * @description: Similar to ifElse, but no 'elseFunc' argument. Instead, if the application
+ * @sig when :: Function -> (Function -> (a -> b))
+ * @description Similar to ifElse, but no 'elseFunc' argument. Instead, if the application
  * of the predicate to the data returns truthy, the transform is applied to
  * the data. Otherwise, the data is returned without invoking the transform.
- * @param: {function} predicate
- * @param: {function} transform
- * @param: {*} data
- * @return: {*}
+ * @type {function}
+ * @param {function} predicate - a
+ * @param {function} transform - b
+ * @param {*} data - c
+ * @return {*} - d
  */
 var when = curry((predicate, transform, data) => predicate(data) ? transform(data) : data);
 
 /**
- * @type:
- * @description:
- * @param: {function} predicate
- * @param: {function} transform
- * @param: {*} data
- * @return: {*}
+ * @sig
+ * @description d
+ * @type {function}
+ * @param {function} predicate - a
+ * @param {function} transform - b
+ * @param {*} data - c
+ * @return {*} - d
  */
 var whenNot = curry((predicate, transform, data) => !predicate(data) ? transform(data) : data);
 
 /**
- * @type:
- * @description:
+ * @sig
+ * @description d
  */
 var y = fixedPoint;
 
 /**
- * @type:
- * @description:
- * @param: {function} fn
- * @return: {function}
+ * @sig
+ * @description d
+ * @param {function} fn - a
+ * @return {function} - b
  */
 function applyWhenReady(fn) {
     var values = [];
@@ -490,7 +508,7 @@ export { all, any, applyWhenReady, c, compose, constant, curry, curryN, curryRig
 <br class="clear">
 
 <footer>
-    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.5.4</a> on Sun Aug 06 2017 21:06:52 GMT-0400 (Eastern Daylight Time)
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.5.4</a> on Mon Aug 07 2017 12:35:07 GMT-0400 (Eastern Daylight Time)
 </footer>
 
 <script> prettyPrint(); </script>

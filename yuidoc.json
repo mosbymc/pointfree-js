@@ -1,9 +1,0 @@
-{
-  "name": "queryable-js",
-  "description": "A JavaScript library for performing queries against lists with lazy evaluation and deferred execution.",
-  "options": {
-    "outdir": "./yuidoc",
-    "paths": "./src/dataStore.js",
-    "linkNatives": true
-  }
-}

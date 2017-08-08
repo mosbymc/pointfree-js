@@ -36,14 +36,14 @@ jspm_packages
 .idea
 
 routes
-app.js
-tmp
-dev-build
+dev
 platoTmp
-.nyc_output
+plato
+documentation
 
 # Individual 'test' files
 playground.js
 wallaby.new.js
 wallaby.test.js
 observations.js
+app.js

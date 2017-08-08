@@ -54,8 +54,8 @@ gulp.task('babel-dev', ['clean-tmp'], function _babelDev() {
 });
 
 gulp.task('clean-dev', function _cleanDevBuild(done) {
-    log('cleaning dev bundle.js');
-    clean(config.build + 'bundle.js', done);
+    log('cleaning dev pointfree.js');
+    clean(config.dev + 'pointfree.js', done);
 });
 
 gulp.task('clean-tmp', function _cleanTmp(done) {
@@ -81,16 +81,16 @@ gulp.task('generate-plato', function _plato(done) {
     });
 });
 
-gulp.task('yuidoc', ['clean-yuidoc'], function _yuidoc() {
-    log('Running yuidoc documentation generator.');
-    return gulp.src([config.gridJs])
+gulp.task('jsdoc', ['clean-jsdoc'], function _jsdoc() {
+    log('Running jsdoc documentation generator.');
+    return gulp.src([config.src])
         .pipe(_.yuidoc())
-        .pipe(gulp.dest('./yuidoc/classes'));
+        .pipe(gulp.dest('./documentation'));
 });
 
-gulp.task('clean-yuidoc', function _clean_yuidoc(done) {
-    log('Cleaning yuidoc dir.');
-    clean('./yuidoc/**/*.*', done);
+gulp.task('clean-jsdoc', function _cleanJsdoc(done) {
+    log('Cleaning jsdoc dir.');
+    clean('./documentation/*', done);
 });
 
 gulp.task('lint', /*['plato'],*/ function _lint() {
@@ -115,7 +115,7 @@ gulp.task('jscs', ['lint'], function _jscs() {
 });
 
 gulp.task('clean', function _clean(done) {
-    var deleteConfig = [].concat(config.build, config.src);
+    var deleteConfig = [].concat(config.dist, config.src);
     log('Cleaning: ' + _.util.colors.blue(deleteConfig));
     del(deleteConfig, done);
 });
@@ -183,10 +183,6 @@ gulp.task('build-server', ['optimize'], function _buildServer() {
     serve(false /*isDev*/);
 });
 
-gulp.task('test', ['set_node_env'], function _test(done) {
-    startTests(true /* singleRun */, done);
-});
-
 gulp.task('set_node_env', function _env() {
     process.env.BABEL_ENV = 'dev';
     return process.env.NODE_ENV = 'dev';
@@ -226,19 +222,11 @@ function startBrowserSync(isDev) {
     if (args.nosync || browserSync.active)  //gulp dev-server --nosync: prevents browser-sync from reloading on changes
         return;
 
-    log ('Starting browser-sync on port: ' + port);
-    if (isDev) {
-        gulp.watch([config.less], ['styles'])
-            .on('change', function _change(evt) {
-                changeEvent(evt);
-            });
-    }
-    else {
-        gulp.watch([config.less, config.js], [browserSync.reload])
-            .on('change', function _change(evt) {
-                changeEvent(evt);
-            });
-    }
+    log('Starting browser-sync on port: ' + port);
+    gulp.watch([config.js], [browserSync.reload])
+        .on('change', function _change(evt) {
+            changeEvent(evt);
+        });
 
     browserSync({
         proxy: 'localhost:' + port + '/public/grid.html',
@@ -276,28 +264,8 @@ function clean(path, done) {
     del(path).then(done());
 }
 
-function startTests(singleRun, done) {
-    //del('./test/report/coverage');
-    var karmaServer = require('karma').Server;
-    var excludedFiles = [];
-
-    new karmaServer({
-        configFile: __dirname + '/karma.conf.js',
-        singleRun: !!singleRun,
-        exclude: excludedFiles
-    }, karmaCompleted).start();
-
-    function karmaCompleted(karmaResult) {
-        log('Karma Completed');
-        if (karmaResult == 1)
-            done('karma: test failed with result: ' + karmaResult);
-        else
-            done();
-    }
-}
-
 function log(msg) {
-    if (typeof msg === 'object') {
+    if ('object' === typeof msg) {
         Object.keys(msg).forEach(function _printMsg(m) {
             _.util.log(_.util.colors.blue(m));
         });

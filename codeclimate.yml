@@ -1,17 +1,23 @@
 engines:
+  esling:
+    enabled: true
   duplication:
     enabled: true
+    config:
+      languages:
+      - javascript
   nodesecurity:
     enabled: true
 
 exclude_paths:
-  - ".nyc_output"
-  - "coverage"
-  - "dev"
-  - "node_modules"
-  - "plato"
-  - "reports"
-  - "routes"
+- "coverage"
+- "dev_browser"
+- "documentation"
+- "node_modules"
+- "plato"
+- "routes"
+- "dist"
 
 ratings:
- - "src"
+  paths:
+  - "src"

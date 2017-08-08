@@ -26,7 +26,7 @@ module.exports = function _wallaby(wallaby) {
             { pattern: 'node_modules/sinon/lib/sinon.js', instrument: false },
             { pattern: 'node_modules/sinon-chai/lib/sinon-chai.js', instrument: false },
             { pattern: 'node_modules/mocha-sinon/mocha-sinon.js', instrument: false },
-            { pattern : 'src/**/*.js', load: true },
+            { pattern: 'src/**/*.js', load: true },
             { pattern: 'test/testData.js', load: true },
             '!test/**/*.spec.js',
             '!playground.js',

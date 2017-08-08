@@ -1,0 +1,16 @@
+coverage/*
+dev_browser/*
+dist/*
+documentation/*
+node_modules/*
+plato/*
+routes/*
+test/*
+app.js
+gulp.config.js
+gulpfile.js
+observations.js
+playground.js
+wallaby.js
+wallaby.new.js
+wallaby.test.js
