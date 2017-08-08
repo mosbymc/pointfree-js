@@ -1,0 +1,32 @@
+engines:
+  eslint:
+    enabled: true
+  duplication:
+    enabled: true
+    config:
+      languages:
+      - javascript
+  fixme:
+    enabled: false
+  nodesecurity:
+    enabled: true
+
+exclude_paths:
+- "coverage/"
+- "dev_browser/"
+- "documentation/"
+- "node_modules/"
+- "plato/"
+- "routes/"
+- "dist/"
+- "test/"
+- "misc/"
+- "index.js"
+- "app.js"
+- "gulpfile.js"
+- "gulp.config.js"
+- "wallaby.js"
+
+ratings:
+  paths:
+  - "src"

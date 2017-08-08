@@ -7,35 +7,96 @@ var gulp = require('gulp'),
     del = require('del'),
     browserSync = require('browser-sync'),
     port = process.env.port || config.defaultPort,
-    transpileDependencies = ['transpile-root', 'transpile-collation', 'transpile-evaluation', 'transpile-expressionParser',
-        'transpile-limitation', 'transpile-mutation', 'transpile-projection', 'transpile-queryObject', 'transpile-transformation'];
+    transpileDependencies = ['transpile-root'];
 
 gulp.task('help', _.taskListing);
 gulp.task('default', ['help']);
 
-gulp.task('plato', function _plato(done) {
+gulp.task('build-dev', ['clean-dev'], function _testTmp() {
+    process.env.BABEL_ENV = 'build';
+    process.env.NODE_ENV = 'build';
+
+    var browserify = require('browserify'),
+        babelify = require('babelify'),
+        source = require('vinyl-source-stream'),
+        buffer = require('vinyl-buffer'),
+        uglify = require('gulp-uglify'),
+        sourceMaps = require('gulp-sourcemaps');
+
+    // objectSet up the browserify instance on a task basis
+    var b = browserify({
+        entries: './src/index.js',
+        debug: true,
+        // defining transforms here will avoid crashing your stream
+        transform: [babelify]
+    });
+
+    return b
+        .bundle()
+        .pipe(source('./src/index.js'))
+        .pipe(buffer())
+        .pipe(sourceMaps.init({loadMaps: true}))
+        // Add transformation tasks to the pipeline here.
+        //.pipe(uglify())
+        //.on('error', _.util.log)
+        .pipe(sourceMaps.write('./'))
+        .pipe(_.rename('bundle.js'))
+        .pipe(gulp.dest('./dev/'));
+});
+
+gulp.task('babel-dev', ['clean-tmp'], function _babelDev() {
+    process.env.BABEL_ENV = 'build';
+    process.env.NODE_ENV = 'build';
+
+    return gulp.src('./src/**/*.js')
+        .pipe(_.babel())
+        .pipe(gulp.dest('./tmp'));
+});
+
+gulp.task('clean-dev', function _cleanDevBuild(done) {
+    log('cleaning dev pointfree.js');
+    clean(config.dev + 'pointfree.js', done);
+});
+
+gulp.task('clean-tmp', function _cleanTmp(done) {
+    log('Cleaning tmp');
+    clean('./tmp', done);
+});
+
+gulp.task('plato', ['strip-comments', 'generate-plato'], function _plato(done) {
+    log('Cleaning: ' + _.util.colors.blue('./tmpPlato'));
+    del('./tmpPlato', done);
+});
+
+gulp.task('strip-comments', function stipComments() {
+    return gulp.src(config.src + '**/*.js')
+        .pipe(_.stripComments())
+        .pipe(gulp.dest('./tmpPlato'));
+});
+
+gulp.task('generate-plato', function _plato(done) {
     var plato = require('plato');
-    plato.inspect(config.build + 'scripts/grid.js', config.plato.report, config.plato.options, function noop(){
+    plato.inspect(config.platoScripts, config.plato.report, config.plato.options, function noop(){
         done();
     });
 });
 
-gulp.task('yuidoc', ['clean-yuidoc'], function _yuidoc() {
-    log('Running yuidoc documentation generator.');
-    return gulp.src([config.gridJs])
+gulp.task('jsdoc', ['clean-jsdoc'], function _jsdoc() {
+    log('Running jsdoc documentation generator.');
+    return gulp.src([config.src])
         .pipe(_.yuidoc())
-        .pipe(gulp.dest('./yuidoc/classes'));
+        .pipe(gulp.dest('./documentation'));
 });
 
-gulp.task('clean-yuidoc', function _clean_yuidoc(done) {
-    log('Cleaning yuidoc dir.');
-    clean('./yuidoc/**/*.*', done);
+gulp.task('clean-jsdoc', function _cleanJsdoc(done) {
+    log('Cleaning jsdoc dir.');
+    clean('./documentation/*', done);
 });
 
 gulp.task('lint', /*['plato'],*/ function _lint() {
     log('Linting source with JSCS and JSHint.');
     return gulp
-        .src(config.gridJs)
+        .src(config.src + '/**/*.js')
         .pipe(_.if(args.verbose, _.print()))
         .pipe(_.jshint())
         .pipe(_.jscs())
@@ -47,14 +108,14 @@ gulp.task('lint', /*['plato'],*/ function _lint() {
 gulp.task('jscs', ['lint'], function _jscs() {
     log('Linting source with JSCS and JSHint.');
     return gulp
-        .src(config.gridJs)
+        .src(config.src + '/**/*.js')
         .pipe(_.if(args.verbose, _.print()))
         .pipe(_.jscs())
         .pipe(_.jscs.reporter('fail'));
 });
 
 gulp.task('clean', function _clean(done) {
-    var deleteConfig = [].concat(config.build, config.src);
+    var deleteConfig = [].concat(config.dist, config.src);
     log('Cleaning: ' + _.util.colors.blue(deleteConfig));
     del(deleteConfig, done);
 });
@@ -107,54 +168,6 @@ gulp.task('transpile-root', function _transpileRoot() {
         .pipe(gulp.dest(config.srcRootJs));
 });
 
-gulp.task('transpile-collation', function _transpileCollation() {
-    return gulp.src(config.devCollationJs)
-        .pipe(_.babel())
-        .pipe(gulp.dest(config.srcCollationJs));
-});
-
-gulp.task('transpile-evaluation', function _transpileEvaluation() {
-    return gulp.src(config.devEvaluationJs)
-        .pipe(_.babel())
-        .pipe(gulp.dest(config.srcEvaluationJs));
-});
-
-gulp.task('transpile-expressionParser', function _transpileExpressionParser() {
-    return gulp.src(config.devExpressionParserJs)
-        .pipe(_.babel())
-        .pipe(gulp.dest(config.srcExpressionParserJs));
-});
-
-gulp.task('transpile-limitation', function _transpileLimitation() {
-    return gulp.src(config.devLimitationJs)
-        .pipe(_.babel())
-        .pipe(gulp.dest(config.srcLimitationJs));
-});
-
-gulp.task('transpile-mutation', function _transpileMutation() {
-    return gulp.src(config.devMutationJs)
-        .pipe(_.babel())
-        .pipe(gulp.dest(config.srcMutationJs));
-});
-
-gulp.task('transpile-projection', function _transpileProjection() {
-    return gulp.src(config.devProjectionJs)
-        .pipe(_.babel())
-        .pipe(gulp.dest(config.srcProjectionJs));
-});
-
-gulp.task('transpile-queryObject', function _transpileQueryObjects() {
-    return gulp.src(config.devQueryObjectJs)
-        .pipe(_.babel())
-        .pipe(gulp.dest(config.srcQueryObjectJs));
-});
-
-gulp.task('transpile-transformation', function _transpileTransformation() {
-    return gulp.src(config.devTransformationJs)
-        .pipe(_.babel())
-        .pipe(gulp.dest(config.srcTransformationJs));
-});
-
 gulp.task('transpile-testData', function _transpileTestData() {
     return gulp.src('./test/testData.js')
         .pipe(_.babel())
@@ -168,10 +181,6 @@ gulp.task('dev-server', ['styles'], function _devServer() {
 
 gulp.task('build-server', ['optimize'], function _buildServer() {
     serve(false /*isDev*/);
-});
-
-gulp.task('test', ['set_node_env'], function _test(done) {
-    startTests(true /* singleRun */, done);
 });
 
 gulp.task('set_node_env', function _env() {
@@ -213,19 +222,11 @@ function startBrowserSync(isDev) {
     if (args.nosync || browserSync.active)  //gulp dev-server --nosync: prevents browser-sync from reloading on changes
         return;
 
-    log ('Starting browser-sync on port: ' + port);
-    if (isDev) {
-        gulp.watch([config.less], ['styles'])
-            .on('change', function _change(evt) {
-                changeEvent(evt);
-            });
-    }
-    else {
-        gulp.watch([config.less, config.js], [browserSync.reload])
-            .on('change', function _change(evt) {
-                changeEvent(evt);
-            });
-    }
+    log('Starting browser-sync on port: ' + port);
+    gulp.watch([config.js], [browserSync.reload])
+        .on('change', function _change(evt) {
+            changeEvent(evt);
+        });
 
     browserSync({
         proxy: 'localhost:' + port + '/public/grid.html',
@@ -263,28 +264,8 @@ function clean(path, done) {
     del(path).then(done());
 }
 
-function startTests(singleRun, done) {
-    //del('./test/report/coverage');
-    var karmaServer = require('karma').Server;
-    var excludedFiles = [];
-
-    new karmaServer({
-        configFile: __dirname + '/karma.conf.js',
-        singleRun: !!singleRun,
-        exclude: excludedFiles
-    }, karmaCompleted).start();
-
-    function karmaCompleted(karmaResult) {
-        log('Karma Completed');
-        if (karmaResult == 1)
-            done('karma: test failed with result: ' + karmaResult);
-        else
-            done();
-    }
-}
-
 function log(msg) {
-    if (typeof msg === 'object') {
+    if ('object' === typeof msg) {
         Object.keys(msg).forEach(function _printMsg(m) {
             _.util.log(_.util.colors.blue(m));
         });

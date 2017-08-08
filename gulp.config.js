@@ -1,52 +1,47 @@
 module.exports = function _gulpConfig() {
     'use strict';
-    var build = './build/',
+    var dist = './dist/',
         src = './src/',
-        dev = './dev/',
+        dev = './dev_browser/',
         test = './test/',
-        report = test + 'report/';
+        report = test + 'report/',
+        tmpPlato = './tmpPlato/',
+        platoScripts = [
+            tmpPlato + './containers/**/*.js',
+            tmpPlato + './containers/functors/*.js',
+            tmpPlato + './containers/monads/*.js',
+            tmpPlato + './groups/*.js',
+            tmpPlato + './streams/**/*.js',
+        ];
 
     return {
-        buildJs: build + 'scripts/grid.js',
-        build: build,
+        distJs: dist + 'scripts/grid.js',
+        dist: dist,
         src: src,
+        platoScripts: platoScripts,
         srcRootJs: src + '/',
-        srcCollationJs: src +'collation/',
-        srcEvaluationJs: src + 'evaluation/',
-        srcExpressionParserJs: src + 'expressionParser/',
-        srcLimitationJs: src + 'limitation/',
-        srcMutationJs: src + 'mutation/',
-        srcProjectionJs: src + 'projection/',
-        srcQueryObjectJs: src + 'queryObjects/',
-        srcTransformationJs: src + 'transformation/',
-        buildFiles: [build + 'scripts'],
+        srcContainers: src + './containers/**/*.js',
+        srcFunctors: src + './containers/functors/*.js',
+        srcMonads: src + './containers/monads/*.js',
+        srcGroups: src + './groups/*.js',
+        srcStreams: src + './streams/**/*.js',
+        buildFiles: [dist + 'scripts'],
         srcFiles: [src + 'scripts'],
-        gridJs: dev + 'scripts/grid.js',
         temp: './.tmp/',
         routes: './routes/',
         dev: dev + '*.js',
         devRootJs: dev + '*.js',
-        devCollationJs: dev +'collation/*.js',
-        devEvaluationJs: dev + 'evaluation/*.js',
-        devExpressionParserJs: dev + 'expressionParser/*.js',
-        devLimitationJs: dev + 'limitation/*.js',
-        devMutationJs: dev + 'mutation/*.js',
-        devProjectionJs: dev + 'projection/*.js',
-        devQueryObjectJs: dev + 'queryObjects/*.js',
-        devTransformationJs: dev + 'transformation/*.js',
         report: report,
         plato: {
             report: './plato',
             options: {
-                title: 'grid-plato',
-                jshint: __dirname + '/.jshintrc'
+                title: 'pointfree-plato'
             }
         },
         js: [
             dev + '**/*.js',
             './*.js',
             '!./closureExterns.js',
-            '!./karma.conf.js'
         ],     //Javascript file to lint
         defaultPort: 3000,
         nodeServer: './app.js',

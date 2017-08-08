@@ -1,14 +1,14 @@
 {
-  "esversion": 5,
+  "esversion": 6,
   "futurehostile": true,
   "freeze": true,
   "latedef": "nofunc",
   "noarg": true,
-  "strict": true,
   "undef": true,
   "unused": true,
   "eqnull": true,
   "validthis": true,
+  "noyield": true,
   "predef": [
     "require",
     "module",
@@ -20,14 +20,7 @@
   "expr": true,
   "sub": true,
   "-W086": true,
-  "globals": {
-    "formatter": false,
-    "validator": false,
-    "excelExporter": false,
-    "toggle": false
-  },
   "browser": true,
-  "jquery": true,
   "node": true,
   "excludePath": "./.jshintignore"
 }
