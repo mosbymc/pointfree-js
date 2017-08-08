@@ -148,4 +148,15 @@ function taker_skipper(amt) {
     };
 }
 
-export { createListCreator, taker_skipper };
+function listExtensionHelper(listFactory, listDelegatee, creatorFunc, ...listTypes) {
+    return function _extend(prop, fn) {
+        if (!listTypes.some(type => prop in type)) {
+            listDelegatee[prop] = function _extension(...args) {
+                return creatorFunc(this, fn(this, ...args));
+            };
+        }
+        return listFactory;
+    };
+}
+
+export { createListCreator, taker_skipper, listExtensionHelper };

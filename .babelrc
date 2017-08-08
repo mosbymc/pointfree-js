@@ -17,12 +17,6 @@
         "transform-es2015-modules-commonjs"
       ]
     },
-    "tt": {
-      "sourceMaps": true,
-      "plugins": [
-        "transform-es2015-modules-commonjs"
-      ]
-    },
     "dev": {
       "presets": [
         "es2015"

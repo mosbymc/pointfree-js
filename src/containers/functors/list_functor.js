@@ -2,10 +2,10 @@ import { all, any, except, intersect, union, map, groupBy, sortBy, prepend, conc
     contains, first, last, count, foldLeft, reduceRight, distinct, ofType, binarySearch, equals, takeWhile, skipWhile, reverse,
     copyWithin, fill, findIndex, findLastIndex, repeat, foldRight, unfold } from '../list_iterators';
 import { sortDirection, generatorProto } from '../../helpers';
-import { wrap, defaultPredicate, delegatesTo, delegatesFrom, isArray, noop, invoke } from '../../functionalHelpers';
+import { wrap, defaultPredicate, delegatesFrom, isArray, noop, invoke } from '../../functionalHelpers';
 import { when, ifElse, identity } from '../../combinators';
 import { not } from '../../decorators';
-import { createListCreator, taker_skipper } from '../list_helpers';
+import { createListCreator, taker_skipper, listExtensionHelper } from '../list_helpers';
 
 /**
  * @description: Object that contains the core functionality of a List; both the m_list and ordered_m_list
@@ -760,56 +760,6 @@ var ordered_list_functor = Object.create(list_core, {
     }
 });
 
-//TODO: monad
-//TODO: functor
-//TODO: monoid
-//TODO: semigroup
-//TODO: decorator
-//TODO: combinator
-//TODO: transducer
-//TODO: JunctionalS
-//TODO: JunctorS
-//TODO: lanoitcunf
-//TODO: rotcnuf
-//TODO: danom
-//TODO: dionom
-//TODO: puorgimes
-//TODO: rotaroced
-//TODO: rotanibmoc
-//TODO: recudsnart
-//TODO: tpircSavaJ
-//TODO: Junctional FavaScript
-//TODO: Algebraic Data Structures
-//TODO: ADS
-
-//TODO: JavaScript
-//TODO: JS
-//TODO: EcmaScript
-//TODO: es-20FP
-//TODO: functional
-//TODO: functional programming
-//TODO: FP
-//TODO: Lambda
-//TODO: Lambda calculus
-//TODO: category theory
-//TODO: higher order (functions)
-//TODO: first class functions
-//TODO: lazy (evaluation)
-//TODO: deferred execution
-//TODO: pure
-//TODO: composable
-//TODO: referential transparency
-//TODO: pointfree/pointless
-
-//TODO: Pointfree Functional programming - PF-FP
-//TODO: pointfree-js pfjs
-
-//TODO: Algebraic JavaScript - AJS
-//TODO: Functional JavaScript - FJS
-//TODO: Deferred Laziness
-//TODO: First-class Laziness
-//TODO: Algebraic Laziness
-
 /**
  * @sig
  * @description Creates a new list_functor object delegate instance; list_functor type is determined by
@@ -992,14 +942,7 @@ List.repeat = function _repeat(item, count) {
  * function and should be constructed like the immediately evaluated functions described
  * above.
  */
-List.extend = function _extend(prop, fn) {
-    if (!(prop in list_functor) && !(prop in ordered_list_functor)) {
-        list_core[prop] = function _extension(...args) {
-            return createListDelegateInstance(this, fn(this, ...args));
-        };
-    }
-    return List;
-};
+List.extend = listExtensionHelper(List, list_core, createListDelegateInstance, list_functor, ordered_list_functor);
 
 function createGroupedListDelegate(source, key) {
     return createListDelegateInstance(source, undefined, undefined, key);
