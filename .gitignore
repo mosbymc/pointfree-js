@@ -37,10 +37,7 @@ dev_browser
 platoTmp
 plato
 documentation
+misc
 
 # Individual 'test' files
-playground.js
-wallaby.new.js
-wallaby.test.js
-observations.js
 app.js
