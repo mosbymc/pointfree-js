@@ -10,7 +10,7 @@ node_js:
 
 before_script: "cc-test-reporter before-build"
 
-script: "npm run lint:test"
+script: "npm run lint:test:coverage"
 
 after_success:
 - "npm run documentation"
