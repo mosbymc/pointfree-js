@@ -88,6 +88,7 @@
     "browser-sync": "^2.11.1",
     "browserify": "^13.3.0",
     "chai": "^3.5.0",
+    "codeclimate-test-reporter": "^0.5.0",
     "concurrently": "^3.3.0",
     "connect": "^3.6.3",
     "cross-env": "^5.0.4",
