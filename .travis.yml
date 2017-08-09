@@ -8,6 +8,8 @@ node_js:
   - "6"
   - "7"
 
+before_script: "cc-test-reporter before-build"
+
 script: "npm run lint:test"
 
 after_success:
@@ -17,7 +19,7 @@ after_success:
 
 after_script:
 - "npm install -g codeclimate-test-reporter"
-- "codeclimate-test-reporter < coverage/lcov.info"
+- "CODECLIMATE_REPO_TOKEN=88f6338a30b9b3b63e26685f78c813c4ca0448d6e21b7f2fed6878ccc11e7f47 codeclimate-test-reporter < coverage/lcov.info"
 
 branches:
   only:

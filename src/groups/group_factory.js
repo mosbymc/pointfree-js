@@ -226,7 +226,7 @@ function groupFactory(concatFn, inverseConcatFn, invertFn, identity, type) {
     /**
      * @sig
      * @description d
-     * @param {Array} others - a
+     * @param {Array} xs - a
      * @return {group} - b
      * @private
      */

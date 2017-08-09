@@ -27,6 +27,7 @@
     "jshint": "./node_modules/.bin/jshint src",
     "lint": "npm run jshint && npm run eslint",
     "lint:test": "npm run lint && npm test",
+    "lint:test:coverage": "npm run lint && npm run coverage",
     "minify": "uglifyjs dist/pointfree.js -o dist/pointfree.min.js -c -m --source-map",
     "start": "node app.js 3000",
     "test": "cross-env NODE_ENV=test mocha test/unit/**/*.spec.js --require babel-polyfill --require test/test_helper --compilers js:babel-register"
