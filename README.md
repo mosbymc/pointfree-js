@@ -10,6 +10,6 @@
 [![Test Coverage](https://codeclimate.com/github/mosbymc/pointfree-js/badges/coverage.svg)](https://codeclimate.com/github/mosbymc/pointfree-js/coverage)
 [![License](https://img.shields.io/npm/l/proxify-js.svg)](https://opensource.org/licenses/MIT)
 
-A JavaScript library that allows queries to be performed against arrays, the execution of which is deferred and lazily evaluated (where possible).
+A JavaScript library that brings together algebraic data structures, combinators, decorators, lenses, transducers, and more into a single environment.
 
-This is a work in progress - The 'master' branch has next to nothing in it currently; I am primarily working off the 'develop' branch until I have the core functionality implemented.
+This is a work in progress and is not yet ready for production use.
