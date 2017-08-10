@@ -1,3 +1,7 @@
+env:
+  global:
+    - GIT_COMMITTED_AT=$(if [ "$TRAVIS_PULL_REQUEST" == "false" ]; then git log -1 --pretty=format:%ct; else git log -1 --skip 1 --pretty=format:%ct; fi)
+
 language: "node_js"
 
 cache:
@@ -8,22 +12,27 @@ node_js:
   - "6"
   - "7"
 
-script: "npm run lint:test"
+before_script:
+  - curl -L https://codeclimate.com/downloads/test-reporter/test-reporter-latest-linux-amd64 > ./cc-test-reporter
+  - chmod +x ./cc-test-reporter
 
-after_success:
-- "npm run documentation"
-- "npm run coverage:report"
-- "npm bundle:minify"
-
-after_script:
-- "npm install -g codeclimate-test-reporter"
-- "codeclimate-test-reporter < coverage/lcov.info"
+script:
+- "npm run coverage"
+# Preferably you will run test-reporter on branch update events. But
+# if you setup travis to build PR updates only, you don't need to run
+# the line below
+- if [[ "$TRAVIS_PULL_REQUEST" != 'false' && "$TRAVIS_JOB_NUMBER" =~ [.]1$ ]]; then ./cc-test-reporter after-build --exit-code $TRAVIS_TEST_RESULT; fi
+# In the case where travis is setup to build PR updates only,
+# uncomment the line below
+# - ./cc-test-reporter after-build --exit-code $TRAVIS_TEST_RESULT
 
 branches:
   only:
   - "develop"
   - "master"
 
-addons:
-  code_climate:
-    repo_token: 88f6338a30b9b3b63e26685f78c813c4ca0448d6e21b7f2fed6878ccc11e7f47
+group: "stable"
+
+dist: "trusty"
+
+os: "linux"
