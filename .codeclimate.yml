@@ -9,7 +9,7 @@ engines:
   fixme:
     enabled: false
   nodesecurity:
-    enabled: true
+    enabled: false
 
 exclude_paths:
 - "coverage/**/*"
