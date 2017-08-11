@@ -1,5 +1,5 @@
-import { identity } from '../combinators';
-import { binary, rightApply } from '../decorators';
+import { identity } from '../src/combinators';
+import { binary, rightApply } from '../src/decorators';
 
 var e = binary(rightApply(identity));
 
@@ -179,7 +179,6 @@ function groupFactory(concatFn, inverseConcatFn, invertFn, identity, type) {
             },
             concatFn: {
                 get: function _getConcatFn() {
-                    console.log(this._concatFn);
                     return this._concatFn ? this._concatFn.bind(this) : concatFn.bind(this);
                 },
                 set: function _setConcatFn(fn) {

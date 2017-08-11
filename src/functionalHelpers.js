@@ -1,4 +1,4 @@
-import { javaScriptTypes, shallowClone } from './helpers';
+import { javaScriptTypes, typeNames, shallowClone } from './helpers';
 import { curry, identity, constant } from './combinators';
 
 /**
@@ -258,6 +258,17 @@ var isFunction = fn => javaScriptTypes.Function === type(fn);
  * @return {boolean} - b
  */
 var isObject = item => javaScriptTypes.Object === type(item) && null !== item;
+
+/**
+ * @sig
+ * @description d
+ * @param {*} item - a
+ * @return {boolean} - b
+ */
+function isPrimitive(item) {
+    var itemType = type(item);
+    return itemType in typeNames && (isNothing(item) || (javaScriptTypes.Object !== itemType && javaScriptTypes.Function !== itemType));
+}
 
 /**
  * @sig
@@ -549,6 +560,6 @@ function reverse2(...args) {
 
 export { add, adjust, and, arraySet, both, concat, defaultPredicate, delegatesFrom, delegatesTo, divide, either, equals,
         falsey, flip, getWith, greaterThan, greaterThanOrEqual, has, inObject, invoke, isArray, isBoolean, isFunction,
-        isObject, isNothing, isNull, isNumber, isSomething, isString, isSymbol, isUndefined, lessThan, lessThanOrEqual,
-        mapSet, modulus, multiply, negate, notEqual, noop, nth, objectSet, once, or, reverse, set, setSet, strictEquals,
-        strictNotEqual, subtract, truthy, type, wrap };
+        isObject, isPrimitive, isNothing, isNull, isNumber, isSomething, isString, isSymbol, isUndefined, lessThan,
+        lessThanOrEqual, mapSet, modulus, multiply, negate, notEqual, noop, nth, objectSet, once, or, reverse, set,
+        setSet, strictEquals, strictNotEqual, subtract, truthy, type, wrap };

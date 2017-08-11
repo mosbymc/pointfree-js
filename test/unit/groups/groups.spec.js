@@ -1,5 +1,6 @@
-import { sumGroup, multGroup, strGroup, xorGroup, xnorGroup } from '../../../src/groups/groups';
+//import { sumGroup, multGroup, strGroup, xorGroup, xnorGroup } from '../../../src/groups/groups';
 
+/*
 describe('Test Groups', function _testGroups() {
     describe('Test sumGroup', function _testSumGroup() {
         it('should return the proper sum of two numbers', function _testSumConcatOnValues() {
@@ -643,3 +644,4 @@ describe('Test Groups', function _testGroups() {
         });
     });
 });
+*/

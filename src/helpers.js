@@ -26,7 +26,7 @@ var javaScriptTypes = {
     Undefined: 'undefined'
 };
 
-var typeName = {
+var typeNames = {
     'boolean': typeof true,
     'function': typeof Function,
     'number': typeof 0,
@@ -355,4 +355,4 @@ var emptyObject = {};
 */
 
 export { javaScriptTypes, sortDirection, observableStatus, sortComparer, cacher, memoizer,
-            deepClone, deepCopy, shallowClone, generatorProto, emptyObject, typeName };
+            deepClone, deepCopy, shallowClone, generatorProto, emptyObject, typeNames };

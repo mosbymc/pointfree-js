@@ -449,16 +449,10 @@ function applyWhenReady(fn) {
         return _applyWhenReady;
     }
 
-    _applyWhenReady.apply = function _apply() {
-        return fn(...values);
-    };
-
+    _applyWhenReady.apply = () => fn(...values);
     _applyWhenReady.leftApply = _applyWhenReady.apply;
-
-    _applyWhenReady.rightApply = function _rightApply() {
-        console.log(values);
-        return fn(...values.reverse());
-    };
+    _applyWhenReady.rightApply = () => fn(...values.reverse());
+    _applyWhenReady.args = () => values;
 
     return _applyWhenReady;
 }
