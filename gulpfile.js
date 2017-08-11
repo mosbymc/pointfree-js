@@ -12,38 +12,6 @@ var gulp = require('gulp'),
 gulp.task('help', _.taskListing);
 gulp.task('default', ['help']);
 
-gulp.task('build-dev', ['clean-dev'], function _testTmp() {
-    process.env.BABEL_ENV = 'build';
-    process.env.NODE_ENV = 'build';
-
-    var browserify = require('browserify'),
-        babelify = require('babelify'),
-        source = require('vinyl-source-stream'),
-        buffer = require('vinyl-buffer'),
-        uglify = require('gulp-uglify'),
-        sourceMaps = require('gulp-sourcemaps');
-
-    // objectSet up the browserify instance on a task basis
-    var b = browserify({
-        entries: './src/index.js',
-        debug: true,
-        // defining transforms here will avoid crashing your stream
-        transform: [babelify]
-    });
-
-    return b
-        .bundle()
-        .pipe(source('./src/index.js'))
-        .pipe(buffer())
-        .pipe(sourceMaps.init({loadMaps: true}))
-        // Add transformation tasks to the pipeline here.
-        //.pipe(uglify())
-        //.on('error', _.util.log)
-        .pipe(sourceMaps.write('./'))
-        .pipe(_.rename('bundle.js'))
-        .pipe(gulp.dest('./dev/'));
-});
-
 gulp.task('babel-dev', ['clean-tmp'], function _babelDev() {
     process.env.BABEL_ENV = 'build';
     process.env.NODE_ENV = 'build';
@@ -75,43 +43,16 @@ gulp.task('strip-comments', function stipComments() {
 });
 
 gulp.task('generate-plato', function _plato(done) {
-    var plato = require('plato');
-    plato.inspect(config.platoScripts, config.plato.report, config.plato.options, function noop(){
+    var plato = require('plato'),
+        options = {
+            title: 'pointfree-js',
+            recurse: true,
+            noempty: true
+        };
+
+    plato.inspect('src', './plato', options, function noop(){
         done();
     });
-});
-
-gulp.task('jsdoc', ['clean-jsdoc'], function _jsdoc() {
-    log('Running jsdoc documentation generator.');
-    return gulp.src([config.src])
-        .pipe(_.yuidoc())
-        .pipe(gulp.dest('./documentation'));
-});
-
-gulp.task('clean-jsdoc', function _cleanJsdoc(done) {
-    log('Cleaning jsdoc dir.');
-    clean('./documentation/*', done);
-});
-
-gulp.task('lint', /*['plato'],*/ function _lint() {
-    log('Linting source with JSCS and JSHint.');
-    return gulp
-        .src(config.src + '/**/*.js')
-        .pipe(_.if(args.verbose, _.print()))
-        .pipe(_.jshint())
-        .pipe(_.jscs())
-        .pipe(_.jscsStylish.combineWithHintResults())
-        .pipe(_.jshint.reporter('jshint-stylish', { verbose: true }))
-        .pipe(_.jshint.reporter('fail'));
-});
-
-gulp.task('jscs', ['lint'], function _jscs() {
-    log('Linting source with JSCS and JSHint.');
-    return gulp
-        .src(config.src + '/**/*.js')
-        .pipe(_.if(args.verbose, _.print()))
-        .pipe(_.jscs())
-        .pipe(_.jscs.reporter('fail'));
 });
 
 gulp.task('clean', function _clean(done) {
@@ -136,7 +77,7 @@ gulp.task('build', ['optimize'], function _build() {
     });
 });
 
-gulp.task('optimize-js', ['lint', 'clean-code'], function _optimize() {
+gulp.task('optimize-js', ['clean-code'], function _optimize() {
     log('Optimizing JavaScript');
     return gulp.src(config.gridJs)
         .pipe(_.plumber())
@@ -175,7 +116,7 @@ gulp.task('transpile-testData', function _transpileTestData() {
         .pipe(gulp.dest('./test/'));
 });
 
-gulp.task('dev-server', ['styles'], function _devServer() {
+gulp.task('dev-server', function _devServer() {
     serve(true /*isDev*/);
 });
 
