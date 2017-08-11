@@ -35,7 +35,7 @@ module.exports = function _gulpConfig() {
         plato: {
             report: './plato',
             options: {
-                title: 'pointfree-plato'
+                title: 'pointfree-js'
             }
         },
         js: [
