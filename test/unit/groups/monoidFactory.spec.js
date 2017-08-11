@@ -1,6 +1,7 @@
-import { monoidFactory } from '../../src/groups/monoidFactory';
-import { pipe } from '../../src/combinators';
+//import { monoidFactory } from '../../../groups/monoidFactory';
+//import { pipe } from '../../../src/combinators';
 
+/*
 describe('monoidFactory tests', function _testMonoidFactory() {
     describe('mathematical monoids', function _testMathematicalMonoids() {
         it('should return proper values with addition', function _testAdditionBasedConcatenation() {
@@ -511,7 +512,7 @@ describe('monoidFactory tests', function _testMonoidFactory() {
             and1.concat(and2).concat(and3).concat(and4).should.eql(and1.concat(and2.concat(and3.concat(and4))));
         });
 
-        /*it('should return proper value with XOR', function _testXorBooleanMonoid() {
+        it('should return proper value with XOR', function _testXorBooleanMonoid() {
             var xorMonoid = monoidFactory(function _strMonoid(boolean) {
                 return xorMonoid(this.value ^ boolean.value);
             }, 'Xor');
@@ -548,7 +549,7 @@ describe('monoidFactory tests', function _testMonoidFactory() {
 
             expect(xor3ConcatXor4.value).to.eql();
             xor3ConcatXor4.toString().should.eql('And(empty)');
-        });*/
+        });
     });
 
     describe('function monoid', function _testFunctionMonoid() {
@@ -610,3 +611,4 @@ describe('monoidFactory tests', function _testMonoidFactory() {
         });
     });
 });
+*/

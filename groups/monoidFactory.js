@@ -9,10 +9,10 @@ var emptyObj = Object.create({});
  * provided as the means of concatenation. The resulting monoid adheres to the FantasyLand spec.
  * @param {function} concatFn - a
  * @param {string} type - b
- * @param {*} empty - c
+ * @param {*} identity - c
  * @return {_monoid} - d
  */
-function monoidFactory(concatFn, type, empty) {
+function monoidFactory(concatFn, type, identity) {
     /**
      * @sig
      * @description d
@@ -108,6 +108,7 @@ function monoidFactory(concatFn, type, empty) {
     return _monoid;
 }
 
+/*
 function monadMonoid(concatFn, m) {
     Object.defineProperties(m, {
         isEmpty: {
@@ -158,20 +159,9 @@ function structure(obj) {
 }
 
 var monoid = {
-    /**
-     * @sig
-     * @description d
-     * @return {undefined|*} - a
-     */
     get value() {
         return this.isEmpty ? undefined : this._value;
     },
-    /**
-     * @sig
-     * @description d
-     * @param {Array} others - a
-     * @return {*} - b
-     */
     concatAll: function _concatAll(...others) {
         return others.filter(function _filterEmpty(m) {
             return !m.isEmpty;
@@ -179,14 +169,10 @@ var monoid = {
             return curr.concat(next);
         }, this);
     },
-    /**
-     * @sig
-     * @description d
-     * @return {string} - a
-     */
     toString: function _toString() {
         return `${type}(${toString.call(this)})`;
     }
 };
+*/
 
 export { monoidFactory };

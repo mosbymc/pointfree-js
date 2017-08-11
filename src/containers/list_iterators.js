@@ -1,7 +1,7 @@
 import { isArray, strictEquals, isObject, type } from '../functionalHelpers';
 import { not, unfoldWith } from '../decorators';
 import { when, ifElse } from '../combinators';
-import { javaScriptTypes, sortDirection, cacher, typeName } from '../helpers';
+import { javaScriptTypes, sortDirection, cacher, typeNames } from '../helpers';
 import { sortData } from  './sortHelpers';
 
 var toArray = when(not(isArray), Array.from);
@@ -377,9 +377,9 @@ function ofType(xs, dataType) {
             return key in dataType;
         }
 
-        if (dataType in typeName) {
+        if (dataType in typeNames) {
             for (let x of xs) {
-                if (typeName[dataType] === typeof x) yield x;
+                if (typeNames[dataType] === typeof x) yield x;
             }
         }
         else {

@@ -1,8 +1,8 @@
 import { add, adjust, and, arraySet, both, concat, defaultPredicate, delegatesFrom, delegatesTo, divide, either, equals,
         falsey, flip, getWith, greaterThan, greaterThanOrEqual, has, inObject, invoke, isArray, isBoolean, isFunction,
-        isObject, isNothing, isNull, isNumber, isSomething, isString, isSymbol, isUndefined, lessThan, lessThanOrEqual,
-        mapSet, modulus, multiply, negate, notEqual, noop, nth, objectSet, once, or, reverse, set, setSet, strictEquals,
-        strictNotEqual, subtract, truthy, type, wrap } from '../../src/functionalHelpers';
+        isObject, isNothing, isNull, isNumber, isPrimitive, isSomething, isString, isSymbol, isUndefined, lessThan,
+        lessThanOrEqual, mapSet, modulus, multiply, negate, notEqual, noop, nth, objectSet, once, or, reverse, set,
+        setSet, strictEquals, strictNotEqual, subtract, truthy, type, wrap } from '../../src/functionalHelpers';
 import { identity, curry, ifElse } from '../../src/combinators';
 import { not } from '../../src/decorators';
 import { testData } from '../testData';
@@ -213,6 +213,30 @@ describe('isObject', function testIsObject() {
 
         expect(resultFive).to.be.a('boolean');
         expect(resultFive).to.not.be.ok;
+    });
+});
+
+describe('Test isPrimitive', function _testIsPrimitive() {
+    it('should return true if the item is a primitive type', function _testIsPrimitiveWithPrimitive() {
+        var res1 = isPrimitive(1),
+            res2 = isPrimitive('2'),
+            res3 = isPrimitive(null),
+            res4 = isPrimitive(undefined),
+            res5 = isPrimitive(Symbol.for('is_primitive'));
+
+        res1.should.be.true;
+        res2.should.be.true;
+        res3.should.be.true;
+        res4.should.be.true;
+        res5.should.be.true;
+    });
+
+    it('should return false if the item is not a primitive', function _testIsPrimitiveWithObjectAndFunction() {
+        var res1 = isPrimitive({ a: 1 }),
+            res2 = isPrimitive(x => x);
+
+        res1.should.be.false;
+        res2.should.be.false;
     });
 });
 

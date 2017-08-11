@@ -3,7 +3,7 @@ import { all, any, except, intersect, union, map, chain, groupBy, sortBy, prepen
         copyWithin, fill, findIndex, findLastIndex, repeat, foldRight, unfold } from '../../../src/containers/list_iterators';
 import { createListCreator } from '../../../src/containers/list_helpers';
 import { list_functor, ordered_list_functor } from '../../../src/containers/functors/list_functor';
-import { cacher, javaScriptTypes, sortDirection, typeName } from '../../../src/helpers';
+import { cacher, javaScriptTypes, sortDirection, typeNames } from '../../../src/helpers';
 import { testData } from '../../testData';
 
 describe('Test List Iterators', function _testListIterators() {
@@ -1484,7 +1484,7 @@ describe('Test List Iterators', function _testListIterators() {
         var typeTestData = [typeTest, Object.create(obj), 'string', 12345, false, Symbol(), null, undefined];
 
         it('should return all test data items when filtered by object', function testOfTypeWithObject() {
-            var ofTypeIterable = ofType(testData.dataSource.data, typeName.object),
+            var ofTypeIterable = ofType(testData.dataSource.data, typeNames.object),
                 ofTypeRes = Array.from(ofTypeIterable());
 
             ofTypeRes.should.have.lengthOf(testData.dataSource.data.length);
@@ -1511,35 +1511,35 @@ describe('Test List Iterators', function _testListIterators() {
         });
 
         it('should return nothing when asked for function types', function testOfTypeWithFunctions() {
-            var ofTypeIterable = ofType(testData.dataSource.data, typeName.function),
+            var ofTypeIterable = ofType(testData.dataSource.data, typeNames.function),
                 ofTypeRes = Array.from(ofTypeIterable());
 
             ofTypeRes.should.have.lengthOf(0);
         });
 
         it('should return nothing when asked for number types', function testOfTypeWithNumbers() {
-            var ofTypeIterable = ofType(testData.dataSource.data, typeName.number),
+            var ofTypeIterable = ofType(testData.dataSource.data, typeNames.number),
                 ofTypeRes = Array.from(ofTypeIterable());
 
             ofTypeRes.should.have.lengthOf(0);
         });
 
         it('should return nothing when asked for string types', function testOfTypeWithStrings() {
-            var ofTypeIterable = ofType(testData.dataSource.data, typeName.string),
+            var ofTypeIterable = ofType(testData.dataSource.data, typeNames.string),
                 ofTypeRes = Array.from(ofTypeIterable());
 
             ofTypeRes.should.have.lengthOf(0);
         });
 
         it('should return nothing when asked for boolean types', function testOfTypeWithBooleans() {
-            var ofTypeIterable = ofType(testData.dataSource.data, typeName.boolean),
+            var ofTypeIterable = ofType(testData.dataSource.data, typeNames.boolean),
                 ofTypeRes = Array.from(ofTypeIterable());
 
             ofTypeRes.should.have.lengthOf(0);
         });
 
         it('should return nothing when asked for symbol types', function testOfTypeWithSymbols() {
-            var ofTypeIterable = ofType(testData.dataSource.data, typeName.symbol),
+            var ofTypeIterable = ofType(testData.dataSource.data, typeNames.symbol),
                 ofTypeRes = Array.from(ofTypeIterable());
 
             ofTypeRes.should.have.lengthOf(0);
@@ -1561,7 +1561,7 @@ describe('Test List Iterators', function _testListIterators() {
         });
 
         it('should return the function in typeTestData', function testOfTypeAgainstTypeTestDataWithFunctions() {
-            var ofTypeIterable1 = ofType(typeTestData, typeName.function),
+            var ofTypeIterable1 = ofType(typeTestData, typeNames.function),
                 ofTypeIterable2 = ofType(typeTestData, typeTest),
                 ofTypeRes1 = Array.from(ofTypeIterable1()),
                 ofTypeRes2 = Array.from(ofTypeIterable2());
@@ -1581,7 +1581,7 @@ describe('Test List Iterators', function _testListIterators() {
         });
 
         it('should return the boolean value in typeTestData', function testOfTypeAgainstTypeTestDataWithBooleanValue() {
-            var ofTypeIterable = ofType(typeTestData, typeName.boolean),
+            var ofTypeIterable = ofType(typeTestData, typeNames.boolean),
                 ofTypeRes = Array.from(ofTypeIterable());
 
             ofTypeRes.should.have.lengthOf(1);
@@ -1589,7 +1589,7 @@ describe('Test List Iterators', function _testListIterators() {
         });
 
         it('should return the undefined value in typeTestData', function testTypeOfAgainstTypeTestDataWithUndefinedValue() {
-            var ofTypeIterable = ofType(typeTestData, typeName.undefined),
+            var ofTypeIterable = ofType(typeTestData, typeNames.undefined),
                 ofTypeRes = Array.from(ofTypeIterable());
 
             ofTypeRes.should.have.lengthOf(1);
@@ -1597,7 +1597,7 @@ describe('Test List Iterators', function _testListIterators() {
         });
 
         it('should return the number in typeTestData', function testTypeOfAgainstTypeTestDataWithNumbers() {
-            var ofTypeIterable = ofType(typeTestData, typeName.number),
+            var ofTypeIterable = ofType(typeTestData, typeNames.number),
                 ofTypeRes = Array.from(ofTypeIterable());
 
             ofTypeRes.should.have.lengthOf(1);
