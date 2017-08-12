@@ -2,8 +2,8 @@ import { observableStatus } from '../helpers';
 import { subscriber } from './subscribers/subscriber';
 import { debounceOperator, chainOperator, filterOperator, groupByOperator, itemBufferOperator, mapOperator, mergeOperator, timeBufferOperator } from './streamOperators/operators';
 import { generatorProto } from '../helpers';
-import { and, wrap, noop } from '../functionalHelpers';
-import { compose } from '../combinators';
+import { wrap, noop, delegatesTo } from '../functionalHelpers';
+import { compose, all } from '../combinators';
 
 //TODO: I thinking about implementing an 'observable watcher' functionality. the concept would be
 //TODO: that you have an observable that is registered to watch one or more other observables. When
@@ -38,9 +38,9 @@ var observable = {
      * @return {observable} - b
      */
     map: function _map(fn) {
-        if (mapOperator.isPrototypeOf(this.operator))
+        if (delegatesTo(this.operator, mapOperator))
             return this.lift.call(this.source, Object.create(mapOperator).init(compose(fn, this.operator.transform)));
-        return this.lift(Object.create(mapOperator).init(fn));
+        return op.call(this, mapOperator, fn);
     },
     /**
      * @sig
@@ -49,7 +49,7 @@ var observable = {
      * @return {observable} - b
      */
     chain: function _deepMap(fn) {
-        return this.lift(Object.create(chainOperator).init(fn));
+        return op.call(this, chainOperator, fn);
     },
     /**
      * @sig
@@ -58,9 +58,9 @@ var observable = {
      * @return {observable} - b
      */
     filter: function _filter(predicate) {
-        if (filterOperator.isPrototypeOf(this.operator))
-            return this.lift.call(this.source, Object.create(filterOperator).init(and(predicate, this.operator.predicate)));
-        return this.lift(Object.create(filterOperator).init(predicate));
+        if (delegatesTo(this.operator, filterOperator))
+            return this.lift.call(this.source, Object.create(filterOperator).init(all(predicate, this.operator.predicate)));
+        return op.call(this, filterOperator, predicate);
     },
     /**
      * @sig
@@ -71,7 +71,7 @@ var observable = {
      * @return {observable} - d
      */
     groupBy: function _groupBy(keySelector, comparer, bufferAmt = 0) {
-        return this.lift(Object.create(groupByOperator).init(keySelector, comparer, bufferAmt));
+        return op.call(this, groupByOperator, keySelector, comparer, bufferAmt);
     },
     /**
      * @sig
@@ -80,9 +80,9 @@ var observable = {
      * @return {observable} - b
      */
     merge: function _merge(...observables) {
-        if (mergeOperator.isPrototypeOf(this.operator))
+        if (delegatesTo(this.operator, mergeOperator))
             return this.lift.call(this.source, Object.create(mergeOperator).init([this].concat(observables, this.operator.observables)));
-        return this.lift(Object.create(mergeOperator).init([this].concat(observables)));
+        return op.call(this, mergeOperator, [this].concat(observables));
     },
     /**
      * @sig
@@ -91,7 +91,7 @@ var observable = {
      * @return {observable} - b
      */
     itemBuffer: function _itemBuffer(count) {
-        return this.lift(Object.create(itemBufferOperator).init(count));
+        return op.call(this, itemBufferOperator, count);
     },
     /**
      * @sig
@@ -100,7 +100,7 @@ var observable = {
      * @return {observable} - b
      */
     timeBuffer: function _timeBuffer(amt) {
-        return this.lift(Object.create(timeBufferOperator).init(amt));
+        return op.call(this, timeBufferOperator, amt);
     },
     /**
      * @sig
@@ -109,7 +109,7 @@ var observable = {
      * @return {*|observable} - b
      */
     debounce: function _debounce(amt) {
-        return this.lift(Object.create(debounceOperator).init(amt));
+        return op.call(this, debounceOperator, amt);
     },
     /**
      * @sig
@@ -317,5 +317,9 @@ var observable = {
         return s;
     }
 };
+
+function op(operator, ...args) {
+    return this.lift(Object.create(operator).init(...args));
+}
 
 export { observable };
