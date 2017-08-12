@@ -1,7 +1,7 @@
 /**
  * @sig
  * @description d
- * @param {Array} fns - One or more comma separated function arguments
+ * @param {function} fns - One or more comma separated function arguments
  * @return {function} - a
  */
 function all(...fns) {
@@ -47,7 +47,7 @@ var rev = (...args) => args.reverse();
  * @description d
  * @type {function}
  * @note: @see {@link pipe}
- * @param {Array} fns - a
+ * @param {function} fns - a
  * @return {*} - b
  */
 function compose(...fns) {
