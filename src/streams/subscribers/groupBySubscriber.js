@@ -4,7 +4,7 @@ import { sortData } from '../../containers/sortHelpers';
 var groupBySubscriber = Object.create(subscriber, {
     next: {
         value: function _next(item) {
-            if (this.buffer.length + 1 >= this.bufferAmount) {
+            if (this.buffer.length + 1 >= this.bufferSize) {
                 try {
                     var res = groupData(this.buffer, [ { keySelector: this.keySelector, comparer: this.comparer, direction: 'desc' } ]);
                     this.subscriber.next(res);
@@ -20,11 +20,11 @@ var groupBySubscriber = Object.create(subscriber, {
         configurable: false
     },
     init: {
-        value: function _init(subscriber, keySelector, comparer, bufferAmount) {
+        value: function _init(subscriber, keySelector, comparer, bufferSize) {
             this.initialize(subscriber);
             this.keySelector = keySelector;
             this.comparer = comparer;
-            this.bufferAmount = bufferAmount;
+            this.bufferAmount = bufferSize;
             this.buffer = [];
             return this;
         },

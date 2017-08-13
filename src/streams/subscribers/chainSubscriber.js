@@ -1,29 +1,20 @@
 import { subscriber } from './subscriber';
+import { delegatesTo } from '../../functionalHelpers';
+import { observable} from '../observable';
 
 var chainSubscriber = Object.create(subscriber, {
     next: {
         value: function _next(item) {
             var mappedResult;
             try {
-                mappedResult = recursiveMap(item);
+                mappedResult = this.transform(item, this.count++);
+                //TODO: figure out what needs to be done to pull the item out of the inner observable
+                this.subscriber.next(delegatesTo(mappedResult, observable) ? mappedResult.value : mappedResult);
             }
             catch (err) {
                 this.subscriber.error(err);
-                return;
             }
-            this.subscriber.next(mappedResult);
             //Promise.resolve(mappedResult).then(this.then);
-
-            function recursiveMap(item) {
-                if (isArray(item)) {
-                    var res = [];
-                    for (let it of item) {
-                        res = res.concat(recursiveMap(it));
-                    }
-                    return res;
-                }
-                return this.transform(item, this.count++);
-            }
         },
         writable: false,
         configurable: false
