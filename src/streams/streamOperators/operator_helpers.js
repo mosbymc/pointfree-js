@@ -12,11 +12,9 @@ function createGettersAndSetters(obj, ...props) {
         Object.defineProperty(obj,
             propName, {
                 get: function _get() {
-                    console.log(this[`_${propName}`]);
                     return this[`_${propName}`] || defaultVal;
                 },
                 set: function _set(val) {
-                    console.log(val);
                     this[`_${propName}`] = val;
                 }
             }
