@@ -1,12 +1,10 @@
 import { itemBufferSubscriber } from '../subscribers/itemBufferSubscriber';
+import { initOperator, subscribe } from './operator_helpers';
 
 var itemBufferOperator = {
-    init: function _init(amt) {
-        this.count = amt;
-        return this;
-    },
+    init: initOperator('count'),
     subscribe: function _subscribe(subscriber, source) {
-        return source.subscribe(Object.create(itemBufferSubscriber).init(subscriber, this.count));
+        return subscribe.call(this, subscriber, source, itemBufferSubscriber);
     }
 };
 

@@ -1,18 +1,11 @@
 import { filterSubscriber } from '../subscribers/filterSubscriber';
+import { initOperator, subscribe } from './operator_helpers';
+import { defaultPredicate } from '../../functionalHelpers';
 
 var filterOperator = {
-    get predicate() {
-        return this._predicate;
-    },
-    set predicate(fn) {
-        this._predicate = fn;
-    },
-    init: function _init(predicate) {
-        this.predicate = predicate;
-        return this;
-    },
+    init: initOperator(['predicate', defaultPredicate]),
     subscribe: function _subscribe(subscriber, source) {
-        return source.subscribe(Object.create(filterSubscriber).init(subscriber, this.predicate));
+        return subscribe.call(this, subscriber, source, filterSubscriber);
     }
 };
 

@@ -1,18 +1,11 @@
 import { mergeSubscriber } from '../subscribers/mergeSubscriber';
+import { initOperator, subscribe } from './operator_helpers';
 
 var mergeOperator = {
-    get observables() {
-        return this._observables || [];
-    },
-    set observables(arr) {
-        this._observables = arr;
-    },
-    init: function _init(observables) {
-        this.observables = observables;
-        return this;
-    },
+    //TODO: update this to take an optional 'merge' function that defaults to an identity for each observable if not provided
+    init: initOperator('observables'),
     subscribe: function _subscribe(subscriber, source) {
-        return source.subscribe(Object.create(mergeSubscriber).init(subscriber, this.observables));
+        return subscribe.call(this, subscriber, source, mergeSubscriber);
     }
 };
 

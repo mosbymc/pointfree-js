@@ -36,7 +36,6 @@ function any(...fns) {
  * @return {*} - c
  */
 var c = curry(function _c(x, y, z) {
-    console.log(x, y, z);
     return x(y)(z);
 });
 
@@ -379,9 +378,7 @@ function uncurry(fn) {
  * @return {function|*} - c
  */
 var uncurryN = curry(function uncurryN(depth, fn) {
-    console.log(depth, fn);
     return curryN(this, depth, function _uncurryN(...args) {
-        console.log(args);
         var currentDepth = 1,
             value = fn,
             idx = 0,
