@@ -1,18 +1,11 @@
 import { chainSubscriber } from '../subscribers/chainSubscriber';
+import { initOperator, subscribe } from './operator_helpers';
+import { noop } from '../../functionalHelpers';
 
 var chainOperator = {
-    get transform() {
-        return this._transform;
-    },
-    set transform(fn) {
-        this._transform = fn;
-    },
-    init: function _init(projectionFunc) {
-        this.transform = projectionFunc;
-        return this;
-    },
+    init: initOperator(['transform', noop]),
     subscribe: function _subscribe(subscriber, source) {
-        return source.subscribe(Object.create(chainSubscriber).init(subscriber, this.transform));
+        return subscribe.call(this, subscriber, source, chainSubscriber);
     }
 };
 

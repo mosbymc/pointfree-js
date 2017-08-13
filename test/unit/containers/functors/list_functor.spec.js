@@ -824,7 +824,7 @@ describe('List functor test', function _testListFunctor() {
                 var mapperSpy = sinon.spy(x => x * 2),
                     filterSpy = sinon.spy(x => 4 < x);
 
-                var list = List([1, 2, 3, 4, 5])
+                List([1, 2, 3, 4, 5])
                     .map(mapperSpy)
                     .filter(filterSpy)
                     .toEvaluatedList()
@@ -839,8 +839,6 @@ describe('List functor test', function _testListFunctor() {
 
             //TODO: need to update this - chai is not comparing maps correctly
             it('should return the underlying data as a map', function _testToMap() {
-                console.log(List([1, 2, 3, 4, 5])
-                    .toMap());
                 List([1, 2, 3, 4, 5])
                     .toMap()
                     .should.eql(new Map())

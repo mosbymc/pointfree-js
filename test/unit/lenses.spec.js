@@ -26,7 +26,7 @@ describe('Test lenses', function _testLenses() {
         var addrs = [{street: '99 Walnut Dr.', zip: '04821'}, {street: '2321 Crane Way', zip: '08082'}];
         var user = {id: 3, name: 'Charles Bronson', addresses: addrs};
 
-        it( '', function () {
+        it('should create a lens path and view/update object', function _createPathForViewingAndUpdating() {
             var name = lensPath('name');
 
             view(name, user).should.eql('Charles Bronson');
@@ -70,11 +70,11 @@ describe('Test lenses', function _testLenses() {
             // renderProfile :: User -> Html
             var renderProfile = compose(map(compose(profilePage, updateUser)), getUser);
 
-            console.log(Object.getPrototypeOf(renderProfile));
+            //console.log(Object.getPrototypeOf(renderProfile));
             //renderProfile(1).fork(console.log, console.log);
         });
 
-        it('', function() {
+        it('should do even more other stuff', function _testEvenMoreOtherStuff() {
             function capitalizeFirst(str) {
                 return str.toUpperCase();
             }
@@ -88,15 +88,15 @@ describe('Test lenses', function _testLenses() {
                     {body:'sing out strong',title:'Line 3'}]
             };
 
-            console.log(over(lensPath('comments', 0, 'body'), capitalizeFirst)(bigBird));//inline);
+            //console.log(over(lensPath('comments', 0, 'body'), capitalizeFirst)(bigBird));//inline);
 
             const firstCommentBody = lensPath('comments',0,'body');//assign lens to a resuable named variable
-            console.log(over(firstCommentBody, capitalizeFirst)(bigBird));//then use
+            //console.log(over(firstCommentBody, capitalizeFirst)(bigBird));//then use
 
             const mapped = curry((f, x) => Identity(mapWith(compose(x => x.value, f), x)));
             const mapTwice = compose(mapped, mapped);
-            console.log(over(mapTwice, x => x + 1, [[4, 6, 7], [5, 7, 8]]));
-            console.log(over(mapped, mapWith(x => x + 1), [[4, 6, 7], [5, 7, 8]]));
+            //console.log(over(mapTwice, x => x + 1, [[4, 6, 7], [5, 7, 8]]));
+            //console.log(over(mapped, mapWith(x => x + 1), [[4, 6, 7], [5, 7, 8]]));
 
 
             const dataset = {
@@ -112,9 +112,9 @@ describe('Test lenses', function _testLenses() {
             const eachEntrysId = compose(L.entries, mapped, L.id);
             const makeInt = x => parseInt(x, 10);
 
-            console.log(over(eachEntrysId, makeInt)(dataset));//boom: we fixed all the ids so they're Integers!
+            //console.log(over(eachEntrysId, makeInt)(dataset));//boom: we fixed all the ids so they're Integers!
 
-            console.log(over(L.entries, mapWith(over(L.id, x => parseInt(x, 10))), dataset));//same result, but eh, messy
+            //console.log(over(L.entries, mapWith(over(L.id, x => parseInt(x, 10))), dataset));//same result, but eh, messy
         });
     });
 });

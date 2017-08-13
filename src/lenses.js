@@ -107,7 +107,7 @@ var set = curry((lens, val, targetData) => over(lens, kestrel(val), targetData))
 /**
  * @sig
  * @description d
- * @param {Array} paths - a
+ * @param {string} paths - a
  * @return {*} - b
  */
 function makeLenses(...paths) {
@@ -120,7 +120,7 @@ function makeLenses(...paths) {
 /**
  * @sig
  * @description d
- * @param {Array} paths - a
+ * @param {string} paths - a
  * @return {function} - b
  */
 function improvedLensPath(...paths) {
@@ -138,7 +138,7 @@ function improvedLensPath(...paths) {
 /**
  * @sig
  * @description d
- * @param {Array} path - a
+ * @param {string|Number} path - a
  * @return {*} - b
  */
 function lensPath(...path) {

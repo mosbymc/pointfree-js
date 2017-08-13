@@ -1,23 +1,20 @@
 import { observableStatus } from '../../helpers';
 
 /**
- * @type {
- *  {
- *      status, status,
- *      count, count,
- *      removeSubscriber: subscriber._removeSubscriber,
- *      removeSubscription: subscriber._removeSubscription,
- *      removeSubscriptions: subscriber._removeSubscriptions,
- *      next: subscriber._next,
- *      error: subscriber._error,
- *      complete: subscriber._complete,
- *      initialize: subscriber._initialize,
- *      onError: subscriber._onError,
- *      onComplete: subscriber._onComplete,
- *      unsubscribe: subscriber._unsubscribe
- *    }
- *  }
- *  @description:
+ * @typedef {Object}
+ * @property {function} status
+ * @property {function} count
+ * @property {function} removeSubscriber
+ * @property {function} removeSubscription
+ * @property {function} removeSubscriptions
+ * @property {function} next
+ * @property {function} error
+ * @property {function} complete
+ * @property {function} initialize
+ * @property {function} onNext
+ * @property {function} onError
+ * @property {function} onComplete
+ * @description:
  */
 var subscriber = {
     get status() {
