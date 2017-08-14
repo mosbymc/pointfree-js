@@ -80,9 +80,19 @@ var observable = {
      * @return {observable} - b
      */
     merge: function _merge(...observables) {
+        return this.mergeMap(null, ...observables);
+    },
+    /**
+     * @sig
+     * @description d
+     * @param {function} fn - a
+     * @param {observable} observables - b
+     * @return {observable} - c
+     */
+    mergeMap: function _mergeMap(fn, ...observables) {
         if (delegatesTo(this.operator, mergeOperator))
-            return this.lift.call(this.source, Object.create(mergeOperator).init([this].concat(observables, this.operator.observables)));
-        return op.call(this, mergeOperator, [this].concat(observables));
+            return this.lift.call(this.source, Object.create(mergeOperator).init(fn, [this].concat(observables, this.operator.observables)));
+        return op.call(this, mergeOperator, fn, [this].concat(observables));
     },
     /**
      * @sig
