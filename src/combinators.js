@@ -4,13 +4,7 @@
  * @param {function} fns - One or more comma separated function arguments
  * @return {function} - a
  */
-function all(...fns) {
-    return function _all(...args) {
-        return fns.every(function _testAll(fn) {
-            return fn(...args);
-        });
-    };
-}
+var all = applyAll((fns, args) => fns.every(fn => fn(...args)));
 
 /**
  * @sig
@@ -18,13 +12,7 @@ function all(...fns) {
  * @param {Array} fns - One or more comma separated function arguments
  * @return {function} - a
  */
-function any(...fns) {
-    return function _any(...args) {
-        return fns.some(function _testAny(fn) {
-            return fn(...args);
-        });
-    };
-}
+var any = applyAll((fns, args) => fns.some(fn => fn(...args)));
 
 /**
  * @sig
@@ -322,13 +310,7 @@ var second = constant(identity);
  * @param {Array} fns - a
  * @return {function} - b
  */
-function sequence(fns) {
-    return function _sequence(...args) {
-        fns.forEach(function fSequence(fn) {
-            fn(...args);
-        });
-    };
-}
+var sequence = applyAll((fns, args) => fns.forEach(fn => fn(...args)));
 
 /**
  * @sig
@@ -452,6 +434,14 @@ function applyWhenReady(fn) {
     _applyWhenReady.args = () => values;
 
     return _applyWhenReady;
+}
+
+function applyAll(fn) {
+    return function _applyAll(...fns) {
+        return function __applyAll(...args) {
+            return fn(fns, args);
+        };
+    };
 }
 
 export { all, any, applyWhenReady, c, compose, constant, curry, curryN, curryRight, first, fixedPoint, fork, identity,

@@ -47,4 +47,18 @@ describe('Test observable', function _testObservable() {
                     done();
                 });
     });
+
+    it('should use the default value when none is provided', function _testMapWithoutMappingFunctionArgument(done) {
+        var list = [1, 2, 3, 4, 5],
+            res = [];
+
+        observable.fromList(list, 0)
+            .map()      // => no map function
+            .subscribe(val => res.push(val),
+                err => console.log(err),
+                function _complete() {
+                    res.should.eql(list);
+                    done();
+                });
+    });
 });

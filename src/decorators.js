@@ -3,6 +3,14 @@ import { curry, curryN } from './combinators';
 /**
  * @sig
  * @description d
+ * @param {function} func - a
+ * @return {function} - b
+ */
+var invoker = func => fn => (...args) => func(fn, ...args);
+
+/**
+ * @sig
+ * @description d
  * @type {function}
  * @param {function} fn - a
  * @param {function} decoration - b
@@ -21,7 +29,7 @@ var after = curryN(this, 3, function _after(fn, decoration, ...args) {
  * @param {function} fn - a
  * @return {function} - b
  */
-var apply = fn => (...args) => () => fn(...args);
+var apply = invoker((fn, ...args) => fn(...args));
 
 /**
  * @sig
@@ -86,11 +94,19 @@ function guard(...fns) {
 /**
  * @sig
  * @description d
+ * @param {function} fn - a
+ * @return {function} - b
+ */
+var lateApply = invoker((fn, ...args) => () => fn(...args));
+
+/**
+ * @sig
+ * @description d
  * @type {function}
  * @param {function} fn - a
  * @return {function} - b
  */
-var leftApply = fn => (...args) => fn(...args);
+var leftApply = apply;
 
 /**
  * @sig
@@ -98,7 +114,7 @@ var leftApply = fn => (...args) => fn(...args);
  * @param {function} fn - a
  * @return {*} - b
  */
-var maybe = (fn) => (...args) => 1 <= args.length && args.every(function _testNull(val) { return null != val; }) ? fn.call(this, ...args) : null;
+var maybe = invoker((fn, ...args) => 1 <= args.length && args.every(function _testNull(val) { return null != val; }) ? fn.call(this, ...args) : null);
 
 /**
  * @sig not :: () -> !()
@@ -110,7 +126,7 @@ var maybe = (fn) => (...args) => 1 <= args.length && args.every(function _testNu
  * @param {function} fn - a
  * @return {*} - b
  */
-var not = fn => (...args) => !fn(...args);
+var not = invoker((fn, ...args) => !fn(...args));
 
 /**
  * @sig
@@ -125,7 +141,6 @@ function once(fn) {
             invoked = true;
             return fn(...args);
         }
-        return undefined;
     };
 }
 
@@ -147,7 +162,7 @@ var repeat = curry(function _repeat(num, fn) {
  * @param {function} fn - a
  * @return {function} - b
  */
-var rightApply = fn => (...args) => fn(...args.reverse());
+var rightApply = invoker((fn, ...args) => fn(...args.reverse()));
 
 //TODO: need to add a try/catch function here, and see about renaming the existing 'safe' function
 //TODO: as that seems more along the lines of a try/catch function, rather than a 'maybe' function.
@@ -157,12 +172,7 @@ var rightApply = fn => (...args) => fn(...args.reverse());
  * @param {function} fn - a
  * @return {function} - b
  */
-function safe(fn) {
-    return function _safe(...args) {
-        if (!args.length || args.includes(null) || args.includes(undefined)) return;
-        return fn(...args);
-    };
-}
+var safe = invoker((fn, ...args) => !args.length || args.includes(null) || args.includes(undefined) ? undefined : fn(...args));
 
 /**
  * @sig
@@ -268,8 +278,7 @@ var hyloWith = curry(function _hylo(cata, ana, seed) {
  * @param {function} fn - a
  * @return {function} - b
  */
-var voidFn = fn => (...args) => void fn(...args);
-
+var voidFn = invoker((fn, ...args) => void fn(...args));
 
 /*
  var c = leftApply(leftApply, rightApply);
@@ -277,6 +286,5 @@ var voidFn = fn => (...args) => void fn(...args);
  var getWith = c(getWith);
  */
 
-
-export { after, apply, before, binary, bindFunction, guard, hyloWith, leftApply, maybe, not, once, repeat, rightApply,
+export { after, apply, before, binary, bindFunction, guard, hyloWith, lateApply, leftApply, maybe, not, once, repeat, rightApply,
         safe, tap, ternary, tryCatch, unary, unfold, unfoldWith, voidFn };

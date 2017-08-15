@@ -24,7 +24,7 @@ var timeBufferSubscriber = Object.create(subscriber, {
 
             function _interval() {
                 if (this.buffer.length) {
-                    //the map is needed here because, due to the asychronous nature of subscribers and the subsequent
+                    //the map is needed here because, due to the asynchronous nature of subscribers and the subsequent
                     //clearing of the buffer, the subscriber#next argument would be nullified before it had a chance
                     //to act on it.
                     this.subscriber.next(this.buffer.map(function _mapBuffer(item) { return item; }));
