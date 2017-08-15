@@ -92,7 +92,7 @@ var subscriber = {
 
         if (subscriber.isPrototypeOf(next)) {
             this.subscriber = next;
-            next.subscriptions = next.subscriptions ? next.subscriptions.concat(this) : [].concat(this);
+            next.subscriptions = next.subscriptions ? next.subscriptions.concat(this) : [this];
             return this;
         }
         this.subscriber = {

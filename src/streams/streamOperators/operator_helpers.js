@@ -24,18 +24,31 @@ function createGettersAndSetters(obj, ...props) {
 }
 
 function subscribe(subscriber, source, operatorSubscriber) {
-    var args = Object.getOwnPropertyNames(this)
-        .filter(prop => Object.getOwnPropertyDescriptor(this, prop).get)
-        .map(prop => this[prop]);
-    return source.subscribe(Object.create(operatorSubscriber).init(subscriber, ...args));
+    return source.subscribe(Object.create(operatorSubscriber).init(subscriber, ...getSetters(this).map(prop => this[prop])));
 }
 
 function initOperator(...props) {
     return function _initOperator(...args) {
-        createGettersAndSetters(this, ...props);
-        props.forEach((prop, idx) => this[prop] = args[idx]);
-        return this;
+        return executeOnSetters(createGettersAndSetters(this, ...props), setDefaultValues(props.map(prop => !Array.isArray(prop) ? prop : prop[0]), args));
     };
+}
+
+function setDefaultValues(props, args) {
+    return function _cb(objectProp, idx) {
+        if (props.includes(objectProp)) {
+            this[objectProp] = args[idx];
+        }
+    };
+}
+
+function getSetters(obj) {
+    return Object.getOwnPropertyNames(obj)
+        .filter(prop => Object.getOwnPropertyDescriptor(obj, prop).set);
+}
+
+function executeOnSetters(obj, fn) {
+    getSetters(obj).forEach(fn, obj);
+    return obj;
 }
 
 export { createGettersAndSetters, initOperator, subscribe };

@@ -105,7 +105,7 @@ describe('Test combinators', function _testCombinators() {
         var obj1 = { a: 1 },
             obj2 = { a: 1 };
 
-        var seqFn = sequence([one, two]);
+        var seqFn = sequence(one, two);
 
         seqFn(obj1, obj2);
 

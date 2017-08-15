@@ -21,8 +21,7 @@ describe('Decorators Test', function _testDecorators() {
             function t(...args) { return args.reverse(); }
 
             var applyT = apply(t),
-                tAwait = applyT(1, 2, 3, 4, 5),
-                tRes = tAwait();
+                tRes = applyT(1, 2, 3, 4, 5);
 
             tRes.should.be.an('array');
             tRes.should.eql([5, 4, 3, 2, 1]);
