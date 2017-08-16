@@ -1,21 +1,30 @@
 import { curry, curryN } from './combinators';
 
 /**
- * @sig
- * @description d
- * @param {function} func - a
- * @return {function} - b
+ * @sig ((*... -> a)) -> (*... -> a) -> [*] -> a
+ * @description Used as a helper function, invoker takes any function that
+ * requires a single function argument and one or more additional parameters
+ * and partially applies that function. @see apply
+ * @param {function} func - A non-curried, non-partially applied function
+ * that expects at least two arguments
+ * @return {function} - Returns a function that has turned the 'func' param
+ * into a partially applied function.
  */
 var invoker = func => fn => (...args) => func(fn, ...args);
 
 /**
- * @sig
- * @description d
+ * @sig (*... -> a) -> (*... -> a) -> [*] -> a
+ * @description A curried function that takes two functions and
+ * n arguments to apply both functions to. The first function is
+ * applied to the arguments, followed by the second. The return value
+ * is equal to the return value of the first function's invocation.
  * @type {function}
- * @param {function} fn - a
- * @param {function} decoration - b
- * @param {*} args - c
- * @return {*} - d
+ * @param {function} fn - A function that should be applied to the arguments. The return
+ * value is equal to this function's return value.
+ * @param {function} decoration - A function that should be applied to the arguments after
+ * the first function; the return value is ignored.
+ * @param {*} args - The arguments that each function should be invoked with.
+ * @return {*} - The return value of the first function.
  */
 var after = curryN(this, 3, function _after(fn, decoration, ...args) {
     var ret = fn(...args);
@@ -24,10 +33,11 @@ var after = curryN(this, 3, function _after(fn, decoration, ...args) {
 });
 
 /**
- * @sig
- * @description d
- * @param {function} fn - a
- * @return {function} - b
+ * @sig (*... -> a) -> [*] -> a
+ * @description A partially applied function that takes a function and any arguments
+ * and returns the result of apply the function to the arguments.
+ * @param {function} fn - The function that should be applied to the arguments.
+ * @return {function} - The result of applying the function to the arguments.
  */
 var apply = invoker((fn, ...args) => fn(...args));
 
@@ -46,25 +56,49 @@ var before = curryN(this, 3, function _before(fn, decoration, ...args) {
 });
 
 /**
- * @sig
- * @description d
+ * @sig (*... -> a) -> (*...) -> a
+ * @description Takes a non-curried function of any arity and turns it
+ * into a binary, curried function.
  * @type {function}
- * @param {function} fn - a
- * @param {*} args - b
- * @return {function} - c
+ * @param {function} fn - The function that should be made binary.
+ * @param {*} args - The arguments that should be applied to the new
+ * binary function.
+ * @return {function} - A function waiting for both arguments to be applied.
  */
 var binary = (fn, ...args) => curryN(this, 2, fn, ...args);
 
 /**
- * @sig
- * @description d
+ * @sig {*} -> (* -> *) -> (* -> *)
+ * @description A curried function that takes an object context and
+ * a function and returns the function bound to the context of the
+ * object.
  * @type {function}
- * @param {object} context - a
- * @param {function} fn - b
- * @return {function} - c
+ * @param {object} context - The context the function should be
+ * invoked with.
+ * @param {function} fn - The function that should be bound to the
+ * context of the object.
+ * @return {function} - A function, bound to the provided context,
+ * waiting to be invoked.
  */
 var bindFunction = curry(function _bindFunction(context, fn) {
     return fn.bind(context);
+});
+
+/**
+ * @sig {*} -> (* -> *) -> (* -> *)
+ * @description A curried function that takes an object context and
+ * a function and returns the function bound to the context of the
+ * object.
+ * @type {function}
+ * @param {function} fn - The function that should be bound to the
+ * context of the object.
+ * @param {object} context - The context the function should be
+ * invoked with.
+ * @return {function} - A function, bound to the provided context,
+ * waiting to be invoked.
+ */
+var bindWith = curry(function _bindWith(fn, context) {
+    return bindFunction(context, fn);
 });
 
 /*
@@ -286,5 +320,5 @@ var voidFn = invoker((fn, ...args) => void fn(...args));
  var getWith = c(getWith);
  */
 
-export { after, apply, before, binary, bindFunction, guard, hyloWith, lateApply, leftApply, maybe, not, once, repeat, rightApply,
+export { after, apply, before, binary, bindFunction, bindWith, guard, hyloWith, lateApply, leftApply, maybe, not, once, repeat, rightApply,
         safe, tap, ternary, tryCatch, unary, unfold, unfoldWith, voidFn };
