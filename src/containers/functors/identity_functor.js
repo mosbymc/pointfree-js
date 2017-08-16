@@ -3,7 +3,7 @@ import { equalMaker, pointMaker, stringMaker, valueOf, get, orElse, getOrElse } 
 /**
  * @sig
  * @description d
- * @param {*} item - a
+ * @param {*} [item] - a
  * @return {identity_functor} - b
  */
 function Identity(item) {
@@ -19,7 +19,7 @@ function Identity(item) {
 /**
  * @sig
  * @description d
- * @param {*} x - a
+ * @param {*} [x] - a
  * @return {identity_functor} - b
  */
 Identity.of = x => Identity(x);
@@ -27,7 +27,7 @@ Identity.of = x => Identity(x);
 /**
  * @sig
  * @description d
- * @param {Object} f - a
+ * @param {Object} [f] - a
  * @return {boolean} - b
  */
 Identity.is = f => identity_functor.isPrototypeOf(f);

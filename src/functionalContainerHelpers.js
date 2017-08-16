@@ -1,5 +1,5 @@
-import { functors } from './containers/functors/functors';
-import { monads } from './containers/monads/monads';
+import * as functors from './containers/functors/functors';
+import * as monads from './containers/monads/monads';
 
 /**
  * @sig

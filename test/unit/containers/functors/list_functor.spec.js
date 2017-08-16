@@ -1,4 +1,4 @@
-import { functors } from '../../../../src/containers/functors/functors';
+import * as functors from '../../../../src/containers/functors/functors';
 import { list_functor, ordered_list_functor } from '../../../../src/containers/functors/list_functor';
 import { testData } from '../../../testData';
 
@@ -190,7 +190,6 @@ describe('List functor test', function _testListFunctor() {
         it('should transform an List functor to the other functor types', function _testListFunctorTransforms() {
             var l = List(1);
             var c = l.mapToConstant(),
-                e = l.mapToEither(),
                 f = l.mapToFuture(),
                 io = l.mapToIo(),
                 i = l.mapToIdentity(),
@@ -200,9 +199,6 @@ describe('List functor test', function _testListFunctor() {
 
             c.should.be.an('object');
             Object.getPrototypeOf(c).should.eql(Object.getPrototypeOf(functors.Constant()));
-
-            e.should.be.an('object');
-            //Object.getPrototypeOf(e).should.eql(Object.getPrototypeOf(functors.Either()));
 
             f.should.be.an('object');
             Object.getPrototypeOf(f).should.eql(Object.getPrototypeOf(functors.Future()));

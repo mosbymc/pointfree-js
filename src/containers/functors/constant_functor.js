@@ -3,7 +3,7 @@ import { equalMaker, pointMaker, stringMaker, valueOf, get, orElse, getOrElse } 
 /**
  * @sig
  * @description d
- * @param {*} item - a
+ * @param {*} [item] - a
  * @return {constant_functor} - b
  */
 function Constant(item) {
@@ -19,7 +19,7 @@ function Constant(item) {
 /**
  * @sig
  * @description d
- * @param {*} x - a
+ * @param {*} [x] - a
  * @return {constant_functor} - b
  */
 Constant.of = x => Constant(x);
@@ -27,7 +27,7 @@ Constant.of = x => Constant(x);
 /**
  * @sig
  * @description d
- * @param {function} f - a
+ * @param {function} [f] - a
  * @return {boolean} - b
  */
 Constant.is = f => constant_functor.isPrototypeOf(f);

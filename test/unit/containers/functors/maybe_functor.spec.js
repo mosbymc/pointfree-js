@@ -1,4 +1,4 @@
-import { functors } from '../../../../src/containers/functors/functors';
+import * as functors from '../../../../src/containers/functors/functors';
 import { just_functor, nothing_functor } from '../../../../src/containers/functors/maybe_functor';
 
 var Maybe = functors.Maybe,

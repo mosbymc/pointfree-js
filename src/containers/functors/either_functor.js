@@ -14,8 +14,8 @@ function fromNullable(x) {
 /**
  * @sig
  * @description d
- * @param {*} val - a
- * @param {string} fork - b
+ * @param {*} [val] - a
+ * @param {string} [fork] - b
  * @return {left_functor|right_functor} - c
  */
 function Either(val, fork) {
@@ -51,7 +51,7 @@ function Either(val, fork) {
 /**
  * @sig
  * @description d
- * @param {*} x - a
+ * @param {*} [x] - a
  * @return {right_functor} - b
  */
 Either.of = x => Either(x, 'right');
@@ -59,7 +59,7 @@ Either.of = x => Either(x, 'right');
 /**
  * @sig
  * @description d
- * @param {Object} f - a
+ * @param {Object} [f] - a
  * @return {boolean} - b
  */
 Either.is = f => Left.is(f) || Right.is(f);
@@ -67,7 +67,7 @@ Either.is = f => Left.is(f) || Right.is(f);
 /**
  * @sig
  * @description d
- * @param {Object} f - a
+ * @param {Object} [f] - a
  * @return {boolean} - b
  */
 Either.isRight = f => f.isRight;
@@ -75,7 +75,7 @@ Either.isRight = f => f.isRight;
 /**
  * @sig
  * @description d
- * @param {Object} f - a
+ * @param {Object} [f] - a
  * @return {boolean} - b
  */
 Either.isLeft = f => f.isLeft;
@@ -91,7 +91,7 @@ Either.Right = x => Either(x, 'right');
 /**
  * @sig
  * @description d
- * @param {*} x - a
+ * @param {*} [x] - a
  * @return {left_functor} - b
  */
 Either.Left = x => Either(x);
@@ -99,7 +99,7 @@ Either.Left = x => Either(x);
 /**
  * @sig
  * @description d
- * @param {*} x - a
+ * @param {*} [x] - a
  * @return {left_functor|right_functor} - b
  */
 Either.fromNullable = fromNullable;
@@ -107,7 +107,7 @@ Either.fromNullable = fromNullable;
 /**
  * @sig
  * @description d
- * @param {*} val - a
+ * @param {*} [val] - a
  * @return {left_functor} - b
  */
 function Left(val) {
@@ -133,7 +133,7 @@ function Left(val) {
 /**
  * @sig
  * @description d
- * @param {*} x - a
+ * @param {*} [x] - a
  * @return {left_functor} - b
  */
 Left.of = x => Left(x);
@@ -141,7 +141,7 @@ Left.of = x => Left(x);
 /**
  * @sig
  * @description d
- * @param {Object} f - a
+ * @param {Object} [f] - a
  * @return {boolean} - b
  */
 Left.is = f => left_functor.isPrototypeOf(f);
@@ -149,7 +149,7 @@ Left.is = f => left_functor.isPrototypeOf(f);
 /**
  * @sig
  * @description d
- * @param {*} val - a
+ * @param {*} [val] - a
  * @return {right_functor} - b
  */
 function Right(val) {
@@ -175,7 +175,7 @@ function Right(val) {
 /**
  * @sig
  * @description d
- * @param {Object} x - a
+ * @param {Object} [x] - a
  * @return {boolean} - b
  */
 Right.is = x => right_functor.isPrototypeOf(x);
@@ -183,7 +183,7 @@ Right.is = x => right_functor.isPrototypeOf(x);
 /**
  * @sig
  * @description d
- * @param {*} x - a
+ * @param {*} [x] - a
  * @return {right_functor} - b
  */
 Right.of = x => Right(x);

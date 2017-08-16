@@ -1,7 +1,7 @@
 import { isConstant, isEither, isFuture, isFunctor, isIdentity, isIo, isJust, isLeft,
         isList, isMaybe, isMonad, isNothing, isRight, isValidation } from '../../src/functionalContainerHelpers';
-import { functors } from '../../src/containers/functors/functors';
-import { monads } from '../../src/containers/monads/monads';
+import * as functors from '../../src/containers/functors/functors';
+import * as monads from '../../src/containers/monads/monads';
 
 describe('Test functionalContainerHelpers', function _testFunctionalContainerHelpers() {
     describe('Test isFunctor', function _testIsFunctor() {

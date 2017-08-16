@@ -1,4 +1,4 @@
-import { functors } from '../../../../src/containers/functors/functors';
+import * as functors from '../../../../src/containers/functors/functors';
 import { right_functor, left_functor } from '../../../../src/containers/functors/either_functor';
 
 var Either = functors.Either,

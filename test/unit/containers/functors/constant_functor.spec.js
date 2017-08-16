@@ -1,4 +1,4 @@
-import { functors } from '../../../../src/containers/functors/functors';
+import * as functors from '../../../../src/containers/functors/functors';
 import { constant_functor } from '../../../../src/containers/functors/constant_functor';
 
 var Constant = functors.Constant;
@@ -168,7 +168,6 @@ describe('Constant functor tests', function _testConstantFunctor() {
         it('should transform an constant functor to the other functor types', function _testConstantFunctorTransforms() {
             var i = Constant(1);
             var c = i.mapToIdentity(),
-                e = i.mapToEither(),
                 f = i.mapToFuture(),
                 io = i.mapToIo(),
                 l = i.mapToList(),
@@ -178,9 +177,6 @@ describe('Constant functor tests', function _testConstantFunctor() {
 
             c.should.be.an('object');
             Object.getPrototypeOf(c).should.eql(Object.getPrototypeOf(functors.Identity()));
-
-            e.should.be.an('object');
-            //Object.getPrototypeOf(e).should.eql(Object.getPrototypeOf(functors.Either()));
 
             f.should.be.an('object');
             Object.getPrototypeOf(f).should.eql(Object.getPrototypeOf(functors.Future()));

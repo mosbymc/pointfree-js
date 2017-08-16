@@ -6,10 +6,7 @@ import { Io, io_monad } from './io_monad';
 import { List, list_monad, ordered_list_monad } from './list_monad';
 import { Maybe, Just, Nothing, just_monad, nothing_monad } from './maybe_monad';
 import { Validation, validation_monad } from './validation_monad';
-
-import { lifter } from '../containerHelpers';
-import { toContainerType, containerIterator } from '../../pointlessContainers';
-
+import { applyTransforms, containerIterator, lifter } from '../containerHelpers';
 
 /*
     - Semigroup:
@@ -78,130 +75,15 @@ import { toContainerType, containerIterator } from '../../pointlessContainers';
         > p.promap(a => f(g(a)), b => h(i(b))) is equivalent to p.promap(f, i).promap(g, h) (composition)
  */
 
-var mapToConstant = toContainerType(Constant),
-    mapToEither = toContainerType(Either),
-    mapToFuture = toContainerType(Future),
-    mapToIdentity = toContainerType(Identity),
-    mapToIo = toContainerType(Io),
-    mapToLeft = toContainerType(Left),
-    mapToList = toContainerType(List),
-    mapToMaybe = toContainerType(Maybe),
-    mapToRight = toContainerType(Right),
-    mapToValidation = toContainerType(Validation);
-
-constant_monad.mapToEither = mapToEither;
-constant_monad.mapToFuture = mapToFuture;
-constant_monad.mapToIdentity = mapToIdentity;
-constant_monad.mapToIo = mapToIo;
-constant_monad.mapToLeft = mapToLeft;
-constant_monad.mapToList = mapToList;
-constant_monad.mapToMaybe = mapToMaybe;
-constant_monad.mapToRight = mapToRight;
-constant_monad.mapToValidation = mapToValidation;
 constant_monad[Symbol.iterator] = containerIterator;
-
-future_monad.mapToConstant = mapToConstant;
-future_monad.mapToEither = mapToEither;
-future_monad.mapToIdentity = mapToIdentity;
-future_monad.mapToIo = mapToIo;
-future_monad.mapToLeft = mapToLeft;
-future_monad.mapToList = mapToList;
-future_monad.mapToMaybe = mapToMaybe;
-future_monad.mapToRight = mapToRight;
-future_monad.mapToValidation = mapToValidation;
 future_monad[Symbol.iterator] = containerIterator;
-
-identity_monad.mapToConstant = mapToConstant;
-identity_monad.mapToEither = mapToEither;
-identity_monad.mapToFuture = mapToFuture;
-identity_monad.mapToIo = mapToIo;
-identity_monad.mapToLeft = mapToLeft;
-identity_monad.mapToList = mapToList;
-identity_monad.mapToMaybe = mapToMaybe;
-identity_monad.mapToRight = mapToRight;
-identity_monad.mapToValidation = mapToValidation;
 identity_monad[Symbol.iterator] = containerIterator;
-
-io_monad.mapToConstant = mapToConstant;
-io_monad.mapToEither = mapToEither;
-io_monad.mapToFuture = mapToFuture;
-io_monad.mapToIdentity = mapToIdentity;
-io_monad.mapToLeft = mapToLeft;
-io_monad.mapToList = mapToList;
-io_monad.mapToMaybe = mapToMaybe;
-io_monad.mapToRight = mapToRight;
-io_monad.mapToValidation = mapToValidation;
 io_monad[Symbol.iterator] = containerIterator;
-
-left_monad.mapToConstant = mapToConstant;
-left_monad.mapToFuture = mapToFuture;
-left_monad.mapToIdentity = mapToIdentity;
-left_monad.mapToIo = mapToIo;
-left_monad.mapToList = mapToList;
-left_monad.mapToMaybe = mapToMaybe;
-left_monad.mapToValidation = mapToValidation;
 left_monad[Symbol.iterator] = containerIterator;
-
-just_monad.mapToConstant = mapToConstant;
-just_monad.mapToEither = mapToEither;
-just_monad.mapToFuture = mapToFuture;
-just_monad.mapToIdentity = mapToIdentity;
-just_monad.mapToIo = mapToIo;
-just_monad.mapToList = mapToList;
-just_monad.mapToValidation = mapToValidation;
 just_monad[Symbol.iterator] = containerIterator;
-
-list_monad.mapToConstant = mapToConstant;
-list_monad.mapToEither = mapToEither;
-list_monad.mapToFuture = mapToFuture;
-list_monad.mapToIdentity = mapToIdentity;
-list_monad.mapToIo = mapToIo;
-list_monad.mapToLeft = mapToLeft;
-list_monad.mapToMaybe = mapToMaybe;
-list_monad.mapToRight = mapToRight;
-list_monad.mapToValidation = mapToValidation;
-
-ordered_list_monad.mapToConstant = mapToConstant;
-ordered_list_monad.mapToEither = mapToEither;
-ordered_list_monad.mapToFuture = mapToFuture;
-ordered_list_monad.mapToIdentity = mapToIdentity;
-ordered_list_monad.mapToIo = mapToIo;
-ordered_list_monad.mapToLeft = mapToLeft;
-ordered_list_monad.mapToMaybe = mapToMaybe;
-ordered_list_monad.mapToRight = mapToRight;
-ordered_list_monad.mapToValidation = mapToValidation;
-
-nothing_monad.mapToConstant = mapToConstant;
-nothing_monad.mapToEither = mapToEither;
-nothing_monad.mapToFuture = mapToFuture;
-nothing_monad.mapToIdentity = mapToIdentity;
-nothing_monad.mapToIo = mapToIo;
-nothing_monad.mapToLeft = mapToLeft;
-nothing_monad.mapToList = mapToList;
-nothing_monad.mapToRight = mapToRight;
-nothing_monad.mapToValidation = mapToValidation;
 nothing_monad[Symbol.iterator] = containerIterator;
-
-right_monad.mapToConstant = mapToConstant;
-right_monad.mapToFuture = mapToFuture;
-right_monad.mapToIdentity = mapToIdentity;
-right_monad.mapToIo = mapToIo;
-right_monad.mapToList = mapToList;
-right_monad.mapToMaybe = mapToMaybe;
-right_monad.mapToValidation = mapToValidation;
 right_monad[Symbol.iterator] = containerIterator;
-
-validation_monad.mapToConstant = mapToConstant;
-validation_monad.mapToEither = mapToEither;
-validation_monad.mapToFuture = mapToFuture;
-validation_monad.mapToIdentity = mapToIdentity;
-validation_monad.mapToIo = mapToIo;
-validation_monad.mapToLeft = mapToLeft;
-validation_monad.mapToList = mapToList;
-validation_monad.mapToMaybe = mapToMaybe;
-validation_monad.mapToRight = mapToRight;
 validation_monad[Symbol.iterator] = containerIterator;
-
 
 Constant.lift = lifter(Constant);
 Either.lift = lifter(Either);
@@ -216,20 +98,21 @@ Nothing.lift = lifter(Nothing);
 Right.lift = lifter(Right);
 Validation.lift = lifter(Validation);
 
+var monads = [
+    { factory: Constant, delegate: constant_monad },
+    { factory: Future, delegate: future_monad },
+    { factory: Identity, delegate: identity_monad },
+    { factory: Io, delegate: io_monad },
+    { factory: Just, delegate: just_monad },
+    { factory: Left, delegate: left_monad },
+    { factory: List, delegate: list_monad },
+    { factory: List, delegate: ordered_list_monad },
+    { factory: Maybe },
+    { factory: Nothing, delegate: nothing_monad },
+    { factory: Right, delegate: right_monad },
+    { factory: Validation, delegate: validation_monad }
+];
 
-var monads = {
-    Constant,
-    Either,
-    Future,
-    Identity,
-    Io,
-    Just,
-    Left,
-    List,
-    Maybe,
-    Nothing,
-    Right,
-    Validation
-};
+applyTransforms(monads);
 
-export { monads };
+export { Constant, Either, Future, Identity, Io, Just, Left, List, Maybe, Nothing, Right, Validation };

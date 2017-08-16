@@ -1,4 +1,4 @@
-import { functors } from '../../../../src/containers/functors/functors';
+import * as functors from '../../../../src/containers/functors/functors';
 import { identity_functor } from '../../../../src/containers/functors/identity_functor';
 
 var Future = functors.Future;
