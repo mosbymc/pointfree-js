@@ -1,4 +1,4 @@
-import { functors } from '../../../../src/containers/functors/functors';
+import * as functors from '../../../../src/containers/functors/functors';
 import { identity_functor } from '../../../../src/containers/functors/identity_functor';
 
 var Identity = functors.Identity;
@@ -221,10 +221,9 @@ describe('Identity functor test', function _testIdentityFunctor() {
             expect(false).to.eql(i8.value);
         });
 
-        it('should transform an identity functor to the other functor types', function _testIdentityFunctorTransforms() {
+        it('should map an identity functor to the other functor types', function _testIdentityFunctorMapTransform() {
             var i = Identity(1);
             var c = i.mapToConstant(),
-                e = i.mapToEither(),
                 f = i.mapToFuture(),
                 io = i.mapToIo(),
                 l = i.mapToList(),
@@ -235,8 +234,38 @@ describe('Identity functor test', function _testIdentityFunctor() {
             c.should.be.an('object');
             Object.getPrototypeOf(c).should.eql(Object.getPrototypeOf(functors.Constant()));
 
-            e.should.be.an('object');
-            //Object.getPrototypeOf(e).should.eql(Object.getPrototypeOf(functors.Either()));
+            f.should.be.an('object');
+            Object.getPrototypeOf(f).should.eql(Object.getPrototypeOf(functors.Future()));
+
+            io.should.be.an('object');
+            Object.getPrototypeOf(io).should.eql(Object.getPrototypeOf(functors.Io()));
+
+            l.should.be.an('object');
+            Object.getPrototypeOf(l).should.eql(Object.getPrototypeOf(functors.List()));
+
+            left.should.be.an('object');
+            Object.getPrototypeOf(left).should.eql(Object.getPrototypeOf(functors.Left()));
+
+            m.should.be.an('object');
+            Object.getPrototypeOf(m).should.eql(Object.getPrototypeOf(functors.Maybe(1)));
+
+            r.should.be.an('object');
+            Object.getPrototypeOf(r).should.eql(Object.getPrototypeOf(functors.Right()));
+        });
+
+        it('should transform an identity functor to the other functor types', function _testIdentityFunctorTransform() {
+            var i = Identity(1);
+
+            var c = i.toConstant(),
+                f = i.toFuture(),
+                io = i.toIo(),
+                l = i.toList(),
+                left = i.toLeft(),
+                m = i.toMaybe(),
+                r = i.toRight();
+
+            c.should.be.an('object');
+            Object.getPrototypeOf(c).should.eql(Object.getPrototypeOf(functors.Constant()));
 
             f.should.be.an('object');
             Object.getPrototypeOf(f).should.eql(Object.getPrototypeOf(functors.Future()));

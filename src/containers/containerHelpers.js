@@ -1,3 +1,65 @@
+import { identity } from '../combinators';
+
+/**
+ * @sig
+ * @description d
+ * @param {Object} type - a
+ * @return {function} - b
+ */
+function toContainerType(type) {
+    return function toType(fn = identity) {
+        return type.of(fn(this.value));
+    };
+}
+
+function selfMapper(fn = identity) {
+    return this.map(fn);
+}
+
+function applyTransforms(types) {
+    var fns = types
+        .map(type => [
+            { name: `mapTo${type.factory.name}`, fn: toContainerType(type.factory) },
+            { name: `to${type.factory.name}`, fn: function _toType() { return type.factory(this.value); } }
+        ]);
+
+    types.forEach(function _applyTransforms(type) {
+        if (type.delegate) {
+            let regex = new RegExp(type.factory.name, 'i');
+
+            fns.forEach(function _addTransformFunctionality(transforms) {
+                transforms.forEach(transform => type.delegate[transform.name] = regex.test(transform.name) ? selfMapper : transform.fn);
+            });
+        }
+    });
+
+    return types;
+}
+
+/**
+ * @sig
+ * @description d
+ * @return {Object} - a
+ */
+function containerIterator() {
+    let first = true,
+        val = this.value;
+    return {
+        next: function _next() {
+            if (first) {
+                first = false;
+                return {
+                    done: false,
+                    value: val
+                };
+            }
+            return {
+                done: true
+            };
+        }
+    };
+}
+
 /**
  * @sig
  * @description d
@@ -124,7 +186,7 @@ var maybeFactoryHelper = type => val => type(val);
  * @return {*} - a
  */
 function mjoin() {
-    return this.value;
+    return Object.getPrototypeOf(this).isPrototypeOf(this.value) ? this.value : this;
 }
 
 /**
@@ -246,5 +308,6 @@ var sharedEitherFns = {
     leftBimapMaker
 };
 
-export { apply, chain, disjunctionEqualMaker, equalMaker, lifter, maybeFactoryHelper, mjoin, pointMaker, stringMaker, valueOf,
-        get, emptyGet, orElse, emptyOrElse, getOrElse, emptyGetOrElse, sharedMaybeFns, sharedEitherFns };
+export { apply, applyTransforms, chain, containerIterator, disjunctionEqualMaker, equalMaker, lifter, maybeFactoryHelper,
+        mjoin, pointMaker, stringMaker, valueOf, get, emptyGet, orElse, emptyOrElse, getOrElse, emptyGetOrElse, sharedMaybeFns,
+        sharedEitherFns };

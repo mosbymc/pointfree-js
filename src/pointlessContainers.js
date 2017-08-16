@@ -210,42 +210,6 @@ function mjoin(ma) {
 /**
  * @sig
  * @description d
- * @param {Object} type - a
- * @return {function} - b
- */
-function toContainerType(type) {
-    return function toType(fn = identity) {
-        return type.of(fn(this.value));
-    };
-}
-
-/**
- * @sig
- * @description d
- * @return {Object} - a
- */
-function containerIterator() {
-    let first = true,
-        val = this.value;
-    return {
-        next: function _next() {
-            if (first) {
-                first = false;
-                return {
-                    done: false,
-                    value: val
-                };
-            }
-            return {
-                done: true
-            };
-        }
-    };
-}
-
-/**
- * @sig
- * @description d
  * @param {Object} ma - a
  * @return {Object} - b
  */
@@ -358,5 +322,5 @@ var except = curry(function _except(xs, comparer, ys) {
     return ys.except(xs, comparer);
 });
 
-export { apply, ap, fmap, map, mapWith, flatMap, flatMapWith, lift2, lift3, lift4, liftN, mjoin, pluckWith, toContainerType,
-            containerIterator, chain, bind, mcompose, filter, intersect, except };
+export { ap, apply, fmap, map, mapWith, flatMap, flatMapWith, lift2, lift3, lift4, liftN, mjoin, pluckWith,
+        chain, bind, mcompose, filter, intersect, except };
