@@ -1,6 +1,8 @@
 /**
  * @sig
  * @description d
+ * @kind function
+ * @function all
  * @param {function} fns - One or more comma separated function arguments
  * @return {function} - a
  */
@@ -9,6 +11,8 @@ var all = applyAll((fns, args) => fns.every(fn => fn(...args)));
 /**
  * @sig
  * @description d
+ * @kind function
+ * @function any
  * @param {Array} fns - One or more comma separated function arguments
  * @return {function} - a
  */
@@ -17,7 +21,8 @@ var any = applyAll((fns, args) => fns.some(fn => fn(...args)));
 /**
  * @sig
  * @description d
- * @type {function}
+ * @kind function
+ * @function c
  * @param {function} x
  * @param {*} y - a
  * @param {*} z - b
@@ -32,7 +37,6 @@ var rev = (...args) => args.reverse();
 /**
  * @sig compose :: (b -> c) -> (a -> b) -> (a -> c)
  * @description d
- * @type {function}
  * @note: @see {@link pipe}
  * @param {function} fns - a
  * @return {*} - b
@@ -45,7 +49,8 @@ function compose(...fns) {
 /**
  * @sig
  * @description d
- * @type {function}
+ * @kind function
+ * @function condition
  * @param {function} exp1 - a
  * @param {function} exp2 - b
  * @param {function} cond - c
@@ -124,6 +129,8 @@ function curryRight(fn) {
 /**
  * @sig
  * @description d
+ * @kind function
+ * @function first
  * @param {*} - a
  * @return {function} - b
  */
@@ -147,6 +154,8 @@ function fixedPoint(fn) {
 /**
  * @sig
  * @description d
+ * @kind function
+ * @function fork
  * @param {function} join - a
  * @param {function} fn1 - b
  * @param {function} fn2 - c
@@ -170,7 +179,8 @@ var identity = item => item;
  * is returned from the application, the provided ifFunc argument will be
  * invoked, passing the data as an argument, otherwise the elseFunc is
  * invoked with the data as an argument.
- * @type {function}
+ * @kind function
+ * @function ifElse
  * @param {function} predicate - a
  * @param {function} ifFunc - b
  * @param {function} elseFunc - c
@@ -183,7 +193,8 @@ var ifElse = curry((predicate, ifFunc, elseFunc, data) => predicate(data) ? ifFu
 /**
  * @sig
  * @description d
- * @type {function}
+ * @kind function
+ * @function ifThisThenThat
  * @param {function} predicate - a
  * @param {function} ifFunc - b
  * @param {*} ifArg - c
@@ -195,7 +206,8 @@ var ifThisThenThat = curry((predicate, ifFunc, ifArg, thatArg) => predicate(ifAr
 /**
  * @sig kestrel :: a -> () -> a
  * @description d
- * @type {function}
+ * @kind function
+ * @function kestrel
  * @note @see {@link constant}
  * @param {*} item - a
  * @return {function} - Returns a function, that when invoked, will
@@ -214,7 +226,8 @@ var m = a => a(a);
 /**
  * @sig
  * @description d
- * @type {function}
+ * @kind function
+ * @function o
  * @param {function} a - a
  * @param {function} b - b
  * @return {*} - c
@@ -247,12 +260,14 @@ function pipe(fn, ...fns) {
 }
 
 /**
- * @type:
- * @description:
- * @param: {function} a
- * @param: {function} b
- * @param: {*} c
- * @return: {*}
+ * @sig
+ * @description d
+ * @kind function
+ * @function q
+ * @param {function} a - a
+ * @param {function} b - b
+ * @param {*} c - c
+ * @return {*} - d
  */
 var q = curry((a, b, c) => b(a(c)));
 
@@ -260,7 +275,8 @@ var q = curry((a, b, c) => b(a(c)));
 /**
  * @sig
  * @description d
- * @type {function}
+ * @kind function
+ * @function reduce
  * @param {function} accFunc - a
  * @param {*} start - b
  * @param {Array} xs - c
@@ -299,7 +315,8 @@ var reduce = curry(function _reduce(accFunc, start, xs) {
 /**
  * @sig
  * @description d
- * @type {function}
+ * @kind function
+ * @function second
  * @return {*} - a
  */
 var second = constant(identity);
@@ -307,6 +324,8 @@ var second = constant(identity);
 /**
  * @sig
  * @description d
+ * @kind function
+ * @function sequence
  * @param {Array} fns - a
  * @return {function} - b
  */
@@ -315,7 +334,8 @@ var sequence = applyAll((fns, args) => fns.forEach(fn => fn(...args)));
 /**
  * @sig
  * @description d
- * @type {function}
+ * @kind function
+ * @function t
  * @param {*} x - a
  * @param {function} f = b
  * @return {*} - c
@@ -325,6 +345,8 @@ var t = curry((x, f) => f(x));
 /**
  * @sig
  * @description d
+ * @kind function
+ * @function thrush
  * @refer {t}
  * @note @see {@link t}
  */
@@ -333,7 +355,8 @@ var thrush = t;
 /**
  * @sig
  * @description d
- * @type {function}
+ * @kind function
+ * @function u
  * @param {function} a - a
  * @param {function} b - b
  * @return {*} - c
@@ -354,7 +377,8 @@ function uncurry(fn) {
 /**
  * @sig
  * @description d
- * @type {function}
+ * @kind function
+ * @function uncurryN
  * @param {number} depth - a
  * @param {function} fn - b
  * @return {function|*} - c
@@ -378,7 +402,8 @@ var uncurryN = curry(function uncurryN(depth, fn) {
 /**
  * @sig
  * @description d
- * @type {function}
+ * @kind function
+ * @function w
  * @param {function} a - a
  * @param {*} b - b
  * @return {*} - c
@@ -390,7 +415,8 @@ var w = curry((a, b) => a(b)(b));
  * @description Similar to ifElse, but no 'elseFunc' argument. Instead, if the application
  * of the predicate to the data returns truthy, the transform is applied to
  * the data. Otherwise, the data is returned without invoking the transform.
- * @type {function}
+ * @kind function
+ * @function when
  * @param {function} predicate - a
  * @param {function} transform - b
  * @param {*} data - c
@@ -401,7 +427,8 @@ var when = curry((predicate, transform, data) => predicate(data) ? transform(dat
 /**
  * @sig
  * @description d
- * @type {function}
+ * @kind function
+ * @function whenNot
  * @param {function} predicate - a
  * @param {function} transform - b
  * @param {*} data - c
@@ -412,6 +439,8 @@ var whenNot = curry((predicate, transform, data) => !predicate(data) ? transform
 /**
  * @sig
  * @description d
+ * @kind function
+ * @function y
  */
 var y = fixedPoint;
 

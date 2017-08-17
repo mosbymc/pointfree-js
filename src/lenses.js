@@ -9,7 +9,8 @@ import { mapWith } from './pointlessContainers';
 /**
  * @sig
  * @description d
- * @type {function}
+ * @kind function
+ * @function arrayLens
  * @param {number} idx - a
  * @param {function} f - b
  * @param {Array} xs - c
@@ -24,7 +25,8 @@ var arrayLens = curry(function _arrayLens(idx, f, xs) {
 /**
  * @sig
  * @description d
- * @type {function}
+ * @kind function
+ * @function objectLens
  * @param {string} prop - a
  * @param {function} f - b
  * @param {Object} xs - c
@@ -39,7 +41,8 @@ var objectLens = curry(function _objectLens(prop, f, xs) {
 /**
  * @sig
  * @description d
- * @type {function}
+ * @kind function
+ * @function unifiedLens
  * @param {string} prop - a
  * @param {function} f - b
  * @param {Array|Object} xs - c
@@ -56,7 +59,8 @@ var unifiedLens = curry(function _unifiedLens(prop, f, xs) {
 /**
  * @sig
  * @description d
- * @type {function}
+ * @kind function
+ * @function view
  * @param {function} lens - a
  * @param {Object} target - b
  * @return {*} - c
@@ -68,7 +72,8 @@ var view = curry(function _view(lens, target) {
 /**
  * @sig
  * @description d
- * @type {function}
+ * @kind function
+ * @function over
  * @param {function} lens - a
  * @param {function} mapFn - b
  * @param {Object} target - c
@@ -83,7 +88,8 @@ var over = curry(function _over(lens, mapFn, target) {
 /**
  * @sig
  * @description d
- * @type {function}
+ * @kind function
+ * @function put
  * @param {function} lens - a
  * @param {*} val - b
  * @param {*} target - c
@@ -96,7 +102,8 @@ var put = curry(function _put(lens, val, target) {
 /**
  * @sig
  * @description d
- * @type {function}
+ * @kind function
+ * @function set
  * @param {function} lens - a
  * @param {*} val - b
  * @param {Object} targetData - c
@@ -150,7 +157,8 @@ function lensPath(...path) {
 /**
  * @sig
  * @description d
- * @type {function}
+ * @kind function
+ * @function prismPath
  * @param {Array|String} path - a
  * @param {Object} obj - b
  * @return {*} - c
@@ -170,7 +178,8 @@ var prismPath = curry(function _prismPath(path, obj) {
 /**
  * @sig
  * @description d
- * @type {function}
+ * @kind function
+ * @function lens
  * @param {function} getter - a
  * @param {function} setter - b
  * @param {String} key - c
@@ -185,7 +194,8 @@ var lens = curry(function _lens(getter, setter, key, f, xs) {
 /**
  * @sig
  * @description d
- * @type {function}
+ * @kind function
+ * @function prism
  * @param {function} getter - a
  * @param {function} setter - b
  * @param {String} key - c
@@ -201,7 +211,8 @@ var prism = curry(function _prism(getter, setter, key, f, xs) {
 /**
  * @sig
  * @description d
- * @type {function}
+ * @kind function
+ * @function split
  * @param {String} delimiter - a
  * @param {String} string - b
  * @return {Array} - c

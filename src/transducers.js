@@ -3,7 +3,8 @@ import { compose, curry } from './combinators';
 /**
  * @sig
  * @description d
- * @type {function}
+ * @kind function
+ * @function mapping
  * @param {function} f - a
  * @return {*} - b
  */
@@ -14,7 +15,8 @@ var mapping = curry(function _mapping(mapFn, reduceFn, result, input) {
 /**
  * @sig
  * @description d
- * @type {function}
+ * @kind function
+ * @function filtering
  * @param {function} predicate - a
  * @param {function} reduceFn - b
  * @param {*} result - c
@@ -52,7 +54,8 @@ function filterReducer(predicate) {
 /**
  * @sig
  * @description d
- * @type {function}
+ * @kind function
+ * @function mapped
  * @param {function} f - a
  * @param {*} x - b
  * @return {*} - c

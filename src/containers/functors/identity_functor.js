@@ -1,5 +1,7 @@
 import { equalMaker, pointMaker, stringMaker, valueOf, get, orElse, getOrElse } from '../containerHelpers';
 
+/** @module identity_functor */
+
 /**
  * @sig
  * @description d
@@ -32,6 +34,18 @@ Identity.of = x => Identity(x);
  */
 Identity.is = f => identity_functor.isPrototypeOf(f);
 
+/**
+ * @typedef {Object}
+ * @property {function} value - returns the underlying value of the the functor
+ * @property {function} map - maps a single function over the underlying value of the functor
+ * @property {function} get - returns the underlying value of the functor
+ * @property {function} orElse - returns the underlying value of the functor
+ * @property {function} getOrElse - returns the underlying value of the functor
+ * @property {function} of - creates a new identity_functor delegate with the value provided
+ * @property {function} valueOf - returns the underlying value of the functor; used during concatenation and coercion
+ * @property {function} toString - returns a string representation of the identity functor and its underlying value
+ * @property {function} factory - a reference to the identity_functor factory function
+ */
 var identity_functor = {
     /**
      * @sig

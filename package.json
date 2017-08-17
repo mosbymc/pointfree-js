@@ -23,7 +23,7 @@
     "coverage": "cross-env NODE_ENV=test nyc mocha test/unit/**/*.spec.js",
     "coverage:report": "nyc report --reporter=text-lcov",
     "predocumentation": "del-cli documentation/*",
-    "documentation": "./node_modules/.bin/jsdoc src -d documentation",
+    "documentation": "./node_modules/.bin/jsdoc -r src -d documentation",
     "eslint": "./node_modules/.bin/eslint src",
     "jshint": "./node_modules/.bin/jshint src",
     "lint": "npm run jshint && npm run eslint",

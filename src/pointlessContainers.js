@@ -17,7 +17,8 @@ import { getWith } from './functionalHelpers';
 /**
  * @sig
  * @description d
- * @type {function}
+ * @kind function
+ * @function apply
  * @param {Object} ma - a
  * @param {Object} mb - b
  * @return {Object} - c
@@ -29,6 +30,9 @@ var apply = curry(function _apply(ma, mb) {
 /**
  * @sig
  * @description d
+ * @kind function
+ * @function ap
+ * @see apply
  * @param {Object} ma - a
  * @param {Object} mb - b
  * @return {Object} - c
@@ -38,7 +42,8 @@ var ap = apply;
 /**
  * @sig
  * @description d
- * @type {function}
+ * @kind function
+ * @function flatMap
  * @param {Object} m - a
  * @param {function} fn :: (a) -> Monad b - b
  * @return {Object} - c
@@ -50,7 +55,8 @@ var flatMap = curry(function _flatMap(m, fn) {
 /**
  * @sig
  * @description d
- * @type {function}
+ * @kind function
+ * @function flatMapWith
  * @param {function} fn - a
  * @param {Object} m - b
  * @return {Object} - c
@@ -62,7 +68,8 @@ var flatMapWith = curry(function _flatMapWith(fn, m) {
 /**
  * @sig
  * @description d
- * @type {function}
+ * @kind function
+ * @function map
  * @param {Object} m - a
  * @param {function} fn :: (a) -> b
  * @return {Object} - b
@@ -74,7 +81,8 @@ var map = curry(function _map(m, fn) {
 /**
  * @sig
  * @description d
- * @type {function}
+ * @kind function
+ * @function mapWith
  * @param {function} fn - a
  * @param {Object} m - b
  * @return {Object} - c
@@ -86,13 +94,16 @@ var mapWith = curry(function _map(fn, m) {
 /**
  * @sig
  * @description d
+ * @kind function
+ * @function pluckWith
  */
 var pluckWith = compose(mapWith, getWith);
 
 /**
  * @sig
  * @description d
- * @type {function}
+ * @kind function
+ * @function fmap
  * @see mapWith
  * @param {function} fn - a
  * @param {Object} m - b
@@ -103,7 +114,8 @@ var fmap = mapWith;
 /**
  * @sig
  * @description d
- * @type {function}
+ * @kind function
+ * @function chain
  * @param {function} f - a
  * @param {Object} m - b
  * @return {*} - c
@@ -115,6 +127,8 @@ var chain = curry(function _chain(f, m){
 /**
  * @sig
  * @description d
+ * @kind function
+ * @function bind
  */
 var bind = chain;
 
@@ -132,7 +146,8 @@ var mcompose = function _mcompose(f, g) {
 /**
  * @sig
  * @description d
- * @type {function}
+ * @kind function
+ * @function put
  * @param {*} val - a
  * @param {Object} fa - b
  * @return {Object} - c
@@ -144,7 +159,8 @@ var put = curry(function _put(val, fa) {
 /**
  * @sig
  * @description d
- * @type {function}
+ * @kind function
+ * @function lift2
  * @param {function} f - a
  * @param {Object} m1 - b
  * @param {Object} m2 - c
@@ -157,7 +173,8 @@ var lift2 = curry(function _lift2(f, m1, m2) {
 /**
  * @sig
  * @description d
- * @type {function}
+ * @kind function
+ * @function lift3
  * @param {function} f - a
  * @param {Object} m1 - b
  * @param {Object} m2 - c
@@ -171,7 +188,8 @@ var lift3 = curry(function _lift3(f, m1, m2, m3) {
 /**
  * @sig
  * @description d
- * @type {function}
+ * @kind function
+ * @function lift4
  * @param {function} f - a
  * @param {Object} m1 - b
  * @param {Object} m2 - c
@@ -186,7 +204,8 @@ var lift4 = curry(function _lift4(f, m1, m2, m3, m4) {
 /**
  * @sig
  * @description d
- * @type {function}
+ * @kind function
+ * @function liftN
  * @param {function} f - a
  * @param {Object} ...ms - b
  * @return {Object} - c
@@ -288,7 +307,8 @@ function _toMaybe() {
 /**
  * @sig
  * @description d
- * @type {function}
+ * @kind function
+ * @function filter
  * @param {function} predicate - a
  * @param {Array} xs - b
  * @return {Array} - c
@@ -300,7 +320,8 @@ var filter = curry(function _filter(predicate, xs) {
 /**
  * @sig
  * @description d
- * @type {function}
+ * @kind function
+ * @function intersect
  * @param {Array} xs - a
  * @param {function} comparer - b
  * @param {Array} ys - c
@@ -313,6 +334,8 @@ var intersect = curry(function _intersect(xs, comparer, ys) {
 /**
  * @sig
  * @description d
+ * @kind function
+ * @function except
  * @param {Array} xs - a
  * @param {function} comparer - b
  * @param {Array} - c

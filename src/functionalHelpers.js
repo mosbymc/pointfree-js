@@ -7,7 +7,8 @@ import { curry, identity, constant } from './combinators';
  * argument should be some form of a unary projector. The 'projector' function will receive
  * the value stored in the existing array at the specified 'idx' argument location. A new array
  * is returned and the original array remains unchanged.
- * @type {function}
+ * @kind function
+ * @function adjust
  * @param {function} fn - A function that can operate on a single point of data from the array
  * and a value to be used as an update for the same index in the new array.
  * @param {number} idx - A number representing the zero-based offset of the array; idx determines
@@ -29,9 +30,11 @@ var adjust = curry(function _adjust(fn, idx, list) {
 });
 
 /**
- * @sig
+ * @sig Number -> Number -> Number
+ * @sig String -> String -> String
  * @description d
- * @type {function}
+ * @kind function
+ * @function add
  * @param {number} x - a
  * @param {number} y - b
  * @return {number} - c
@@ -41,7 +44,8 @@ var add = curry((x, y) => x + y);
 /**
  * @sig and :: (*... -> a) -> ((*... -> b) -> ((*... -> Boolean)))
  * @description d
- * @type {function}
+ * @kind function
+ * @function and
  * @param {*} a - a
  * @param {*} b - b
  * @return {boolean} - c
@@ -52,7 +56,8 @@ var and = curry((a, b) => !!(a && b));
  * @sig
  * @description Updates the value at a specified index of an array by first creating a shallow copy
  * of the array and then updating its value at the specified index.
- * @type {function}
+ * @kind function
+ * @function arraySet
  * @note @see {@link adjust}
  * @param {number} idx - The index of the array to which the alternate value will be set.
  * @param {*} x - The value to be used to update the array at the index specified.
@@ -67,7 +72,8 @@ var arraySet = curry(function _arraySet(idx, x, list) {
 /**
  * @sig
  * @description d
- * @type {function}
+ * @kind function
+ * @function both
  * @param {function} f - a
  * @param {function} g - b
  * @return {boolean} - c
@@ -90,7 +96,8 @@ var concat = first => (...rest) => null == rest || !rest.length ? first :
 /**
  * @sig
  * @description d
- * @type {function}
+ * @kind function
+ * @function defaultPredicate
  * @return {boolean} - a
  */
 var defaultPredicate = constant(true);
@@ -98,7 +105,8 @@ var defaultPredicate = constant(true);
 /**
  * @sig
  * @description d
- * @type {function}
+ * @kind function
+ * @function delegatesFrom
  * @param {object} delegate - a
  * @param {object} delegator - b
  * @return {boolean} - c
@@ -108,7 +116,8 @@ var delegatesFrom = curry((delegate, delegator) => delegate.isPrototypeOf(delega
 /**
  * @sig
  * @description d
- * @type {function}
+ * @kind function
+ * @function delegatesTo
  * @param {object} delegator - a
  * @param {object} delegate - b
  * @return {boolean} - c
@@ -118,7 +127,8 @@ var delegatesTo = curry((delegator, delegate) => delegate.isPrototypeOf(delegato
 /**
  * @sig
  * @description d
- * @type {function}
+ * @kind function
+ * @function divide
  * @param {number} x - a
  * @param {number} y - b
  * @return {number} - c
@@ -128,7 +138,8 @@ var divide = curry((x, y) => x / y);
 /**
  * @sig
  * @description d
- * @type {function}
+ * @kind function
+ * @function either
  * @param {function} f - a
  * @param {function} g - b
  * @return {boolean} - c
@@ -140,7 +151,8 @@ var either = curry(function _either(f, g) {
 /**
  * @sig
  * @description d
- * @type {function}
+ * @kind function
+ * @function equals
  * @param {*} x - a
  * @param {*} y - b
  * @return {boolean} - c
@@ -150,7 +162,8 @@ var equals = curry((x, y) => x == y);
 /**
  * @sig
  * @description d
- * @type {function}
+ * @kind function
+ * @function falsey
  * @see flip
  * @param {*} x - a
  * @return {boolean} - b
@@ -168,7 +181,8 @@ var flip = x => !x;
 /**
  * @sig
  * @description d
- * @type {function}
+ * @kind function
+ * @function getWith
  * @param {string} prop - a
  * @param {object} obj - b
  * @return {*} - c
@@ -178,7 +192,8 @@ var getWith = curry((prop, obj) => obj[prop]);
 /**
  * @sig
  * @description d
- * @type {function}
+ * @kind function
+ * @function greaterThan
  * @param {number | string} x - a
  * @param {number | string} y - b
  * @return {boolean} - c
@@ -188,7 +203,8 @@ var greaterThan = curry((x, y) => x > y);
 /**
  * @sig
  * @description d
- * @type {function}
+ * @kind function
+ * @function greaterThanOrEqual
  * @param {string | number} x - a
  * @param {string | number} y - b
  * @return {boolean} - c
@@ -198,7 +214,8 @@ var greaterThanOrEqual = curry((x, y) => x >= y);
 /**
  * @sig
  * @description d
- * @type {function}
+ * @kind function
+ * @function has
  * @param {string} prop - a
  * @param {object} obj - b
  * @return {boolean} - c
@@ -210,7 +227,8 @@ var has = curry(function _has(prop, obj) {
 /**
  * @sig
  * @description d
- * @type {function}
+ * @kind function
+ * @function inObject
  * @param {string} key - a
  * @param {object} obj - b
  * @return {boolean} - c
@@ -329,7 +347,8 @@ var isUndefined = u => javaScriptTypes.Undefined === type(u);
 /**
  * @sig
  * @description d
- * @type {function}
+ * @kind function
+ * @function lessThan
  * @param {string | number} x - a
  * @param {string | number} y - b
  * @return {boolean} - c
@@ -339,7 +358,8 @@ var lessThan = curry((x, y) => x < y);
 /**
  * @sig
  * @description d
- * @type {function}
+ * @kind function
+ * @function lessThanOrEqual
  * @param {string | number} x - a
  * @param {string | number} y - b
  * @return {boolean} - c
@@ -349,7 +369,8 @@ var lessThanOrEqual = curry((x, y) => x <= y);
 /**
  * @sig
  * @description d
- * @type {function}
+ * @kind function
+ * @function mapSet
  * @param {*} key - a
  * @param {*} val - b
  * @param {Map} map - c
@@ -363,7 +384,8 @@ var mapSet = curry(function _mapSet(key, val, map) {
 /**
  * @sig
  * @description d
- * @type {function}
+ * @kind function
+ * @function modulus
  * @param {number} x - a
  * @param {number} y - b
  * @return {number} - c
@@ -373,7 +395,8 @@ var modulus = curry((x, y) => x % y);
 /**
  * @sig
  * @description d
- * @type {function}
+ * @kind function
+ * @function multiply
  * @param {number} x - a
  * @param {number} y - b
  * @return {number} - c
@@ -391,7 +414,8 @@ var negate = x => -x;
 /**
  * @sig
  * @description d
- * @type {function}
+ * @kind function
+ * @function notEqual
  * @param {*} - a
  * @param {*} - b
  * @return {boolean} - c
@@ -409,7 +433,8 @@ function noop() {}
 /**
  * @sig
  * @description d
- * @type {function}
+ * @kind function
+ * @function nth
  * @param {number} offset - a
  * @param {Array} List - b
  * @return {*} - c
@@ -422,7 +447,8 @@ var nth = curry(function nth(offset, list) {
 /**
  * @sig
  * @description d
- * @type {function}
+ * @kind function
+ * @function objectSet
  * @param {string} prop - a
  * @param {*} val - b
  * @param {object} obj - c
@@ -453,7 +479,8 @@ function once(fn) {
 /**
  * @sig or :: (*... -> a) -> ((*... -> b) -> ((*... -> Boolean)))
  * @description d
- * @type {function}
+ * @kind function
+ * @function or
  * @param {*} a - a
  * @param {*} b - b
  * @return {boolean} - c
@@ -471,7 +498,8 @@ var reverse = xs => isArray(xs) ? xs.slice(0).reverse() : xs.split('').reverse()
 /**
  * @sig
  * @description d
- * @type {function}
+ * @kind function
+ * @function set
  * @param {string} prop - a
  * @param {*} val - b
  * @param {object} obj - c
@@ -485,7 +513,8 @@ var set = curry(function _set(prop, val, obj) {
 /**
  * @sig
  * @description d
- * @type {function}
+ * @kind function
+ * @function setSet
  * @param {*} val - a
  * @param {Set} set - b
  * @return {Set} - c
@@ -498,7 +527,8 @@ var setSet = curry(function _setSet(val, set) {
 /**
  * @sig
  * @description d
- * @type {function}
+ * @kind function
+ * @function strictEquals
  * @param {*} x - a
  * @param {*} y - b
  * @return {boolean} - c
@@ -508,7 +538,8 @@ var strictEquals = curry((x, y) => x === y);
 /**
  * @sig
  * @description d
- * @type {function}
+ * @kind function
+ * @function strictNotEqual
  * @param {*} x - a
  * @param {*} y - b
  * @return {boolean} - c
@@ -518,7 +549,8 @@ var strictNotEqual = curry((x, y) => x !== y);
 /**
  * @sig
  * @description d
- * @type {function}
+ * @kind function
+ * @function subtract
  * @param {number} x - a
  * @param {number} y - b
  * @return {number} - c

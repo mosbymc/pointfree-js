@@ -160,7 +160,7 @@ function join(xs, ys, xSelector, ySelector, projector, comparer = strictEquals) 
 
 /**
  * @sig
- * @description
+ * @description d
  * @param {Array|generator} xs - a
  * @param {Array|generator} ys - b
  * @param {function} comparer - c
