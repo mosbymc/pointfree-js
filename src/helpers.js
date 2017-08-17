@@ -7,40 +7,54 @@ var generatorProto = Object.getPrototypeOf(function *_generator(){});
 
 /**
  * @description d
- * @typedef {Object}
- * @property {string} Function
- * @property {string} Object
- * @property {string} Boolean
- * @property {string} Number
- * @property {string} Symbol
- * @property {string} String
- * @property {string} Undefined
+ * @enum {string}
  */
 var javaScriptTypes = {
+    /** function */
     Function: 'function',
+    /** object */
     Object: 'object',
+    /** boolean */
     Boolean: 'boolean',
+    /** number */
     Number: 'number',
+    /** symbol */
     Symbol: 'symbol',
+    /** string */
     String: 'string',
+    /** undefined */
     Undefined: 'undefined'
 };
 
+/**
+ * @description Contains the list of all JavaScript types
+ * @enum {string}
+ */
 var typeNames = {
+    /** boolean */
     'boolean': typeof true,
+    /** function */
     'function': typeof Function,
+    /** number */
     'number': typeof 0,
+    /** object */
     'object': typeof{ a: 1 },
+    /** string */
     'string': typeof '',
+    /** symbol */
     'symbol': typeof Symbol.iterator,
+    /** undefined */
     'undefined': typeof void 0
 };
 
 /**
- * @description d
+ * @description Contains a list of built-in iterables
+ * @enum {Array}
  */
 var collectionTypes = {
+    /** Generator */
     'Generator': [generatorProto],
+    /** Array Family */
     'Array': [
         Array.prototype,
         Int16Array.prototype,
@@ -53,28 +67,41 @@ var collectionTypes = {
         Uint8Array.prototype,
         Uint8ClampedArray.prototype
     ],
+    /** ArrayBuffer */
     'ArrayBuffer': [ArrayBuffer.prototype],
+    /** Map */
     'Map': [Map.prototype],
+    /** WeakMap */
     'WeakMap': [WeakMap.prototype],
+    /** Set */
     'Set': [Set.prototype],
+    /** WeakSet */
     'WeakSet': [WeakSet.prototype]
 };
 
 /**
- * @description d
+ * @description Contains the list of possible observable statuses
+ * @enum {number}
  */
 var observableStatus = {
+    /** inactive */
     inactive: 0,
+    /** active */
     active: 1,
+    /** paused */
     paused: 2,
+    /** complete */
     complete: 3
 };
 
 /**
- * @description d
+ * @description Contains the list of possible sort directions
+ * @enum {number}
  */
 var sortDirection = {
+    /** ascending */
     ascending: 1,
+    /** descending */
     descending: 2
 };
 
@@ -83,7 +110,7 @@ var sortDirection = {
  * @description d
  * @param {*} x - a
  * @param {*} y - b
- * @param {string} dir - c
+ * @param {number} dir - c
  * @return {number} - d
  */
 function sortComparer(x, y, dir) {

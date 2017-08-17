@@ -31,9 +31,11 @@ jspm_packages
 .node_repl_history
 
 .idea
+jsdoc.conf.json
 
 routes
 dev_browser
+jsdoc_plugin
 platoTmp
 plato
 documentation

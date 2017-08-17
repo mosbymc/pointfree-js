@@ -233,8 +233,10 @@ var right_functor = {
 };
 
 /**
- * @description
- * @return
+ * @sig
+ * @description d
+ * @kind function
+ * @return {boolean} - a
  */
 right_functor.equals = disjunctionEqualMaker(right_functor, 'isRight');
 

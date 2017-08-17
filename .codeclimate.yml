@@ -23,11 +23,13 @@ exclude_paths:
 - "plato/**/*"
 - "routes/**/*"
 - "test/**/*"
+- "jsdoc_plugin/**/*"
 - "index.js"
 - "app.js"
 - "gulpfile.js"
 - "gulp.config.js"
 - "wallaby.js"
+- "jsdoc.conf.json"
 
 ratings:
   paths:

@@ -18,7 +18,8 @@ var invoker = func => fn => (...args) => func(fn, ...args);
  * n arguments to apply both functions to. The first function is
  * applied to the arguments, followed by the second. The return value
  * is equal to the return value of the first function's invocation.
- * @type {function}
+ * @kind function
+ * @function after
  * @param {function} fn - A function that should be applied to the arguments. The return
  * value is equal to this function's return value.
  * @param {function} decoration - A function that should be applied to the arguments after
@@ -36,6 +37,8 @@ var after = curryN(this, 3, function _after(fn, decoration, ...args) {
  * @sig (*... -> a) -> [*] -> a
  * @description A partially applied function that takes a function and any arguments
  * and returns the result of apply the function to the arguments.
+ * @kind function
+ * @function apply
  * @param {function} fn - The function that should be applied to the arguments.
  * @return {function} - The result of applying the function to the arguments.
  */
@@ -44,7 +47,8 @@ var apply = invoker((fn, ...args) => fn(...args));
 /**
  * @sig
  * @description d
- * @type {function}
+ * @kind function
+ * @function before
  * @param {function} fn - a
  * @param {function} decoration - b
  * @param {*} args - c
@@ -59,7 +63,8 @@ var before = curryN(this, 3, function _before(fn, decoration, ...args) {
  * @sig (*... -> a) -> (*...) -> a
  * @description Takes a non-curried function of any arity and turns it
  * into a binary, curried function.
- * @type {function}
+ * @kind function
+ * @function binary
  * @param {function} fn - The function that should be made binary.
  * @param {*} args - The arguments that should be applied to the new
  * binary function.
@@ -72,7 +77,8 @@ var binary = (fn, ...args) => curryN(this, 2, fn, ...args);
  * @description A curried function that takes an object context and
  * a function and returns the function bound to the context of the
  * object.
- * @type {function}
+ * @kind function
+ * @function bindFunction
  * @param {object} context - The context the function should be
  * invoked with.
  * @param {function} fn - The function that should be bound to the
@@ -89,7 +95,8 @@ var bindFunction = curry(function _bindFunction(context, fn) {
  * @description A curried function that takes an object context and
  * a function and returns the function bound to the context of the
  * object.
- * @type {function}
+ * @kind function
+ * @function bindWith
  * @param {function} fn - The function that should be bound to the
  * context of the object.
  * @param {object} context - The context the function should be
@@ -112,76 +119,107 @@ function guardAfter(...fns) {
 */
 
 /**
- * @sig
- * @description d
- * @param {function} fns - a
- * @return {function} - b
+ * @sig (* -> *), (* -> *), ... (* -> *) -> [*] -> *
+ * @description Accepts one or more functions to be executed with
+ * zero or more arguments, and will only invoke the first function argument
+ * if all the other functions return a truthy value. If all the functions
+ * return truthy, the return value is the result of apply the first function
+ * argument to the parameters provided; otherwise the result is 'undefined'.
+ * @param {function} fns - One or more functions that should be applied to the arguments.
+ * @return {function} - A function waiting for the arguments to be provided.
  */
 function guard(...fns) {
     return function waitForArgs(...args) {
-        if (fns.slice(1).every(function _functionRunner(fn) {
+        if (1 === fns.length || fns.slice(1).every(function _functionRunner(fn) {
                 return fn(...args);
             })) return fns[0](...args);
     };
 }
 
 /**
- * @sig
- * @description d
- * @param {function} fn - a
- * @return {function} - b
+ * @sig (* -> *) -> [*] -> () -> *
+ * @description Partially applied function that takes a function as
+ * its first parameter, followed by zero or more arguments that the
+ * function should be applied to. Finally, a function that takes no
+ * arguments is returned. Once invoked, the provided function will
+ * be applied to the provided arguments. This is similar to {@see apply}
+ * except after the arguments are provided, there is an intermediary
+ * function returned that needs to be invoked before anything happens.
+ * @kind function
+ * @function lateApply
+ * @param {function} fn - A function to be executed
+ * @return {function} - The return value of the 'fn' function argument.
  */
 var lateApply = invoker((fn, ...args) => () => fn(...args));
 
 /**
- * @sig
- * @description d
- * @type {function}
- * @param {function} fn - a
- * @return {function} - b
+ * @sig (*... -> a) -> [*] -> a
+ * @alias apply
+ * @description A partially applied function that takes a function and any arguments
+ * and returns the result of apply the function to the arguments.
+ * @kind function
+ * @function leftApply
+ * @param {function} fn - The function that should be applied to the arguments.
+ * @return {function} - The result of applying the function to the arguments.
  */
 var leftApply = apply;
 
 /**
- * @sig
- * @description d
- * @param {function} fn - a
- * @return {*} - b
+ * @sig (* -> *) -> [*] -> null|*
+ * @description A partially applied function that takes a function
+ * and zero or more arguments. If no arguments are provided, or at
+ * least of the the arguments is null or undefined, a value of null
+ * is returned. Otherwise, the return value is the result of apply
+ * the function to the arguments.
+ * @kind function
+ * @function maybe
+ * @param {function} fn - The function that may run
+ * @return {null|*} - Returns either null, or the result of the function.
  */
 var maybe = invoker((fn, ...args) => 1 <= args.length && args.every(function _testNull(val) { return null != val; }) ? fn.call(this, ...args) : null);
 
 /**
- * @sig not :: () -> !()
- * @description - Returns a function, that, when invoked, will return the
- * result of the inversion of the invocation of the function argument. The
- * returned function is curried to the same arity as the function argument,
- * so it can be partially applied even after being 'wrapped' inside the
- * not function.
- * @param {function} fn - a
- * @return {*} - b
+ * @sig (* -> *) -> [*] -> boolean
+ * @description - Takes a function and one or more parameters that the function
+ * should be applied to. The result is the inverse coercion of the return
+ * value of the function's application to the provided arguments to a
+ * boolean.
+ * @kind function
+ * @function not
+ * @param {function} fn - A function that should be applied to the arguments.
+ * @return {*} - The inverted coercion of the return value of the function to
+ * a boolean.
  */
 var not = invoker((fn, ...args) => !fn(...args));
 
 /**
- * @sig
- * @description d
- * @param {function} fn - a
- * @returns {function} - b
+ * @sig (* -> *) -> [*] ->
+ * @description - Takes a function and zero or more arguments that the
+ * function should be applied to. When invoked the first time, the function
+ * argument will be applied to the argument parameters and the result of
+ * that application is returned. Subsequent invocations will not execute
+ * the function, but will returned the cached results of the first invocation.
+ * @param {function} fn - The function that should be run a single time.
+ * @returns {function} - The value of the application of the function
+ * to the arguments.
  */
 function once(fn) {
-    var invoked = false;
+    var invoked = false,
+        res;
     return function _once(...args) {
         if (!invoked) {
             invoked = true;
-            return fn(...args);
+            res = fn(...args);
         }
+        return res;
     };
 }
 
 /**
  * @sig
  * @description d
- * @type {function}
+ * @kind function
+ * @function repeat
  * @param {number} num - a
  * @param {function} fn - b
  * @return {*} - c
@@ -193,6 +231,8 @@ var repeat = curry(function _repeat(num, fn) {
 /**
  * @sig
  * @description d
+ * @kind function
+ * @function rightApply
  * @param {function} fn - a
  * @return {function} - b
  */
@@ -203,6 +243,8 @@ var rightApply = invoker((fn, ...args) => fn(...args.reverse()));
 /**
  * @sig
  * @description d
+ * @kind function
+ * @function safe
  * @param {function} fn - a
  * @return {function} - b
  */
@@ -211,7 +253,8 @@ var safe = invoker((fn, ...args) => !args.length || args.includes(null) || args.
 /**
  * @sig
  * @description d
- * @type {function}
+ * @kind function
+ * @function tap
  * @param {*} arg - a
  * @param {function} fn - b
  * @return {arg} - c
@@ -233,7 +276,8 @@ var ternary = (fn, ...args) => curryN(this, 3, fn, ...args);
 /**
  * @sig
  * @description d
- * @type {function}
+ * @kind function
+ * @function tryCatch
  * @param {function} catcher - a
  * @param {function} tryer - b
  * @return {function} - c
@@ -250,11 +294,16 @@ var tryCatch = curry(function _tryCatch(catcher, tryer) {
 });
 
 /**
- * @sig
- * @description d
- * @param {function} fn - a
- * @param {*} arg - b
- * @return {function} - c
+ * @sig (*... -> *) -> * -> *
+ * @description - Takes a single function of any arity and turns it into
+ * a unary function. An optional argument may be provided. If it is, the
+ * immediate result of the function's application to the argument is returned,
+ * otherwise, a new function expecting a single argument is returned.
+ * @param {function} fn - The function that should be turned into a unary function.
+ * @param {*} [arg] - Optional argument that the unary function should be applied to.
+ * @return {function|*} - Returns either a function waiting for a single argument
+ * before invocation, or the result of applying the function to the provided
+ * argument.
  */
 var unary = (fn, arg) => undefined === arg ? curryN(this, 1, fn) : fn(arg);
 
@@ -290,6 +339,8 @@ function unfoldWith(fn) {
 /**
  * @sig
  * @description d
+ * @kind function
+ * @function hyloWith
  * @param cata - a
  * @param ana - b
  * @param seed - c
@@ -307,10 +358,13 @@ var hyloWith = curry(function _hylo(cata, ana, seed) {
 });
 
 /**
- * @sig
- * @description d
- * @param {function} fn - a
- * @return {function} - b
+ * @sig (* -> *) -> [*] -> undefined
+ * @description This function works just like {@see apply} except that
+ * 'undefined' is always returned, regardless of the result of the function.
+ * @kind function
+ * @function voidFn
+ * @param {function} fn - The function that should be applied to the arguments
+ * @return {function} -
  */
 var voidFn = invoker((fn, ...args) => void fn(...args));
 
