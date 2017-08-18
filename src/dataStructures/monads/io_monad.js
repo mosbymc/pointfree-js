@@ -1,8 +1,9 @@
-import { constant_functor } from '../functors/constant_functor';
-import { apply, mjoin, pointMaker } from '../containerHelpers';
+import { io_functor } from '../functors/io_functor';
+import { compose } from '../../combinators';
+import { apply, chain, mjoin, pointMaker } from '../dataStructureHelpers';
 
-function Constant(val) {
-    return Object.create(constant_monad, {
+function Io(val) {
+    return Object.create(io_monad, {
         _value: {
             value: val,
             writable: false,
@@ -11,14 +12,8 @@ function Constant(val) {
     });
 }
 
-/**
- * @sig
- * @description d
- * @param {*} item - a
- * @return {constant_monad} - b
- */
-Constant.of = function _of(item) {
-    return Constant(item);
+Io.of = function _of(val) {
+    return 'function' === typeof val ? Io(val) : Io(function _wrapper() { return val; });
 };
 
 /**
@@ -27,47 +22,45 @@ Constant.of = function _of(item) {
  * @param {Object} m - a
  * @return {boolean} - b
  */
-Constant.is = m => constant_monad.isPrototypeOf(m);
+Io.is = m => io_monad.isPrototypeOf(m);
 
-var constant_monad = Object.create(constant_functor, {
-    chain: {
-        value: function _chain() {
-            return this;
-        }
-    },
+var io_monad = Object.create(io_functor, {
     fold: {
-        value: function _fold(f) {
-            return f(this.value);
-        }
-    },
-    sequence: {
-        value: function _sequence(p) {
-            return this.of(this.value);
+        value: function _fold(fn, x) {
+            return fn(this.value, x);
         }
     },
     traverse: {
-        value: function _traverse(a, f) {
-            return this.of(this.value);
+        value: function _traverse(fa, fn) {
+            return this.fold(function _reductioAdAbsurdum(xs, x) {
+                fn(x).map(function _map(x) {
+                    return function _map_(y) {
+                        return y.concat([x]);
+                    };
+                }).ap(xs);
+                return fa(this.empty);
+            });
         }
     },
     of: {
-        value: pointMaker(Constant),
+        value: pointMaker(Io),
         writable: false,
         configurable: false
     },
     factory: {
-        value: Constant
+        value: Io
     }
 });
 
-constant_monad.mjoin = mjoin;
-constant_monad.apply = apply;
+io_monad.chain = chain;
+io_monad.mjoin = mjoin;
+io_monad.apply = apply;
 
-constant_monad.ap =constant_monad.apply;
-constant_monad.fmap = constant_monad.chain;
-constant_monad.flapMap = constant_monad.chain;
-constant_monad.bind = constant_monad.chain;
-constant_monad.reduce = constant_monad.fold;
+io_monad.ap =io_monad.apply;
+io_monad.fmap = io_monad.chain;
+io_monad.flapMap = io_monad.chain;
+io_monad.bind = io_monad.chain;
+io_monad.reduce = io_monad.fold;
 
 //Since FantasyLand is the defacto standard for JavaScript algebraic data structures, and I want to maintain
 //compliance with the standard, a .constructor property must be on the container delegators. In this case, its
@@ -78,7 +71,7 @@ constant_monad.reduce = constant_monad.fold;
 //as it was intended... you know, like Douglas Crockford and his "good parts", which is really just another
 //way of saying: "your too dumb to understand how JavaScript works, and I either don't know myself, or don't
 //care to know, so just stick with what I tell you to use."
-constant_monad.constructor = constant_monad.factory;
+io_monad.constructor = io_monad.factory;
 
 
-export { Constant, constant_monad };
+export { Io, io_monad };

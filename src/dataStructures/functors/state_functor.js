@@ -1,4 +1,4 @@
-import { equalMaker, pointMaker, stringMaker, valueOf, get, orElse, getOrElse } from '../containerHelpers';
+import { equalMaker, pointMaker, stringMaker, valueOf, get, orElse, getOrElse } from '../dataStructureHelpers';
 import { constant } from '../../combinators';
 
 function State(val) {

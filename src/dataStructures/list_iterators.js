@@ -2,7 +2,7 @@ import { isArray, strictEquals, isObject, type } from '../functionalHelpers';
 import { not, unfoldWith } from '../decorators';
 import { when, ifElse } from '../combinators';
 import { javaScriptTypes, sortDirection, cacher, typeNames } from '../helpers';
-import { sortData } from  './sortHelpers';
+import { sortData } from './sortHelpers';
 
 var toArray = when(not(isArray), Array.from);
 

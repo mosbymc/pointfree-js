@@ -1,6 +1,6 @@
 import { noop, once, type, strictEquals } from '../../functionalHelpers';
 import { javaScriptTypes } from '../../helpers';
-import { pointMaker, valueOf } from '../containerHelpers';
+import { pointMaker, valueOf } from '../dataStructureHelpers';
 
 /**
  * @sig

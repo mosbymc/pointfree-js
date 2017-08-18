@@ -6,7 +6,7 @@ import { Io, io_monad } from './io_monad';
 import { List, list_monad, ordered_list_monad } from './list_monad';
 import { Maybe, Just, Nothing, just_monad, nothing_monad } from './maybe_monad';
 import { Validation, validation_monad } from './validation_monad';
-import { applyTransforms, containerIterator, lifter } from '../containerHelpers';
+import { applyTransforms, containerIterator, lifter } from '../dataStructureHelpers';
 
 /*
     - Semigroup:

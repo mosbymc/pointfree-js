@@ -1,5 +1,5 @@
 import { subscriber } from './subscriber';
-import { sortData } from '../../containers/sortHelpers';
+import { sortData } from '../../dataStructures/sortHelpers';
 
 var groupBySubscriber = Object.create(subscriber, {
     next: {

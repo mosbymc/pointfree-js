@@ -6,7 +6,12 @@ import { Io, io_functor } from './io_functor';
 import { List, list_core } from './list_functor';
 import { Maybe, Just, Nothing, just_functor, nothing_functor } from './maybe_functor';
 import { Validation, validation_functor } from './validation_functor';
-import { applyTransforms, containerIterator, lifter } from '../containerHelpers';
+import { applyTransforms, containerIterator, lifter } from '../dataStructureHelpers';
+
+/**
+ * @module dataStructures/functors
+ * @namespace functors
+ */
 
 //Natural Transformations (nt):
 //.fold(f) -> f = functor type factory

@@ -1,5 +1,5 @@
-import * as functors from '../../../../src/containers/functors/functors';
-import { right_functor, left_functor } from '../../../../src/containers/functors/either_functor';
+import * as functors from '../../../../src/dataStructures/functors/functors';
+import { right_functor, left_functor } from '../../../../src/dataStructures/functors/either_functor';
 
 var Either = functors.Either,
     Left = functors.Left,

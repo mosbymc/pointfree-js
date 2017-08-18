@@ -1,4 +1,4 @@
-import { sortData } from '../../../src/containers/sortHelpers';
+import { sortData } from '../../../src/dataStructures/sortHelpers';
 import { sortDirection } from '../../../src/helpers'
 import { testData } from '../../testData';
 

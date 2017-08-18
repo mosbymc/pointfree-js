@@ -1,7 +1,7 @@
 import { constant } from '../../combinators';
 import { type, strictEquals } from '../../functionalHelpers';
 import { javaScriptTypes } from '../../helpers';
-import { equalMaker, pointMaker, stringMaker, valueOf } from '../containerHelpers';
+import { equalMaker, pointMaker, stringMaker, valueOf } from '../dataStructureHelpers';
 
 /**
  * @sig

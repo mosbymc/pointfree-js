@@ -1,5 +1,5 @@
-import * as functors from '../../../../src/containers/functors/functors';
-import { identity_functor } from '../../../../src/containers/functors/identity_functor';
+import * as functors from '../../../../src/dataStructures/functors/functors';
+import { identity_functor } from '../../../../src/dataStructures/functors/identity_functor';
 
 var Future = functors.Future;
 

@@ -1,5 +1,5 @@
-import * as monads from '../../../../src/containers/monads/monads';
-import { constant_monad } from '../../../../src/containers/monads/constant_monad';
+import * as monads from '../../../../src/dataStructures/monads/monads';
+import { constant_monad } from '../../../../src/dataStructures/monads/constant_monad';
 import { identity } from '../../../../src/combinators';
 
 var Constant = monads.Constant;

@@ -1,7 +1,7 @@
 import { identity_functor } from '../functors/identity_functor';
 import { emptyObject } from '../../helpers';
 import { identity } from '../../combinators';
-import { apply, chain, mjoin, pointMaker } from '../containerHelpers';
+import { apply, chain, mjoin, pointMaker } from '../dataStructureHelpers';
 
 /**
  * @sig
