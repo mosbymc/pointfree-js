@@ -1,6 +1,6 @@
 import { future_functor } from '../functors/future_functor';
 import { noop } from '../../functionalHelpers';
-import { apply, mjoin, pointMaker } from '../containerHelpers';
+import { apply, mjoin, pointMaker } from '../dataStructureHelpers';
 
 function safeFork(reject, resolve) {
     return function _safeFork(val) {

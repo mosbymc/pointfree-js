@@ -1,5 +1,5 @@
-import * as functors from '../../../../src/containers/functors/functors';
-import { just_functor, nothing_functor } from '../../../../src/containers/functors/maybe_functor';
+import * as functors from '../../../../src/dataStructures/functors/functors';
+import { just_functor, nothing_functor } from '../../../../src/dataStructures/functors/maybe_functor';
 
 var Maybe = functors.Maybe,
     Just = functors.Just,

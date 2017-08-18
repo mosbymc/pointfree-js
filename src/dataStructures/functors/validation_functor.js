@@ -1,4 +1,4 @@
-import { equalMaker, pointMaker, stringMaker, valueOf } from '../containerHelpers';
+import { equalMaker, pointMaker, stringMaker, valueOf } from '../dataStructureHelpers';
 
 function Validation(val) {
     return Object.create(validation_functor, {

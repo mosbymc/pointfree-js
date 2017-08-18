@@ -1,5 +1,7 @@
+/** @module combinators */
+
 /**
- * @sig
+ * @sig (* -> *) -> [*] -> boolean
  * @description d
  * @kind function
  * @function all

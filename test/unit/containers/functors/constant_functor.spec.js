@@ -1,5 +1,5 @@
-import * as functors from '../../../../src/containers/functors/functors';
-import { constant_functor } from '../../../../src/containers/functors/constant_functor';
+import * as functors from '../../../../src/dataStructures/functors/functors';
+import { constant_functor } from '../../../../src/dataStructures/functors/constant_functor';
 
 var Constant = functors.Constant;
 

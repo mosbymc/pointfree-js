@@ -1,6 +1,6 @@
 import { just_functor, nothing_functor } from '../functors/maybe_functor';
 import { identity } from '../../combinators';
-import { apply, chain, mjoin, pointMaker, sharedMaybeFns } from '../containerHelpers';
+import { apply, chain, mjoin, pointMaker, sharedMaybeFns } from '../dataStructureHelpers';
 
 function Maybe(item) {
     return null == item ?

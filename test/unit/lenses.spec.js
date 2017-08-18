@@ -2,7 +2,7 @@ import { arrayLens, objectLens, view, over, put, set, lens, prismPath, makeLense
 import { reverse } from '../../src/functionalHelpers';
 import { compose, curry } from '../../src/combinators';
 import { map, mapWith } from '../../src/pointlessContainers';
-import * as functors from '../../src/containers/functors/functors';
+import * as functors from '../../src/dataStructures/functors/functors';
 
 var Identity = functors.Identity,
     Future = functors.Future;

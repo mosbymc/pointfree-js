@@ -1,5 +1,5 @@
 import { disjunctionEqualMaker, pointMaker, stringMaker, valueOf,
-        get, emptyGet, orElse, emptyOrElse, getOrElse, emptyGetOrElse, sharedEitherFns } from '../containerHelpers';
+        get, emptyGet, orElse, emptyOrElse, getOrElse, emptyGetOrElse, sharedEitherFns } from '../dataStructureHelpers';
 
 /**
  * @sig

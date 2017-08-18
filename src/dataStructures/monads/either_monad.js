@@ -1,6 +1,6 @@
 import { right_functor, left_functor } from '../functors/either_functor';
 import { identity } from '../../combinators';
-import { apply, chain, mjoin, pointMaker, sharedEitherFns } from '../containerHelpers';
+import { apply, chain, mjoin, pointMaker, sharedEitherFns } from '../dataStructureHelpers';
 
 function Either(val, fork) {
     return 'right' === fork ?

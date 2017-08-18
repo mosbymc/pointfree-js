@@ -1,5 +1,5 @@
-import * as functors from '../../../../src/containers/functors/functors';
-import { list_functor, ordered_list_functor } from '../../../../src/containers/functors/list_functor';
+import * as functors from '../../../../src/dataStructures/functors/functors';
+import { list_functor, ordered_list_functor } from '../../../../src/dataStructures/functors/list_functor';
 import { testData } from '../../../testData';
 
 var List = functors.List;
