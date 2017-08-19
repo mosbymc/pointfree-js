@@ -1,21 +1,19 @@
 import { equalMaker, pointMaker, stringMaker, valueOf, get, orElse, getOrElse } from '../dataStructureHelpers';
 
-/** @module dataStructures/functors/identity */
-
 /**
- * @signature - :: * -> {@link identity_functor}
+ * @signature - :: * -> {@link functors.identity_functor}
  * @description Factory function used to create a new object that delegates to
- * the {@link identity_functor} object. Any single value may be provided as an argument
- * which will be used to set the underlying value of the new {@link identity_functor}
+ * the {@link functors.identity_functor} object. Any single value may be provided as an argument
+ * which will be used to set the underlying value of the new {@link functors.identity_functor}
  * delegator. If no argument is provided, the underlying value will be 'undefined'.
  * @namespace Identity
- * @memberOf dataStructures/functors/identity
+ * @memberOf functors
  * @property {function} of
  * @property {function} is
  * @param {*} [val] - The value that should be set as the underlying
- * value of the {@link identity_functor}.
- * @return {identity_functor} - Returns a new object that delegates to the
- * {@link identity_functor}.
+ * value of the {@link functors.identity_functor}.
+ * @return {functors.identity_functor} - Returns a new object that delegates to the
+ * {@link functors.identity_functor}.
  */
 function Identity(val) {
     return Object.create(identity_functor, {
@@ -28,31 +26,31 @@ function Identity(val) {
 }
 
 /**
- * @signature * -> {@link identity_functor}
+ * @signature * -> {@link functors.identity_functor}
  * @description Takes any value and places it in the correct context if it is
- * not already and creates a new {@link identity_functor} object delegator instance.
+ * not already and creates a new {@link functors.identity_functor} object delegator instance.
  * Because the identity functor does not require any specific context for
  * its value, this can be viewed as an alias for {@link Identity}
- * @memberOf identity_functor.Identity
+ * @memberOf functors.Identity
  * @static
  * @function of
  * @param {*} [x] - The value that should be set as the underlying
- * value of the {@link identity_functor}.
- * @return {identity_functor} - Returns a new object that delegates to the
- * {@link identity_functor}.
+ * value of the {@link functors.identity_functor}.
+ * @return {functors.identity_functor} - Returns a new object that delegates to the
+ * {@link functors.identity_functor}.
  */
 Identity.of = x => Identity(x);
 
 /**
  * @signature * -> boolean
  * @description Convenience function for determining if a value is an
- * {@link identity_functor} delegate or not. Available on the
+ * {@link functors.identity_functor} delegate or not. Available on the
  * identity_functor's factory function as Identity.is.
- * @memberOf identity_functor.Identity
+ * @memberOf functors.Identity
  * @function is
  * @param {*} [f] - Any value may be used as an argument to this function.
  * @return {boolean} Returns a boolean that indicates whether the
- * argument provided delegates to the {@link identity_functor} delegate.
+ * argument provided delegates to the {@link functors.identity_functor} delegate.
  */
 Identity.is = f => identity_functor.isPrototypeOf(f);
 
@@ -60,6 +58,7 @@ Identity.is = f => identity_functor.isPrototypeOf(f);
  * @typedef {Object} identity_functor
  * @property {function} value - returns the underlying value of the the functor
  * @property {function} map - maps a single function over the underlying value of the functor
+ * @property {function} bimap
  * @property {function} get - returns the underlying value of the functor
  * @property {function} orElse - returns the underlying value of the functor
  * @property {function} getOrElse - returns the underlying value of the functor
@@ -68,10 +67,11 @@ Identity.is = f => identity_functor.isPrototypeOf(f);
  * @property {function} toString - returns a string representation of the identity functor and its underlying value
  * @property {function} factory - a reference to the identity_functor factory function
  * @kind {Object}
+ * @memberOf functors
  * @namespace identity_functor
  * @description This is the delegate object that specifies the behavior of the identity functor. All
  * operations that may be performed on an identity functor 'instance' delegate to this object. Identity
- * functor 'instances' are created by the {@link Identity} factory function via Object.create,
+ * functor 'instances' are created by the {@link functors.Identity} factory function via Object.create,
  * during which the underlying value is placed directly on the newly created object. No other
  * properties exist directly on an identity functor delegator object beyond the ._value property.
  * All behavior delegates to this object, or higher up the prototype chain.
@@ -82,10 +82,11 @@ var identity_functor = {
      * @description Returns the underlying value of an identity_functor delegator. This
      * getter is not expected to be used directly by consumers - it is meant as an internal
      * access only. To manipulate the underlying value of an identity_functor delegator,
-     * see {@link identity_functor#map} and {@link identity_functor#bimap}.
-     * To retrieve the underlying value of an identity_functor delegator, see {@link identity_functor#get},
-     * {@link identity_functor#orElse}, {@link identity_functor#getOrElse},
-     * and {@link identity_functor#valueOf}.
+     * see {@link functors.identity_functor#map} and {@link functors.identity_functor#bimap}.
+     * To retrieve the underlying value of an identity_functor delegator, see {@link functors.identity_functor#get},
+     * {@link functors.identity_functor#orElse}, {@link functors.identity_functor#getOrElse},
+     * and {@link functors.identity_functor#valueOf}.
+     * @memberOf functors.identity_functor
      * @instance
      * @function
      * @return {*} Returns the underlying value of the delegator. May be any value.
@@ -94,14 +95,15 @@ var identity_functor = {
         return this._value;
     },
     /**
-     * @signature () -> {@link identity_functor}
+     * @signature () -> {@link functors.identity_functor}
      * @description Takes a function that is applied to the underlying value of the
-     * functor, the result of which is used to create a new {@link identity_functor}
+     * functor, the result of which is used to create a new {@link functors.identity_functor}
      * delegator instance.
+     * @memberOf functors.identity_functor
      * @instance
      * @param {function} fn - A mapping function that can operate on the underlying
-     * value of the {@link identity_functor}.
-     * @return {identity_functor} Returns a new {@link identity_functor}
+     * value of the {@link functors.identity_functor}.
+     * @return {functors.identity_functor} Returns a new {@link functors.identity_functor}
      * delegator whose underlying value is the result of the mapping operation
      * just performed.
      */
@@ -111,6 +113,7 @@ var identity_functor = {
     /**
      * @signature () -> *
      * @description Returns the underlying value of the current functor 'instance'.
+     * @memberOf functors.identity_functor
      * @instance
      * @function
      * @return {*} - Returns the underlying value of the current functor 'instance'.
@@ -123,6 +126,7 @@ var identity_functor = {
      * 'mappable'. Because the identity_functor does not support disjunctions, the
      * parameter is entirely optional and will always be ignored. Whatever the actual
      * underlying value is, it will always be returned.
+     * @memberOf functors.identity_functor
      * @instance
      * @function
      * @param {function} [f] - An optional function argument which is invoked and the result
@@ -137,6 +141,7 @@ var identity_functor = {
      * Because the identity_functor does not support disjunctions, the parameter is entirely
      * optional and will always be ignored. Whatever the actual underlying value is, it will
      * always be returned.
+     * @memberOf functors.identity_functor
      * @instance
      * @function
      * @param {*} [x] - a
@@ -144,17 +149,18 @@ var identity_functor = {
      */
     getOrElse: getOrElse,
     /**
-     * @signature * -> {@link identity_functor}
+     * @signature * -> {@link functors.identity_functor}
      * @description Factory function used to create a new object that delegates to
-     * the {@link identity_functor} object. Any single value may be provided as an argument
-     * which will be used to set the underlying value of the new {@link identity_functor}
+     * the {@link functors.identity_functor} object. Any single value may be provided as an argument
+     * which will be used to set the underlying value of the new {@link functors.identity_functor}
      * delegator. If no argument is provided, the underlying value will be 'undefined'.
+     * @memberOf functors.identity_functor
      * @instance
      * @function
      * @param {*} item - The value that should be set as the underlying
-     * value of the {@link identity_functor}.
-     * @return {identity_functor} Returns a new {@link identity_functor} delegator object
-     * via the {@link Identity#of} function.
+     * value of the {@link functors.identity_functor}.
+     * @return {functors.identity_functor} Returns a new {@link functors.identity_functor} delegator object
+     * via the {@link functors.Identity#of} function.
      */
     of: pointMaker(Identity),
     /**
@@ -162,6 +168,7 @@ var identity_functor = {
      * @description Returns the underlying value of the current functor 'instance'. This
      * function property is not meant for explicit use. Rather, the JavaScript engine uses
      * this property during implicit coercion like addition and concatenation.
+     * @memberOf functors.identity_functor
      * @instance
      * @function
      * @return {*} Returns the underlying value of the current functor 'instance'.
@@ -171,6 +178,7 @@ var identity_functor = {
      * @signature () -> string
      * @description Returns a string representation of the functor and its
      * underlying value
+     * @memberOf functors.identity_functor
      * @instance
      * @function
      * @return {string} Returns a string representation of the identity_functor
@@ -178,17 +186,18 @@ var identity_functor = {
      */
     toString: stringMaker('Identity'),
     /**
-     * @signature * -> {@link identity_functor}
+     * @signature * -> {@link functors.identity_functor}
      * @description Factory function used to create a new object that delegates to
-     * the {@link identity_functor} object. Any single value may be provided as an argument
-     * which will be used to set the underlying value of the new {@link identity_functor}
+     * the {@link functors.identity_functor} object. Any single value may be provided as an argument
+     * which will be used to set the underlying value of the new {@link functors.identity_functor}
      * delegator. If no argument is provided, the underlying value will be 'undefined'.
+     * @memberOf functors.identity_functor
      * @instance
      * @function
-     * @see Identity
+     * @see functors.Identity
      * @param {*} val - The value that should be set as the underlying
-     * value of the {@link identity_functor}.
-     * @return {identity_functor} - Returns a new identity functor delegator
+     * value of the {@link functors.identity_functor}.
+     * @return {functors.identity_functor} - Returns a new identity functor delegator
      */
     factory: Identity
 };
@@ -199,6 +208,7 @@ var identity_functor = {
  * is defined as:
  * 1) The other functor shares the same delegate object as 'this' identity functor
  * 2) Both underlying values are strictly equal to each other
+ * @memberOf functors.identity_functor
  * @instance
  * @function
  * @param {Object} ma - The other functor to check for equality with 'this' functor.
@@ -207,18 +217,19 @@ var identity_functor = {
 identity_functor.equals = equalMaker(identity_functor);
 
 /**
- * @signature (* -> *) -> (* -> *) -> identity_functor<T>
+ * @signature (* -> *) -> (* -> *) -> functors.identity_functor<T>
  * @description Since the constant functor does not represent a disjunction, the Identity's
  * bimap function property behaves just as its map function property. It is merely here as a
  * convenience so that swapping out functors/monads does not break an application that is
  * relying on its existence.
+ * @memberOf functors.identity_functor
  * @instance
  * @function
  * @param {function} f - A function that will be used to map over the underlying data of the
- * {@link identity_functor} delegator.
- * @param {function} [g] - An optional function that is simply ignored on the {@link identity_functor}
+ * {@link functors.identity_functor} delegator.
+ * @param {function} [g] - An optional function that is simply ignored on the {@link functors.identity_functor}
  * since there is no disjunction present.
- * @return {identity_functor} - Returns a new {@link identity_functor} delegator after applying
+ * @return {functors.identity_functor} - Returns a new {@link functors.identity_functor} delegator after applying
  * the mapping function to the underlying data.
  */
 identity_functor.bimap = identity_functor.map;
