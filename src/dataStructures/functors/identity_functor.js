@@ -1,6 +1,6 @@
 import { equalMaker, pointMaker, stringMaker, valueOf, get, orElse, getOrElse } from '../dataStructureHelpers';
 
-/** @module identity_functor */
+/** @module dataStructures/functors/identity */
 
 /**
  * @signature - :: * -> {@link identity_functor}
@@ -9,6 +9,7 @@ import { equalMaker, pointMaker, stringMaker, valueOf, get, orElse, getOrElse } 
  * which will be used to set the underlying value of the new {@link identity_functor}
  * delegator. If no argument is provided, the underlying value will be 'undefined'.
  * @namespace Identity
+ * @memberOf dataStructures/functors/identity
  * @property {function} of
  * @property {function} is
  * @param {*} [val] - The value that should be set as the underlying
@@ -32,7 +33,7 @@ function Identity(val) {
  * not already and creates a new {@link identity_functor} object delegator instance.
  * Because the identity functor does not require any specific context for
  * its value, this can be viewed as an alias for {@link Identity}
- * @memberOf identity_functor~Identity
+ * @memberOf identity_functor.Identity
  * @static
  * @function of
  * @param {*} [x] - The value that should be set as the underlying
@@ -47,7 +48,7 @@ Identity.of = x => Identity(x);
  * @description Convenience function for determining if a value is an
  * {@link identity_functor} delegate or not. Available on the
  * identity_functor's factory function as Identity.is.
- * @memberOf Identity
+ * @memberOf identity_functor.Identity
  * @function is
  * @param {*} [f] - Any value may be used as an argument to this function.
  * @return {boolean} Returns a boolean that indicates whether the
@@ -206,14 +207,13 @@ var identity_functor = {
 identity_functor.equals = equalMaker(identity_functor);
 
 /**
- * @sig
+ * @signature (* -> *) -> (* -> *) -> identity_functor<T>
  * @description Since the constant functor does not represent a disjunction, the Identity's
  * bimap function property behaves just as its map function property. It is merely here as a
  * convenience so that swapping out functors/monads does not break an application that is
  * relying on its existence.
  * @instance
  * @function
- * @type {function}
  * @param {function} f - A function that will be used to map over the underlying data of the
  * {@link identity_functor} delegator.
  * @param {function} [g] - An optional function that is simply ignored on the {@link identity_functor}

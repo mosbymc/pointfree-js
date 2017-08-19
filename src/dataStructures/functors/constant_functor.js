@@ -1,15 +1,26 @@
 import { equalMaker, pointMaker, stringMaker, valueOf, get, orElse, getOrElse } from '../dataStructureHelpers';
 
+/** @module constant_functor */
+
 /**
- * @sig
- * @description d
- * @param {*} [item] - a
- * @return {constant_functor} - b
+ * @signature - :: * -> {@link constant_functor}
+ * @description Factory function used to create a new object that delegates to
+ * the {@link constant_functor} object. Any single value may be provided as an argument
+ * which will be used to set the underlying value of the new {@link constant_functor}
+ * delegator. If no argument is provided, the underlying value will be 'undefined'.
+ * @namespace Constant
+ * @memberOf constant_functor
+ * @property {function} of
+ * @property {function} is
+ * @param {*} [val] - The value that should be set as the underlying
+ * value of the {@link constant_functor}.
+ * @return {constant_functor} - Returns a new object that delegates to the
+ * {@link constant_functor}.
  */
-function Constant(item) {
+function Constant(val) {
     return Object.create(constant_functor, {
         _value: {
-            value: item,
+            value: val,
             writable: false,
             configurable: false
         }
@@ -17,33 +28,53 @@ function Constant(item) {
 }
 
 /**
- * @sig
- * @description d
- * @param {*} [x] - a
- * @return {constant_functor} - b
+ * @signature * -> {@link constant_functor}
+ * @description Takes any value and places it in the correct context if it is
+ * not already and creates a new {@link constant_functor} object delegator instance.
+ * Because the constant functor does not require any specific context for
+ * its value, this can be viewed as an alias for {@link constant_functor.Constant}
+ * @memberOf constant_functor.Constant
+ * @static
+ * @function of
+ * @param {*} [x] - The value that should be set as the underlying
+ * value of the {@link constant_functor}.
+ * @return {constant_functor} - Returns a new object that delegates to the
+ * {@link constant_functor}.
  */
 Constant.of = x => Constant(x);
 
 /**
- * @sig
- * @description d
- * @param {function} [f] - a
- * @return {boolean} - b
+ * @signature * -> boolean
+ * @description Convenience function for determining if a value is an
+ * {@link constant_functor} delegate or not. Available on the
+ * identity_functor's factory function as Identity.is.
+ * @memberOf constant_functor.Constant
+ * @function is
+ * @param {*} [f] - Any value may be used as an argument to this function.
+ * @return {boolean} Returns a boolean that indicates whether the
+ * argument provided delegates to the {@link constant_functor} delegate.
  */
 Constant.is = f => constant_functor.isPrototypeOf(f);
 
 /**
- * @description d
- * @typedef {Object}
- * @property {function} value
- * @property {function} map
- * @property {function} get
- * @property {function} orElse
- * @property {function} getOrElse
- * @property {function} valueOf
- * @property {function} of
- * @property {function} toString
- * @property {function} factory
+ * @typedef {Object} constant_functor
+ * @property {function} value - returns the underlying value of the the functor
+ * @property {function} map - maps a single function over the underlying value of the functor
+ * @property {function} get - returns the underlying value of the functor
+ * @property {function} orElse - returns the underlying value of the functor
+ * @property {function} getOrElse - returns the underlying value of the functor
+ * @property {function} of - creates a new identity_functor delegate with the value provided
+ * @property {function} valueOf - returns the underlying value of the functor; used during concatenation and coercion
+ * @property {function} toString - returns a string representation of the identity functor and its underlying value
+ * @property {function} factory - a reference to the identity_functor factory function
+ * @kind {Object}
+ * @namespace constant_functor
+ * @description This is the delegate object that specifies the behavior of the identity functor. All
+ * operations that may be performed on an identity functor 'instance' delegate to this object. Constant
+ * functor 'instances' are created by the {@link constant_functor.Constant} factory function via Object.create,
+ * during which the underlying value is placed directly on the newly created object. No other
+ * properties exist directly on an identity functor delegator object beyond the ._value property.
+ * All behavior delegates to this object, or higher up the prototype chain.
  */
 var constant_functor = {
     get value() {
