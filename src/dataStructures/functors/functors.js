@@ -17,26 +17,80 @@ import { applyTransforms, containerIterator, lifter } from '../dataStructureHelp
 //.fold(f) -> f = functor type factory
 //nt(x)mapWith(fn) === nt(x.mapWith(fn))
 
+/**
+ * @memberOf functors.constant_functor
+ * @type {containerIterator}
+ * @description Iterator for the constant functor. Allows the constant functor
+ * to be iterated via for-of or Array#from.
+ */
 constant_functor[Symbol.iterator] = containerIterator;
 future_functor[Symbol.iterator] = containerIterator;
+
+/**
+ * @memberOf functors.identity_functor
+ * @type {containerIterator}
+ * @description Iterator for the identity functor. Allows the identity functor
+ * to be iterated via for-or of Array#from.
+ */
 identity_functor[Symbol.iterator] = containerIterator;
 io_functor[Symbol.iterator] = containerIterator;
 just_functor[Symbol.iterator] = containerIterator;
+
+/**
+ * @memberOf functors.left_functor
+ * @type {containerIterator}
+ * @description Iterator for the left functor. Allows the left functor to
+ * be iterated via for-of or Array#from.
+ */
 left_functor[Symbol.iterator] = containerIterator;
 nothing_functor[Symbol.iterator] = containerIterator;
+
+/**
+ * @memberOf functors.right_functor
+ * @type {containerIterator}
+ * @description Iterator for the right functor. Allows the right functor to
+ * be iterated via for-of or Aray#from.
+ */
 right_functor[Symbol.iterator] = containerIterator;
 validation_functor[Symbol.iterator] = containerIterator;
 
+/**
+ * @memberOf functors.Constant
+ * @type {Function}
+ * @description Lifts any non-constant returning function into a {@link functors.constant_functor}
+ * returning function.
+ */
 Constant.lift = lifter(Constant);
 Either.lift = lifter(Either);
 Future.lift = lifter(Future);
+
+/**
+ * @memberOf functors.Identity
+ * @type {Function}
+ * @description Lifts any non-identity returning function into a {@link functors.identity_functor}
+ * returning function.
+ */
 Identity.lift = lifter(Identity);
 Io.lift = lifter(Io);
 Just.lift = lifter(Just);
+
+/**
+ * @memberOf functors.Left
+ * @type {Function}
+ * @description Lifts any non-left returning function into a {@link functors.left_functor}
+ * returning function.
+ */
 Left.lift = lifter(Left);
 List.lift = lifter(List);
 Maybe.lift = lifter(Maybe);
 Nothing.lift = lifter(Nothing);
+
+/**
+ * @memberOf functors.Right
+ * @type {Function}
+ * @description Lifts any non-right returning function into a {@link functors.right_functor}
+ * returning function.
+ */
 Right.lift = lifter(Right);
 Validation.lift = lifter(Validation);
 

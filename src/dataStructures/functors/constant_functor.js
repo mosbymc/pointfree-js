@@ -10,6 +10,7 @@ import { equalMaker, pointMaker, stringMaker, valueOf, get, orElse, getOrElse } 
  * @memberOf functors
  * @property {function} of
  * @property {function} is
+ * @property {function} lift
  * @param {*} [val] - The value that should be set as the underlying
  * value of the {@link functors.constant_functor}.
  * @return {functors.constant_functor} - Returns a new object that delegates to the
@@ -62,10 +63,11 @@ Constant.is = f => constant_functor.isPrototypeOf(f);
  * @property {function} get - returns the underlying value of the functor
  * @property {function} orElse - returns the underlying value of the functor
  * @property {function} getOrElse - returns the underlying value of the functor
- * @property {function} of - creates a new identity_functor delegate with the value provided
+ * @property {function} of - creates a new constant_functor delegate with the value provided
  * @property {function} valueOf - returns the underlying value of the functor; used during concatenation and coercion
  * @property {function} toString - returns a string representation of the identity functor and its underlying value
- * @property {function} factory - a reference to the identity_functor factory function
+ * @property {function} factory - a reference to the constant_functor factory function
+ * @property {function} [Symbol.Iterator] - Iterator for the constant_functor
  * @kind {Object}
  * @memberOf functors
  * @namespace constant_functor
@@ -79,7 +81,7 @@ Constant.is = f => constant_functor.isPrototypeOf(f);
 var constant_functor = {
     /**
      * @signature () -> *
-     * @description Returns the underlying value of an identity_functor delegator. This
+     * @description Returns the underlying value of an constant_functor delegator. This
      * getter is not expected to be used directly by consumers - it is meant as an internal
      * access only. To manipulate the underlying value of an identity_functor delegator,
      * see {@link functors.constant_functor#map} and {@link functors.constant_functor#bimap}.

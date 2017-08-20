@@ -1,8 +1,12 @@
 /** @module combinators */
 
 /**
- * @sig (* -> *) -> [*] -> boolean
- * @description d
+ * @signature (* -> *) -> [*] -> boolean
+ * @description Partially applied function that takes one or more functions followed
+ * by zero or more arguments and applies each function to the arguments in the order
+ * they were passed. If every function returns a truthy value when applied to the arguments,
+ * 'true' is returned, 'false' other wise.
+ * @note: This function is partially applied, not curried.
  * @kind function
  * @function all
  * @param {function} fns - One or more comma separated function arguments
@@ -11,8 +15,12 @@
 var all = applyAll((fns, args) => fns.every(fn => fn(...args)));
 
 /**
- * @sig
- * @description d
+ * @signature (* -> *) -> [*] -> boolean
+ * @description Partially applied function that takes one or more functions followed
+ * by zero or more arguments and applies each function to the arguments in the order
+ * they were passed. If a single function returns a truthy value when applied to the
+ * arguments, 'true' is returned, 'false' other wise.
+ * @note: This function is partially applied, not curried.
  * @kind function
  * @function any
  * @param {Array} fns - One or more comma separated function arguments
@@ -21,7 +29,7 @@ var all = applyAll((fns, args) => fns.every(fn => fn(...args)));
 var any = applyAll((fns, args) => fns.some(fn => fn(...args)));
 
 /**
- * @sig
+ * @signature
  * @description d
  * @kind function
  * @function c
@@ -34,22 +42,39 @@ var c = curry(function _c(x, y, z) {
     return x(y)(z);
 });
 
+/**
+ * @description Takes any number of arguments, collects them, and then returns them
+ * in an array in reverse order.
+ * @param {*} args The arguments that are to be grouped and reversed.
+ * @return {Array} Returns an array of values.
+ */
 var rev = (...args) => args.reverse();
 
 /**
- * @sig compose :: (b -> c) -> (a -> b) -> (a -> c)
- * @description d
- * @note: @see {@link pipe}
- * @param {function} fns - a
+ * @signature compose :: (b -> c) -> (a -> b) -> (a -> c)
+ * @description Takes one or more functions and feeds the result of each
+ * into the following function. The return value of the last function is
+ * the return value of this function. Note that the functions are invoked
+ * in reverse order of how they are received. Use {@link pipe} if you want
+ * the functions invoked in the same order they are received.
+ * @note: This function is partially applied, not curried.
+ * @see pipe
+ * @param {function} fns - Two or more functions that should be composed
  * @return {*} - b
- */
+ *
+ * @example
+ *      var list = 6,
+ *          mapFilter = compose(x => x > 5, x => x * 2);
+ *
+ *      mapFilter(list);    //10
+*/
 function compose(...fns) {
     fns = fns.reverse();
     return pipe(...fns);
 }
 
 /**
- * @sig
+ * @signature
  * @description d
  * @kind function
  * @function condition
@@ -70,9 +95,12 @@ var n = function _n(x, y, z) {
 };
 
 /**
- * @sig constant :: a -> () -> a
- * @description d
- * @param {*} item - a
+ * @signature constant :: a -> () -> a
+ * @description A function that creates a constant function. When invoked
+ * with any value, the constant function will return a new function. When
+ * the new function is invoked, with or without values, it will always return
+ * the value that was given to the initial function.
+ * @param {*} item - Any value
  * @return {function} - Returns a function, that when invoked, will
  * return the item passed to the constant function as an argument.
  */
@@ -83,10 +111,15 @@ function constant(item) {
 }
 
 /**
- * @sig curry :: (* -> a) -> (* -> a)
+ * @signature curry :: (* -> a) -> (* -> a)
  * @description d
+ * @note This function is partially applied, not curried.
  * @param {function} fn - a
  * @return {function|*} - b
+ *
+ * @example
+ *      var c = curry((a, b, c, d) => a + b + c + d);
+ *      c(1)(2, 3)(4)   //10
  */
 function curry(fn) {
     if (!fn.length || 1 >= fn.length) return fn;
@@ -94,15 +127,20 @@ function curry(fn) {
 }
 
 /**
- * @sig curryN :: (* -> a) -> (* -> a)
+ * @signature curryN :: (* -> a) -> (* -> a)
  * @description Curries a function to a specified arity
  * @param {Object} context - The context the curried function should be invoked with
  * @param {number} arity - The number of arguments to curry the function for
  * @param {function} fn - The function to be curried
- * @param {Array} received - An array of the arguments to be applied to the function
+ * @param {Array} [received] - An optional array of the arguments to be applied to the
+ * function.
  * @return {function | *} - Returns either a function waiting for more arguments to
  * be applied before invocation, or will return the result of the function applied
  * to the supplied arguments if the specified number of arguments have been received.
+ *
+ * @example
+ *      var c = curryN(this, 5, (a, b, c) => a + b + c);
+ *      c(1, 2)(3)(4, 5)    //6
  */
 function curryN(context, arity, fn, received = []) {
     if (fn.orig && fn.orig !== fn) return curryN(context, arity, fn.orig, received);
@@ -117,20 +155,39 @@ function curryN(context, arity, fn, received = []) {
 }
 
 /**
- * @sig
- * @description d
- * @param {function} fn - a
- * @return {Function|*} - b
+ * @signature
+ * @description Behaves like curry, but executes the given function with the arguments
+ * in reverse order from that in which they were received.
+ * @note This function is partially applied, not curried.
+ * @see curry
+ * @param {function} fn - A function that should be curried and eventually invoked with
+ * the arguments in reverse order.
+ * @return {Function|*} - Returns a function waiting for arguments.
+ *
+ * @example
+ *      var c = curryRight((a, b, c, d) => a + b * c / d);
+ *      c(1)(2, 3, 4)   //1
  */
 function curryRight(fn) {
+    /**
+     * @description Function returned both by {@link curryRight} and itself unless and
+     * until it has received the appropriate number of arguments to invoked the curried
+     * function.
+     * @function _wrapper
+     * @param {*} args One or more arguments that the function should be applied to.
+     * @return {function|*} Returns either a function if not enough arguments have been
+     * received yet, other wise it returns whatever the return value of the last function
+     * in the pipeline returned.
+     */
     return curryN(this, fn.length, function _wrapper(...args) {
         return fn.call(this, ...args.reverse());
     });
 }
 
 /**
- * @sig
+ * @signature
  * @description d
+ * @see constant
  * @kind function
  * @function first
  * @param {*} - a
@@ -139,8 +196,9 @@ function curryRight(fn) {
 var first = constant;
 
 /**
- * @sig
+ * @signature
  * @description d
+ * @note This function is partially applied, not curried.
  * @param {function} fn - a
  * @return {*} - b
  */
@@ -154,7 +212,7 @@ function fixedPoint(fn) {
 }
 
 /**
- * @sig
+ * @signature
  * @description d
  * @kind function
  * @function fork
@@ -168,7 +226,7 @@ var fork = curry((join, fn1, fn2) => {
 });
 
 /**
- * @sig Identity :: a -> a
+ * @signature Identity :: a -> a
  * @description Identity function; takes any item and returns same item when invoked
  * @param {*} item - Any value of any type
  * @return {*} - returns item
@@ -176,7 +234,7 @@ var fork = curry((join, fn1, fn2) => {
 var identity = item => item;
 
 /**
- * @sig ifElse :: Function -> ( Function -> ( Function -> (a -> b) ) )
+ * @signature ifElse :: Function -> ( Function -> ( Function -> (a -> b) ) )
  * @description Takes a predicate function that is applied to the data; If a truthy value
  * is returned from the application, the provided ifFunc argument will be
  * invoked, passing the data as an argument, otherwise the elseFunc is
@@ -193,7 +251,7 @@ var identity = item => item;
 var ifElse = curry((predicate, ifFunc, elseFunc, data) => predicate(data) ? ifFunc(data) : elseFunc(data));
 
 /**
- * @sig
+ * @signature
  * @description d
  * @kind function
  * @function ifThisThenThat
@@ -206,11 +264,11 @@ var ifElse = curry((predicate, ifFunc, elseFunc, data) => predicate(data) ? ifFu
 var ifThisThenThat = curry((predicate, ifFunc, ifArg, thatArg) => predicate(ifArg) ? ifFunc(thatArg) : thatArg);
 
 /**
- * @sig kestrel :: a -> () -> a
+ * @signature kestrel :: a -> () -> a
  * @description d
  * @kind function
  * @function kestrel
- * @note @see {@link constant}
+ * @see constant
  * @param {*} item - a
  * @return {function} - Returns a function, that when invoked, will
  * return the item passed to the constant function as an argument.
@@ -218,7 +276,7 @@ var ifThisThenThat = curry((predicate, ifFunc, ifArg, thatArg) => predicate(ifAr
 var kestrel = constant;
 
 /**
- * @sig
+ * @signature
  * @description d
  * @param {function} a - a
  * @return {*} - b
@@ -226,7 +284,7 @@ var kestrel = constant;
 var m = a => a(a);
 
 /**
- * @sig
+ * @signature
  * @description d
  * @kind function
  * @function o
@@ -237,7 +295,7 @@ var m = a => a(a);
 var o = curry((a, b) => b(a(b)));
 
 /**
- * @sig pipe :: [a] -> (b -> c)
+ * @signature pipe :: [a] -> (b -> c)
  * @description -  Takes a List of functions as arguments and returns
  * a function waiting to be invoked with a single item. Once the returned
  * function is invoked, it will reduce the List of functions over the item,
@@ -245,13 +303,18 @@ var o = curry((a, b) => b(a(b)));
  * sequentially. Performs a similar functionality to compose, but applies
  * the functions in reverse order to that of compose.
  * @refer {compose}
- * @note @see {@link compose}
+ * @see compose
  * @param {function} fn - The function to run initially; may be any arity.
  * @param {Array} fns - The remaining functions in the pipeline. Each receives
  * its input from the output of the previous function. Therefore each of these
  * functions must be unary.
  * @return {function} - Returns a function waiting for the item over which
  * to reduce the functions.
+ *
+ * @example
+ *      var p = pipe(x => x % 2, x => x * x);
+ *
+ *      p(10)  //0
  */
 function pipe(fn, ...fns) {
     return function _pipe(...args) {
@@ -262,7 +325,7 @@ function pipe(fn, ...fns) {
 }
 
 /**
- * @sig
+ * @signature
  * @description d
  * @kind function
  * @function q
@@ -275,7 +338,7 @@ var q = curry((a, b, c) => b(a(c)));
 
 //const reduce = (accFn, start, xs) => xs.reduce(accFn, start);
 /**
- * @sig
+ * @signature
  * @description d
  * @kind function
  * @function reduce
@@ -315,7 +378,7 @@ var reduce = curry(function _reduce(accFunc, start, xs) {
 });
 
 /**
- * @sig
+ * @signature
  * @description d
  * @kind function
  * @function second
@@ -324,8 +387,9 @@ var reduce = curry(function _reduce(accFunc, start, xs) {
 var second = constant(identity);
 
 /**
- * @sig
+ * @signature
  * @description d
+ * @note This function is partially applied, not curried.
  * @kind function
  * @function sequence
  * @param {Array} fns - a
@@ -334,7 +398,7 @@ var second = constant(identity);
 var sequence = applyAll((fns, args) => fns.forEach(fn => fn(...args)));
 
 /**
- * @sig
+ * @signature
  * @description d
  * @kind function
  * @function t
@@ -345,17 +409,17 @@ var sequence = applyAll((fns, args) => fns.forEach(fn => fn(...args)));
 var t = curry((x, f) => f(x));
 
 /**
- * @sig
+ * @signature
  * @description d
  * @kind function
  * @function thrush
  * @refer {t}
- * @note @see {@link t}
+ * @see t
  */
-var thrush = t;
+ var thrush = t;
 
-/**
- * @sig
+ /**
+ * @signature
  * @description d
  * @kind function
  * @function u
@@ -366,10 +430,17 @@ var thrush = t;
 var u = curry((a, b) => b(a(a)(b)));
 
 /**
- * @sig
- * @description d
+ * @signature
+ * @description Takes any function curried by this library and uncurries it.
  * @param {function} fn - a
  * @return {function} - b
+ *
+ * @example
+ *      var c = curry((a, b, c, d) => a + b + c + d),
+ *      d = uncurry(c);
+ *
+ *      c(1)(2, 3, 4)   //10
+ *      d(1)            //NaN
  */
 function uncurry(fn) {
     if (fn && fn.orig) return fn.orig;
@@ -377,13 +448,19 @@ function uncurry(fn) {
 }
 
 /**
- * @sig
+ * @signature
  * @description d
  * @kind function
  * @function uncurryN
  * @param {number} depth - a
  * @param {function} fn - b
  * @return {function|*} - c
+ *
+ * @example
+ *      var c = curry((a, b, c) => a + b + c),
+ *          d = uncurryN(1, c);
+ *
+ *      c(1, 2)     //NaN
  */
 var uncurryN = curry(function uncurryN(depth, fn) {
     return curryN(this, depth, function _uncurryN(...args) {
@@ -402,7 +479,7 @@ var uncurryN = curry(function uncurryN(depth, fn) {
 });
 
 /**
- * @sig
+ * @signature
  * @description d
  * @kind function
  * @function w
@@ -413,7 +490,7 @@ var uncurryN = curry(function uncurryN(depth, fn) {
 var w = curry((a, b) => a(b)(b));
 
 /**
- * @sig when :: Function -> (Function -> (a -> b))
+ * @signature when :: Function -> (Function -> (a -> b))
  * @description Similar to ifElse, but no 'elseFunc' argument. Instead, if the application
  * of the predicate to the data returns truthy, the transform is applied to
  * the data. Otherwise, the data is returned without invoking the transform.
@@ -427,7 +504,7 @@ var w = curry((a, b) => a(b)(b));
 var when = curry((predicate, transform, data) => predicate(data) ? transform(data) : data);
 
 /**
- * @sig
+ * @signature
  * @description d
  * @kind function
  * @function whenNot
@@ -439,7 +516,7 @@ var when = curry((predicate, transform, data) => predicate(data) ? transform(dat
 var whenNot = curry((predicate, transform, data) => !predicate(data) ? transform(data) : data);
 
 /**
- * @sig
+ * @signature
  * @description d
  * @kind function
  * @function y
@@ -447,26 +524,84 @@ var whenNot = curry((predicate, transform, data) => !predicate(data) ? transform
 var y = fixedPoint;
 
 /**
- * @sig
+ * @signature
  * @description d
  * @param {function} fn - a
  * @return {function} - b
  */
 function applyWhenReady(fn) {
     var values = [];
+
+    /**
+     * @signature (*...) -> (*...) -> *
+     * @description Takes any function and will allow any number of arguments to
+     * be passed as parameters until _applyWhenReady#apply, _applyWhenReady#leftApply,
+     * or _applyWhenReady#rightApply are invoked.
+     * @namespace _applyWhenReady
+     * @param {*} args - Zero or more arguments to be applied to the given function.
+     * @return {_applyWhenReady} Returns a function that will wait and gather arguments
+     * to be applied to the given function.
+     * @private
+     * @property {function} apply
+     * @property {function} leftApply
+     * @property {function} rightApply
+     * @property {function} args
+     */
     function _applyWhenReady(...args) {
         values = values.concat(args);
         return _applyWhenReady;
     }
 
+    /**
+     * @signature () -> *
+     * @description Invokes the given function using all of the provided
+     * arguments.
+     * @memberOf _applyWhenReady
+     * @function apply
+     * @return {*} Returns the value that the given function returns
+     */
     _applyWhenReady.apply = () => fn(...values);
+
+    /**
+     * @signature () -> *
+     * @description Invokes the given function using all of the provided
+     * arguments.
+     * @memberOf _applyWhenReady
+     * @function leftApply
+     * @return {*} Returns the value that the given function returns
+     */
     _applyWhenReady.leftApply = _applyWhenReady.apply;
+
+    /**
+     * @signature () -> *
+     * @description Invokes the given function using all of the provided
+     * arguments in reverse order.
+     * @memberOf _applyWhenReady
+     * @function rightApply
+     * @return {*} Returns the value that the given function returns
+     */
     _applyWhenReady.rightApply = () => fn(...values.reverse());
+
+    /**
+     * @signature () -> [*]
+     * @description Returns an array of the arguments received thus far.
+     * @function args
+     * @return {Array} Returns an array of values.
+     */
     _applyWhenReady.args = () => values;
 
     return _applyWhenReady;
 }
 
+/**
+ * @signature () -> () -> * -> *
+ * @description Takes two or more functions and zero or more
+ * arguments and invokes the function with the arguments.
+ * @note This function is partially applied, not curried.
+ * @param {function} fn - The first function in a pipeline that
+ * should have all of the provided arguments applied to first.
+ * @return {function} Returns a function waiting for more functions.
+ */
 function applyAll(fn) {
     return function _applyAll(...fns) {
         return function __applyAll(...args) {

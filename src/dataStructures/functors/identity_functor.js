@@ -10,6 +10,7 @@ import { equalMaker, pointMaker, stringMaker, valueOf, get, orElse, getOrElse } 
  * @memberOf functors
  * @property {function} of
  * @property {function} is
+ * @property {function} lift
  * @param {*} [val] - The value that should be set as the underlying
  * value of the {@link functors.identity_functor}.
  * @return {functors.identity_functor} - Returns a new object that delegates to the
@@ -66,6 +67,7 @@ Identity.is = f => identity_functor.isPrototypeOf(f);
  * @property {function} valueOf - returns the underlying value of the functor; used during concatenation and coercion
  * @property {function} toString - returns a string representation of the identity functor and its underlying value
  * @property {function} factory - a reference to the identity_functor factory function
+ * @property {function} [Symbol.Iterator] - Iterator for the identity_functor
  * @kind {Object}
  * @memberOf functors
  * @namespace identity_functor
