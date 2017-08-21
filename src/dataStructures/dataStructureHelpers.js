@@ -1,5 +1,7 @@
 import { identity } from '../combinators';
 
+/** @module dataStructures/dataStructureHelpers */
+
 /**
  * @sig
  * @description d

@@ -1,7 +1,7 @@
 import { arrayLens, objectLens, view, over, put, set, lens, prismPath, makeLenses, lensPath } from '../../src/lenses';
 import { reverse } from '../../src/functionalHelpers';
 import { compose, curry } from '../../src/combinators';
-import { map, mapWith } from '../../src/pointlessContainers';
+import { map, mapWith } from '../../src/pointless_data_structures';
 import * as functors from '../../src/dataStructures/functors/functors';
 
 var Identity = functors.Identity,

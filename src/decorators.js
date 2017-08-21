@@ -1,10 +1,14 @@
 import { curry, curryN } from './combinators';
 
+/** @module decorators */
+
 /**
- * @sig ((*... -> a)) -> (*... -> a) -> [*] -> a
+ * @signature ((*... -> a)) -> (*... -> a) -> [*] -> a
  * @description Used as a helper function, invoker takes any function that
  * requires a single function argument and one or more additional parameters
- * and partially applies that function. @see apply
+ * and partially applies that function.
+ * @note This function is partially applied, not curried.
+ * @see apply
  * @param {function} func - A non-curried, non-partially applied function
  * that expects at least two arguments
  * @return {function} - Returns a function that has turned the 'func' param
@@ -13,12 +17,11 @@ import { curry, curryN } from './combinators';
 var invoker = func => fn => (...args) => func(fn, ...args);
 
 /**
- * @sig (*... -> a) -> (*... -> a) -> [*] -> a
+ * @signature (*... -> a) -> (*... -> a) -> [*] -> a
  * @description A curried function that takes two functions and
  * n arguments to apply both functions to. The first function is
  * applied to the arguments, followed by the second. The return value
  * is equal to the return value of the first function's invocation.
- * @kind function
  * @function after
  * @param {function} fn - A function that should be applied to the arguments. The return
  * value is equal to this function's return value.
@@ -34,10 +37,10 @@ var after = curryN(this, 3, function _after(fn, decoration, ...args) {
 });
 
 /**
- * @sig (*... -> a) -> [*] -> a
+ * @signature (*... -> a) -> [*] -> a
  * @description A partially applied function that takes a function and any arguments
  * and returns the result of apply the function to the arguments.
- * @kind function
+ * @note This function is partially applied, not curried.
  * @function apply
  * @param {function} fn - The function that should be applied to the arguments.
  * @return {function} - The result of applying the function to the arguments.
@@ -45,9 +48,8 @@ var after = curryN(this, 3, function _after(fn, decoration, ...args) {
 var apply = invoker((fn, ...args) => fn(...args));
 
 /**
- * @sig
+ * @signature (* -> *) -> (* -> *) -> [*] -> *
  * @description d
- * @kind function
  * @function before
  * @param {function} fn - a
  * @param {function} decoration - b
@@ -60,10 +62,9 @@ var before = curryN(this, 3, function _before(fn, decoration, ...args) {
 });
 
 /**
- * @sig (*... -> a) -> (*...) -> a
+ * @signature (*... -> a) -> (*...) -> a
  * @description Takes a non-curried function of any arity and turns it
  * into a binary, curried function.
- * @kind function
  * @function binary
  * @param {function} fn - The function that should be made binary.
  * @param {*} args - The arguments that should be applied to the new
@@ -73,11 +74,10 @@ var before = curryN(this, 3, function _before(fn, decoration, ...args) {
 var binary = (fn, ...args) => curryN(this, 2, fn, ...args);
 
 /**
- * @sig {*} -> (* -> *) -> (* -> *)
+ * @signature {*} -> (* -> *) -> (* -> *)
  * @description A curried function that takes an object context and
  * a function and returns the function bound to the context of the
  * object.
- * @kind function
  * @function bindFunction
  * @param {object} context - The context the function should be
  * invoked with.
@@ -91,11 +91,10 @@ var bindFunction = curry(function _bindFunction(context, fn) {
 });
 
 /**
- * @sig {*} -> (* -> *) -> (* -> *)
+ * @signature {*} -> (* -> *) -> (* -> *)
  * @description A curried function that takes an object context and
  * a function and returns the function bound to the context of the
  * object.
- * @kind function
  * @function bindWith
  * @param {function} fn - The function that should be bound to the
  * context of the object.
@@ -119,12 +118,13 @@ function guardAfter(...fns) {
 */
 
 /**
- * @sig (* -> *), (* -> *), ... (* -> *) -> [*] -> *
+ * @signature (* -> *), (* -> *), ... (* -> *) -> [*] -> *
  * @description Accepts one or more functions to be executed with
  * zero or more arguments, and will only invoke the first function argument
  * if all the other functions return a truthy value. If all the functions
  * return truthy, the return value is the result of apply the first function
  * argument to the parameters provided; otherwise the result is 'undefined'.
+ * @note This function is partially applied, not curried.
  * @param {function} fns - One or more functions that should be applied to the arguments.
  * @return {function} - A function waiting for the arguments to be provided.
  */
@@ -137,7 +137,7 @@ function guard(...fns) {
 }
 
 /**
- * @sig (* -> *) -> [*] -> () -> *
+ * @signature (* -> *) -> [*] -> () -> *
  * @description Partially applied function that takes a function as
  * its first parameter, followed by zero or more arguments that the
  * function should be applied to. Finally, a function that takes no
@@ -145,7 +145,7 @@ function guard(...fns) {
  * be applied to the provided arguments. This is similar to {@see apply}
  * except after the arguments are provided, there is an intermediary
  * function returned that needs to be invoked before anything happens.
- * @kind function
+ * @note This function is partially applied, not curried.
  * @function lateApply
  * @param {function} fn - A function to be executed
  * @return {function} - The return value of the 'fn' function argument.
@@ -153,11 +153,10 @@ function guard(...fns) {
 var lateApply = invoker((fn, ...args) => () => fn(...args));
 
 /**
- * @sig (*... -> a) -> [*] -> a
+ * @signature (*... -> a) -> [*] -> a
  * @alias apply
  * @description A partially applied function that takes a function and any arguments
  * and returns the result of apply the function to the arguments.
- * @kind function
  * @function leftApply
  * @param {function} fn - The function that should be applied to the arguments.
  * @return {function} - The result of applying the function to the arguments.
@@ -165,13 +164,13 @@ var lateApply = invoker((fn, ...args) => () => fn(...args));
 var leftApply = apply;
 
 /**
- * @sig (* -> *) -> [*] -> null|*
+ * @signature (* -> *) -> [*] -> null|*
  * @description A partially applied function that takes a function
  * and zero or more arguments. If no arguments are provided, or at
  * least of the the arguments is null or undefined, a value of null
  * is returned. Otherwise, the return value is the result of apply
  * the function to the arguments.
- * @kind function
+ * @note This function is partially applied, not curried.
  * @function maybe
  * @param {function} fn - The function that may run
  * @return {null|*} - Returns either null, or the result of the function.
@@ -179,12 +178,12 @@ var leftApply = apply;
 var maybe = invoker((fn, ...args) => 1 <= args.length && args.every(function _testNull(val) { return null != val; }) ? fn.call(this, ...args) : null);
 
 /**
- * @sig (* -> *) -> [*] -> boolean
+ * @signature (* -> *) -> [*] -> boolean
  * @description - Takes a function and one or more parameters that the function
  * should be applied to. The result is the inverse coercion of the return
  * value of the function's application to the provided arguments to a
  * boolean.
- * @kind function
+ * @note This function is partially applied, not curried.
  * @function not
  * @param {function} fn - A function that should be applied to the arguments.
  * @return {*} - The inverted coercion of the return value of the function to
@@ -193,12 +192,13 @@ var maybe = invoker((fn, ...args) => 1 <= args.length && args.every(function _te
 var not = invoker((fn, ...args) => !fn(...args));
 
 /**
- * @sig (* -> *) -> [*] ->
+ * @signature (* -> *) -> [*] ->
  * @description - Takes a function and zero or more arguments that the
  * function should be applied to. When invoked the first time, the function
  * argument will be applied to the argument parameters and the result of
  * that application is returned. Subsequent invocations will not execute
  * the function, but will returned the cached results of the first invocation.
+ * @note This function is partially applied, not curried.
  * @param {function} fn - The function that should be run a single time.
  * @returns {function} - The value of the application of the function
  * to the arguments.
@@ -216,9 +216,8 @@ function once(fn) {
 }
 
 /**
- * @sig
+ * @signature number -> (number -> *) -> *
  * @description d
- * @kind function
  * @function repeat
  * @param {number} num - a
  * @param {function} fn - b
@@ -229,9 +228,9 @@ var repeat = curry(function _repeat(num, fn) {
 });
 
 /**
- * @sig
+ * @signature
  * @description d
- * @kind function
+ * @note This function is partially applied, not curried.
  * @function rightApply
  * @param {function} fn - a
  * @return {function} - b
@@ -241,9 +240,9 @@ var rightApply = invoker((fn, ...args) => fn(...args.reverse()));
 //TODO: need to add a try/catch function here, and see about renaming the existing 'safe' function
 //TODO: as that seems more along the lines of a try/catch function, rather than a 'maybe' function.
 /**
- * @sig
+ * @signature
  * @description d
- * @kind function
+ * @note This function is partially applied, not curried.
  * @function safe
  * @param {function} fn - a
  * @return {function} - b
@@ -251,9 +250,8 @@ var rightApply = invoker((fn, ...args) => fn(...args.reverse()));
 var safe = invoker((fn, ...args) => !args.length || args.includes(null) || args.includes(undefined) ? undefined : fn(...args));
 
 /**
- * @sig
+ * @signature
  * @description d
- * @kind function
  * @function tap
  * @param {*} arg - a
  * @param {function} fn - b
@@ -265,18 +263,18 @@ var tap = curry(function _tap(fn, arg) {
 });
 
 /**
- * @sig
- * @description d
+ * @signature (* -> *) -> [*] -> (*, *, * -> *)
+ * @description Takes any function and turns it into a curried ternary function.
  * @param {function} fn - a
- * @param {*} args - b
+ * @param {*} [args] - Accepts zero or more optional arguments. If three or more arguments
+ * and given, the function is invoked immediately with the first three values.
  * @return {function} - c
  */
 var ternary = (fn, ...args) => curryN(this, 3, fn, ...args);
 
 /**
- * @sig
+ * @signature
  * @description d
- * @kind function
  * @function tryCatch
  * @param {function} catcher - a
  * @param {function} tryer - b
@@ -294,7 +292,7 @@ var tryCatch = curry(function _tryCatch(catcher, tryer) {
 });
 
 /**
- * @sig (*... -> *) -> * -> *
+ * @signature (*... -> *) -> * -> *
  * @description - Takes a single function of any arity and turns it into
  * a unary function. An optional argument may be provided. If it is, the
  * immediate result of the function's application to the argument is returned,
@@ -308,7 +306,7 @@ var tryCatch = curry(function _tryCatch(catcher, tryer) {
 var unary = (fn, arg) => undefined === arg ? curryN(this, 1, fn) : fn(arg);
 
 /**
- * @sig
+ * @signature
  * @description d
  * @param {*} seed - a
  * @return {function} - b
@@ -320,8 +318,9 @@ function unfold(seed) {
 }
 
 /**
- * @sig
+ * @signature
  * @description d
+ * @note This function is partially applied, not curried.
  * @param {function} fn - a
  * @return {function} - b
  */
@@ -337,9 +336,8 @@ function unfoldWith(fn) {
 }
 
 /**
- * @sig
+ * @signature
  * @description d
- * @kind function
  * @function hyloWith
  * @param cata - a
  * @param ana - b
@@ -358,10 +356,10 @@ var hyloWith = curry(function _hylo(cata, ana, seed) {
 });
 
 /**
- * @sig (* -> *) -> [*] -> undefined
+ * @signature (* -> *) -> [*] -> undefined
  * @description This function works just like {@see apply} except that
  * 'undefined' is always returned, regardless of the result of the function.
- * @kind function
+ * @note This function is partially applied, not curried.
  * @function voidFn
  * @param {function} fn - The function that should be applied to the arguments
  * @return {function} -

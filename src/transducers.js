@@ -1,7 +1,9 @@
 import { compose, curry } from './combinators';
 
+/** @module transducers */
+
 /**
- * @sig
+ * @signature
  * @description d
  * @kind function
  * @function mapping
@@ -13,7 +15,7 @@ var mapping = curry(function _mapping(mapFn, reduceFn, result, input) {
 });
 
 /**
- * @sig
+ * @signature
  * @description d
  * @kind function
  * @function filtering
@@ -28,7 +30,7 @@ var filtering = curry(function _filtering2(predicate, reduceFn, result, input) {
 });
 
 /**
- * @sig
+ * @signature
  * @description d
  * @param {function} mapFn - a
  * @return {function} - b
@@ -40,7 +42,7 @@ function mapReducer (mapFn) {
 }
 
 /**
- * @sig
+ * @signature
  * @description d
  * @param {function} predicate - a
  * @return {function} - b
@@ -52,7 +54,7 @@ function filterReducer(predicate) {
 }
 
 /**
- * @sig
+ * @signature
  * @description d
  * @kind function
  * @function mapped
@@ -67,7 +69,7 @@ var mapped = curry(function _mapped(f, x) {
 });
 
 /**
- * @sig
+ * @signature
  * @description d
  * @param {function} xform - a
  * @param {function} reducing - b
@@ -78,7 +80,7 @@ var mapped = curry(function _mapped(f, x) {
 var transduce = (xform, reducing, initial, input) => input.reduce(xform(reducing), initial);
 
 /**
- * @sig
+ * @signature
  * @description d
  * @param {*} txf - a
  * @param {*} acc - b
@@ -104,7 +106,7 @@ Object.defineProperty(reduce, 'stopper', {
 });
 
 /**
- * @sig
+ * @signature
  * @description d
  * @param {number} skips - a
  * @return {function} - b
@@ -125,7 +127,7 @@ var taking = allows => reducerFn => (acc, item) => {
 */
 
 /**
- * @sig
+ * @signature
  * @description d
  * @param {*} allows - a
  * @return {function} - b

@@ -1,8 +1,10 @@
 import * as functors from './dataStructures/functors/functors';
 import * as monads from './dataStructures/monads/monads';
 
+/** @module functional_data_structure_helpers */
+
 /**
- * @sig
+ * @signature
  * @description d
  * @param {*} fa - a
  * @return {boolean} - b
@@ -12,7 +14,7 @@ function isConstant(fa) {
 }
 
 /**
- * @sig
+ * @signature
  * @description d
  * @param {*} fa - a
  * @return {boolean} - b
@@ -22,7 +24,7 @@ function isEither(fa) {
 }
 
 /**
- * @sig
+ * @signature
  * @description d
  * @param {*} fa - a
  * @return {boolean} - b
@@ -32,7 +34,7 @@ function isFunctor(fa) {
 }
 
 /**
- * @sig
+ * @signature
  * @description d
  * @param {*} fa - a
  * @return {boolean} - b
@@ -42,7 +44,7 @@ function isFuture(fa) {
 }
 
 /**
- * @sig
+ * @signature
  * @description d
  * @param {*} fa - a
  * @return {boolean} - b
@@ -52,7 +54,7 @@ function isIdentity(fa) {
 }
 
 /**
- * @sig
+ * @signature
  * @description d
  * @param {*} fa - a
  * @return {boolean} - b
@@ -62,48 +64,48 @@ function isIo(fa) {
 }
 
 /**
- * @sig
+ * @signature
  * @description d
  * @param {*} fa - a
  * @return {boolean} - b
  */
 function isJust(fa) {
-    return !!(fa.isJust && (fa.factory === functors.Maybe || fa.factory === monads.Maybe));
+    return fa.isJust && (fa.factory === functors.Maybe || fa.factory === monads.Maybe);
 }
 
 /**
- * @sig
+ * @signature
  * @description d
  * @param {*} fa - a
  * @return {boolean} - b
  */
 function isLeft(fa) {
-    return !!(fa.isLeft && (fa.factory === functors.Either || fa.factory === monads.Either));
+    return fa.isLeft && (fa.factory === functors.Either || fa.factory === monads.Either);
 }
 
 /**
- * @sig
+ * @signature
  * @description d
  * @param {*} fa - a
  * @return {boolean} - b
  */
 function isList(fa) {
-    return (fa.factory === functors.List || fa.factory === monads.List);
+    return fa.factory === functors.List || fa.factory === monads.List;
 }
 
 /**
- * @sig
+ * @signature
  * @description d
  * @param {*} fa - a
  * @return {boolean} - b
  */
 function isMaybe(fa) {
-    return !!((fa.isNothing && (fa.factory === functors.Maybe || fa.factory === monads.Maybe)) ||
-        (fa.isJust && (fa.factory === functors.Maybe || fa.factory === monads.Maybe)));
+    return (fa.isNothing && (fa.factory === functors.Maybe || fa.factory === monads.Maybe)) ||
+        (fa.isJust && (fa.factory === functors.Maybe || fa.factory === monads.Maybe));
 }
 
 /**
- * @sig
+ * @signature
  * @description d
  * @param {Object} ma - a
  * @return {boolean} - b
@@ -113,7 +115,7 @@ function isMonad(ma) {
 }
 
 /**
- * @sig
+ * @signature
  * @description d
  * @param {*} fa - a
  * @return {boolean} - b
@@ -123,7 +125,7 @@ function isNothing(fa) {
 }
 
 /**
- * @sig
+ * @signature
  * @description d
  * @param {*} fa - a
  * @return {boolean} - b
@@ -133,7 +135,7 @@ function isRight(fa) {
 }
 
 /**
- * @sig
+ * @signature
  * @description d
  * @param {*} fa - a
  * @return {boolean} - b
