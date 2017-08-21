@@ -1,5 +1,7 @@
 import { deepClone, sortComparer } from '../helpers';
 
+/** @module dataStructures/sortHelpers */
+
 /**
  * @sig
  * @description d

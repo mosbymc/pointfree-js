@@ -1,5 +1,5 @@
 import { isConstant, isEither, isFuture, isFunctor, isIdentity, isIo, isJust, isLeft,
-        isList, isMaybe, isMonad, isNothing, isRight, isValidation } from '../../src/functionalContainerHelpers';
+        isList, isMaybe, isMonad, isNothing, isRight, isValidation } from '../../src/functional_data_structure_helpers';
 import * as functors from '../../src/dataStructures/functors/functors';
 import * as monads from '../../src/dataStructures/monads/monads';
 

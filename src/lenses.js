@@ -4,10 +4,12 @@ import { deepClone } from './helpers';
 import { Maybe } from './dataStructures/monads/maybe_monad';
 import { Identity } from './dataStructures/monads/identity_monad';
 import { Constant } from './dataStructures/monads/constant_monad';
-import { mapWith } from './pointlessContainers';
+import { mapWith } from './pointless_data_structures';
+
+/** @module lenses */
 
 /**
- * @sig
+ * @signature
  * @description d
  * @kind function
  * @function arrayLens
@@ -23,7 +25,7 @@ var arrayLens = curry(function _arrayLens(idx, f, xs) {
 });
 
 /**
- * @sig
+ * @signature
  * @description d
  * @kind function
  * @function objectLens
@@ -39,7 +41,7 @@ var objectLens = curry(function _objectLens(prop, f, xs) {
 });
 
 /**
- * @sig
+ * @signature
  * @description d
  * @kind function
  * @function unifiedLens
@@ -57,7 +59,7 @@ var unifiedLens = curry(function _unifiedLens(prop, f, xs) {
 });
 
 /**
- * @sig
+ * @signature
  * @description d
  * @kind function
  * @function view
@@ -70,7 +72,7 @@ var view = curry(function _view(lens, target) {
 });
 
 /**
- * @sig
+ * @signature
  * @description d
  * @kind function
  * @function over
@@ -86,7 +88,7 @@ var over = curry(function _over(lens, mapFn, target) {
 });
 
 /**
- * @sig
+ * @signature
  * @description d
  * @kind function
  * @function put
@@ -100,7 +102,7 @@ var put = curry(function _put(lens, val, target) {
 });
 
 /**
- * @sig
+ * @signature
  * @description d
  * @kind function
  * @function set
@@ -112,7 +114,7 @@ var put = curry(function _put(lens, val, target) {
 var set = curry((lens, val, targetData) => over(lens, kestrel(val), targetData));
 
 /**
- * @sig
+ * @signature
  * @description d
  * @param {string} paths - a
  * @return {*} - b
@@ -125,7 +127,7 @@ function makeLenses(...paths) {
 }
 
 /**
- * @sig
+ * @signature
  * @description d
  * @param {string} paths - a
  * @return {function} - b
@@ -143,7 +145,7 @@ function improvedLensPath(...paths) {
 }
 
 /**
- * @sig
+ * @signature
  * @description d
  * @param {string|Number} path - a
  * @return {*} - b
@@ -155,7 +157,7 @@ function lensPath(...path) {
 }
 
 /**
- * @sig
+ * @signature
  * @description d
  * @kind function
  * @function prismPath
@@ -176,7 +178,7 @@ var prismPath = curry(function _prismPath(path, obj) {
 });
 
 /**
- * @sig
+ * @signature
  * @description d
  * @kind function
  * @function lens
@@ -192,7 +194,7 @@ var lens = curry(function _lens(getter, setter, key, f, xs) {
 });
 
 /**
- * @sig
+ * @signature
  * @description d
  * @kind function
  * @function prism
@@ -209,7 +211,7 @@ var prism = curry(function _prism(getter, setter, key, f, xs) {
 });
 
 /**
- * @sig
+ * @signature
  * @description d
  * @kind function
  * @function split

@@ -4,13 +4,15 @@ import { when, ifElse } from '../combinators';
 import { javaScriptTypes, sortDirection, cacher, typeNames } from '../helpers';
 import { sortData } from './sortHelpers';
 
+/** @module dataStructures/list_iterators */
+
 var toArray = when(not(isArray), Array.from);
 
 /**
  * @sig 
  * @description -
- * @param {Array|generator} xs - some stuff
- * @param {Array|generator} ys - some other stuff
+ * @param {Array|generator|functors.list_core} xs - some stuff
+ * @param {Array|generator|functors.list_core} ys - some other stuff
  * @return {generator} - some other other stuff
  */
 function prepend(xs, ys) {
@@ -24,8 +26,8 @@ function prepend(xs, ys) {
 /**
  * @sig:
  * @description description
- * @param {Array|generator} xs - x
- * @param {Array|generator} yss - y
+ * @param {Array|generator|functors.list_core} xs - x
+ * @param {Array|generator|functors.list_core} yss - y
  * @param {number} argsCount - z
  * @return {generator} - a
  */
@@ -48,8 +50,8 @@ function concat(xs, yss, argsCount) {
 /**
  * @sig
  * @description d
- * @param {Array|generator} xs - x
- * @param {Array|generator} ys - y
+ * @param {Array|generator|functors.list_core} xs - x
+ * @param {Array|generator|functors.list_core} ys - y
  * @param {function} comparer - z
  * @return {generator} - a
  */
@@ -67,8 +69,8 @@ function except(xs, ys, comparer = strictEquals) {
 /**
  * @sig
  * @description d
- * @param {Array|generator} xs - a
- * @param {Array|generator} ys - b
+ * @param {Array|generator|functors.list_core} xs - a
+ * @param {Array|generator|functors.list_core} ys - b
  * @param {function} xSelector - c
  * @param {function} ySelector - d
  * @param {function} projector - e
@@ -98,8 +100,8 @@ function groupJoin(xs, ys, xSelector, ySelector, projector, listFactory, compare
 /**
  * @sig
  * @description d
- * @param {Array|generator} xs - a
- * @param {Array|generator} ys - b
+ * @param {Array|generator|functors.list_core} xs - a
+ * @param {Array|generator|functors.list_core} ys - b
  * @param {function} comparer - c
  * @return {generator} - d
  */
@@ -117,7 +119,7 @@ function intersect(xs, ys, comparer = strictEquals) {
 /**
  * @sig
  * @description d
- * @param {Array|generator} xs - a
+ * @param {Array|generator|functors.list_core} xs - a
  * @param {*} val - b
  * @return {generator} - c
  */
@@ -137,8 +139,8 @@ function intersperse(xs, val) {
 /**
  * @sig
  * @description d
- * @param {Array|generator} xs - a
- * @param {Array|generator} ys - b
+ * @param {Array|generator|functors.list_core} xs - a
+ * @param {Array|generator|functors.list_core} ys - b
  * @param {function} xSelector - c
  * @param {function} ySelector - d
  * @param {function} projector - e
@@ -161,8 +163,8 @@ function join(xs, ys, xSelector, ySelector, projector, comparer = strictEquals) 
 /**
  * @sig
  * @description d
- * @param {Array|generator} xs - a
- * @param {Array|generator} ys - b
+ * @param {Array|generator|functors.list_core} xs - a
+ * @param {Array|generator|functors.list_core} ys - b
  * @param {function} comparer - c
  * @return {generator} - d
  */
@@ -182,8 +184,8 @@ function union(xs, ys, comparer = strictEquals) {
 /**
  * @sig
  * @description d
- * @param {Array|generator} xs - a
- * @param {Array|generator} ys - b
+ * @param {Array|generator|functors.list_core} xs - a
+ * @param {Array|generator|functors.list_core} ys - b
  * @param {function} selector - c
  * @return {generator} - d
  */
@@ -203,7 +205,7 @@ function zip(xs, ys, selector) {
 /**
  * @sig
  * @description d
- * @param {Array|generator} xs - a
+ * @param {Array|generator|functors.list_core} xs - a
  * @param {function} predicate - b
  * @return {boolean} - c
  */
@@ -214,7 +216,7 @@ function all(xs, predicate) {
 /**
  * @sig
  * @description d
- * @param {Array|generator} xs - a
+ * @param {Array|generator|functors.list_core} xs - a
  * @param {function} predicate - b
  * @return {boolean} - c
  */
@@ -225,7 +227,7 @@ function any(xs, predicate) {
 /**
  * @sig
  * @description d
- * @param {Array|generator} xs - a
+ * @param {Array|generator|functors.list_core} xs - a
  * @param {*} val - b
  * @param {function} comparer - c
  * @return {*} - d
@@ -238,7 +240,7 @@ function contains(xs, val, comparer) {
 /**
  * @sig
  * @description d
- * @param {Array|generator} xs - a
+ * @param {Array|generator|functors.list_core} xs - a
  * @param {*} val - b
  * @param {function} comparer - c
  * @return {boolean} - d
@@ -250,7 +252,7 @@ function binarySearch(xs, val, comparer) {
 /**
  * @sig
  * @description d
- * @param {Array|generator} xs - a
+ * @param {Array|generator|functors.list_core} xs - a
  * @param {number} left - b
  * @param {number} right - c
  * @param {*} val - d
@@ -269,7 +271,7 @@ function binarySearchRec(xs, left, right, val, comparer) {
 /**
  * @sig
  * @description d
- * @param {Array|generator} xs - a
+ * @param {Array|generator|functors.list_core} xs - a
  * @param {function} predicate - b
  * @return {Number} - c
  */
@@ -281,7 +283,7 @@ function count(xs, predicate) {
 /**
  * @sig
  * @description d
- * @param {Array|generator} xs - a
+ * @param {Array|generator|functors.list_core} xs - a
  * @param {function} predicate - b
  * @return {*} - c
  */
@@ -292,7 +294,7 @@ function first(xs, predicate) {
 /**
  * @sig
  * @description d
- * @param {Array|generator} xs - a
+ * @param {Array|generator|functors.list_core} xs - a
  * @param {function} fn - b
  * @param {*} initial - c
  * @return {*} - d
@@ -322,7 +324,7 @@ function foldRight(arr, op, acc) {
 /**
  * @sig
  * @description s
- * @param {Array|generator} xs - a
+ * @param {Array|generator|functors.list_core} xs - a
  * @param {function} fn - b
  * @param {*} initial - c
  * @return {*} - d
@@ -334,7 +336,7 @@ function reduceRight(xs, fn, initial) {
 /**
  * @sig
  * @description d
- * @param {Array|generator} xs - a
+ * @param {Array|generator|functors.list_core} xs - a
  * @param {function} predicate - b
  * @return {*} - c
  */
@@ -347,7 +349,7 @@ function last(xs, predicate) {
 /**
  * @sig
  * @description d
- * @param {Array|generator} xs - a
+ * @param {Array|generator|functors.list_core} xs - a
  * @param {function} comparer - b
  * @return {generator} - c
  */
@@ -364,7 +366,7 @@ function distinct(xs, comparer = strictEquals) {
 /**
  * @sig
  * @description d
- * @param {Array|generator} xs - a
+ * @param {Array|generator|functors.list_core} xs - a
  * @param {string} dataType - b
  * @return {generator} - c
  */
@@ -415,7 +417,7 @@ function ofType(xs, dataType) {
 /**
  * @sig
  * @description d
- * @param {Array|generator} xs - a
+ * @param {Array|generator|functors.list_core} xs - a
  * @param {function} predicate - b
  * @return {generator} - c
  */
@@ -471,7 +473,7 @@ function chain(xs, fn) {
 /**
  * @sig
  * @description d
- * @param {Array|generator} xs - a
+ * @param {Array|generator|functors.list_core} xs - a
  * @return {generator} - b
  */
 function flatten(xs) {
@@ -491,7 +493,7 @@ function flatten(xs) {
 /**
  * @sig
  * @description d
- * @param {Array|generator} xs - a
+ * @param {Array|generator|functors.list_core} xs - a
  * @param {object} groupObject - b
  * @param {function} queryableConstructor - c
  * @return {generator} - d
@@ -575,7 +577,7 @@ function findGroup(arr, field) {
 /**
  * @sig
  * @description d
- * @param {Array|generator} xs - a
+ * @param {Array|generator|functors.list_core} xs - a
  * @param {function} fn - b
  * @return {generator} - c
  */
@@ -591,7 +593,7 @@ function map(xs, fn) {
 /**
  * @sig
  * @description d
- * @param {Array|generator} xs - a
+ * @param {Array|generator|functors.list_core} xs - a
  * @param {Array} orderObject - b
  * @return {generator} - d
  */
@@ -606,8 +608,8 @@ function sortBy(xs, orderObject) {
 /**
  * @sig
  * @description d
- * @param {list_core} xs - a
- * @param {list_core} ys - b
+ * @param {functors.list_core} xs - a
+ * @param {functors.list_core} ys - b
  * @param {function} comparer - c
  * @return {boolean} - d
  */
@@ -624,7 +626,7 @@ function equals(xs, ys, comparer = strictEquals) {
 /**
  * @sig
  * @description d
- * @param {Array|generator} xs - a
+ * @param {Array|generator|functors.list_core} xs - a
  * @param {function} predicate - b
  * @return {generator} - c
  */
@@ -640,7 +642,7 @@ function takeWhile(xs, predicate) {
 /**
  * @sig
  * @description d
- * @param {Array|generator} xs - a
+ * @param {Array|generator|functors.list_core} xs - a
  * @param {function} predicate - b
  * @return {generator} - c
  */
@@ -662,7 +664,7 @@ function skipWhile(xs, predicate) {
 /**
  * @sig
  * @description d
- * @param {Array|generator} xs - a
+ * @param {Array|generator|functors.list_core} xs - a
  * @return {generator} - b
  */
 function reverse(xs) {
@@ -692,7 +694,7 @@ function repeat(item, count) {
  * @param {number} idx - a
  * @param {number} start - b
  * @param {number} end - c
- * @param {list_core} xs - d
+ * @param {functors.list_core} xs - d
  * @returns {generator} - e
  */
 function copyWithin(idx, start, end, xs) {
@@ -719,7 +721,7 @@ function fill(val, start, end, xs) {
 /**
  * @sig
  * @description d
- * @param {Array|generator} xs - a
+ * @param {Array|generator|functors.list_core} xs - a
  * @param {function} comparer - b
  * @return {Number} - c
  */
@@ -730,7 +732,7 @@ function findIndex(xs, comparer = strictEquals) {
 /**
  * @sig
  * @description d
- * @param {Array|generator} xs - a
+ * @param {Array|generator|functors.list_core} xs - a
  * @param {function} comparer - b
  * @return {Number} - c
  */

@@ -1,6 +1,8 @@
 import { delegatesTo, isArray, isString } from '../functionalHelpers';
 import { generatorProto } from '../helpers';
 
+/** @module dataStructures/list_helpers */
+
 /**
  * @sig
  * @description This factory producing function is used by both the list functor and the
