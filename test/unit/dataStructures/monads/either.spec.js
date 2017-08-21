@@ -1,9 +1,9 @@
-import * as functors from '../../../../src/dataStructures/functors/functors';
-import { right_functor, left_functor } from '../../../../src/dataStructures/functors/either_functor';
+import * as monads from '../../../../src/dataStructures/monads/monads';
+import { right, left } from '../../../../src/dataStructures/monads/either';
 
-var Either = functors.Either,
-    Left = functors.Left,
-    Right = functors.Right;
+var Either = monads.Either,
+    Left = monads.Left,
+    Right = monads.Right;
 
 describe('Either functor tests', function _testEitherFunctor() {
     describe('Either object factory tests', function _testEitherObjectFactory() {
@@ -15,10 +15,10 @@ describe('Either functor tests', function _testEitherFunctor() {
                 e3 = Either(arr, 'right'),
                 e4 = Either(obj, 'right');
 
-            left_functor.isPrototypeOf(e1).should.be.true;
-            left_functor.isPrototypeOf(e2).should.be.true;
-            right_functor.isPrototypeOf(e3).should.be.true;
-            right_functor.isPrototypeOf(e4).should.be.true;
+            left.isPrototypeOf(e1).should.be.true;
+            left.isPrototypeOf(e2).should.be.true;
+            right.isPrototypeOf(e3).should.be.true;
+            right.isPrototypeOf(e4).should.be.true;
 
             e1.isLeft.should.be.true;
             e1.isRight.should.not.be.true;
@@ -38,10 +38,10 @@ describe('Either functor tests', function _testEitherFunctor() {
                 e3 = Either(arr, 'right'),
                 e4 = Either(obj, 'right');
 
-            left_functor.isPrototypeOf(e1).should.be.true;
-            left_functor.isPrototypeOf(e2).should.be.true;
-            right_functor.isPrototypeOf(e3).should.be.true;
-            right_functor.isPrototypeOf(e4).should.be.true;
+            left.isPrototypeOf(e1).should.be.true;
+            left.isPrototypeOf(e2).should.be.true;
+            right.isPrototypeOf(e3).should.be.true;
+            right.isPrototypeOf(e4).should.be.true;
 
             e1.isLeft.should.be.true;
             e1.isRight.should.not.be.true;
@@ -57,8 +57,8 @@ describe('Either functor tests', function _testEitherFunctor() {
             var r = Either.Right(10),
                 l = Either.Left(10);
 
-            right_functor.isPrototypeOf(r).should.be.true;
-            left_functor.isPrototypeOf(l).should.be.true;
+            right.isPrototypeOf(r).should.be.true;
+            left.isPrototypeOf(l).should.be.true;
 
             r.isRight.should.be.true;
             r.isLeft.should.be.false;
@@ -71,8 +71,8 @@ describe('Either functor tests', function _testEitherFunctor() {
             var e1 = Either.fromNullable(null),
                 e2 = Either.fromNullable(1);
 
-            left_functor.isPrototypeOf(e1).should.be.true;
-            right_functor.isPrototypeOf(e2).should.be.true;
+            left.isPrototypeOf(e1).should.be.true;
+            right.isPrototypeOf(e2).should.be.true;
 
             e1.isLeft.should.be.true;
             e1.isRight.should.be.false;
@@ -85,8 +85,8 @@ describe('Either functor tests', function _testEitherFunctor() {
             var e1 = Either(10),
                 e2 = Either(10, 'left'),
                 e3 = Either(10, 'right'),
-                m = functors.Maybe(10),
-                i = functors.Identity(10),
+                m = monads.Maybe(10),
+                i = monads.Identity(10),
                 f = Either.is,
                 n = null,
                 s = 'string',
@@ -210,8 +210,8 @@ describe('Either functor tests', function _testEitherFunctor() {
             var e1_1 = e1.map(function _m(i) { return i*2; }),
                 e2_1 = e2.map(function _m(a) { return a.map(function t(i) { return i * 2 ;}); });
 
-            right_functor.isPrototypeOf(e1_1).should.be.true;
-            right_functor.isPrototypeOf(e2_1).should.be.true;
+            right.isPrototypeOf(e1_1).should.be.true;
+            right.isPrototypeOf(e2_1).should.be.true;
 
             e1_1.isLeft.should.be.false;
             e1_1.isRight.should.be.true;
@@ -230,8 +230,8 @@ describe('Either functor tests', function _testEitherFunctor() {
             var e1_1 = e1.map(),
                 e2_1 = e2.map();
 
-            left_functor.isPrototypeOf(e1_1).should.be.true;
-            left_functor.isPrototypeOf(e2_1).should.be.true;
+            left.isPrototypeOf(e1_1).should.be.true;
+            left.isPrototypeOf(e2_1).should.be.true;
 
             e1_1.isLeft.should.be.true;
             e1_1.isRight.should.be.false;
@@ -243,7 +243,7 @@ describe('Either functor tests', function _testEitherFunctor() {
             e2_1.value.should.eql(e2.value);
         });
 
-        it('should properly indicate equality when constant functors are indeed equal', function _testEitherFunctorEquality() {
+        it('should properly indicate equality when constant monads are indeed equal', function _testEitherFunctorEquality() {
             var m1 = Either(null),
                 m2 = Either(null),
                 m3 = Either(1),
@@ -255,7 +255,7 @@ describe('Either functor tests', function _testEitherFunctor() {
                 m9 = Right(1);
 
             m1.equals(6).should.be.false;
-            expect(m1.value).to.not.equal(functors.Maybe(true).value);
+            expect(m1.value).to.not.equal(monads.Maybe(true).value);
 
             m1.equals(m2).should.be.true;
             m1.equals(m3).should.be.false;
@@ -311,10 +311,10 @@ describe('Either functor tests', function _testEitherFunctor() {
                 e3 = e.of(arr),
                 e4 = e.of(obj);
 
-            right_functor.isPrototypeOf(e1).should.be.true;
-            right_functor.isPrototypeOf(e2).should.be.true;
-            right_functor.isPrototypeOf(e3).should.be.true;
-            right_functor.isPrototypeOf(e4).should.be.true;
+            right.isPrototypeOf(e1).should.be.true;
+            right.isPrototypeOf(e2).should.be.true;
+            right.isPrototypeOf(e3).should.be.true;
+            right.isPrototypeOf(e4).should.be.true;
 
             e1.isLeft.should.be.false;
             e1.isRight.should.be.true;

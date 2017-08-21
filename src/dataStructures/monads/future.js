@@ -1,6 +1,6 @@
 import { noop, once, type, strictEquals } from '../../functionalHelpers';
+import { apply, mjoin, pointMaker, valueOf } from '../dataStructureHelpers';
 import { javaScriptTypes } from '../../helpers';
-import { pointMaker, valueOf } from '../dataStructureHelpers';
 
 /**
  * @sig
@@ -24,10 +24,10 @@ function safeFork(reject, resolve) {
  * @sig
  * @description d
  * @param {function} fn - a
- * @return {future_functor} - b
+ * @return {future} - b
  */
 function Future(fn) {
-    return Object.create(future_functor, {
+    return Object.create(future, {
         _value: {
             value: once(fn),
             writable: false,
@@ -46,13 +46,13 @@ function Future(fn) {
  * @param {Object} f - a
  * @return {boolean} - b
  */
-Future.is = f => future_functor.isPrototypeOf(f);
+Future.is = f => future.isPrototypeOf(f);
 
 /**
  * @sig
  * @description d
  * @param {function|*} val - a
- * @return {future_functor} - b
+ * @return {future} - b
  */
 Future.of = val => strictEquals(javaScriptTypes.Function, type(val)) ?
     Future(val) : Future((_, resolve) => safeFork(noop, resolve(val)));
@@ -61,7 +61,7 @@ Future.of = val => strictEquals(javaScriptTypes.Function, type(val)) ?
  * @sig
  * @description d
  * @param {*} val - a
- * @return {future_functor} - b
+ * @return {future} - b
  */
 Future.reject = val => Future((reject, resolve) => reject(val));
 
@@ -69,18 +69,18 @@ Future.reject = val => Future((reject, resolve) => reject(val));
  * @sig
  * @description d
  * @param {function} val - a
- * @return {future_functor} - b
+ * @return {future} - b
  */
 Future.unit = val => Future(val).complete();
 
 /**
  * @sig
  * @description d
- * @return {future_functor} - a
+ * @return {future} - a
  */
 Future.empty = () => Future(noop);
 
-var future_functor = {
+var future = {
     /**
      * @sig
      * @description d
@@ -92,6 +92,32 @@ var future_functor = {
     map: function _map(fn) {
         return this.of((reject, resolve) =>
             this.fork(a => reject(a), b => resolve(fn(b))));
+    },
+    //TODO: probably need to compose here, not actually map over the value; this is a temporary fill-in until
+    //TODO: I have time to finish working on the Future
+    chain: function _chain(fn) {
+        return this.of((reject, resolve) =>
+        {
+            let cancel,
+                outerFork = this._fork(a => reject(a), b => {
+                    cancel = fn(b).fork(reject, resolve);
+                });
+            return cancel ? cancel : (cancel = outerFork, x => cancel());
+        });
+    },
+    fold: function _fold(f, g) {
+        return this.of((reject, resolve) =>
+            this.fork(a => resolve(f(a)), b => resolve(g(b))));
+    },
+    traverse: function _traverse(fa, fn) {
+        return this.fold(function _reductioAdAbsurdum(xs, x) {
+            fn(x).map(function _map(x) {
+                return function _map_(y) {
+                    return y.concat([x]);
+                };
+            }).ap(xs);
+            return fa(this.empty);
+        });
     },
     fork: function _fork(reject, resolve) {
         this._fork(reject, resolve);
@@ -108,6 +134,14 @@ var future_functor = {
     factory: Future
 };
 
+future.mjoin = mjoin;
+future.apply = apply;
+future.ap = future.apply;
+future.fmap = future.chain;
+future.flapMap = future.chain;
+future.bind = future.chain;
+future.reduce = future.fold;
+
 //Since FantasyLand is the defacto standard for JavaScript algebraic data structures, and I want to maintain
 //compliance with the standard, a .constructor property must be on the container delegators. In this case, its
 //just an alias for the true .factory property, which points to the delegator factory. I am isolating this from
@@ -117,6 +151,6 @@ var future_functor = {
 //as it was intended... you know, like Douglas Crockford and his "good parts", which is really just another
 //way of saying: "your too dumb to understand how JavaScript works, and I either don't know myself, or don't
 //care to know, so just stick with what I tell you to use."
-future_functor.constructor = future_functor.factory;
+future.constructor = future.factory;
 
-export { Future, future_functor };
+export { Future, future };

@@ -1,7 +1,7 @@
-import * as functors from '../../../../src/dataStructures/functors/functors';
-import { identity_functor } from '../../../../src/dataStructures/functors/identity_functor';
+import * as monads from '../../../../src/dataStructures/monads/monads';
+import { identity } from '../../../../src/dataStructures/monads/identity';
 
-var Future = functors.Future;
+var Future = monads.Future;
 
 describe('Future functor test', function _testFutureFunctor() {
     describe('Future functor object tests', function _testFutureFunctorObject() {

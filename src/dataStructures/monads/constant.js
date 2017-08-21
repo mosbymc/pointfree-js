@@ -1,23 +1,23 @@
-import { equalMaker, pointMaker, stringMaker, valueOf, get, orElse, getOrElse } from '../dataStructureHelpers';
+import { apply, mjoin, pointMaker, equalMaker, stringMaker, valueOf, get, orElse, getOrElse } from '../dataStructureHelpers';
 
 /**
- * @signature - :: * -> {@link functors.constant_functor}
+ * @signature - :: * -> {@link monads.constant}
  * @description Factory function used to create a new object that delegates to
- * the {@link functors.constant_functor} object. Any single value may be provided as an argument
- * which will be used to set the underlying value of the new {@link functors.constant_functor}
+ * the {@link monads.constant} object. Any single value may be provided as an argument
+ * which will be used to set the underlying value of the new {@link monads.constant}
  * delegator. If no argument is provided, the underlying value will be 'undefined'.
  * @namespace Constant
- * @memberOf functors
+ * @memberOf monads
  * @property {function} of
  * @property {function} is
  * @property {function} lift
  * @param {*} [val] - The value that should be set as the underlying
- * value of the {@link functors.constant_functor}.
- * @return {functors.constant_functor} - Returns a new object that delegates to the
- * {@link functors.constant_functor}.
+ * value of the {@link monads.constant}.
+ * @return {monads.constant} - Returns a new object that delegates to the
+ * {@link monads.constant}.
  */
 function Constant(val) {
-    return Object.create(constant_functor, {
+    return Object.create(constant, {
         _value: {
             value: val,
             writable: false,
@@ -27,68 +27,68 @@ function Constant(val) {
 }
 
 /**
- * @signature * -> {@link functors.constant_functor}
+ * @signature * -> {@link monads.constant}
  * @description Takes any value and places it in the correct context if it is
- * not already and creates a new {@link functors.constant_functor} object delegator instance.
+ * not already and creates a new {@link monads.constant} object delegator instance.
  * Because the constant functor does not require any specific context for
- * its value, this can be viewed as an alias for {@link functors.Constant}
- * @memberOf functors.Constant
+ * its value, this can be viewed as an alias for {@link monads.Constant}
+ * @memberOf monads.Constant
  * @static
  * @function of
  * @param {*} [x] - The value that should be set as the underlying
- * value of the {@link functors.constant_functor}.
- * @return {functors.constant_functor} - Returns a new object that delegates to the
- * {@link functors.constant_functor}.
+ * value of the {@link monads.constant}.
+ * @return {monads.constant} - Returns a new object that delegates to the
+ * {@link monads.constant}.
  */
 Constant.of = x => Constant(x);
 
- /**
+/**
  * @signature * -> boolean
  * @description Convenience function for determining if a value is an
- * {@link functors.constant_functor} delegate or not. Available on the
+ * {@link monads.constant} delegate or not. Available on the
  * identity_functor's factory function as Identity.is.
- * @memberOf functors.Constant
+ * @memberOf monads.Constant
  * @function is
  * @param {*} [f] - Any value may be used as an argument to this function.
  * @return {boolean} Returns a boolean that indicates whether the
- * argument provided delegates to the {@link functors.constant_functor} delegate.
+ * argument provided delegates to the {@link monads.constant} delegate.
  */
-Constant.is = f => constant_functor.isPrototypeOf(f);
+Constant.is = f => constant.isPrototypeOf(f);
 
 /**
- * @typedef {Object} constant_functor
+ * @typedef {Object} constant
  * @property {function} value - returns the underlying value of the the functor
  * @property {function} map - maps a single function over the underlying value of the functor
  * @property {function} bimap
  * @property {function} get - returns the underlying value of the functor
  * @property {function} orElse - returns the underlying value of the functor
  * @property {function} getOrElse - returns the underlying value of the functor
- * @property {function} of - creates a new constant_functor delegate with the value provided
+ * @property {function} of - creates a new constant delegate with the value provided
  * @property {function} valueOf - returns the underlying value of the functor; used during concatenation and coercion
  * @property {function} toString - returns a string representation of the identity functor and its underlying value
- * @property {function} factory - a reference to the constant_functor factory function
- * @property {function} [Symbol.Iterator] - Iterator for the constant_functor
+ * @property {function} factory - a reference to the constant factory function
+ * @property {function} [Symbol.Iterator] - Iterator for the constant
  * @kind {Object}
- * @memberOf functors
- * @namespace constant_functor
+ * @memberOf monads
+ * @namespace constant
  * @description This is the delegate object that specifies the behavior of the identity functor. All
  * operations that may be performed on an identity functor 'instance' delegate to this object. Constant
- * functor 'instances' are created by the {@link functors.Constant} factory function via Object.create,
+ * functor 'instances' are created by the {@link monads.Constant} factory function via Object.create,
  * during which the underlying value is placed directly on the newly created object. No other
  * properties exist directly on an identity functor delegator object beyond the ._value property.
  * All behavior delegates to this object, or higher up the prototype chain.
  */
-var constant_functor = {
+var constant = {
     /**
      * @signature () -> *
-     * @description Returns the underlying value of an constant_functor delegator. This
+     * @description Returns the underlying value of an constant delegator. This
      * getter is not expected to be used directly by consumers - it is meant as an internal
      * access only. To manipulate the underlying value of an identity_functor delegator,
-     * see {@link functors.constant_functor#map} and {@link functors.constant_functor#bimap}.
-     * To retrieve the underlying value of an identity_functor delegator, see {@link functors.constant_functor#get},
-     * {@link functors.constant_functor#orElse}, {@link functors.constant_functor#getOrElse},
-     * and {@link functors.constant_functor#valueOf}.
-     * @memberOf functors.constant_functor
+     * see {@link monads.constant#map} and {@link monads.constant#bimap}.
+     * To retrieve the underlying value of an identity_functor delegator, see {@link monads.constant#get},
+     * {@link monads.constant#orElse}, {@link monads.constant#getOrElse},
+     * and {@link monads.constant#valueOf}.
+     * @memberOf monads.constant
      * @instance
      * @function
      * @return {*} Returns the underlying value of the delegator. May be any value.
@@ -97,25 +97,37 @@ var constant_functor = {
         return this._value;
     },
     /**
-     * @signature () -> {@link functors.constant_functor}
+     * @signature () -> {@link monads.constant}
      * @description Takes a function that is applied to the underlying value of the
-     * functor, the result of which is used to create a new {@link functors.constant_functor}
+     * functor, the result of which is used to create a new {@link monads.constant}
      * delegator instance.
-     * @memberOf functors.constant_functor
+     * @memberOf monads.constant
      * @instance
      * @param {function} fn - A mapping function that can operate on the underlying
-     * value of the {@link functors.constant_functor}.
-     * @return {functors.constant_functor} Returns a new {@link functors.constant_functor}
+     * value of the {@link monads.constant}.
+     * @return {monads.constant} Returns a new {@link monads.constant}
      * delegator whose underlying value is the result of the mapping operation
      * just performed.
      */
     map: function _map(fn) {
         return this.of(this.value);
     },
+    chain: function _chain() {
+        return this;
+    },
+    fold: function _fold(f) {
+        return f(this.value);
+    },
+    sequence: function _sequence(p) {
+        return this.of(this.value);
+    },
+    traverse: function _traverse(a, f) {
+        return this.of(this.value);
+    },
     /**
      * @signature () -> *
      * @description Returns the underlying value of the current functor 'instance'.
-     * @memberOf functors.constant_functor
+     * @memberOf monads.constant
      * @instance
      * @function
      * @return {*} - Returns the underlying value of the current functor 'instance'.
@@ -128,7 +140,7 @@ var constant_functor = {
      * 'mappable'. Because the identity_functor does not support disjunctions, the
      * parameter is entirely optional and will always be ignored. Whatever the actual
      * underlying value is, it will always be returned.
-     * @memberOf functors.constant_functor
+     * @memberOf monads.constant
      * @instance
      * @function
      * @param {function} [f] - An optional function argument which is invoked and the result
@@ -143,7 +155,7 @@ var constant_functor = {
      * Because the identity_functor does not support disjunctions, the parameter is entirely
      * optional and will always be ignored. Whatever the actual underlying value is, it will
      * always be returned.
-     * @memberOf functors.constant_functor
+     * @memberOf monads.constant
      * @instance
      * @function
      * @param {*} [x] - a
@@ -151,18 +163,18 @@ var constant_functor = {
      */
     getOrElse: getOrElse,
     /**
-     * @signature * -> {@link functors.constant_functor}
+     * @signature * -> {@link monads.constant}
      * @description Factory function used to create a new object that delegates to
-     * the {@link functors.constant_functor} object. Any single value may be provided as an argument
-     * which will be used to set the underlying value of the new {@link functors.constant_functor}
+     * the {@link monads.constant} object. Any single value may be provided as an argument
+     * which will be used to set the underlying value of the new {@link monads.constant}
      * delegator. If no argument is provided, the underlying value will be 'undefined'.
-     * @memberOf functors.constant_functor
+     * @memberOf monads.constant
      * @instance
      * @function
      * @param {*} item - The value that should be set as the underlying
-     * value of the {@link functors.constant_functor}.
-     * @return {functors.constant_functor} Returns a new {@link functors.constant_functor} delegator object
-     * via the {@link functors.Constant#of} function.
+     * value of the {@link monads.constant}.
+     * @return {monads.constant} Returns a new {@link monads.constant} delegator object
+     * via the {@link monads.Constant#of} function.
      */
     of: pointMaker(Constant),
     /**
@@ -170,7 +182,7 @@ var constant_functor = {
      * @description Returns the underlying value of the current functor 'instance'. This
      * function property is not meant for explicit use. Rather, the JavaScript engine uses
      * this property during implicit coercion like addition and concatenation.
-     * @memberOf functors.constant_functor
+     * @memberOf monads.constant
      * @instance
      * @function
      * @return {*} Returns the underlying value of the current functor 'instance'.
@@ -180,26 +192,26 @@ var constant_functor = {
      * @signature () -> string
      * @description Returns a string representation of the functor and its
      * underlying value
-     * @memberOf functors.constant_functor
+     * @memberOf monads.constant
      * @instance
      * @function
-     * @return {string} Returns a string representation of the constant_functor
+     * @return {string} Returns a string representation of the constant
      * and its underlying value.
      */
     toString: stringMaker('Constant'),
     /**
-     * @signature * -> {@link functors.constant_functor}
+     * @signature * -> {@link monads.constant}
      * @description Factory function used to create a new object that delegates to
-     * the {@link functors.constant_functor} object. Any single value may be provided as an argument
-     * which will be used to set the underlying value of the new {@link functors.constant_functor}
+     * the {@link monads.constant} object. Any single value may be provided as an argument
+     * which will be used to set the underlying value of the new {@link monads.constant}
      * delegator. If no argument is provided, the underlying value will be 'undefined'.
-     * @memberOf functors.constant_functor
+     * @memberOf monads.constant
      * @instance
      * @function
-     * @see functors.Constant
+     * @see monads.Constant
      * @param {*} val - The value that should be set as the underlying
-     * value of the {@link functors.constant_functor}.
-     * @return {functors.constant_functor} - Returns a new identity functor delegator
+     * value of the {@link monads.constant}.
+     * @return {monads.constant} - Returns a new identity functor delegator
      */
     factory: Constant
 };
@@ -210,31 +222,31 @@ var constant_functor = {
  * is defined as:
  * 1) The other functor shares the same delegate object as 'this' identity functor
  * 2) Both underlying values are strictly equal to each other
- * @memberOf functors.constant_functor
+ * @memberOf monads.constant
  * @instance
  * @function
  * @param {Object} ma - The other functor to check for equality with 'this' functor.
  * @return {boolean} - Returns a boolean indicating equality
  */
-constant_functor.equals = equalMaker(constant_functor);
+constant.equals = equalMaker(constant);
 
 /**
- * @signature (* -> *) -> (* -> *) -> functors.constant_functor<T>
+ * @signature (* -> *) -> (* -> *) -> monads.constant<T>
  * @description Since the constant functor does not represent a disjunction, the Identity's
  * bimap function property behaves just as its map function property. It is merely here as a
- * convenience so that swapping out functors/monads does not break an application that is
+ * convenience so that swapping out monads/monads does not break an application that is
  * relying on its existence.
- * @memberOf functors.constant_functor
+ * @memberOf monads.constant
  * @instance
  * @function
  * @param {function} f - A function that will be used to map over the underlying data of the
- * {@link functors.constant_functor} delegator.
- * @param {function} [g] - An optional function that is simply ignored on the {@link functors.constant_functor}
+ * {@link monads.constant} delegator.
+ * @param {function} [g] - An optional function that is simply ignored on the {@link monads.constant}
  * since there is no disjunction present.
- * @return {functors.constant_functor} - Returns a new {@link functors.constant_functor} delegator after applying
+ * @return {monads.constant} - Returns a new {@link monads.constant} delegator after applying
  * the mapping function to the underlying data.
  */
-constant_functor.bimap = constant_functor.map;
+constant.bimap = constant.map;
 
 /**
  * @description: sigh.... awesome spec ya got there fantasy-land. Yup, good thing you guys understand
@@ -252,6 +264,27 @@ constant_functor.bimap = constant_functor.map;
  * of JS developers; thanks for making the world of JavaScript a spec which has become the standard and as
  * such enforces poor practices, poor design, and mental hurdles.
  */
-constant_functor.constructor = constant_functor.factory;
+constant.constructor = constant.factory;
 
-export { Constant, constant_functor };
+constant.mjoin = mjoin;
+constant.apply = apply;
+
+constant.ap =constant.apply;
+constant.fmap = constant.chain;
+constant.flapMap = constant.chain;
+constant.bind = constant.chain;
+constant.reduce = constant.fold;
+
+//Since FantasyLand is the defacto standard for JavaScript algebraic data structures, and I want to maintain
+//compliance with the standard, a .constructor property must be on the container delegators. In this case, its
+//just an alias for the true .factory property, which points to the delegator factory. I am isolating this from
+//the actual delegator itself as it encourages poor JavaScript development patterns and ... the myth of Javascript
+//classes and inheritance. I do not recommend using the .constructor property at all since that just encourages
+//FantasyLand and others to continue either not learning how JavaScript actually works, or refusing to use it
+//as it was intended... you know, like Douglas Crockford and his "good parts", which is really just another
+//way of saying: "your too dumb to understand how JavaScript works, and I either don't know myself, or don't
+//care to know, so just stick with what I tell you to use."
+constant.constructor = constant.factory;
+
+
+export { Constant, constant };

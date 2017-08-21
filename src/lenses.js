@@ -1,9 +1,9 @@
 import { arraySet, mapSet, objectSet, setSet, isArray } from './functionalHelpers';
 import { curry, compose, kestrel, when } from './combinators';
 import { deepClone } from './helpers';
-import { Maybe } from './dataStructures/monads/maybe_monad';
-import { Identity } from './dataStructures/monads/identity_monad';
-import { Constant } from './dataStructures/monads/constant_monad';
+import { Maybe } from './dataStructures/monads/maybe';
+import { Identity } from './dataStructures/monads/identity';
+import { Constant } from './dataStructures/monads/constant';
 import { mapWith } from './pointless_data_structures';
 
 /** @module lenses */

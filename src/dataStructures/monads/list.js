@@ -1,4 +1,4 @@
-import { all, any, except, intersect, union, map, groupBy, sortBy, prepend, concat, groupJoin, join, zip, filter, intersperse,
+import { all, any, chain, except, intersect, union, map, groupBy, sortBy, prepend, concat, groupJoin, join, zip, filter, intersperse,
     contains, first, last, count, foldLeft, reduceRight, distinct, ofType, binarySearch, equals, takeWhile, skipWhile, reverse,
     copyWithin, fill, findIndex, findLastIndex, repeat, foldRight, unfold } from '../list_iterators';
 import { sortDirection, generatorProto } from '../../helpers';
@@ -61,11 +61,11 @@ import { createListCreator, taker_skipper, listExtensionHelper } from '../list_h
  * @property {function} of
  * @property {Symbol.iterator}
  * @kind {Object}
- * @memberOf functors
+ * @memberOf monads
  * @namespace list_core
  * @description This is the delegate object that specifies the behavior of the list functor. Most
  * operations that may be performed on an list functor 'instance' delegate to this object. List
- * functor 'instances' are created by the {@link functors.List} factory function via Object.create,
+ * functor 'instances' are created by the {@link monads.List} factory function via Object.create,
  * during which the underlying value is placed directly on the newly created object. No other
  * properties exist directly on an list functor delegator object beyond the ._value property.
  * All behavior delegates to this object, or higher up the prototype chain.
@@ -79,11 +79,11 @@ var list_core = {
      * @description Returns the underlying value of an identity_functor delegator. This
      * getter is not expected to be used directly by consumers - it is meant as an internal
      * access only. To manipulate the underlying value of an identity_functor delegator,
-     * see {@link functors.list_functor#map} and {@link functors.list_functor#bimap}.
-     * To retrieve the underlying value of an identity_functor delegator, see {@link functors.list_functor#get},
-     * {@link functors.list_functor#orElse}, {@link functors.list_functor#getOrElse},
-     * and {@link functors.list_functor#valueOf}.
-     * @memberOf functors.list_functor
+     * see {@link monads.list#map} and {@link monads.list#bimap}.
+     * To retrieve the underlying value of an identity_functor delegator, see {@link monads.list#get},
+     * {@link monads.list#orElse}, {@link monads.list#getOrElse},
+     * and {@link monads.list#valueOf}.
+     * @memberOf monads.list
      * @instance
      * @function
      * @return {*} Returns the underlying value of the delegator. May be any value.
@@ -99,7 +99,7 @@ var list_core = {
      * @param {number} index - a
      * @param {number} start - b
      * @param {number} end - c
-     * @return {functors.list_core} - d
+     * @return {monads.list_core} - d
      */
     copyWithin: function _copyWithin(index, start, end) {
         return this.of(this, copyWithin(index, start, end, this));
@@ -113,7 +113,7 @@ var list_core = {
      * information on how to perform the operation.
      * @protected
      * @param {Array | *} ys - a
-     * @return {functors.list_core} - b
+     * @return {monads.list_core} - b
      */
     concat: function _concat(...ys) {
         return this.of(this, concat(this, ys, ys.length));
@@ -124,7 +124,7 @@ var list_core = {
      * @description d
      * @protected
      * @param {function} comparer - a
-     * @return {functors.list_core} - b
+     * @return {monads.list_core} - b
      */
     distinct: function _distinct(comparer) {
         return this.of(this, distinct(this, comparer));
@@ -143,7 +143,7 @@ var list_core = {
      * @protected
      * @param {Array|generator} xs - a
      * @param {function} comparer - b
-     * @return {functors.list_core} - c
+     * @return {monads.list_core} - c
      */
     except: function _except(xs, comparer) {
         return this.of(this, except(this, xs, comparer));
@@ -156,7 +156,7 @@ var list_core = {
      * @param {number} value - a
      * @param {number} start - b
      * @param {number} end - c
-     * @return {functors.list_core} - d
+     * @return {monads.list_core} - d
      */
     fill: function _fill(value, start, end) {
         return this.of(this, fill(value, start, end, this));
@@ -167,7 +167,7 @@ var list_core = {
      * @description d
      * @protected
      * @param {function} predicate - a
-     * @return {functors.list_core} - b
+     * @return {monads.list_core} - b
      */
     filter: function _filter(predicate) {
         return this.of(this, filter(this, predicate));
@@ -179,7 +179,7 @@ var list_core = {
      * @protected
      * @param {function} keySelector - a
      * @param {function} comparer - b
-     * @return {functors.list_core} - c
+     * @return {monads.list_core} - c
      */
     groupBy: function _groupBy(keySelector, comparer) {
         var groupObj = [{ keySelector: keySelector, comparer: comparer, direction: sortDirection.ascending }];
@@ -192,7 +192,7 @@ var list_core = {
      * @protected
      * @param {function} keySelector - a
      * @param {function} comparer - b
-     * @return {functors.list_core} - c
+     * @return {monads.list_core} - c
      */
     groupByDescending: function _groupByDescending(keySelector, comparer) {
         var groupObj = [{ keySelector: keySelector, comparer: comparer, direction: sortDirection.descending }];
@@ -209,12 +209,12 @@ var list_core = {
      * object delegator instance that contains all the requisite information on
      * how to perform the operation.
      * @protected
-     * @param {functors.list_core | Array} ys - a
+     * @param {monads.list_core | Array} ys - a
      * @param {function} xSelector - b
      * @param {function} ySelector - c
      * @param {function} projector - d
      * @param {function} comparer - e
-     * @return {functors.list_core} - f
+     * @return {monads.list_core} - f
      */
     groupJoin: function _groupJoin(ys, xSelector, ySelector, projector, comparer) {
         return this.of(this, groupJoin(this, ys, xSelector, ySelector, projector, createGroupedListDelegate, comparer));
@@ -232,7 +232,7 @@ var list_core = {
      * @protected
      * @param {Array|generator} xs - a
      * @param {function} comparer - b
-     * @return {functors.list_core} - c
+     * @return {monads.list_core} - c
      */
     intersect: function _intersect(xs, comparer) {
         return this.of(this, intersect(this, xs, comparer));
@@ -243,7 +243,7 @@ var list_core = {
      * @description d
      * @protected
      * @param {*} val - a
-     * @return {functors.list_core} - b
+     * @return {monads.list_core} - b
      */
     intersperse: function _intersperse(val) {
         return this.of(this, intersperse(this, val));
@@ -263,7 +263,7 @@ var list_core = {
      * @param {function} ySelector - c
      * @param {function} projector - d
      * @param {function} comparer - e
-     * @return {functors.list_core} - f
+     * @return {monads.list_core} - f
      */
     join: function _join(ys, xSelector, ySelector, projector, comparer) {
         return this.of(this, join(this, ys, xSelector, ySelector, projector, comparer));
@@ -274,7 +274,7 @@ var list_core = {
      * @description d
      * @protected
      * @param {function} mapFunc - a
-     * @return {functors.list_core} - b
+     * @return {monads.list_core} - b
      */
     map: function _map(mapFunc) {
         return this.of(this, map(this, mapFunc));
@@ -285,7 +285,7 @@ var list_core = {
      * @description d
      * @protected
      * @param {string|Object} type - a
-     * @returns {functors.list_core} - b
+     * @returns {monads.list_core} - b
      */
     ofType: function _ofType(type) {
         return this.of(this, ofType(this, type));
@@ -296,7 +296,7 @@ var list_core = {
      * @description d
      * @protected
      * @param {Array|generator} xs - a
-     * @return {functors.list_core} - b
+     * @return {monads.list_core} - b
      */
     prepend: function _prepend(xs) {
         return this.of(this, prepend(this, xs));
@@ -306,7 +306,7 @@ var list_core = {
      * @signature
      * @description d
      * @protected
-     * @return {functors.list_core} - a
+     * @return {monads.list_core} - a
      */
     reverse: function _reverse() {
         return this.of(this, reverse(this));
@@ -315,13 +315,13 @@ var list_core = {
     /**
      * @signature
      * @description Skips over a specified number of items in the source and returns the
-     * remaining items. If no amount is specified, an empty list_functor is returned;
-     * Otherwise, a list_functor containing the items collected from the source is
+     * remaining items. If no amount is specified, an empty list is returned;
+     * Otherwise, a list containing the items collected from the source is
      * returned.
      * @protected
      * @param {number} amt - The number of items in the source to skip before
      * returning the remainder.
-     * @return {functors.list_core} - a
+     * @return {monads.list_core} - a
      */
     skip: function _skip(amt) {
         return this.skipWhile(taker_skipper(amt));
@@ -332,7 +332,7 @@ var list_core = {
      * @description d
      * @protected
      * @param {function} predicate - a
-     * @return {functors.list_core} - b
+     * @return {monads.list_core} - b
      */
     skipWhile: function _skipWhile(predicate = defaultPredicate) {
         return this.of(this, skipWhile(this, predicate));
@@ -343,7 +343,7 @@ var list_core = {
      * @description d
      * @protected
      * @param {number} amt - a
-     * @return {functors.list_core} - b
+     * @return {monads.list_core} - b
      */
     take: function _take(amt) {
         return this.takeWhile(taker_skipper(amt));
@@ -354,7 +354,7 @@ var list_core = {
      * @description d
      * @protected
      * @param {function} predicate - a
-     * @return {functors.list_core} - b
+     * @return {monads.list_core} - b
      */
     takeWhile: function _takeWhile(predicate = defaultPredicate) {
         return this.of(this, takeWhile(this, predicate));
@@ -371,7 +371,7 @@ var list_core = {
      * @protected
      * @param {Array|generator} xs - a
      * @param {function} comparer - b
-     * @return {functors.list_core} - c
+     * @return {monads.list_core} - c
      */
     union: function _union(xs, comparer) {
         return this.of(this, union(this, xs, comparer));
@@ -388,7 +388,7 @@ var list_core = {
      * @protected
      * @param {function} selector - a
      * @param {Array|generator} xs - b
-     * @return {functors.list_core} - c
+     * @return {monads.list_core} - c
      */
     zip: function _zip(selector, xs) {
         return this.of(this, zip(this, xs, selector));
@@ -431,7 +431,7 @@ var list_core = {
      * @signature
      * @description d
      * @protected
-     * @param {functors.list_core} f - a
+     * @param {monads.list_core} f - a
      * @param {function} comparer - b
      * @return {boolean} - c
      */
@@ -550,7 +550,7 @@ var list_core = {
      * be iterated many times without needing to re-evaluate. It is effectively
      * a syntactical shortcut for: List.from(listInstance.data)
      * @protected
-     * @return {functors.list_core} - a
+     * @return {monads.list_core} - a
      */
     toEvaluatedList: function _toEvaluatedList() {
         return List.from(this.data /* the .data property is a getter function that forces evaluation */);
@@ -619,7 +619,7 @@ var list_core = {
      * @signature
      * @description d
      * @protected
-     * @return {functors.list_core} - a
+     * @return {monads.list_core} - a
      */
     factory: List,
 
@@ -631,7 +631,7 @@ var list_core = {
      * @param {generator} [iterator] - b
      * @param {Array} [sortObj] - c
      * @param {string} [key] - d
-     * @return {functors.list_core} - e
+     * @return {monads.list_core} - e
      */
     of: function _of(xs, iterator, sortObj, key) {
         return createListDelegateInstance(xs, iterator, sortObj, key);
@@ -650,10 +650,72 @@ var list_core = {
         for (let item of data) {
             yield item;
         }
+    },
+    /**
+     * @sig
+     * @description d
+     * @param {function} fn - a
+     * @return {list} - b
+     */
+    chain: function _chain(fn) {
+        return this.of(chain(this, fn));
+    },
+    mjoin: function _mjoin() {
+        return this.value;
+    },
+    sequence: function _sequence(p) {
+        return this.traverse(p, identity);
+    },
+    traverse: function _traverse(fa, fn) {
+        return this.value.reduce(function _reduce(xs, x) {
+            fn(x).map(x => y => y.concat([x])).apply(xs);
+        }, fa.of(List.of()));
+
+        /*
+        return this.fold(function _reductioAdAbsurdum(xs, x) {
+            fn(x).map(function _map(x) {
+                return function _map_(y) {
+                    return y.concat([x]);
+                };
+            }).ap(xs);
+            return fa(this.empty);
+        });*/
+
+        //TODO: this exists inside the traverse function. Function should take a typeRep + fn
+        /*
+         var xs = this;
+         function go(idx, n) {
+             switch (n) {
+                 case 0: return of(typeRep, []);
+                 case 2: return lift2(pair, f(xs[idx]), f(xs[idx + 1]));
+                 default:
+                     var m = Math.floor(n / 4) * 2;
+                     return lift2(concat_, go(idx, m), go(idx + m, n - m));
+            }
+         }
+         return this.length % 2 === 1 ?
+             lift2(concat_, map(Array$of, f(this[0])), go(1, this.length - 1)) :
+             go(0, this.length);
+         */
+    },
+    /**
+     * @sig
+     * @description Applies a function contained in another functor to the source
+     * of this List object instance's underlying source. A new List object instance
+     * is returned.
+     * @param {Object} ma - a
+     * @return {list} - b
+     */
+    apply: function _apply(ma) {
+        return this.map(ma.value);
     }
 };
 
 list_core.append = list_core.concat;
+list_core.ap = list_core.apply;
+list_core.fmap = list_core.chain;
+list_core.flapMap = list_core.chain;
+list_core.bind = list_core.chain;
 
 /**
  * @description: A list_core delegator object that, in addition to the delegatable functionality
@@ -665,17 +727,17 @@ list_core.append = list_core.concat;
  * @property {function} sortByDescending
  * @property {function} contains
  * @kind {Object}
- * @memberOf functors
- * @namespace list_functor
+ * @memberOf monads
+ * @namespace list
  */
-var list_functor = Object.create(list_core, {
+var list = Object.create(list_core, {
     /**
      * @signature
      * @description d
      * @protected
      * @param {function} keySelector - a
      * @param {function} comparer - b
-     * @return {ordered_list_functor} - c
+     * @return {ordered_list} - c
      */
     sortBy: {
         value: function _orderBy(keySelector, comparer = defaultPredicate) {
@@ -689,7 +751,7 @@ var list_functor = Object.create(list_core, {
      * @protected
      * @param {function} keySelector - a
      * @param {function} comparer - b
-     * @return {ordered_list_functor} - c
+     * @return {ordered_list} - c
      */
     sortByDescending: {
         value: function _orderByDescending(keySelector, comparer = defaultPredicate) {
@@ -721,7 +783,7 @@ var list_functor = Object.create(list_core, {
  * @property {function} sortByDescending
  * @property {function} contains
  */
-var ordered_list_functor = Object.create(list_core, {
+var ordered_list = Object.create(list_core, {
     _appliedSorts: {
         value: []
     },
@@ -737,7 +799,7 @@ var ordered_list_functor = Object.create(list_core, {
      * @protected
      * @param {function} keySelector - a
      * @param {function} comparer - b
-     * @return {ordered_list_functor} - c
+     * @return {ordered_list} - c
      */
     thenBy: {
         value: function _thenBy(keySelector, comparer = defaultPredicate) {
@@ -751,7 +813,7 @@ var ordered_list_functor = Object.create(list_core, {
      * @protected
      * @param {function} keySelector - a
      * @param {function} comparer - b
-     * @return {ordered_list_functor} - c
+     * @return {ordered_list} - c
      */
     thenByDescending: {
         value: function thenByDescending(keySelector, comparer = defaultPredicate) {
@@ -783,16 +845,16 @@ var ordered_list_functor = Object.create(list_core, {
 
 /**
  * @signature
- * @description Creates a new list_functor object delegate instance; list_functor type is determined by
+ * @description Creates a new list object delegate instance; list type is determined by
  * the parameters passed to the function. If only the 'source' parameter is provided, a
- * 'basic' list_functor delegate object instance is created. If the source and iterator parameters
- * are passed as arguments, a 'basic' list_functor delegate object instance is created and the
+ * 'basic' list delegate object instance is created. If the source and iterator parameters
+ * are passed as arguments, a 'basic' list delegate object instance is created and the
  * iterator provided is used as the new instance object's iterator rather than the default
- * list_functor iterator. If the source, iterator, and sortObj parameters are passed as arguments,
- * an ordered_list_functor delegate object instance is created. The provided iterator is set on
+ * list iterator. If the source, iterator, and sortObj parameters are passed as arguments,
+ * an ordered_list delegate object instance is created. The provided iterator is set on
  * the instance object to be used in lieu of the default iterator and the ._appliedSorts
  * field is set as the 'sortObj' parameter. If all four of the function's arguments are
- * provided (source, iterator, sortObj, and key), then a list_functor delegate object instance
+ * provided (source, iterator, sortObj, and key), then a list delegate object instance
  * is created, setting the iterator for the object instance as the provided iterator, the
  * ._appliedSorts field as the sortObj argument, and the ._key field as the 'key' parameter's
  * value.
@@ -803,23 +865,23 @@ var ordered_list_functor = Object.create(list_core, {
  * will be odd. Thus, only odd values (plus the default case which covers a value of zero) need
  * to be handled. A case of zero arises when only the 'source' argument is provided.
  *
- * @param {*} source - The value to be used as the underlying source of the list_functor functor; may be
+ * @param {*} source - The value to be used as the underlying source of the list functor; may be
  * anything javascript object that has an iterator.
- * @param {generator} iterator - A generator function that is to be used on the new list_functor delegate
+ * @param {generator} iterator - A generator function that is to be used on the new list delegate
  * object instance's iterator.
  * @param {Array} sortObj - An array of the sort(s) (field and direction} to be used when the
  * instance is evaluated.
- * @param {string} key - A string that denotes what value the new list_functor delegate object instance
+ * @param {string} key - A string that denotes what value the new list delegate object instance
  * was grouped on.
  * @return {list_core}
  */
-var createListDelegateInstance = createListCreator(list_functor, ordered_list_functor, list_functor);
+var createListDelegateInstance = createListCreator(list, ordered_list, list);
 
 /**
  * @signature
  * @description d
  * @param {*} source - a
- * @return {list_functor} - b
+ * @return {list} - b
  */
 var listFromNonGen = source => createListDelegateInstance(source && source[Symbol.iterator] ? source : wrap(source));
 
@@ -827,7 +889,7 @@ var listFromNonGen = source => createListDelegateInstance(source && source[Symbo
  * @signature
  * @description d
  * @param {generator} source - a
- * @return {list_functor} - b
+ * @return {list} - b
  */
 var listFromGen = source => createListDelegateInstance(invoke(source));
 
@@ -837,18 +899,18 @@ var listFromGen = source => createListDelegateInstance(invoke(source));
  * and, if it has an iterator defined, with set it as the underlying source of the List as is,
  * or, wrap the item in an array if there is no defined iterator.
  * @namespace List
- * @memberOf functors
- * @property {function} from {@link functors.List#from}
- * @property {function} of {@link functors.List#of}
- * @property {function} ordered {@link functors.List#ordered}
- * @property {function} empty {@link functors.List#empty}
- * @property {function} just {@link functors.List#just}
- * @property {function} unfold {@link functors.List#unfold}
- * @property {function} is {@link functors.List#is}
- * @property {function} repeat {@link functors.List#repeat}
- * @property {function} extend {@link functors.List#extend}
+ * @memberOf monads
+ * @property {function} from {@link monads.List#from}
+ * @property {function} of {@link monads.List#of}
+ * @property {function} ordered {@link monads.List#ordered}
+ * @property {function} empty {@link monads.List#empty}
+ * @property {function} just {@link monads.List#just}
+ * @property {function} unfold {@link monads.List#unfold}
+ * @property {function} is {@link monads.List#is}
+ * @property {function} repeat {@link monads.List#repeat}
+ * @property {function} extend {@link monads.List#extend}
  * @param {*} source - Any type, any value; used as the underlying source of the List
- * @return {list_functor} - A new List instance with the value provided as the underlying source.
+ * @return {list} - A new List instance with the value provided as the underlying source.
  */
 //TODO: should I exclude strings from being used as a source directly, or allow it because
 //TODO: they have an iterator?
@@ -859,24 +921,24 @@ function List(source) {
 /**
  * @signature
  * @description Convenience function for listCreate a new List instance; internally calls List.
- * @memberOf functors.List
+ * @memberOf monads.List
  * @static
  * @function from
  * @see List
  * @param {*} source - Any type, any value; used as the underlying source of the List
- * @return {list_functor} - A new List instance with the value provided as the underlying source.
+ * @return {list} - A new List instance with the value provided as the underlying source.
  */
 List.from = source => List(source);
 
 /**
  * @signature
  * @description Alias for List.from
- * @memberOf functors.List
+ * @memberOf monads.List
  * @static
  * @function of
  * @see List.from
  * @param {*}
- * @return {list_functor} - a
+ * @return {list} - a
  */
 List.of = List.from;
 
@@ -887,11 +949,11 @@ List.ordered = (source, selector, comparer = defaultPredicate) => createListDele
 /**
  * @signature
  * @description d
- * @memberOf functors.List
+ * @memberOf monads.List
  * @static
  * @function empty
  * @see List
- * @return {list_functor} - a
+ * @return {list} - a
  */
 List.empty = () => createListDelegateInstance([], null,
     [{ keySelector: identity, comparer: defaultPredicate, direction: sortDirection.ascending }]);
@@ -899,12 +961,12 @@ List.empty = () => createListDelegateInstance([], null,
 /**
  * @signature
  * @description d
- * @memberOf functors.List
+ * @memberOf monads.List
  * @static
  * @function just
  * @see List
  * @param {*} val - a
- * @return {list_functor} - b
+ * @return {list} - b
  */
 List.just = val => createListDelegateInstance([val], null,
     [{ keySelector: identity, comparer: defaultPredicate, direction: sortDirection.ascending }]);
@@ -912,20 +974,20 @@ List.just = val => createListDelegateInstance([val], null,
 /**
  * @signature
  * @description d
- * @memberOf functors.List
+ * @memberOf monads.List
  * @static
  * @function unfold
  * @see List
  * @param {function|generator} fn - a
  * @param {*} seed - b
- * @return {list_functor} - c
+ * @return {list} - c
  */
 List.unfold = (fn, seed) => createListDelegateInstance(unfold(fn)(seed));
 
 /**
  * @signature
  * @description d
- * @memberOf functors.List
+ * @memberOf monads.List
  * @static
  * @function is
  * @see List
@@ -939,13 +1001,13 @@ List.is = f => list_core.isPrototypeOf(f);
  * @description Generates a new list with the specified item repeated the specified number of times. Because
  * this generates a list with the same item repeated n times, the resulting List is trivially
  * sorted. Thus, a sorted List is returned rather than an unsorted list.
- * @memberOf functors.List
+ * @memberOf monads.List
  * @static
  * @function repeat
  * @see List
  * @param {*} item - a
  * @param {number} count - b
- * @return {ordered_list_functor} - c
+ * @return {ordered_list} - c
  */
 List.repeat = function _repeat(item, count) {
     return createListDelegateInstance([], repeat(item, count), [{ keySelector: noop, comparer: noop, direction: sortDirection.descending }]);
@@ -955,7 +1017,7 @@ List.repeat = function _repeat(item, count) {
  * @signature
  * @summary Extension function that allows new functionality to be applied to
  * the queryable object
- * @memberOf functors.List
+ * @memberOf monads.List
  * @static
  * @function extend
  * @see List
@@ -990,7 +1052,7 @@ List.repeat = function _repeat(item, count) {
  * function and should be constructed like the immediately evaluated functions described
  * above.
  */
-List.extend = listExtensionHelper(List, list_core, createListDelegateInstance, list_functor, ordered_list_functor);
+List.extend = listExtensionHelper(List, list_core, createListDelegateInstance, list, ordered_list);
 
 function createGroupedListDelegate(source, key) {
     return createListDelegateInstance(source, undefined, undefined, key);
@@ -1013,7 +1075,7 @@ list_core.reduce = list_core.foldl;
  * @signature
  * @description Since the constant functor does not represent a disjunction, the List's
  * bimap function property behaves just as its map function property. It is merely here as a
- * convenience so that swapping out functors/monads does not break an application that is
+ * convenience so that swapping out monads/monads does not break an application that is
  * relying on its existence.
  * @protected
  * @param {function} f - a
@@ -1022,5 +1084,4 @@ list_core.reduce = list_core.foldl;
  */
 list_core.bimap = list_core.map;
 
-
-export { List, list_core, list_functor, ordered_list_functor };
+export { List, list_core, list, ordered_list };

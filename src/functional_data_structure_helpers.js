@@ -1,4 +1,3 @@
-import * as functors from './dataStructures/functors/functors';
 import * as monads from './dataStructures/monads/monads';
 
 /** @module functional_data_structure_helpers */
@@ -10,7 +9,7 @@ import * as monads from './dataStructures/monads/monads';
  * @return {boolean} - b
  */
 function isConstant(fa) {
-    return fa.factory === functors.Constant || fa.factory === monads.Constant;
+    return fa.factory === monads.Constant;
 }
 
 /**
@@ -20,17 +19,7 @@ function isConstant(fa) {
  * @return {boolean} - b
  */
 function isEither(fa) {
-    return fa.factory === functors.Either || fa.factory === monads.Either;
-}
-
-/**
- * @signature
- * @description d
- * @param {*} fa - a
- * @return {boolean} - b
- */
-function isFunctor(fa) {
-    return !!(fa && fa.factory && fa.factory === functors[fa.factory.name]);
+    return fa.factory === monads.Either;
 }
 
 /**
@@ -40,7 +29,7 @@ function isFunctor(fa) {
  * @return {boolean} - b
  */
 function isFuture(fa) {
-    return fa.factory === functors.Future || fa.factory === monads.Future;
+    return fa.factory === monads.Future;
 }
 
 /**
@@ -50,7 +39,7 @@ function isFuture(fa) {
  * @return {boolean} - b
  */
 function isIdentity(fa) {
-    return fa.factory === functors.Identity || fa.factory === monads.Identity;
+    return fa.factory === monads.Identity;
 }
 
 /**
@@ -60,7 +49,7 @@ function isIdentity(fa) {
  * @return {boolean} - b
  */
 function isIo(fa) {
-    return fa.factory === functors.Io || fa.factory === monads.Io;
+    return fa.factory === monads.Io;
 }
 
 /**
@@ -70,7 +59,7 @@ function isIo(fa) {
  * @return {boolean} - b
  */
 function isJust(fa) {
-    return fa.isJust && (fa.factory === functors.Maybe || fa.factory === monads.Maybe);
+    return !!(fa.isJust && fa.factory === monads.Maybe);
 }
 
 /**
@@ -80,7 +69,7 @@ function isJust(fa) {
  * @return {boolean} - b
  */
 function isLeft(fa) {
-    return fa.isLeft && (fa.factory === functors.Either || fa.factory === monads.Either);
+    return !!(fa.isLeft && fa.factory === monads.Either);
 }
 
 /**
@@ -90,7 +79,7 @@ function isLeft(fa) {
  * @return {boolean} - b
  */
 function isList(fa) {
-    return fa.factory === functors.List || fa.factory === monads.List;
+    return fa.factory === monads.List;
 }
 
 /**
@@ -100,8 +89,8 @@ function isList(fa) {
  * @return {boolean} - b
  */
 function isMaybe(fa) {
-    return (fa.isNothing && (fa.factory === functors.Maybe || fa.factory === monads.Maybe)) ||
-        (fa.isJust && (fa.factory === functors.Maybe || fa.factory === monads.Maybe));
+    return !!((fa.isNothing && (fa.factory === monads.Maybe)) ||
+        (fa.isJust && (fa.factory === monads.Maybe)));
 }
 
 /**
@@ -141,7 +130,7 @@ function isRight(fa) {
  * @return {boolean} - b
  */
 function isValidation(fa) {
-    return fa.factory === functors.Validation || fa.factory === monads.Validation;
+    return fa.factory === monads.Validation;
 }
 
-export { isConstant, isEither, isFuture, isFunctor, isIdentity, isIo, isJust, isLeft, isList, isMaybe, isMonad, isNothing, isRight, isValidation };
+export { isConstant, isEither, isFuture, isIdentity, isIo, isJust, isLeft, isList, isMaybe, isMonad, isNothing, isRight, isValidation };

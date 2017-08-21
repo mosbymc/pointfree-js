@@ -1,12 +1,17 @@
-import { Constant, constant_monad } from './constant_monad';
-import { Either, Left, Right, right_monad, left_monad } from './either_monad';
-import { Future, future_monad } from './future_monad';
-import { Identity, identity_monad } from './identity_monad';
-import { Io, io_monad } from './io_monad';
-import { List, list_monad, ordered_list_monad } from './list_monad';
-import { Maybe, Just, Nothing, just_monad, nothing_monad } from './maybe_monad';
-import { Validation, validation_monad } from './validation_monad';
+import { Constant, constant } from './constant';
+import { Either, Left, Right, right, left } from './either';
+import { Future, future } from './future';
+import { Identity, identity } from './identity';
+import { Io, io } from './io';
+import { List, list_core } from './list';
+import { Maybe, Just, Nothing, just, nothing } from './maybe';
+import { Validation, validation } from './validation';
 import { applyTransforms, containerIterator, lifter } from '../dataStructureHelpers';
+
+/**
+ * @module dataStructures/monads
+ * @namespace monads
+ */
 
 /*
     - Semigroup:
@@ -75,42 +80,95 @@ import { applyTransforms, containerIterator, lifter } from '../dataStructureHelp
         > p.promap(a => f(g(a)), b => h(i(b))) is equivalent to p.promap(f, i).promap(g, h) (composition)
  */
 
-constant_monad[Symbol.iterator] = containerIterator;
-future_monad[Symbol.iterator] = containerIterator;
-identity_monad[Symbol.iterator] = containerIterator;
-io_monad[Symbol.iterator] = containerIterator;
-left_monad[Symbol.iterator] = containerIterator;
-just_monad[Symbol.iterator] = containerIterator;
-nothing_monad[Symbol.iterator] = containerIterator;
-right_monad[Symbol.iterator] = containerIterator;
-validation_monad[Symbol.iterator] = containerIterator;
+/**
+ * @memberOf monads.constant
+ * @type {containerIterator}
+ * @description Iterator for the constant functor. Allows the constant functor
+ * to be iterated via for-of or Array#from.
+ */
+constant[Symbol.iterator] = containerIterator;
+future[Symbol.iterator] = containerIterator;
 
+/**
+ * @memberOf monads.identity
+ * @type {containerIterator}
+ * @description Iterator for the identity functor. Allows the identity functor
+ * to be iterated via for-or of Array#from.
+ */
+identity[Symbol.iterator] = containerIterator;
+io[Symbol.iterator] = containerIterator;
+
+/**
+ * @memberOf monads.left
+ * @type {containerIterator}
+ * @description Iterator for the left functor. Allows the left functor to
+ * be iterated via for-of or Array#from.
+ */
+left[Symbol.iterator] = containerIterator;
+just[Symbol.iterator] = containerIterator;
+nothing[Symbol.iterator] = containerIterator;
+
+/**
+ * @memberOf monads.right
+ * @type {containerIterator}
+ * @description Iterator for the right functor. Allows the right functor to
+ * be iterated via for-of or Array#from.
+ */
+right[Symbol.iterator] = containerIterator;
+validation[Symbol.iterator] = containerIterator;
+
+/**
+ * @memberOf monads.Constant
+ * @type {Function}
+ * @description Lifts any non-constant returning function into a {@link monads.Constant}
+ * returning function.
+ */
 Constant.lift = lifter(Constant);
 Either.lift = lifter(Either);
 Future.lift = lifter(Future);
+
+/**
+ * @memberOf monads.Identity
+ * @type {Function}
+ * @description Lifts any non-identity returning function into a {@link monads.identity}
+ * returning function.
+ */
 Identity.lift = lifter(Identity);
 Io.lift = lifter(Io);
 Just.lift = lifter(Just);
+
+/**
+ * @memberOf monads.Left
+ * @type {Function}
+ * @description Lifts any non-left returning function into a {@link monads.left}
+ * returning function.
+ */
 Left.lift = lifter(Left);
 List.lift = lifter(List);
 Maybe.lift = lifter(Maybe);
 Nothing.lift = lifter(Nothing);
+
+/**
+ * @memberOf monads.Right
+ * @type {Function}
+ * @description Lifts any non-right returning function into a {@link monads.right}
+ * returning function.
+ */
 Right.lift = lifter(Right);
 Validation.lift = lifter(Validation);
 
 var monads = [
-    { factory: Constant, delegate: constant_monad },
-    { factory: Future, delegate: future_monad },
-    { factory: Identity, delegate: identity_monad },
-    { factory: Io, delegate: io_monad },
-    { factory: Just, delegate: just_monad },
-    { factory: Left, delegate: left_monad },
-    { factory: List, delegate: list_monad },
-    { factory: List, delegate: ordered_list_monad },
+    { factory: Constant, delegate: constant },
+    { factory: Future, delegate: future },
+    { factory: Identity, delegate: identity },
+    { factory: Io, delegate: io },
+    { factory: Just, delegate: just },
+    { factory: Left, delegate: left },
+    { factory: List, delegate: list_core },
     { factory: Maybe },
-    { factory: Nothing, delegate: nothing_monad },
-    { factory: Right, delegate: right_monad },
-    { factory: Validation, delegate: validation_monad }
+    { factory: Nothing, delegate: nothing },
+    { factory: Right, delegate: right },
+    { factory: Validation, delegate: validation }
 ];
 
 applyTransforms(monads);
