@@ -1,8 +1,10 @@
 import { javaScriptTypes, typeNames, shallowClone } from './helpers';
 import { curry, identity, constant } from './combinators';
 
+/** @module functionalHelpers */
+
 /**
- * @sig
+ * @signature
  * @description Updates the value stored in a single specified index of an array. The function
  * argument should be some form of a unary projector. The 'projector' function will receive
  * the value stored in the existing array at the specified 'idx' argument location. A new array
@@ -30,8 +32,8 @@ var adjust = curry(function _adjust(fn, idx, list) {
 });
 
 /**
- * @sig Number -> Number -> Number
- * @sig String -> String -> String
+ * @signature Number -> Number -> Number
+ * @signature String -> String -> String
  * @description d
  * @kind function
  * @function add
@@ -42,7 +44,7 @@ var adjust = curry(function _adjust(fn, idx, list) {
 var add = curry((x, y) => x + y);
 
 /**
- * @sig and :: (*... -> a) -> ((*... -> b) -> ((*... -> Boolean)))
+ * @signature and :: (*... -> a) -> ((*... -> b) -> ((*... -> Boolean)))
  * @description d
  * @kind function
  * @function and
@@ -53,7 +55,7 @@ var add = curry((x, y) => x + y);
 var and = curry((a, b) => !!(a && b));
 
 /**
- * @sig
+ * @signature
  * @description Updates the value at a specified index of an array by first creating a shallow copy
  * of the array and then updating its value at the specified index.
  * @kind function
@@ -70,7 +72,7 @@ var arraySet = curry(function _arraySet(idx, x, list) {
 });
 
 /**
- * @sig
+ * @signature
  * @description d
  * @kind function
  * @function both
@@ -83,7 +85,7 @@ var both = curry(function _both(f, g) {
 });
 
 /**
- * @sig
+ * @signature
  * @description d
  * @param {Array} first - a
  * @return {function} - b
@@ -94,7 +96,7 @@ var concat = first => (...rest) => null == rest || !rest.length ? first :
     }, first);
 
 /**
- * @sig
+ * @signature
  * @description d
  * @kind function
  * @function defaultPredicate
@@ -103,7 +105,7 @@ var concat = first => (...rest) => null == rest || !rest.length ? first :
 var defaultPredicate = constant(true);
 
 /**
- * @sig
+ * @signature
  * @description d
  * @kind function
  * @function delegatesFrom
@@ -114,7 +116,7 @@ var defaultPredicate = constant(true);
 var delegatesFrom = curry((delegate, delegator) => delegate.isPrototypeOf(delegator));
 
 /**
- * @sig
+ * @signature
  * @description d
  * @kind function
  * @function delegatesTo
@@ -125,7 +127,7 @@ var delegatesFrom = curry((delegate, delegator) => delegate.isPrototypeOf(delega
 var delegatesTo = curry((delegator, delegate) => delegate.isPrototypeOf(delegator));
 
 /**
- * @sig
+ * @signature
  * @description d
  * @kind function
  * @function divide
@@ -136,7 +138,7 @@ var delegatesTo = curry((delegator, delegate) => delegate.isPrototypeOf(delegato
 var divide = curry((x, y) => x / y);
 
 /**
- * @sig
+ * @signature
  * @description d
  * @kind function
  * @function either
@@ -149,7 +151,7 @@ var either = curry(function _either(f, g) {
 });
 
 /**
- * @sig
+ * @signature
  * @description d
  * @kind function
  * @function equals
@@ -160,7 +162,7 @@ var either = curry(function _either(f, g) {
 var equals = curry((x, y) => x == y);
 
 /**
- * @sig
+ * @signature
  * @description d
  * @kind function
  * @function falsey
@@ -171,7 +173,7 @@ var equals = curry((x, y) => x == y);
 var falsey = flip;
 
 /**
- * @sig
+ * @signature
  * @description d
  * @param {*} x - a
  * @return {boolean} - b
@@ -179,7 +181,7 @@ var falsey = flip;
 var flip = x => !x;
 
 /**
- * @sig
+ * @signature
  * @description d
  * @kind function
  * @function getWith
@@ -190,7 +192,7 @@ var flip = x => !x;
 var getWith = curry((prop, obj) => obj[prop]);
 
 /**
- * @sig
+ * @signature
  * @description d
  * @kind function
  * @function greaterThan
@@ -201,7 +203,7 @@ var getWith = curry((prop, obj) => obj[prop]);
 var greaterThan = curry((x, y) => x > y);
 
 /**
- * @sig
+ * @signature
  * @description d
  * @kind function
  * @function greaterThanOrEqual
@@ -212,7 +214,7 @@ var greaterThan = curry((x, y) => x > y);
 var greaterThanOrEqual = curry((x, y) => x >= y);
 
 /**
- * @sig
+ * @signature
  * @description d
  * @kind function
  * @function has
@@ -225,7 +227,7 @@ var has = curry(function _has(prop, obj) {
 });
 
 /**
- * @sig
+ * @signature
  * @description d
  * @kind function
  * @function inObject
@@ -238,15 +240,15 @@ var inObject = curry(function _inObject(prop, obj) {
 });
 
 /**
- * @sig
+ * @signature
  * @description d
- * @param {function} fn - a
+ * @param {function|generator} fn - a
  * @return {*} - b
  */
 var invoke = fn => fn();
 
 /**
- * @sig isArray :: a -> Boolean
+ * @signature isArray :: a -> Boolean
  * @description d
  * @param {*} data - a
  * @return {boolean} - b
@@ -254,7 +256,7 @@ var invoke = fn => fn();
 var isArray = data => Array.isArray(data);
 
 /**
- * @sig
+ * @signature
  * @description d
  * @param {boolean} bool - a
  * @return {boolean} - b
@@ -262,7 +264,7 @@ var isArray = data => Array.isArray(data);
 var isBoolean = bool => javaScriptTypes.Boolean === type(bool);
 
 /**
- * @sig isFunction :: a -> Boolean
+ * @signature isFunction :: a -> Boolean
  * @description d
  * @param {function} fn - a
  * @return {boolean} - b
@@ -270,7 +272,7 @@ var isBoolean = bool => javaScriptTypes.Boolean === type(bool);
 var isFunction = fn => javaScriptTypes.Function === type(fn);
 
 /**
- * @sig isObject :: a -> Boolean
+ * @signature isObject :: a -> Boolean
  * @description d
  * @param {*} item - a
  * @return {boolean} - b
@@ -278,7 +280,7 @@ var isFunction = fn => javaScriptTypes.Function === type(fn);
 var isObject = item => javaScriptTypes.Object === type(item) && null !== item;
 
 /**
- * @sig
+ * @signature
  * @description d
  * @param {*} item - a
  * @return {boolean} - b
@@ -289,7 +291,7 @@ function isPrimitive(item) {
 }
 
 /**
- * @sig
+ * @signature
  * @description d
  * @param {*} x - a
  * @return {boolean} - b
@@ -297,7 +299,7 @@ function isPrimitive(item) {
 var isNothing = x => null == x;
 
 /**
- * @sig
+ * @signature
  * @description d
  * @param {*} n - a
  * @return {string|boolean} - b
@@ -305,7 +307,7 @@ var isNothing = x => null == x;
 var isNull = n => type(n) && null === n;
 
 /**
- * @sig
+ * @signature
  * @description d
  * @param {number} num - a
  * @return {boolean} - b
@@ -313,7 +315,7 @@ var isNull = n => type(n) && null === n;
 var isNumber = num => javaScriptTypes.Number == type(num);
 
 /**
- * @sig
+ * @signature
  * @description d
  * @param {*} x - a
  * @return {boolean} - b
@@ -321,7 +323,7 @@ var isNumber = num => javaScriptTypes.Number == type(num);
 var isSomething = x => null != x;
 
 /**
- * @sig
+ * @signature
  * @description d
  * @param {string} str - a
  * @return {boolean} - b
@@ -329,7 +331,7 @@ var isSomething = x => null != x;
 var isString = str => javaScriptTypes.String === type(str);
 
 /**
- * @sig
+ * @signature
  * @description d
  * @param {Symbol} sym - a
  * @return {boolean} - b
@@ -337,7 +339,7 @@ var isString = str => javaScriptTypes.String === type(str);
 var isSymbol = sym => javaScriptTypes.Symbol === type(sym);
 
 /**
- * @sig
+ * @signature
  * @description d
  * @param {*} u - a
  * @return {boolean} - b
@@ -345,7 +347,7 @@ var isSymbol = sym => javaScriptTypes.Symbol === type(sym);
 var isUndefined = u => javaScriptTypes.Undefined === type(u);
 
 /**
- * @sig
+ * @signature
  * @description d
  * @kind function
  * @function lessThan
@@ -356,7 +358,7 @@ var isUndefined = u => javaScriptTypes.Undefined === type(u);
 var lessThan = curry((x, y) => x < y);
 
 /**
- * @sig
+ * @signature
  * @description d
  * @kind function
  * @function lessThanOrEqual
@@ -367,7 +369,7 @@ var lessThan = curry((x, y) => x < y);
 var lessThanOrEqual = curry((x, y) => x <= y);
 
 /**
- * @sig
+ * @signature
  * @description d
  * @kind function
  * @function mapSet
@@ -382,7 +384,7 @@ var mapSet = curry(function _mapSet(key, val, map) {
 });
 
 /**
- * @sig
+ * @signature
  * @description d
  * @kind function
  * @function modulus
@@ -393,7 +395,7 @@ var mapSet = curry(function _mapSet(key, val, map) {
 var modulus = curry((x, y) => x % y);
 
 /**
- * @sig
+ * @signature
  * @description d
  * @kind function
  * @function multiply
@@ -404,7 +406,7 @@ var modulus = curry((x, y) => x % y);
 var multiply = curry((x, y) => x * y);
 
 /**
- * @sig
+ * @signature
  * @description d
  * @param {number} x - a
  * @return {number} - b
@@ -412,7 +414,7 @@ var multiply = curry((x, y) => x * y);
 var negate = x => -x;
 
 /**
- * @sig
+ * @signature
  * @description d
  * @kind function
  * @function notEqual
@@ -423,7 +425,7 @@ var negate = x => -x;
 var notEqual = curry((x, y) => x != y);
 
 /**
- * @sig
+ * @signature
  * @description No-op function; used as default function in some cases when argument is optional
  * and consumer does not provide.
  * @returns {undefined} - a
@@ -431,7 +433,7 @@ var notEqual = curry((x, y) => x != y);
 function noop() {}
 
 /**
- * @sig
+ * @signature
  * @description d
  * @kind function
  * @function nth
@@ -445,7 +447,7 @@ var nth = curry(function nth(offset, list) {
 });
 
 /**
- * @sig
+ * @signature
  * @description d
  * @kind function
  * @function objectSet
@@ -461,7 +463,7 @@ var objectSet = curry(function _objectSet(prop, val, obj) {
 });
 
 /**
- * @sig
+ * @signature
  * @description d
  * @param {function} fn - a
  * @return {function} - b
@@ -477,7 +479,7 @@ function once(fn) {
 }
 
 /**
- * @sig or :: (*... -> a) -> ((*... -> b) -> ((*... -> Boolean)))
+ * @signature or :: (*... -> a) -> ((*... -> b) -> ((*... -> Boolean)))
  * @description d
  * @kind function
  * @function or
@@ -488,7 +490,7 @@ function once(fn) {
 var or = curry((a, b) => !!(a || b));
 
 /**
- * @sig
+ * @signature
  * @description d
  * @param {Array|String} xs - a
  * @return {Array|String} - b
@@ -496,7 +498,7 @@ var or = curry((a, b) => !!(a || b));
 var reverse = xs => isArray(xs) ? xs.slice(0).reverse() : xs.split('').reverse().join('');
 
 /**
- * @sig
+ * @signature
  * @description d
  * @kind function
  * @function set
@@ -511,7 +513,7 @@ var set = curry(function _set(prop, val, obj) {
 });
 
 /**
- * @sig
+ * @signature
  * @description d
  * @kind function
  * @function setSet
@@ -525,7 +527,7 @@ var setSet = curry(function _setSet(val, set) {
 });
 
 /**
- * @sig
+ * @signature
  * @description d
  * @kind function
  * @function strictEquals
@@ -536,7 +538,7 @@ var setSet = curry(function _setSet(val, set) {
 var strictEquals = curry((x, y) => x === y);
 
 /**
- * @sig
+ * @signature
  * @description d
  * @kind function
  * @function strictNotEqual
@@ -547,7 +549,7 @@ var strictEquals = curry((x, y) => x === y);
 var strictNotEqual = curry((x, y) => x !== y);
 
 /**
- * @sig
+ * @signature
  * @description d
  * @kind function
  * @function subtract
@@ -558,7 +560,7 @@ var strictNotEqual = curry((x, y) => x !== y);
 var subtract = curry((x, y) => x - y);
 
 /**
- * @sig
+ * @signature
  * @description d
  * @param {*} x - a
  * @return {boolean} - b
@@ -566,7 +568,7 @@ var subtract = curry((x, y) => x - y);
 var truthy = x => flip(falsey(x));
 
 /**
- * @sig
+ * @signature
  * @description d
  * @param {*} a - a
  * @return {string} - b
@@ -574,7 +576,7 @@ var truthy = x => flip(falsey(x));
 var type = a => typeof a;
 
 /**
- * @sig wrap :: a -> [a]
+ * @signature wrap :: a -> [a]
  * @description Takes any value of any type and returns an array containing
  * the value passed as its only item
  * @param {*} data - Any value, any type

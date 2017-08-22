@@ -1,8 +1,8 @@
-import * as functors from '../../../../src/dataStructures/functors/functors';
-import { list_functor, ordered_list_functor } from '../../../../src/dataStructures/functors/list_functor';
+import * as monads from '../../../../src/dataStructures/monads/monads';
+import { list, ordered_list } from '../../../../src/dataStructures/monads/list';
 import { testData } from '../../../testData';
 
-var List = functors.List;
+var List = monads.List;
 
 describe('List functor test', function _testListFunctor() {
     describe('List object factory tests', function _testListObjectFactory() {
@@ -18,14 +18,14 @@ describe('List functor test', function _testListFunctor() {
                 l7 = List('testing constant'),
                 l8 = List(false);
 
-            list_functor.isPrototypeOf(l1).should.be.true;
-            list_functor.isPrototypeOf(l2).should.be.true;
-            list_functor.isPrototypeOf(l3).should.be.true;
-            list_functor.isPrototypeOf(l4).should.be.true;
-            list_functor.isPrototypeOf(l5).should.be.true;
-            list_functor.isPrototypeOf(l6).should.be.true;
-            list_functor.isPrototypeOf(l7).should.be.true;
-            list_functor.isPrototypeOf(l8).should.be.true;
+            list.isPrototypeOf(l1).should.be.true;
+            list.isPrototypeOf(l2).should.be.true;
+            list.isPrototypeOf(l3).should.be.true;
+            list.isPrototypeOf(l4).should.be.true;
+            list.isPrototypeOf(l5).should.be.true;
+            list.isPrototypeOf(l6).should.be.true;
+            list.isPrototypeOf(l7).should.be.true;
+            list.isPrototypeOf(l8).should.be.true;
 
             expect([undefined]).to.eql(l1.value);
             expect([null]).to.eql(l2.value);
@@ -49,14 +49,14 @@ describe('List functor test', function _testListFunctor() {
                 i7 = List.of('testing constant'),
                 i8 = List.of(false);
 
-            list_functor.isPrototypeOf(i1).should.be.true;
-            list_functor.isPrototypeOf(i2).should.be.true;
-            list_functor.isPrototypeOf(i3).should.be.true;
-            list_functor.isPrototypeOf(i4).should.be.true;
-            list_functor.isPrototypeOf(i5).should.be.true;
-            list_functor.isPrototypeOf(i6).should.be.true;
-            list_functor.isPrototypeOf(i7).should.be.true;
-            list_functor.isPrototypeOf(i8).should.be.true;
+            list.isPrototypeOf(i1).should.be.true;
+            list.isPrototypeOf(i2).should.be.true;
+            list.isPrototypeOf(i3).should.be.true;
+            list.isPrototypeOf(i4).should.be.true;
+            list.isPrototypeOf(i5).should.be.true;
+            list.isPrototypeOf(i6).should.be.true;
+            list.isPrototypeOf(i7).should.be.true;
+            list.isPrototypeOf(i8).should.be.true;
 
             expect([undefined]).to.eql(i1.value);
             expect([null]).to.eql(i2.value);
@@ -73,9 +73,9 @@ describe('List functor test', function _testListFunctor() {
                 l2 = List.just(1),
                 l3 = List.ordered([1, 2, 3, 4, 5], x => x);
 
-            ordered_list_functor.isPrototypeOf(l1).should.be.true;
-            ordered_list_functor.isPrototypeOf(l2).should.be.true;
-            ordered_list_functor.isPrototypeOf(l3).should.be.true;
+            ordered_list.isPrototypeOf(l1).should.be.true;
+            ordered_list.isPrototypeOf(l2).should.be.true;
+            ordered_list.isPrototypeOf(l3).should.be.true;
         });
 
         it('should return a list from a generator source', function _testListFromGen() {
@@ -93,8 +93,8 @@ describe('List functor test', function _testListFunctor() {
 
         it('should return correct response when checking is a type is an Identity', function _testListDotIs() {
             var l = List(2),
-                m = functors.Maybe(2),
-                c = functors.Constant(null),
+                m = monads.Maybe(2),
+                c = monads.Constant(null),
                 test1 = 2,
                 test2 = { a: 1 },
                 test3 = [1, 2, 3];
@@ -198,25 +198,25 @@ describe('List functor test', function _testListFunctor() {
                 r = l.mapToRight();
 
             c.should.be.an('object');
-            Object.getPrototypeOf(c).should.eql(Object.getPrototypeOf(functors.Constant()));
+            Object.getPrototypeOf(c).should.eql(Object.getPrototypeOf(monads.Constant()));
 
             f.should.be.an('object');
-            Object.getPrototypeOf(f).should.eql(Object.getPrototypeOf(functors.Future()));
+            Object.getPrototypeOf(f).should.eql(Object.getPrototypeOf(monads.Future()));
 
             io.should.be.an('object');
-            Object.getPrototypeOf(io).should.eql(Object.getPrototypeOf(functors.Io()));
+            Object.getPrototypeOf(io).should.eql(Object.getPrototypeOf(monads.Io()));
 
             i.should.be.an('object');
-            Object.getPrototypeOf(i).should.eql(Object.getPrototypeOf(functors.Identity()));
+            Object.getPrototypeOf(i).should.eql(Object.getPrototypeOf(monads.Identity()));
 
             left.should.be.an('object');
-            Object.getPrototypeOf(left).should.eql(Object.getPrototypeOf(functors.Left()));
+            Object.getPrototypeOf(left).should.eql(Object.getPrototypeOf(monads.Left()));
 
             m.should.be.an('object');
-            Object.getPrototypeOf(m).should.eql(Object.getPrototypeOf(functors.Just(1)));
+            Object.getPrototypeOf(m).should.eql(Object.getPrototypeOf(monads.Just(1)));
 
             r.should.be.an('object');
-            Object.getPrototypeOf(r).should.eql(Object.getPrototypeOf(functors.Right()));
+            Object.getPrototypeOf(r).should.eql(Object.getPrototypeOf(monads.Right()));
         });
 
         it('should allow "expected" functionality of concatenation for strings and mathematical operators for numbers', function _testListFunctorValueOf() {
@@ -241,8 +241,8 @@ describe('List functor test', function _testListFunctor() {
     });
 
     describe('List functor object unique fields tests', function _testListFunctorUniqueFields() {
-        describe('Deferred execution list_functor functions', function _testDeferredExecutionListFunctions() {
-            it('should return two lists concatenated with the non-this list_functor at the front', function _testAddFront() {
+        describe('Deferred execution list functions', function _testDeferredExecutionListFunctions() {
+            it('should return two lists concatenated with the non-this list at the front', function _testAddFront() {
                 var list = List.from([1, 2, 3, 4, 5]),
                     arr = [6, 7, 8, 9, 10];
 
@@ -261,18 +261,18 @@ describe('List functor test', function _testListFunctor() {
                 listRes.data.should.eql([1, 2, 3, 1, 2]);
             });
 
-            it('should return a single list_functor after concatenating the current list_functor with a new list_functor', function _testConcat() {
+            it('should return a single list after concatenating the current list with a new list', function _testConcat() {
                 var list = List.from([1, 2, 3, 4, 5]),
                     arr = [6, 7, 8, 9, 10],
                     concatIterator = list.concat(arr),
                     res = concatIterator.data;
 
-                    res.should.be.an('array');
-                    res.should.have.lengthOf(10);
-                    res.should.eql([1, 2, 3, 4, 5, 6, 7, 8, 9, 10]);
+                res.should.be.an('array');
+                res.should.have.lengthOf(10);
+                res.should.eql([1, 2, 3, 4, 5, 6, 7, 8, 9, 10]);
             });
 
-            it('should return a single list_functor after concatenating multiple lists', function _testConcatWithMutlipleLists() {
+            it('should return a single list after concatenating multiple lists', function _testConcatWithMutlipleLists() {
                 var list = List.from([1, 2, 3, 4, 5]),
                     arr1 = [6, 7, 8, 9, 10],
                     arr2 = [11, 12, 13, 14, 15],
@@ -305,7 +305,7 @@ describe('List functor test', function _testListFunctor() {
                     .data.should.eql([1, 3, 5, 7, 9]);
             });
 
-            it('should return the list_functor except where the two intersect (numbers)', function _testExceptWithNumbers() {
+            it('should return the list except where the two intersect (numbers)', function _testExceptWithNumbers() {
                 var list = List.from([1, 2, 3, 4, 5]),
                     arr = [2, 4, 6, 8, 10],
                     exceptList = list.except(arr),
@@ -316,7 +316,7 @@ describe('List functor test', function _testListFunctor() {
                 res.should.eql([1, 3, 5]);
             });
 
-            it('should return the list_functor except where the two intersect (strings)', function _testExceptWithStrings() {
+            it('should return the list except where the two intersect (strings)', function _testExceptWithStrings() {
                 var list = List.from(['1', '2', '3', '4', '5']),
                     arr = ['2', '4', '6', '8', '10'],
                     exceptList = list.except(arr),
@@ -327,7 +327,7 @@ describe('List functor test', function _testListFunctor() {
                 res.should.eql(['1', '3', '5']);
             });
 
-            it('should return the list_functor except where the two intersect (objects)', function _testExceptWithObjects() {
+            it('should return the list except where the two intersect (objects)', function _testExceptWithObjects() {
                 function comparer(a, b) {
                     return a.FirstName === b.FirstName;
                 }
@@ -454,7 +454,7 @@ describe('List functor test', function _testListFunctor() {
                     .data.should.eql([1, 1, 2, 1, 3, 1, 4, 1, 5]);
             });
 
-            it('should return the list_functor only where the two intersect (numbers)', function _testIntersectWithNumbers() {
+            it('should return the list only where the two intersect (numbers)', function _testIntersectWithNumbers() {
                 var list = List.from([1, 2, 3, 4, 5]),
                     arr = [2, 4, 6, 8, 10],
                     intersectList = list.intersect(arr),
@@ -465,7 +465,7 @@ describe('List functor test', function _testListFunctor() {
                 res.should.eql([2, 4]);
             });
 
-            it('should return the list_functor only where the two intersect (strings)', function _testIntersectWithStrings() {
+            it('should return the list only where the two intersect (strings)', function _testIntersectWithStrings() {
                 var list = List.from(['1', '2', '3', '4', '5']),
                     arr = ['2', '4', '6', '8', '10'],
                     intersectList = list.intersect(arr),
@@ -476,7 +476,7 @@ describe('List functor test', function _testListFunctor() {
                 res.should.eql(['2', '4']);
             });
 
-            it('should return the list_functor only where the two intersect (objects)', function _testIntersectWithObjects() {
+            it('should return the list only where the two intersect (objects)', function _testIntersectWithObjects() {
                 function comparer(a, b) {
                     return a.FirstName === b.FirstName;
                 }
@@ -591,14 +591,14 @@ describe('List functor test', function _testListFunctor() {
                 List(testData.dataSource.data)
                     .zip((function _selector(x, y) { return { x: x.FirstName, y: y }; }), [1, 2, 3, 4, 5, 6, 7])
                     .data.should.eql([
-                        { x: 'Phillip J.', y: 1 },
-                        { x: 'Hedonism', y: 2 },
-                        { x: 'Hypnotoad', y: 3 },
-                        { x: 'Robot', y: 4 },
-                        { x: '9', y: 5 },
-                        { x: 'Crushinator', y: 6 },
-                        { x: 'Lrrr', y: 7 }
-                    ]);
+                    { x: 'Phillip J.', y: 1 },
+                    { x: 'Hedonism', y: 2 },
+                    { x: 'Hypnotoad', y: 3 },
+                    { x: 'Robot', y: 4 },
+                    { x: '9', y: 5 },
+                    { x: 'Crushinator', y: 6 },
+                    { x: 'Lrrr', y: 7 }
+                ]);
             });
 
             it('should sort a list in ascending order', function _testSortBy() {
@@ -628,8 +628,8 @@ describe('List functor test', function _testListFunctor() {
             });
         });
 
-        describe('Immediately Evaluated list_functor functions', function _testImmediatelyEvaluatedListFunctions() {
-            it('should return true when the list_functor contains the specified item and false other wise', function _testContains() {
+        describe('Immediately Evaluated list functions', function _testImmediatelyEvaluatedListFunctions() {
+            it('should return true when the list contains the specified item and false other wise', function _testContains() {
                 var list = List.from([1, 2, 3, 4, 5, 6, 7, 8, 9, 10]),
                     res1 = list.contains(1),
                     res2 = list.contains(11);

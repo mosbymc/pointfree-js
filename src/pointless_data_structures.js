@@ -1,6 +1,8 @@
 import { curry, compose, identity } from './combinators';
 import { getWith } from './functionalHelpers';
 
+/** @module pointless_data_structures */
+
 //TODO: I need to figure out how to structure this lib. I'd like to have several different types of containers...
 //TODO: ...specifically, functors (pointed), monads, and maybe one other type. In addition, each container type
 //TODO: would have several implementations: maybe, option, constant, identity, future_functor, io, etc. It would make sense
@@ -15,7 +17,7 @@ import { getWith } from './functionalHelpers';
 //TODO: But the more separation between containers, the more they have to 'import' each other.
 
 /**
- * @sig
+ * @signature
  * @description d
  * @kind function
  * @function apply
@@ -28,7 +30,7 @@ var apply = curry(function _apply(ma, mb) {
 });
 
 /**
- * @sig
+ * @signature
  * @description d
  * @kind function
  * @function ap
@@ -40,7 +42,7 @@ var apply = curry(function _apply(ma, mb) {
 var ap = apply;
 
 /**
- * @sig
+ * @signature
  * @description d
  * @kind function
  * @function flatMap
@@ -53,7 +55,7 @@ var flatMap = curry(function _flatMap(m, fn) {
 });
 
 /**
- * @sig
+ * @signature
  * @description d
  * @kind function
  * @function flatMapWith
@@ -66,7 +68,7 @@ var flatMapWith = curry(function _flatMapWith(fn, m) {
 });
 
 /**
- * @sig
+ * @signature
  * @description d
  * @kind function
  * @function map
@@ -79,7 +81,7 @@ var map = curry(function _map(m, fn) {
 });
 
 /**
- * @sig
+ * @signature
  * @description d
  * @kind function
  * @function mapWith
@@ -92,7 +94,7 @@ var mapWith = curry(function _map(fn, m) {
 });
 
 /**
- * @sig
+ * @signature
  * @description d
  * @kind function
  * @function pluckWith
@@ -100,7 +102,7 @@ var mapWith = curry(function _map(fn, m) {
 var pluckWith = compose(mapWith, getWith);
 
 /**
- * @sig
+ * @signature
  * @description d
  * @kind function
  * @function fmap
@@ -112,7 +114,7 @@ var pluckWith = compose(mapWith, getWith);
 var fmap = mapWith;
 
 /**
- * @sig
+ * @signature
  * @description d
  * @kind function
  * @function chain
@@ -125,7 +127,7 @@ var chain = curry(function _chain(f, m){
 });
 
 /**
- * @sig
+ * @signature
  * @description d
  * @kind function
  * @function bind
@@ -133,7 +135,7 @@ var chain = curry(function _chain(f, m){
 var bind = chain;
 
 /**
- * @sig
+ * @signature
  * @description d
  * @param {function} f - a
  * @param {function} g - b
@@ -144,7 +146,7 @@ var mcompose = function _mcompose(f, g) {
 };
 
 /**
- * @sig
+ * @signature
  * @description d
  * @kind function
  * @function put
@@ -157,7 +159,7 @@ var put = curry(function _put(val, fa) {
 });
 
 /**
- * @sig
+ * @signature
  * @description d
  * @kind function
  * @function lift2
@@ -171,7 +173,7 @@ var lift2 = curry(function _lift2(f, m1, m2) {
 });
 
 /**
- * @sig
+ * @signature
  * @description d
  * @kind function
  * @function lift3
@@ -186,7 +188,7 @@ var lift3 = curry(function _lift3(f, m1, m2, m3) {
 });
 
 /**
- * @sig
+ * @signature
  * @description d
  * @kind function
  * @function lift4
@@ -202,7 +204,7 @@ var lift4 = curry(function _lift4(f, m1, m2, m3, m4) {
 });
 
 /**
- * @sig
+ * @signature
  * @description d
  * @kind function
  * @function liftN
@@ -217,7 +219,7 @@ var liftN = curry(function _liftN(f, ...ms) {
 });
 
 /**
- * @sig
+ * @signature
  * @description d
  * @param {Object} ma - a
  * @return {Object} - b
@@ -227,7 +229,7 @@ function mjoin(ma) {
 }
 
 /**
- * @sig
+ * @signature
  * @description d
  * @param {Object} ma - a
  * @return {Object} - b
@@ -237,7 +239,7 @@ function toList(ma) {
 }
 
 /**
- * @sig
+ * @signature
  * @description d
  * @param {Object} ma - a
  * @return {Object} - b
@@ -247,7 +249,7 @@ function toMaybe(ma) {
 }
 
 /**
- * @sig
+ * @signature
  * @description d
  * @param {Object} ma - a
  * @return {Object} - b
@@ -257,7 +259,7 @@ function toFuture(ma) {
 }
 
 /**
- * @sig
+ * @signature
  * @description d
  * @param {Object} ma - a
  * @return {Object} - b
@@ -267,7 +269,7 @@ function toIdentity(ma) {
 }
 
 /**
- * @sig
+ * @signature
  * @description d
  * @param {Object} ma - a
  * @return {Object} - b
@@ -305,7 +307,7 @@ function _toMaybe() {
 //===========================================================================================//
 
 /**
- * @sig
+ * @signature
  * @description d
  * @kind function
  * @function filter
@@ -318,7 +320,7 @@ var filter = curry(function _filter(predicate, xs) {
 });
 
 /**
- * @sig
+ * @signature
  * @description d
  * @kind function
  * @function intersect
@@ -332,7 +334,7 @@ var intersect = curry(function _intersect(xs, comparer, ys) {
 });
 
 /**
- * @sig
+ * @signature
  * @description d
  * @kind function
  * @function except

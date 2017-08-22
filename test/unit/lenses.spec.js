@@ -1,11 +1,11 @@
 import { arrayLens, objectLens, view, over, put, set, lens, prismPath, makeLenses, lensPath } from '../../src/lenses';
 import { reverse } from '../../src/functionalHelpers';
 import { compose, curry } from '../../src/combinators';
-import { map, mapWith } from '../../src/pointlessContainers';
-import * as functors from '../../src/dataStructures/functors/functors';
+import { map, mapWith } from '../../src/pointless_data_structures';
+import * as monads from '../../src/dataStructures/monads/monads';
 
-var Identity = functors.Identity,
-    Future = functors.Future;
+var Identity = monads.Identity,
+    Future = monads.Future;
 
 function toUpper(str) {
     return str.toUpperCase();
@@ -49,7 +49,7 @@ describe('Test lenses', function _testLenses() {
 
         it('should do other stuff', function _testOtherStuff() {
             var name = lensPath('name');
-            over(compose(mapped, mapped, mapped, name), toUpper, functors.Identity.of(functors.Maybe.of([user])))
+            over(compose(mapped, mapped, mapped, name), toUpper, monads.Identity.of(monads.Maybe.of([user])))
                 .toString().should.eql('Identity(Just([object Object]))');
         });
 

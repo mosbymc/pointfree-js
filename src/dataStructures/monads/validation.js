@@ -1,7 +1,7 @@
-import { equalMaker, pointMaker, stringMaker, valueOf } from '../dataStructureHelpers';
+import { apply, chain, mjoin, pointMaker, equalMaker, stringMaker, valueOf } from '../dataStructureHelpers';
 
 function Validation(val) {
-    return Object.create(validation_functor, {
+    return Object.create(validation, {
         _value: {
             value: val
         }
@@ -18,9 +18,9 @@ Validation.of = function _of(val) {
  * @param {Object} f - a
  * @return {boolean} - b
  */
-Validation.is = f => validation_functor.isPrototypeOf(f);
+Validation.is = f => validation.isPrototypeOf(f);
 
-var validation_functor = {
+var validation = {
     map: function _map(fn) {
         return this.of(fn(this.value));
     },
@@ -35,7 +35,7 @@ var validation_functor = {
  * @description d
  * @return {boolean} - a
  */
-validation_functor.equals = equalMaker(validation_functor);
+validation.equals = equalMaker(validation);
 
 /**
  * @sig
@@ -46,9 +46,13 @@ validation_functor.equals = equalMaker(validation_functor);
  * @type {function}
  * @param {function} f - a
  * @param {function} g - b
- * @return {validation_functor} - c
+ * @return {validation} - c
  */
-validation_functor.bimap = validation_functor.map;
+validation.bimap = validation.map;
+
+validation.chain = chain;
+validation.mjoin = mjoin;
+validation.apply = apply;
 
 //Since FantasyLand is the defacto standard for JavaScript algebraic data structures, and I want to maintain
 //compliance with the standard, a .constructor property must be on the container delegators. In this case, its
@@ -59,7 +63,6 @@ validation_functor.bimap = validation_functor.map;
 //as it was intended... you know, like Douglas Crockford and his "good parts", which is really just another
 //way of saying: "your too dumb to understand how JavaScript works, and I either don't know myself, or don't
 //care to know, so just stick with what I tell you to use."
-validation_functor.constructor = validation_functor.factory;
+validation.constructor = validation.factory;
 
-
-export { Validation, validation_functor };
+export { Validation, validation };

@@ -1,3 +1,7 @@
+/** @module helpers */
+
+/** @modules helpers */
+
 /**
  * @description - Prototype of a generator; used to detect if a function
  * argument is a generator or a regular function.
@@ -106,7 +110,7 @@ var sortDirection = {
 };
 
 /**
- * @sig
+ * @signature
  * @description d
  * @param {*} x - a
  * @param {*} y - b
@@ -119,7 +123,7 @@ function sortComparer(x, y, dir) {
 }
 
 /**
- * @sig
+ * @signature
  * @description d
  * @param {function} comparer - a
  * @return {function} - b
@@ -157,7 +161,7 @@ function cacher(comparer) {
 }
 
 /**
- * @sig
+ * @signature
  * @description d
  * @param {Generator|Array|Map|Set} collection - a
  * @param {function} comparer - b
@@ -237,7 +241,7 @@ function genericCacher(collection, comparer) {
 }
 
 /**
- * @sig
+ * @signature
  * @description d
  * @param {function} fn - a
  * @param {function} keyMaker - b
@@ -252,7 +256,7 @@ function memoizer(fn, keyMaker) {
 }
 
 /**
- * @sig
+ * @signature
  * @description d
  * @param {*} obj - a
  * @return {*} - b
@@ -263,7 +267,7 @@ function deepClone(obj) {
     return objectCloner(obj);
 
     /**
-     * @sig
+     * @signature
      * @description d
      * @param {*} obj - a
      * @return {*} - b
@@ -299,7 +303,7 @@ function deepClone(obj) {
 
 
 /**
- * @sig
+ * @signature
  * @description d
  * @param {function} fn - a
  * @param {Object} cxt - b
@@ -333,7 +337,7 @@ function functionClone(fn, cxt = null) {
 }
 
 /**
- * @sig
+ * @signature
  * @description d
  * @param {Array} arr - a
  * @return {Array} - b
@@ -349,7 +353,7 @@ function deepCopy(arr) {
 }
 
 /**
- * @sig
+ * @signature
  * @description d
  * @param {object} obj - a
  * @return {object} - b
@@ -364,8 +368,10 @@ function shallowClone(obj) {
 
 var emptyObject = {};
 
+var nil = {};
+
 /**
- * @sig
+ * @signature
  * @description d
  * @param {number} len - a
  * @param {function} fn - b
@@ -382,4 +388,4 @@ var emptyObject = {};
 */
 
 export { javaScriptTypes, sortDirection, observableStatus, sortComparer, cacher, memoizer,
-            deepClone, deepCopy, shallowClone, generatorProto, emptyObject, typeNames };
+            deepClone, deepCopy, shallowClone, generatorProto, emptyObject, typeNames, nil };

@@ -3,7 +3,7 @@ import { constant } from '../../combinators';
 
 function State(val) {
     var t = tuple(val);
-    return Object.create(state_functor, {
+    return Object.create(state, {
         _value: {
             value: t,
             writable: false,
@@ -22,10 +22,10 @@ State.of = function _of(a) {
 };
 
 State.is = function _is(fa) {
-    return state_functor.isPrototypeOf(fa);
+    return state.isPrototypeOf(fa);
 };
 
-var state_functor = {
+var state = {
     /**
      * @sig
      * @description d
@@ -92,4 +92,4 @@ function tuple(a, b) {
     };
 }
 
-export { State, state_functor };
+export { State, state };
