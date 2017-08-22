@@ -3,7 +3,7 @@ import { apply, mjoin, pointMaker, valueOf } from '../dataStructureHelpers';
 import { javaScriptTypes } from '../../helpers';
 
 /**
- * @sig
+ * @signature
  * @description d
  * @param {function} reject - a
  * @param {function} resolve - b
@@ -21,10 +21,20 @@ function safeFork(reject, resolve) {
 }
 
 /**
- * @sig
- * @description d
- * @param {function} fn - a
- * @return {future} - b
+ * @signature - :: * -> {@link monads.future}
+ * @description Factory function used to create a new object that delegates to
+ * the {@link monads.future} object. Any single value may be provided as an argument
+ * which will be used to set the underlying value of the new {@link monads.future}
+ * delegator. If no argument is provided, the underlying value will be 'undefined'.
+ * @namespace Future
+ * @memberOf monads
+ * @property {function} of
+ * @property {function} is
+ * @property {function} lift
+ * @param {*} fn - The value that should be set as the underlying
+ * value of the {@link monads.future}.
+ * @return {monads.future} - Returns a new object that delegates to the
+ * {@link monads.future}.
  */
 function Future(fn) {
     return Object.create(future, {
@@ -49,46 +59,106 @@ function Future(fn) {
 Future.is = f => future.isPrototypeOf(f);
 
 /**
- * @sig
- * @description d
- * @param {function|*} val - a
- * @return {future} - b
+ * @signature * -> {@link monads.future}
+ * @description Takes any value and places it in the correct context if it is
+ * not already and creates a new {@link monads.future} object delegator instance.
+ * Because the identity functor does not require any specific context for
+ * its value, this can be viewed as an alias for {@link future}
+ * @memberOf monads.Future
+ * @static
+ * @function of
+ * @param {*} [val] - The value that should be set as the underlying
+ * value of the {@link monads.future}.
+ * @return {monads.future} - Returns a new object that delegates to the
+ * {@link monads.future}.
  */
 Future.of = val => strictEquals(javaScriptTypes.Function, type(val)) ?
     Future(val) : Future((_, resolve) => safeFork(noop, resolve(val)));
 
 /**
- * @sig
+ * @signature
  * @description d
+ * @memberOf monads.Future
+ * @static
+ * @function reject
  * @param {*} val - a
  * @return {future} - b
  */
 Future.reject = val => Future((reject, resolve) => reject(val));
 
 /**
- * @sig
+ * @signature
  * @description d
+ * @memberOf monads.Future
+ * @static
+ * @function unit
  * @param {function} val - a
  * @return {future} - b
  */
 Future.unit = val => Future(val).complete();
 
 /**
- * @sig
- * @description d
- * @return {future} - a
+ * @signature () -> {@link monads.future}
+ * @description Creates and returns an 'empty' identity monad.
+ * @return {monads.future} - Returns a new identity monad.
  */
 Future.empty = () => Future(noop);
 
+/**
+ * @typedef {Object} future
+ * @property {function} value - returns the underlying value of the the monad
+ * @property {function} map - maps a single function over the underlying value of the monad
+ * @property {function} bimap
+ * @property {function} get - returns the underlying value of the monad
+ * @property {function} orElse - returns the underlying value of the monad
+ * @property {function} getOrElse - returns the underlying value of the monad
+ * @property {function} of - creates a new future delegate with the value provided
+ * @property {function} valueOf - returns the underlying value of the monad; used during concatenation and coercion
+ * @property {function} toString - returns a string representation of the future monad and its underlying value
+ * @property {function} factory - a reference to the future factory function
+ * @property {function} [Symbol.Iterator] - Iterator for the future monad
+ * @kind {Object}
+ * @memberOf monads
+ * @namespace future
+ * @description This is the delegate object that specifies the behavior of the identity functor. All
+ * operations that may be performed on an future monad 'instance' delegate to this object. Future
+ * functor 'instances' are created by the {@link monads.Future} factory function via Object.create,
+ * during which the underlying value is placed directly on the newly created object. No other
+ * properties exist directly on an identity functor delegator object beyond the ._value property.
+ * All behavior delegates to this object, or higher up the prototype chain.
+ */
 var future = {
     /**
-     * @sig
-     * @description d
-     * @return {*} - a
+     * @signature () -> *
+     * @description Returns the underlying value of an future delegator. This
+     * getter is not expected to be used directly by consumers - it is meant as an internal
+     * access only. To manipulate the underlying value of an future delegator,
+     * see {@link monads.future#map} and {@link monads.future#bimap}.
+     * To retrieve the underlying value of an future delegator, see {@link monads.future#get},
+     * {@link monads.future#orElse}, {@link monads.future#getOrElse},
+     * and {@link monads.future#valueOf}.
+     * @memberOf monads.future
+     * @instance
+     * @protected
+     * @function
+     * @return {*} Returns the underlying value of the delegator. May be any value.
      */
     get value() {
         return this._value;
     },
+    /**
+     * @signature () -> {@link monads.future}
+     * @description Takes a function that is applied to the underlying value of the
+     * monad, the result of which is used to create a new {@link monads.future}
+     * delegator instance.
+     * @memberOf monads.future
+     * @instance
+     * @param {function} fn - A mapping function that can operate on the underlying
+     * value of the {@link monads.future}.
+     * @return {monads.future} Returns a new {@link monads.future}
+     * delegator whose underlying value is the result of the mapping operation
+     * just performed.
+     */
     map: function _map(fn) {
         return this.of((reject, resolve) =>
             this.fork(a => reject(a), b => resolve(fn(b))));
@@ -122,15 +192,75 @@ var future = {
     fork: function _fork(reject, resolve) {
         this._fork(reject, resolve);
     },
+    /**
+     * @signature * -> boolean
+     * @description Determines if 'this' future monad is equal to another monad. Equality
+     * is defined as:
+     * 1) The other monad shares the same delegate object as 'this' future monad
+     * 2) Both underlying values are strictly equal to each other
+     * @memberOf monads.future
+     * @instance
+     * @function
+     * @param {Object} ma - The other monad to check for equality with 'this' monad.
+     * @return {boolean} - Returns a boolean indicating equality
+     */
     equals: function _equals(ma) {
         return Object.getPrototypeOf(this).isPrototypeOf(ma) && ma.value === this.value;
     },
+    /**
+     * @signature * -> {@link monads.future}
+     * @description Factory function used to create a new object that delegates to
+     * the {@link monads.future} object. Any single value may be provided as an argument
+     * which will be used to set the underlying value of the new {@link monads.future}
+     * delegator. If no argument is provided, the underlying value will be 'undefined'.
+     * @memberOf monads.future
+     * @instance
+     * @function
+     * @param {*} item - The value that should be set as the underlying
+     * value of the {@link monads.future}.
+     * @return {monads.future} Returns a new {@link monads.future} delegator object
+     * via the {@link monads.Future#of} function.
+     */
     of: pointMaker(Future),
+    /**
+     * @signature () -> *
+     * @description Returns the underlying value of the current monad 'instance'. This
+     * function property is not meant for explicit use. Rather, the JavaScript engine uses
+     * this property during implicit coercion like addition and concatenation.
+     * @memberOf monads.future
+     * @instance
+     * @function
+     * @return {*} Returns the underlying value of the current monad 'instance'.
+     */
     valueOf: valueOf,
+    /**
+     * @signature () -> string
+     * @description Returns a string representation of the monad and its
+     * underlying value
+     * @memberOf monads.future
+     * @instance
+     * @function
+     * @return {string} Returns a string representation of the future
+     * and its underlying value.
+     */
     toString: function _toString() {
         console.log(this.value, this.value.name, this.value === once);
         return `Future(${this.value.name})`;
     },
+    /**
+     * @signature * -> {@link monads.future}
+     * @description Factory function used to create a new object that delegates to
+     * the {@link monads.future} object. Any single value may be provided as an argument
+     * which will be used to set the underlying value of the new {@link monads.future}
+     * delegator. If no argument is provided, the underlying value will be 'undefined'.
+     * @memberOf monads.future
+     * @instance
+     * @function
+     * @see monads.Future
+     * @param {*} val - The value that should be set as the underlying
+     * value of the {@link monads.future}.
+     * @return {monads.future} - Returns a new future monad delegator
+     */
     factory: Future
 };
 

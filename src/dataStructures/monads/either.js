@@ -317,6 +317,7 @@ var right = {
      * and {@link monads.right#valueOf}.
      * @memberOf monads.right
      * @instance
+     * @protected
      * @function
      * @return {*} Returns the underlying value of the delegator. May be any value.
      */
@@ -504,6 +505,7 @@ var left = {
      * and {@link monads.left#valueOf}.
      * @memberOf monads.left
      * @instance
+     * @protected
      * @function
      * @return {*} Returns the underlying value of the delegator. May be any value.
      */

@@ -3,7 +3,7 @@ import { identity } from '../combinators';
 /** @module dataStructures/dataStructureHelpers */
 
 /**
- * @sig
+ * @signature
  * @description d
  * @param {Object} type - a
  * @return {function} - b
@@ -39,7 +39,7 @@ function applyTransforms(types) {
 }
 
 /**
- * @sig
+ * @signature
  * @description d
  * @return {Object} - a
  */
@@ -63,7 +63,7 @@ function containerIterator() {
 }
 
 /**
- * @sig
+ * @signature
  * @description d
  * @return {*} - a
  */
@@ -72,7 +72,7 @@ function get() {
 }
 
 /**
- * @sig
+ * @signature
  * @description d
  * @return {string} - b
  */
@@ -81,7 +81,7 @@ function emptyGet() {
 }
 
 /**
- * @sig
+ * @signature
  * @description d
  * @param {function} f - a
  * @return {*} - b
@@ -91,7 +91,7 @@ function orElse(f) {
 }
 
 /**
- * @sig
+ * @signature
  * @description d
  * @param {function} f - a
  * @return {*} - b
@@ -101,7 +101,7 @@ function emptyOrElse(f) {
 }
 
 /**
- * @sig
+ * @signature
  * @description d
  * @param {*} x - a
  * @return {*} - b
@@ -111,7 +111,7 @@ function getOrElse(x) {
 }
 
 /**
- * @sig
+ * @signature
  * @description d
  * @param {*} x - a
  * @return {*} - b
@@ -121,7 +121,7 @@ function emptyGetOrElse(x) {
 }
 
 /**
- * @sig
+ * @signature
  * @description d
  * @param {Object} ma - a
  * @return {*} - b
@@ -131,7 +131,7 @@ function apply(ma) {
 }
 
 /**
- * @sig
+ * @signature
  * @description d
  * @param {function} fn - a
  * @return {*} - b
@@ -142,7 +142,7 @@ function chain(fn) {
 }
 
 /**
- * @sig
+ * @signature
  * @description d
  * @param {Object} type - a
  * @param {string} prop - b
@@ -155,7 +155,7 @@ function disjunctionEqualMaker(type, prop) {
 }
 
 /**
- * @sig
+ * @signature
  * @description d
  * @param {Object} type - a
  * @return {function} - b
@@ -167,7 +167,7 @@ function equalMaker(type) {
 }
 
 /**
- * @sig
+ * @signature
  * @description d
  * @param {Object} type - a
  * @return {function} - b
@@ -175,7 +175,7 @@ function equalMaker(type) {
 var lifter = (type) => (fn) => (...args) => type.of(fn(...args));
 
 /**
- * @sig
+ * @signature
  * @description d
  * @param {Object} type - a
  * @return {function} - b
@@ -183,7 +183,7 @@ var lifter = (type) => (fn) => (...args) => type.of(fn(...args));
 var maybeFactoryHelper = type => val => type(val);
 
 /**
- * @sig
+ * @signature
  * @description d
  * @return {*} - a
  */
@@ -192,7 +192,7 @@ function mjoin() {
 }
 
 /**
- * @sig
+ * @signature
  * @description d
  * @param {Object} type - a
  * @return {function} - b
@@ -200,7 +200,7 @@ function mjoin() {
 var pointMaker = type => val => type.of(val);
 
 /**
- * @sig
+ * @signature
  * @description d
  * @param {string} typeString - a
  * @return {function} - b
@@ -212,7 +212,7 @@ function stringMaker(typeString) {
 }
 
 /**
- * @sig
+ * @signature
  * @description d
  * @return {*} - a
  */
@@ -259,7 +259,7 @@ var sharedMaybeFns = {
 //==========================================================================================================//
 //==========================================================================================================//
 /**
- * @sig
+ * @signature
  * @description d
  * @param {function} fn - a
  * @return {*} - b
@@ -269,7 +269,7 @@ function rightMap(fn) {
 }
 
 /**
- * @sig
+ * @signature
  * @description d
  * @param {function} factory - a
  * @return {function} - b
@@ -281,7 +281,7 @@ function leftMapMaker(factory) {
 }
 
 /**
- * @sig
+ * @signature
  * @description d
  * @param {function} f - a
  * @param {function} g - b
@@ -292,7 +292,7 @@ function rightBiMap(f, g) {
 }
 
 /**
- * @sig
+ * @signature
  * @description d
  * @param {function} factory - a
  * @return {function} - b

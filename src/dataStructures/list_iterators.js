@@ -294,7 +294,7 @@ function first(xs, predicate) {
 /**
  * @sig
  * @description d
- * @param {Array|generator|functors.list_core} xs - a
+ * @param {Array|generator|monads.list_core} xs - a
  * @param {function} fn - b
  * @param {*} initial - c
  * @return {*} - d

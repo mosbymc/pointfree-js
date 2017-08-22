@@ -368,6 +368,8 @@ function shallowClone(obj) {
 
 var emptyObject = {};
 
+var nil = {};
+
 /**
  * @signature
  * @description d
@@ -386,4 +388,4 @@ var emptyObject = {};
 */
 
 export { javaScriptTypes, sortDirection, observableStatus, sortComparer, cacher, memoizer,
-            deepClone, deepCopy, shallowClone, generatorProto, emptyObject, typeNames };
+            deepClone, deepCopy, shallowClone, generatorProto, emptyObject, typeNames, nil };

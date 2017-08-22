@@ -1,4 +1,4 @@
-import { emptyObject } from '../../helpers';
+import { nil } from '../../helpers';
 import { apply, chain, mjoin, equalMaker, pointMaker, stringMaker, valueOf, get, orElse, getOrElse } from '../dataStructureHelpers';
 
 /**
@@ -31,7 +31,7 @@ function Identity(val) {
  * @signature * -> {@link monads.identity}
  * @description Takes any value and places it in the correct context if it is
  * not already and creates a new {@link monads.identity} object delegator instance.
- * Because the identity functor does not require any specific context for
+ * Because the identity monad does not require any specific context for
  * its value, this can be viewed as an alias for {@link Identity}
  * @memberOf monads.Identity
  * @static
@@ -57,35 +57,42 @@ Identity.of = x => Identity(x);
 Identity.is = f => identity.isPrototypeOf(f);
 
 /**
- * @sig
- * @description d
- * @return {identity} - a
+ * @signature () -> {@link monads.identity}
+ * @description Creates and returns an 'empty' identity monad.
+ * @return {monads.identity} - Returns a new identity monad.
  */
-Identity.empty = function _empty() {
-    return this.of(Object.create(emptyObject));
-};
+Identity.empty = () => Identity(Object.create(nil));
 
 /**
  * @typedef {Object} identity
- * @property {function} value - returns the underlying value of the the functor
- * @property {function} map - maps a single function over the underlying value of the functor
- * @property {function} bimap
- * @property {function} get - returns the underlying value of the functor
- * @property {function} orElse - returns the underlying value of the functor
- * @property {function} getOrElse - returns the underlying value of the functor
+ * @property {function} value - returns the underlying value of the the monad
+ * @property {function} map - maps a single function over the underlying value of the monad
+ * @property {function} chain - returns a new identity monad
+ * @property {function} mjoin - returns a new identity monad
+ * @property {function} apply - returns a new instance of whatever functor type's underlying value this
+ * identity's underlying function value should be mapped over.
+ * @property {function} bimap - returns a new identity monad
+ * @property {function} fold - Applies a function to the identity's underlying value and returns the result
+ * @property {function} sequence - returns a new identity monad
+ * @property {function} traverse - returns a new identity monad
+ * @property {function} empty - Creates a new, 'empty' identity monad
+ * @property {function} isEmpty - Returns a boolean indicating if the identity monad is 'empty'
+ * @property {function} get - returns the underlying value of the monad
+ * @property {function} orElse - returns the underlying value of the monad
+ * @property {function} getOrElse - returns the underlying value of the monad
  * @property {function} of - creates a new identity delegate with the value provided
- * @property {function} valueOf - returns the underlying value of the functor; used during concatenation and coercion
- * @property {function} toString - returns a string representation of the identity functor and its underlying value
+ * @property {function} valueOf - returns the underlying value of the monad; used during concatenation and coercion
+ * @property {function} toString - returns a string representation of the identity monad and its underlying value
  * @property {function} factory - a reference to the identity factory function
  * @property {function} [Symbol.Iterator] - Iterator for the identity
  * @kind {Object}
  * @memberOf monads
  * @namespace identity
- * @description This is the delegate object that specifies the behavior of the identity functor. All
- * operations that may be performed on an identity functor 'instance' delegate to this object. Identity
- * functor 'instances' are created by the {@link monads.Identity} factory function via Object.create,
+ * @description This is the delegate object that specifies the behavior of the identity monad. All
+ * operations that may be performed on an identity monad 'instance' delegate to this object. Identity
+ * monad 'instances' are created by the {@link monads.Identity} factory function via Object.create,
  * during which the underlying value is placed directly on the newly created object. No other
- * properties exist directly on an identity functor delegator object beyond the ._value property.
+ * properties exist directly on an identity monad delegator object beyond the ._value property.
  * All behavior delegates to this object, or higher up the prototype chain.
  */
 var identity = {
@@ -100,6 +107,7 @@ var identity = {
      * and {@link monads.identity#valueOf}.
      * @memberOf monads.identity
      * @instance
+     * @protected
      * @function
      * @return {*} Returns the underlying value of the delegator. May be any value.
      */
@@ -109,7 +117,7 @@ var identity = {
     /**
      * @signature () -> {@link monads.identity}
      * @description Takes a function that is applied to the underlying value of the
-     * functor, the result of which is used to create a new {@link monads.identity}
+     * monad, the result of which is used to create a new {@link monads.identity}
      * delegator instance.
      * @memberOf monads.identity
      * @instance
@@ -122,34 +130,129 @@ var identity = {
     map: function _map(fn) {
         return this.of(fn(this.value));
     },
+    /**
+     * @signature () -> {@link monads.identity}
+     * @description Accepts a mapping function as an argument, applies the function to the
+     * underlying value. If the mapping function returns an identity monad, chain will 'flatten'
+     * the nested identities by one level. If the mapping function does not return an identity
+     * monad, chain will just return an identity monad that 'wraps' whatever the return value
+     * of the mapping function is. However, if the mapping function does not return a monad of
+     * the same type, then chain is probably not the functionality you should use. See
+     * {@link monads.identity#map} instead.
+     * @memberOf monads.identity
+     * @instance
+     * @function chain
+     * @param {function} fn - A mapping function that returns a monad of the same type
+     * @return {Object} Returns a new identity monad that 'wraps' the return value of the
+     * mapping function after flattening it by one level.
+     */
+    chain: chain,
+    /**
+     * @signature () -> {@link monads.identity}
+     * @description Returns a new identity monad. If the current identity monad is nested, mjoin
+     * will flatten it by one level. Very similar to {@link monads.identity#chain} except no
+     * mapping function is accepted or run.
+     * @memberOf monads.identity
+     * @instance
+     * @function mjoin
+     * @return {Object} Returns a new identity monad after flattening the nested monads by one level.
+     */
+    mjoin: mjoin,
+    /**
+     * @signature Object -> Object
+     * @description Accepts any functor object with a mapping function and invokes that object's mapping
+     * function on the identity's underlying value. In order for this function to execute properly and
+     * not throw, the identity's underlying value must be a function that can be used as a mapping function
+     * on the functor object supplied as the argument.
+     * @memberOf monads.identity
+     * @instance
+     * @function apply
+     * @param {Object} ma - Any object with a map function - i.e. a functor.
+     * @return {Object} Returns an instance of the functor object provide as an argument.
+     */
+    apply: apply,
+    /**
+     * @signature () -> *
+     * @description Accepts a function that is used to map over the identity's underlying value
+     * and returns the returns value of the function without 're-wrapping' it in a new identity
+     * monad instance.
+     * @memberOf monads.identity
+     * @instance
+     * @function fold
+     * @param {function} fn - Any mapping function that should be applied to the underlying value
+     * of the identity monad.
+     * @return {*} Returns the return value of the mapping function provided as an argument.
+     */
     fold: function _fold(fn) {
         return fn(this.value);
     },
+    /**
+     * @signature monad -> monad<monad<T>>
+     * @description Returns a monad of the type passed as an argument that 'wraps'
+     * and identity monad that 'wraps' the current identity monad's underlying value.
+     * @memberOf monads.identity
+     * @instance
+     * @function sequence
+     * @param {Object} p - Any pointed functor with a '#of' function property
+     * @return {Object} Returns a monad of the type passed as an argument that 'wraps'
+     * and identity monad that 'wraps' the current identity monad's underlying value.
+     */
     sequence: function _sequence(p) {
-        return this.traverse(x => x, p);
+        return this.traverse(p.of, p.of);
     },
+    /**
+     * @signature Object -> () -> Object
+     * @description Accepts a pointed functor with a '#of' function property and a mapping function. The mapping
+     * function is applied to the identity monad's underlying value. The mapping function should return a functor
+     * of any type. Then the {@link monads.Identity.of} function is used to map over the returned functor. Essentially
+     * creating a new object of type: functor<Identity<T>>, where 'functor' is the type of functor the mapping
+     * function returns.
+     * @memberOf monads.identity
+     * @instance
+     * @function traverse
+     * @param {Object} a - A pointed functor with a '#of' function property. Used only in cases
+     * where the mapping function cannot be run.
+     * @param {function} f - A mapping function that should be applied to the identity's underlying value.
+     * @return {Object} Returns a new identity monad that wraps the mapping function's returned monad type.
+     */
     traverse: function _traverse(a, f) {
         return f(this.value).map(this.of);
     },
+    /**
+     * @signature () -> {@link monads.identity}
+     * @description Creates and returns a new, 'empty' identity monad.
+     * @memberOf monads.identity
+     * @instance
+     * @function empty
+     * @return {monads.identity} Creates and returns a new, 'empty' identity monad.
+     */
     empty: function _empty() {
-        return this.of(Object.create(emptyObject));
+        return this.of(Object.create(nil));
     },
+    /**
+     * @signature () -> boolean
+     * @description Returns a boolean indicating if the monad is 'empty'
+     * @memberOf monads.identity
+     * @instance
+     * @function isEmpty
+     * @return {boolean} Returns a boolean indicating if the monad is 'empty'
+     */
     isEmpty: function _getIsEmpty() {
-        return emptyObject.isPrototypeOf(this.value);
+        return nil.isPrototypeOf(this.value);
     },
     /**
      * @signature () -> *
-     * @description Returns the underlying value of the current functor 'instance'.
+     * @description Returns the underlying value of the current monad 'instance'.
      * @memberOf monads.identity
      * @instance
      * @function
-     * @return {*} - Returns the underlying value of the current functor 'instance'.
+     * @return {*} - Returns the underlying value of the current monad 'instance'.
      */
     get: get,
     /**
      * @signature () -> *
      * @description Takes an optional function parameter as a default to be invoked and
-     * returned in cases where the current functor 'instance\'s' underlying value is not
+     * returned in cases where the current monad 'instance\'s' underlying value is not
      * 'mappable'. Because the identity does not support disjunctions, the
      * parameter is entirely optional and will always be ignored. Whatever the actual
      * underlying value is, it will always be returned.
@@ -164,7 +267,7 @@ var identity = {
     /**
      * @signature * -> *
      * @description Takes an optional parameter of any value as a default return value in
-     * cases where the current functor 'instance\'s' underlying value is not 'mappable'.
+     * cases where the current monad 'instance\'s' underlying value is not 'mappable'.
      * Because the identity does not support disjunctions, the parameter is entirely
      * optional and will always be ignored. Whatever the actual underlying value is, it will
      * always be returned.
@@ -172,7 +275,7 @@ var identity = {
      * @instance
      * @function
      * @param {*} [x] - a
-     * @return {*} Returns the underlying value of the current functor 'instance'.
+     * @return {*} Returns the underlying value of the current monad 'instance'.
      */
     getOrElse: getOrElse,
     /**
@@ -192,18 +295,18 @@ var identity = {
     of: pointMaker(Identity),
     /**
      * @signature () -> *
-     * @description Returns the underlying value of the current functor 'instance'. This
+     * @description Returns the underlying value of the current monad 'instance'. This
      * function property is not meant for explicit use. Rather, the JavaScript engine uses
      * this property during implicit coercion like addition and concatenation.
      * @memberOf monads.identity
      * @instance
      * @function
-     * @return {*} Returns the underlying value of the current functor 'instance'.
+     * @return {*} Returns the underlying value of the current monad 'instance'.
      */
     valueOf: valueOf,
     /**
      * @signature () -> string
-     * @description Returns a string representation of the functor and its
+     * @description Returns a string representation of the monad and its
      * underlying value
      * @memberOf monads.identity
      * @instance
@@ -224,28 +327,28 @@ var identity = {
      * @see monads.Identity
      * @param {*} val - The value that should be set as the underlying
      * value of the {@link monads.identity}.
-     * @return {monads.identity} - Returns a new identity functor delegator
+     * @return {monads.identity} - Returns a new identity monad delegator
      */
     factory: Identity
 };
 
 /**
  * @signature * -> boolean
- * @description Determines if 'this' identity functor is equal to another functor. Equality
+ * @description Determines if 'this' identity monad is equal to another monad. Equality
  * is defined as:
- * 1) The other functor shares the same delegate object as 'this' identity functor
+ * 1) The other monad shares the same delegate object as 'this' identity monad
  * 2) Both underlying values are strictly equal to each other
  * @memberOf monads.identity
  * @instance
  * @function
- * @param {Object} ma - The other functor to check for equality with 'this' functor.
+ * @param {Object} ma - The other monad to check for equality with 'this' monad.
  * @return {boolean} - Returns a boolean indicating equality
  */
 identity.equals = equalMaker(identity);
 
 /**
  * @signature (* -> *) -> (* -> *) -> monads.identity<T>
- * @description Since the constant functor does not represent a disjunction, the Identity's
+ * @description Since the constant monad does not represent a disjunction, the Identity's
  * bimap function property behaves just as its map function property. It is merely here as a
  * convenience so that swapping out monads/monads does not break an application that is
  * relying on its existence.
@@ -261,14 +364,67 @@ identity.equals = equalMaker(identity);
  */
 identity.bimap = identity.map;
 
-identity.chain = chain;
-identity.mjoin = mjoin;
-identity.apply = apply;
-
+/**
+ * @signature Object -> Object
+ * @description Alias for {@link monads.identity#apply}
+ * @instance
+ * @function ap
+ * @see monads.identity#apply
+ * @param {Object} ma - Any object with a map function - i.e. a functor.
+ * @return {Object} Returns an instance of the functor object provide as an argument.
+ */
 identity.ap = identity.apply;
+
+/**
+ * @signature () -> {@link monads.identity}
+ * @description Alias for {@link monads.identity#chain}
+ * @memberOf monads.identity
+ * @instance
+ * @function fmap
+ * @see monads.identity#chain
+ * @param {function} fn - A mapping function that returns a monad of the same type
+ * @return {Object} Returns a new identity monad that 'wraps' the return value of the
+ * mapping function after flattening it by one level.
+ */
 identity.fmap = identity.chain;
+
+/**
+ * @signature () -> {@link monads.identity}
+ * @description Alias for {@link monads.identity#chain}
+ * @memberOf monads.identity
+ * @instance
+ * @function flatMap
+ * @see monads.identity#chain
+ * @param {function} fn - A mapping function that returns a monad of the same type
+ * @return {Object} Returns a new identity monad that 'wraps' the return value of the
+ * mapping function after flattening it by one level.
+ */
 identity.flapMap = identity.chain;
+
+/**
+ * @signature () -> {@link monads.identity}
+ * @description Alias for {@link monads.identity#chain}
+ * @memberOf monads.identity
+ * @instance
+ * @function bind
+ * @see monads.identity#chain
+ * @param {function} fn - A mapping function that returns a monad of the same type
+ * @return {Object} Returns a new identity monad that 'wraps' the return value of the
+ * mapping function after flattening it by one level.
+ */
 identity.bind = identity.chain;
+
+/**
+ * @signature () -> *
+ * @description Alias for {@link monads.identity#fold}
+ * @memberOf monads.identity
+ * @instance
+ * @function reduce
+ * @see monads.identity#fold
+ * @param {function} fn - Any mapping function that should be applied to the underlying value
+ * of the identity monad.
+ * @return {*} Returns the return value of the mapping function provided as an argument.
+ */
 identity.reduce = identity.fold;
 
 

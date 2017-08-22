@@ -90,6 +90,7 @@ var constant = {
      * and {@link monads.constant#valueOf}.
      * @memberOf monads.constant
      * @instance
+     * @protected
      * @function
      * @return {*} Returns the underlying value of the delegator. May be any value.
      */

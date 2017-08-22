@@ -83,9 +83,10 @@ var list_core = {
      * To retrieve the underlying value of an identity_functor delegator, see {@link monads.list#get},
      * {@link monads.list#orElse}, {@link monads.list#getOrElse},
      * and {@link monads.list#valueOf}.
-     * @memberOf monads.list
+     * @memberOf monads.list_core
      * @instance
-     * @function
+     * @protected
+     * @function value
      * @return {*} Returns the underlying value of the delegator. May be any value.
      */
     get value() {
@@ -95,7 +96,9 @@ var list_core = {
     /**
      * @signature
      * @description d
-     * @protected
+     * @memberOf monads.list_core
+     * @instance
+     * @function copyWithin
      * @param {number} index - a
      * @param {number} start - b
      * @param {number} end - c
@@ -111,7 +114,9 @@ var list_core = {
      * List's value. This function is a deferred execution call that returns
      * a new queryable object delegator instance that contains all the requisite
      * information on how to perform the operation.
-     * @protected
+     * @memberOf monads.list_core
+     * @instance
+     * @function concat
      * @param {Array | *} ys - a
      * @return {monads.list_core} - b
      */
@@ -122,7 +127,9 @@ var list_core = {
     /**
      * @signature (a -> boolean) -> List<b>
      * @description d
-     * @protected
+     * @memberOf monads.list_core
+     * @instance
+     * @function distinct
      * @param {function} comparer - a
      * @return {monads.list_core} - b
      */
@@ -140,7 +147,9 @@ var list_core = {
      * object delegator instance that contains all the requisite information on
      * how to perform the operation.
      * equality comparer.
-     * @protected
+     * @memberOf monads.list_core
+     * @instance
+     * @function except
      * @param {Array|generator} xs - a
      * @param {function} comparer - b
      * @return {monads.list_core} - c
@@ -152,7 +161,9 @@ var list_core = {
     /**
      * @signature
      * @description d
-     * @protected
+     * @memberOf monads.list_core
+     * @instance
+     * @function fill
      * @param {number} value - a
      * @param {number} start - b
      * @param {number} end - c
@@ -165,7 +176,9 @@ var list_core = {
     /**
      * @signature
      * @description d
-     * @protected
+     * @memberOf monads.list_core
+     * @instance
+     * @function filter
      * @param {function} predicate - a
      * @return {monads.list_core} - b
      */
@@ -176,7 +189,9 @@ var list_core = {
     /**
      * @signature
      * @description d
-     * @protected
+     * @memberOf monads.list_core
+     * @instance
+     * @function groupBy
      * @param {function} keySelector - a
      * @param {function} comparer - b
      * @return {monads.list_core} - c
@@ -189,7 +204,9 @@ var list_core = {
     /**
      * @signature
      * @description d
-     * @protected
+     * @memberOf monads.list_core
+     * @instance
+     * @function groupByDescending
      * @param {function} keySelector - a
      * @param {function} comparer - b
      * @return {monads.list_core} - c
@@ -208,7 +225,9 @@ var list_core = {
      * This function is a deferred execution call that returns a new queryable
      * object delegator instance that contains all the requisite information on
      * how to perform the operation.
-     * @protected
+     * @memberOf monads.list_core
+     * @instance
+     * @function groupJoin
      * @param {monads.list_core | Array} ys - a
      * @param {function} xSelector - b
      * @param {function} ySelector - c
@@ -229,7 +248,9 @@ var list_core = {
      * This function is a deferred execution call that returns a new queryable
      * object delegator instance that contains all the requisite information on
      * how to perform the operation.
-     * @protected
+     * @memberOf monads.list_core
+     * @instance
+     * @function intersect
      * @param {Array|generator} xs - a
      * @param {function} comparer - b
      * @return {monads.list_core} - c
@@ -241,7 +262,9 @@ var list_core = {
     /**
      * @signature
      * @description d
-     * @protected
+     * @memberOf monads.list_core
+     * @instance
+     * @function intersperse
      * @param {*} val - a
      * @return {monads.list_core} - b
      */
@@ -257,7 +280,9 @@ var list_core = {
      * function will use a default equality comparer. This function is a deferred
      * execution call that returns a new queryable object delegator instance that
      * contains all the requisite information on how to perform the operation.
-     * @protected
+     * @memberOf monads.list_core
+     * @instance
+     * @function join
      * @param {Array|List} ys - a
      * @param {function} xSelector - b
      * @param {function} ySelector - c
@@ -272,7 +297,9 @@ var list_core = {
     /**
      * @signature
      * @description d
-     * @protected
+     * @memberOf monads.list_core
+     * @instance
+     * @function map
      * @param {function} mapFunc - a
      * @return {monads.list_core} - b
      */
@@ -283,7 +310,9 @@ var list_core = {
     /**
      * @signature
      * @description d
-     * @protected
+     * @memberOf monads.list_core
+     * @instance
+     * @function ofType
      * @param {string|Object} type - a
      * @returns {monads.list_core} - b
      */
@@ -294,7 +323,9 @@ var list_core = {
     /**
      * @signature
      * @description d
-     * @protected
+     * @memberOf monads.list_core
+     * @instance
+     * @function prepend
      * @param {Array|generator} xs - a
      * @return {monads.list_core} - b
      */
@@ -305,7 +336,9 @@ var list_core = {
     /**
      * @signature
      * @description d
-     * @protected
+     * @memberOf monads.list_core
+     * @instance
+     * @function reverse
      * @return {monads.list_core} - a
      */
     reverse: function _reverse() {
@@ -318,7 +351,9 @@ var list_core = {
      * remaining items. If no amount is specified, an empty list is returned;
      * Otherwise, a list containing the items collected from the source is
      * returned.
-     * @protected
+     * @memberOf monads.list_core
+     * @instance
+     * @function skip
      * @param {number} amt - The number of items in the source to skip before
      * returning the remainder.
      * @return {monads.list_core} - a
@@ -330,7 +365,9 @@ var list_core = {
     /**
      * @signature
      * @description d
-     * @protected
+     * @memberOf monads.list_core
+     * @instance
+     * @function skipWhile
      * @param {function} predicate - a
      * @return {monads.list_core} - b
      */
@@ -341,7 +378,9 @@ var list_core = {
     /**
      * @signature
      * @description d
-     * @protected
+     * @memberOf monads.list_core
+     * @instance
+     * @function take
      * @param {number} amt - a
      * @return {monads.list_core} - b
      */
@@ -352,7 +391,9 @@ var list_core = {
     /**
      * @signature
      * @description d
-     * @protected
+     * @memberOf monads.list_core
+     * @instance
+     * @function takeWhile
      * @param {function} predicate - a
      * @return {monads.list_core} - b
      */
@@ -368,7 +409,9 @@ var list_core = {
      * function will use a default equality comparer. This function is a deferred
      * execution call that returns a new queryable object delegator instance that
      * contains all the requisite information on how to perform the operation.
-     * @protected
+     * @memberOf monads.list_core
+     * @instance
+     * @function union
      * @param {Array|generator} xs - a
      * @param {function} comparer - b
      * @return {monads.list_core} - c
@@ -385,7 +428,9 @@ var list_core = {
      * function will use a default equality comparer. This function is a deferred
      * execution call that returns a new queryable object delegator instance that
      * contains all the requisite information on how to perform the operation.
-     * @protected
+     * @memberOf monads.list_core
+     * @instance
+     * @function zip
      * @param {function} selector - a
      * @param {Array|generator} xs - b
      * @return {monads.list_core} - c
@@ -397,7 +442,9 @@ var list_core = {
     /**
      * @signature (a -> Boolean) -> [a] -> Boolean
      * @description d
-     * @protected
+     * @memberOf monads.list_core
+     * @instance
+     * @function all
      * @param {function} predicate - a
      * @return {boolean} - b
      */
@@ -408,7 +455,9 @@ var list_core = {
     /**
      * @signature: (a -> Boolean) -> [a] -> Boolean
      * @description d
-     * @protected
+     * @memberOf monads.list_core
+     * @instance
+     * @function any
      * @param {function} predicate - a
      * @return {boolean} - b
      */
@@ -419,7 +468,9 @@ var list_core = {
     /**
      * @signature
      * @description d
-     * @protected
+     * @memberOf monads.list_core
+     * @instance
+     * @function count
      * @param {function} predicate - a
      * @return {Number} -  b
      */
@@ -430,7 +481,9 @@ var list_core = {
     /**
      * @signature
      * @description d
-     * @protected
+     * @memberOf monads.list_core
+     * @instance
+     * @function equals
      * @param {monads.list_core} f - a
      * @param {function} comparer - b
      * @return {boolean} - c
@@ -442,7 +495,9 @@ var list_core = {
     /**
      * @signature
      * @description d
-     * @protected
+     * @memberOf monads.list_core
+     * @instance
+     * @function findIndex
      * @param {function} comparer - a
      * @return {Number} - b
      */
@@ -453,7 +508,9 @@ var list_core = {
     /**
      * @signature
      * @description d
-     * @protected
+     * @memberOf monads.list_core
+     * @instance
+     * @function findLastIndex
      * @param {function} comparer - a
      * @return {Number} - b
      */
@@ -464,7 +521,9 @@ var list_core = {
     /**
      * @signature
      * @description d
-     * @protected
+     * @memberOf monads.list_core
+     * @instance
+     * @function first
      * @param {function} predicate - a
      * @return {*} - b
      */
@@ -475,7 +534,9 @@ var list_core = {
     /**
      * @signature (a -> b -> c) -> a -> [b] -> a
      * @description d
-     * @protected
+     * @memberOf monads.list_core
+     * @instance
+     * @function foldl
      * @param {function} fn - a
      * @param {*} acc - b
      * @return {*} - c
@@ -487,7 +548,9 @@ var list_core = {
     /**
      * @signature (a -> a -> a) -> [a] -> a
      * @description d
-     * @protected
+     * @memberOf monads.list_core
+     * @instance
+     * @function foldr
      * @param {function} fn - a
      * @param {*} acc - b
      * @return {*} - c
@@ -499,7 +562,9 @@ var list_core = {
     /**
      * @signature
      * @description d
-     * @protected
+     * @memberOf monads.list_core
+     * @instance
+     * @function isEmpty
      * @return {boolean} - a
      */
     isEmpty: function _isEmpty() {
@@ -509,7 +574,9 @@ var list_core = {
     /**
      * @signature
      * @description d
-     * @protected
+     * @memberOf  monads.list_core
+     * @instance
+     * @function last
      * @param {function} predicate - a
      * @return {*} - b
      */
@@ -520,7 +587,9 @@ var list_core = {
     /**
      * @signature
      * @description d
-     * @protected
+     * @memberOf monads.list_core
+     * @instance
+     * @function reduceRight
      * @param {function} fn - a
      * @param {*} acc - b
      * @return {*} - c
@@ -532,7 +601,9 @@ var list_core = {
     /**
      * @signature
      * @description d
-     * @protected
+     * @memberOf monads.list_core
+     * @instance
+     * @function toArray
      * @return {Array} - a
      */
     toArray: function _toArray() {
@@ -549,7 +620,9 @@ var list_core = {
      * allow you to evaluate the List's data and store it in a new List that can
      * be iterated many times without needing to re-evaluate. It is effectively
      * a syntactical shortcut for: List.from(listInstance.data)
-     * @protected
+     * @memberOf monads.list_core
+     * @instance
+     * @function toEvaluatedList
      * @return {monads.list_core} - a
      */
     toEvaluatedList: function _toEvaluatedList() {
@@ -559,7 +632,9 @@ var list_core = {
     /**
      * @signature
      * @description d
-     * @protected
+     * @memberOf monads.list_core
+     * @instance
+     * @function toMap
      * @return {Map} - a
      */
     toMap: function _toMap() {
@@ -571,7 +646,9 @@ var list_core = {
     /**
      * @signature
      * @description d
-     * @protected
+     * @memberOf monads.list_core
+     * @instance
+     * @function toSet
      * @return {Set} - a
      */
     toSet: function _toSet() {
@@ -584,7 +661,9 @@ var list_core = {
      * delegator object. This function does not cause evaluation of the source,
      * but this also means the returned value only reflects the underlying
      * data, not the evaluated data.
-     * @protected
+     * @memberOf monads.list_core
+     * @instance
+     * @function toString
      * @return {string} - a
      */
     toString: function _toString() {
@@ -608,7 +687,9 @@ var list_core = {
     /**
      * @signature
      * @description d
-     * @protected
+     * @memberOf monads.list_core
+     * @instance
+     * @function valueOf
      * @return {*} - a
      */
     valueOf: function _valueOf() {
@@ -618,7 +699,9 @@ var list_core = {
     /**
      * @signature
      * @description d
-     * @protected
+     * @memberOf monads.list_core
+     * @instance
+     * @function factory
      * @return {monads.list_core} - a
      */
     factory: List,
@@ -626,7 +709,9 @@ var list_core = {
     /**
      * @signature
      * @description d
-     * @protected
+     * @memberOf monads.list_core
+     * @instance
+     * @function of
      * @param {*} xs - a
      * @param {generator} [iterator] - b
      * @param {Array} [sortObj] - c
@@ -642,7 +727,8 @@ var list_core = {
      * @description Base iterator to which all queryable_core delegator objects
      * delegate to for iteration if for some reason an iterator wasn't
      * objectSet on the delegator at the time of creation.
-     * @protected
+     * @memberOf monads.list_core
+     * @instance
      * @return {Array} - a
      */
     [Symbol.iterator]: function *_iterator() {
@@ -652,20 +738,50 @@ var list_core = {
         }
     },
     /**
-     * @sig
+     * @signature
      * @description d
+     * @memberOf monads.list_core
+     * @instance
+     * @function chain
      * @param {function} fn - a
      * @return {list} - b
      */
     chain: function _chain(fn) {
         return this.of(chain(this, fn));
     },
+    /**
+     * @signature
+     * @description d
+     * @memberOf monads.list_core
+     * @instance
+     * @function mjoin
+     * @return {*} - a
+     */
     mjoin: function _mjoin() {
         return this.value;
     },
+    /**
+     * @signature
+     * @description d
+     * @memberOf monads.list_core
+     * @instance
+     * @function sequence
+     * @param {Object} p - a
+     * @return {*} - b
+     */
     sequence: function _sequence(p) {
         return this.traverse(p, identity);
     },
+    /**
+     * @signature
+     * @description d
+     * @memberOf monads.list_core
+     * @instance
+     * @function traverse
+     * @param {function} fa - a
+     * @param {function} fn - b
+     * @return {*} - c
+     */
     traverse: function _traverse(fa, fn) {
         return this.value.reduce(function _reduce(xs, x) {
             fn(x).map(x => y => y.concat([x])).apply(xs);
@@ -699,10 +815,13 @@ var list_core = {
          */
     },
     /**
-     * @sig
+     * @signature
      * @description Applies a function contained in another functor to the source
      * of this List object instance's underlying source. A new List object instance
      * is returned.
+     * @memberOf monads.list_core
+     * @instance
+     * @function apply
      * @param {Object} ma - a
      * @return {list} - b
      */
@@ -715,6 +834,16 @@ list_core.append = list_core.concat;
 list_core.ap = list_core.apply;
 list_core.fmap = list_core.chain;
 list_core.flapMap = list_core.chain;
+
+/**
+ * @signature
+ * @description Alias for {@link monads.list_core#chain}
+ * @memberOf monads.list_core
+ * @instance
+ * @function bind
+ * @property {function} fn
+ * @return {monads.list_core} - Returns a new list monad
+ */
 list_core.bind = list_core.chain;
 
 /**
@@ -734,7 +863,9 @@ var list = Object.create(list_core, {
     /**
      * @signature
      * @description d
-     * @protected
+     * @memberOf monads.list
+     * @instance
+     * @function sortBy
      * @param {function} keySelector - a
      * @param {function} comparer - b
      * @return {ordered_list} - c
@@ -748,7 +879,9 @@ var list = Object.create(list_core, {
     /**
      * @signature
      * @description d
-     * @protected
+     * @memberOf monads.list
+     * @instance
+     * @function sortByDescending
      * @param {function} keySelector - a
      * @param {function} comparer - b
      * @return {ordered_list} - c
@@ -762,7 +895,9 @@ var list = Object.create(list_core, {
     /**
      * @signature
      * @description d
-     * @protected
+     * @memberOf monads.list
+     * @instance
+     * @function contains
      * @param {*} val - a
      * @param {function} comparer - b
      * @return {boolean} - c
@@ -782,6 +917,8 @@ var list = Object.create(list_core, {
  * @property {function} sortBy
  * @property {function} sortByDescending
  * @property {function} contains
+ * @memberOf monads
+ * @namespace ordered_list
  */
 var ordered_list = Object.create(list_core, {
     _appliedSorts: {
@@ -796,7 +933,9 @@ var ordered_list = Object.create(list_core, {
     /**
      * @signature
      * @description d
-     * @protected
+     * @memberOf monads.ordered_list
+     * @instance
+     * @function thenBy
      * @param {function} keySelector - a
      * @param {function} comparer - b
      * @return {ordered_list} - c
@@ -810,7 +949,9 @@ var ordered_list = Object.create(list_core, {
     /**
      * @signature
      * @description d
-     * @protected
+     * @memberOf monads.ordered_list
+     * @instance
+     * @function thenByDescending
      * @param {function} keySelector - a
      * @param {function} comparer - b
      * @return {ordered_list} - c
@@ -829,7 +970,9 @@ var ordered_list = Object.create(list_core, {
      * function should not be called on a sorted List for look for a value that is not the
      * primary field on which the List's data is sorted on as an incorrect result will likely
      * be returned.
-     * @protected
+     * @memberOf monads.ordered_list
+     * @instance
+     * @function contains
      * @param {*} val - The value that should be searched for
      * @param {function} comparer - The function used to compare values in the List to
      * the 'val' parameter
