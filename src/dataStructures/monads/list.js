@@ -1097,9 +1097,11 @@ List.of = List.from;
  * @memberOf monads.List
  * @static
  * @function ordered
- * @param source
- * @param [selector]
- * @param [comparer]
+ * @param {*} [source] - Any JavaScript value
+ * @param {function} [selector] - A function that selects either a subset of each value in the list, or can
+ * act as the 'identity' function and just return the entire value.
+ * @param {function} [comparer] - A function that knows how to compare the type of values the selector function
+ * 'pulls' out of the list.
  * @return {monads.ordered_list} Returns a new list monad
  */
 List.ordered = (source, selector, comparer = defaultPredicate) => createListDelegateInstance(source, null,
