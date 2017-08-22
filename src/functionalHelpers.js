@@ -242,7 +242,7 @@ var inObject = curry(function _inObject(prop, obj) {
 /**
  * @signature
  * @description d
- * @param {function} fn - a
+ * @param {function|generator} fn - a
  * @return {*} - b
  */
 var invoke = fn => fn();

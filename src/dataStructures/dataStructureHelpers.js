@@ -43,7 +43,7 @@ function applyTransforms(types) {
  * @description d
  * @return {Object} - a
  */
-function containerIterator() {
+function monadIterator() {
     let first = true,
         val = this.value;
     return {
@@ -310,6 +310,6 @@ var sharedEitherFns = {
     leftBimapMaker
 };
 
-export { apply, applyTransforms, chain, containerIterator, disjunctionEqualMaker, equalMaker, lifter, maybeFactoryHelper,
+export { apply, applyTransforms, chain, monadIterator, disjunctionEqualMaker, equalMaker, lifter, maybeFactoryHelper,
         mjoin, pointMaker, stringMaker, valueOf, get, emptyGet, orElse, emptyOrElse, getOrElse, emptyGetOrElse, sharedMaybeFns,
         sharedEitherFns };

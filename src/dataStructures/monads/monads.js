@@ -6,7 +6,7 @@ import { Io, io } from './io';
 import { List, list_core } from './list';
 import { Maybe, Just, Nothing, just, nothing } from './maybe';
 import { Validation, validation } from './validation';
-import { applyTransforms, containerIterator, lifter } from '../dataStructureHelpers';
+import { applyTransforms, monadIterator, lifter } from '../dataStructureHelpers';
 
 /**
  * @module dataStructures/monads
@@ -82,40 +82,40 @@ import { applyTransforms, containerIterator, lifter } from '../dataStructureHelp
 
 /**
  * @memberOf monads.constant
- * @type {containerIterator}
+ * @type {monadIterator}
  * @description Iterator for the constant functor. Allows the constant functor
  * to be iterated via for-of or Array#from.
  */
-constant[Symbol.iterator] = containerIterator;
-future[Symbol.iterator] = containerIterator;
+constant[Symbol.iterator] = monadIterator;
+future[Symbol.iterator] = monadIterator;
 
 /**
  * @memberOf monads.identity
- * @type {containerIterator}
+ * @type {monadIterator}
  * @description Iterator for the identity functor. Allows the identity functor
  * to be iterated via for-or of Array#from.
  */
-identity[Symbol.iterator] = containerIterator;
-io[Symbol.iterator] = containerIterator;
+identity[Symbol.iterator] = monadIterator;
+io[Symbol.iterator] = monadIterator;
 
 /**
  * @memberOf monads.left
- * @type {containerIterator}
+ * @type {monadIterator}
  * @description Iterator for the left functor. Allows the left functor to
  * be iterated via for-of or Array#from.
  */
-left[Symbol.iterator] = containerIterator;
-just[Symbol.iterator] = containerIterator;
-nothing[Symbol.iterator] = containerIterator;
+left[Symbol.iterator] = monadIterator;
+just[Symbol.iterator] = monadIterator;
+nothing[Symbol.iterator] = monadIterator;
 
 /**
  * @memberOf monads.right
- * @type {containerIterator}
+ * @type {monadIterator}
  * @description Iterator for the right functor. Allows the right functor to
  * be iterated via for-of or Array#from.
  */
-right[Symbol.iterator] = containerIterator;
-validation[Symbol.iterator] = containerIterator;
+right[Symbol.iterator] = monadIterator;
+validation[Symbol.iterator] = monadIterator;
 
 /**
  * @memberOf monads.Constant

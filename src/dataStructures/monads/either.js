@@ -7,6 +7,7 @@ import { disjunctionEqualMaker, stringMaker, valueOf, apply, chain, mjoin, point
  * @description Returns an either functor based on a loose equals null comparison. If
  * the argument passed to the function loose equals null, a left is returned; other wise,
  * a right.
+ * @private
  * @param {*} x - Any value that should be placed inside an either functor.
  * @return {monads.left|monads.right} - Either a left or a right functor
  */
@@ -66,7 +67,6 @@ function Either(val, fork) {
             }
         });
 }
-//left|monads.right
 
 /**
  * @signature * -> {@link monads.right}
@@ -100,7 +100,7 @@ Either.is = f => Left.is(f) || Right.is(f);
 /**
  * @signature Object -> boolean
  * @description Takes any object and returns a boolean indicating if the object is
- * a 'right' functor.
+ * a 'right' monad.
  * @memberOf monads.Either
  * @function is
  * @param {Object} [f] - a
@@ -111,7 +111,7 @@ Either.isRight = f => f.isRight;
 /**
  * @signature Object -> boolean
  * @description Takes any object and returns a boolean indicating if the object is
- * a 'left' functor.
+ * a 'left' monad.
  * @memberOf monads.Either
  * @function is
  * @param {Object} [f] - a
@@ -142,9 +142,9 @@ Either.Right = x => Either(x, 'right');
 Either.Left = x => Either(x);
 
 /**
- * @signature * -> functor.left|monads.right
- * @description Takes any value and returns a 'left' functor is the value
- * loose equals null; other wise returns a 'right' functor.
+ * @signature * -> monads.left|monads.right
+ * @description Takes any value and returns a 'left' monad is the value
+ * loose equals null; other wise returns a 'right' monad.
  * @memberOf monads.Either
  * @function is
  * @param {*} [x] - a

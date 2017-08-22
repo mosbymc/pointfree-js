@@ -729,6 +729,7 @@ var list_core = {
      * objectSet on the delegator at the time of creation.
      * @memberOf monads.list_core
      * @instance
+     * @generator
      * @return {Array} - a
      */
     [Symbol.iterator]: function *_iterator() {
@@ -744,7 +745,7 @@ var list_core = {
      * @instance
      * @function chain
      * @param {function} fn - a
-     * @return {list} - b
+     * @return {monads.list} - b
      */
     chain: function _chain(fn) {
         return this.of(chain(this, fn));
@@ -755,7 +756,7 @@ var list_core = {
      * @memberOf monads.list_core
      * @instance
      * @function mjoin
-     * @return {*} - a
+     * @return {monads.list} - a
      */
     mjoin: function _mjoin() {
         return this.value;
@@ -767,7 +768,7 @@ var list_core = {
      * @instance
      * @function sequence
      * @param {Object} p - a
-     * @return {*} - b
+     * @return {monads.list} - b
      */
     sequence: function _sequence(p) {
         return this.traverse(p, identity);
@@ -780,7 +781,7 @@ var list_core = {
      * @function traverse
      * @param {function} fa - a
      * @param {function} fn - b
-     * @return {*} - c
+     * @return {monads.list} - c
      */
     traverse: function _traverse(fa, fn) {
         return this.value.reduce(function _reduce(xs, x) {
@@ -823,7 +824,7 @@ var list_core = {
      * @instance
      * @function apply
      * @param {Object} ma - a
-     * @return {list} - b
+     * @return {monads.list} - b
      */
     apply: function _apply(ma) {
         return this.map(ma.value);
@@ -1008,6 +1009,7 @@ var ordered_list = Object.create(list_core, {
  * will be odd. Thus, only odd values (plus the default case which covers a value of zero) need
  * to be handled. A case of zero arises when only the 'source' argument is provided.
  *
+ * @private
  * @param {*} source - The value to be used as the underlying source of the list functor; may be
  * anything javascript object that has an iterator.
  * @param {generator} iterator - A generator function that is to be used on the new list delegate
@@ -1023,16 +1025,18 @@ var createListDelegateInstance = createListCreator(list, ordered_list, list);
 /**
  * @signature
  * @description d
- * @param {*} source - a
- * @return {list} - b
+ * @private
+ * @param {*} [source] - a
+ * @return {monads.list} - b
  */
 var listFromNonGen = source => createListDelegateInstance(source && source[Symbol.iterator] ? source : wrap(source));
 
 /**
  * @signature
  * @description d
+ * @private
  * @param {generator} source - a
- * @return {list} - b
+ * @return {monads.list} - b
  */
 var listFromGen = source => createListDelegateInstance(invoke(source));
 
@@ -1052,8 +1056,8 @@ var listFromGen = source => createListDelegateInstance(invoke(source));
  * @property {function} is {@link monads.List#is}
  * @property {function} repeat {@link monads.List#repeat}
  * @property {function} extend {@link monads.List#extend}
- * @param {*} source - Any type, any value; used as the underlying source of the List
- * @return {list} - A new List instance with the value provided as the underlying source.
+ * @param {*} [source] - Any type, any value; used as the underlying source of the List
+ * @return {monads.list} - A new List instance with the value provided as the underlying source.
  */
 //TODO: should I exclude strings from being used as a source directly, or allow it because
 //TODO: they have an iterator?
@@ -1068,8 +1072,8 @@ function List(source) {
  * @static
  * @function from
  * @see List
- * @param {*} source - Any type, any value; used as the underlying source of the List
- * @return {list} - A new List instance with the value provided as the underlying source.
+ * @param {*} [source] - Any type, any value; used as the underlying source of the List
+ * @return {monads.list} - A new List instance with the value provided as the underlying source.
  */
 List.from = source => List(source);
 
@@ -1086,30 +1090,44 @@ List.from = source => List(source);
 List.of = List.from;
 
 //TODO: implement this so that a consumer can initiate a List as ordered
+/**
+ * @signature
+ * @description Creates a new {@link monads.ordered_list} for the source provided. An optional
+ * source selector and comparer functions may be provided.
+ * @memberOf monads.List
+ * @static
+ * @function ordered
+ * @param source
+ * @param [selector]
+ * @param [comparer]
+ * @return {monads.ordered_list} Returns a new list monad
+ */
 List.ordered = (source, selector, comparer = defaultPredicate) => createListDelegateInstance(source, null,
     [{ keySelector: selector, comparer: comparer, direction: sortDirection.ascending }]);
 
 /**
  * @signature
- * @description d
+ * @description Creates and returns a new {@link monads.ordered_list} since an empty list is trivially
+ * ordered.
  * @memberOf monads.List
  * @static
  * @function empty
  * @see List
- * @return {list} - a
+ * @return {monads.ordered_list} - a
  */
 List.empty = () => createListDelegateInstance([], null,
     [{ keySelector: identity, comparer: defaultPredicate, direction: sortDirection.ascending }]);
 
 /**
  * @signature
- * @description d
+ * @description Creates and returns a new {@link monads.ordered_list} since a list with a single
+ * item is trivially ordered.
  * @memberOf monads.List
  * @static
  * @function just
  * @see List
  * @param {*} val - a
- * @return {list} - b
+ * @return {monads.ordered_list} - b
  */
 List.just = val => createListDelegateInstance([val], null,
     [{ keySelector: identity, comparer: defaultPredicate, direction: sortDirection.ascending }]);
@@ -1123,7 +1141,7 @@ List.just = val => createListDelegateInstance([val], null,
  * @see List
  * @param {function|generator} fn - a
  * @param {*} seed - b
- * @return {list} - c
+ * @return {monads.list} - c
  */
 List.unfold = (fn, seed) => createListDelegateInstance(unfold(fn)(seed));
 
@@ -1150,7 +1168,7 @@ List.is = f => list_core.isPrototypeOf(f);
  * @see List
  * @param {*} item - a
  * @param {number} count - b
- * @return {ordered_list} - c
+ * @return {monads.ordered_list} - c
  */
 List.repeat = function _repeat(item, count) {
     return createListDelegateInstance([], repeat(item, count), [{ keySelector: noop, comparer: noop, direction: sortDirection.descending }]);
@@ -1167,7 +1185,7 @@ List.repeat = function _repeat(item, count) {
  * @param {string} prop - The name of the new property that should exist on the List; must be unique
  * @param {function} fn - A function that defines the new List functionality and
  * will be called when this new List property is invoked.
- * @return {List} - a
+ * @return {monads.List} - a
  *
  * @description The fn parameter must be a non-generator function that takes one or more
  * arguments. If this new List function should be an immediately evaluated
@@ -1220,10 +1238,12 @@ list_core.reduce = list_core.foldl;
  * bimap function property behaves just as its map function property. It is merely here as a
  * convenience so that swapping out monads/monads does not break an application that is
  * relying on its existence.
- * @protected
+ * @memberOf monads.list_core
+ * @instance
+ * @function bimap
  * @param {function} f - a
  * @param {function} g - b
- * @return {list_core} - c
+ * @return {monads.list} - c
  */
 list_core.bimap = list_core.map;
 

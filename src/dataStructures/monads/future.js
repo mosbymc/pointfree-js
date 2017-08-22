@@ -5,6 +5,7 @@ import { javaScriptTypes } from '../../helpers';
 /**
  * @signature
  * @description d
+ * @private
  * @param {function} reject - a
  * @param {function} resolve - b
  * @return {function} - c

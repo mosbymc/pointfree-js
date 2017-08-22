@@ -354,12 +354,12 @@ identity.equals = equalMaker(identity);
  * relying on its existence.
  * @memberOf monads.identity
  * @instance
- * @function
+ * @function bimap
  * @param {function} f - A function that will be used to map over the underlying data of the
  * {@link monads.identity} delegator.
  * @param {function} [g] - An optional function that is simply ignored on the {@link monads.identity}
  * since there is no disjunction present.
- * @return {monads.identity} - Returns a new {@link monads.identity} delegator after applying
+ * @return {monads.identity<T>} - Returns a new {@link monads.identity} delegator after applying
  * the mapping function to the underlying data.
  */
 identity.bimap = identity.map;
@@ -367,6 +367,7 @@ identity.bimap = identity.map;
 /**
  * @signature Object -> Object
  * @description Alias for {@link monads.identity#apply}
+ * @memberOf monads.identity
  * @instance
  * @function ap
  * @see monads.identity#apply
