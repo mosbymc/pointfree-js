@@ -4,7 +4,7 @@ import { apply, chain, mjoin, pointMaker, equalMaker, stringMaker, valueOf } fro
 import { javaScriptTypes } from '../../helpers';
 
 /**
- * @sig
+ * @signature
  * @description d
  * @param {function} item - a
  * @return {io} - b
@@ -25,7 +25,7 @@ function Io(item) {
 }
 
 /**
- * @sig
+ * @signature
  * @description d
  * @param {function|*} item - a
  * @return {io} - b
@@ -33,7 +33,7 @@ function Io(item) {
 Io.of =  item => strictEquals(javaScriptTypes.Function, type(item)) ? Io(item) : Io(constant(item));
 
 /**
- * @sig
+ * @signature
  * @description d
  * @param {Object} f - a
  * @return {boolean} - b

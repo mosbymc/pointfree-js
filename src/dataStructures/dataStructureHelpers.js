@@ -310,6 +310,10 @@ var sharedEitherFns = {
     leftBimapMaker
 };
 
+var fl = {
+
+};
+
 export { apply, applyTransforms, chain, monadIterator, disjunctionEqualMaker, equalMaker, lifter, maybeFactoryHelper,
         mjoin, pointMaker, stringMaker, valueOf, get, emptyGet, orElse, emptyOrElse, getOrElse, emptyGetOrElse, sharedMaybeFns,
         sharedEitherFns };

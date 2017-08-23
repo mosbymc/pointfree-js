@@ -15,9 +15,12 @@ import { createListCreator, taker_skipper, listExtensionHelper } from '../list_h
  * object at creation if not specified.
  * @typedef {Object}
  * @property {function} value
+ * @property {function} apply
  * @property {function} append
- * @property {function} copyWithin
+ * @property {function} bimap
+ * @property {function} chain
  * @property {function} concat
+ * @property {function} copyWithin
  * @property {function} distinct
  * @property {function} except
  * @property {function} fill
@@ -29,9 +32,11 @@ import { createListCreator, taker_skipper, listExtensionHelper } from '../list_h
  * @property {function} intersperse
  * @property {function} join
  * @property {function} map
+ * @property {function} mjoin
  * @property {function} ofType
  * @property {function} prepend
  * @property {function} reverse
+ * @property {function} sequence
  * @property {function} skip
  * @property {function} skipWhile
  * @property {function} take
@@ -40,13 +45,12 @@ import { createListCreator, taker_skipper, listExtensionHelper } from '../list_h
  * @property {function} zip
  * @property {function} all
  * @property {function} any
- * @property {function} contains
  * @property {function} count
  * @property {function} equals
  * @property {function} findIndex
  * @property {function} findLastIndex
  * @property {function} first
- * @property {function} foldLeft
+ * @property {function} foldl
  * @property {function} foldr
  * @property {function} isEmpty
  * @property {function} last
@@ -56,6 +60,7 @@ import { createListCreator, taker_skipper, listExtensionHelper } from '../list_h
  * @property {function} toMap
  * @property {function} toSet
  * @property {function} toString
+ * @property {function} traverse
  * @property {function} valueOf
  * @property {function} factory
  * @property {function} of
