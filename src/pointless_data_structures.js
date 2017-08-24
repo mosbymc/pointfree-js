@@ -3,19 +3,6 @@ import { getWith } from './functionalHelpers';
 
 /** @module pointless_data_structures */
 
-//TODO: I need to figure out how to structure this lib. I'd like to have several different types of containers...
-//TODO: ...specifically, functors (pointed), monads, and maybe one other type. In addition, each container type
-//TODO: would have several implementations: maybe, option, constant, identity, future_functor, io, etc. It would make sense
-//TODO: to let the "higher" level containers delegate to the "lower" level implementations since they share all the
-//TODO: functionality of the "lower" containers and add to them. In addition, a lot of the containers will have the
-//TODO: same mapWith, flatMapWith, chain, apply, etc functionality; it would be nice to share this functionality as well.
-//TODO: Finally, I'd like to have each container in a category be capable of converting their underlying value to
-//TODO: another container of the same category without the use of 'apply', more in the manner of 'toContainerX'.
-//TODO: However, this means that each container in a given category has a dependency on all the other containers in
-//TODO: the same category. This, more than the rest, makes structuring this lib difficult. I'd like to, at the very
-//TODO: least, split each container category up so that they can be imported (and preferably downloaded) individually.
-//TODO: But the more separation between containers, the more they have to 'import' each other.
-
 /**
  * @signature
  * @description d

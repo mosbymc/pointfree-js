@@ -836,9 +836,50 @@ var list_core = {
     }
 };
 
+/**
+ * @signature
+ * @description Alias for {@link monads.list_core#concat}
+ * @memberOf monads.list_core
+ * @instance
+ * @function append
+ * @see monads.list_core#concat
+ * @param {Array | *} ys - a
+ * @return {monads.list_core} - b
+ */
 list_core.append = list_core.concat;
+
+/**
+ * @signature Object -> Object
+ * @description Alias for {@link monads.list_core#apply}
+ * @memberOf monads.list_core
+ * @instance
+ * @function ap
+ * @see monads.list_core#apply
+ * @param {Object} ma - Any object with a map function - i.e. a monad.
+ * @return {Object} Returns an instance of the monad object provide as an argument.
+ */
 list_core.ap = list_core.apply;
+
+/**
+ * @signature
+ * @description Alias for {@link monads.list_core#chain}
+ * @memberOf monads.list_core
+ * @instance
+ * @function fmap
+ * @param {function} fn - a
+ * @return {monads.list} - b
+ */
 list_core.fmap = list_core.chain;
+
+/**
+ * @signature
+ * @description Alias for {@link monads.list_core#chain}
+ * @memberOf monads.list_core
+ * @instance
+ * @function fmap
+ * @param {function} fn - a
+ * @return {monads.list} - b
+ */
 list_core.flapMap = list_core.chain;
 
 /**
@@ -853,6 +894,8 @@ list_core.flapMap = list_core.chain;
 list_core.bind = list_core.chain;
 
 /**
+ * @delegate
+ * @delegator {@link monads.list_core}
  * @description: A list_core delegator object that, in addition to the delegatable functionality
  * it has from the list_core object, also exposes .orderBy and .orderByDescending
  * functions. These functions allow a consumer to sort a List's data by
@@ -1047,6 +1090,7 @@ var listFromGen = source => createListDelegateInstance(invoke(source));
 
 /**
  * @signature
+ * @factory List
  * @description Creator function for a new List object. Takes any value/type as a parameter
  * and, if it has an iterator defined, with set it as the underlying source of the List as is,
  * or, wrap the item in an array if there is no defined iterator.
@@ -1141,7 +1185,8 @@ List.just = val => createListDelegateInstance([val], null,
 
 /**
  * @signature
- * @description d
+ * @description Takes a function and a seed value. The function is used to 'unfold' the seed value
+ * into an array which is used as the source of a new List monad.
  * @memberOf monads.List
  * @static
  * @function unfold
@@ -1154,13 +1199,14 @@ List.unfold = (fn, seed) => createListDelegateInstance(unfold(fn)(seed));
 
 /**
  * @signature
- * @description d
+ * @description Takes any value as an argument and returns a boolean indicating if
+ * the value is a list.
  * @memberOf monads.List
  * @static
  * @function is
  * @see List
- * @param {*} f - a
- * @return {boolean} - b
+ * @param {*} f - Any JavaScript value
+ * @return {boolean} - Returns a boolean indicating of the value is a list.
  */
 List.is = f => list_core.isPrototypeOf(f);
 
@@ -1173,9 +1219,9 @@ List.is = f => list_core.isPrototypeOf(f);
  * @static
  * @function repeat
  * @see List
- * @param {*} item - a
- * @param {number} count - b
- * @return {monads.ordered_list} - c
+ * @param {*} item - Any JavaScript value that should be used to build a new list monad.
+ * @param {number} count - The number of times the value should be repeated to build the list.
+ * @return {monads.ordered_list} - Returns a new ordered list monad.
  */
 List.repeat = function _repeat(item, count) {
     return createListDelegateInstance([], repeat(item, count), [{ keySelector: noop, comparer: noop, direction: sortDirection.descending }]);

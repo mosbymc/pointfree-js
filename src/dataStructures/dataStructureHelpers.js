@@ -1,4 +1,5 @@
 import { identity } from '../combinators';
+import { map } from '../pointless_data_structures';
 
 /** @module dataStructures/dataStructureHelpers */
 
@@ -8,20 +9,22 @@ import { identity } from '../combinators';
  * @param {Object} type - a
  * @return {function} - b
  */
-function toContainerType(type) {
+function monadTransformer(type) {
     return function toType(fn = identity) {
         return type.of(fn(this.value));
     };
 }
 
-function selfMapper(fn = identity) {
-    return this.map(fn);
-}
-
+/**
+ * @signature
+ * @description Applies mapping transformers from each monad to each monad
+ * @param {Array} types - An array containing each monad type factory function and associated delegate object
+ * @return {*} Returns the array of monad 'types' that it received as an argument.
+ */
 function applyTransforms(types) {
     var fns = types
         .map(type => [
-            { name: `mapTo${type.factory.name}`, fn: toContainerType(type.factory) },
+            { name: `mapTo${type.factory.name}`, fn: monadTransformer(type.factory) },
             { name: `to${type.factory.name}`, fn: function _toType() { return type.factory(this.value); } }
         ]);
 
@@ -30,12 +33,30 @@ function applyTransforms(types) {
             let regex = new RegExp(type.factory.name, 'i');
 
             fns.forEach(function _addTransformFunctionality(transforms) {
-                transforms.forEach(transform => type.delegate[transform.name] = regex.test(transform.name) ? selfMapper : transform.fn);
+                transforms.forEach(transform => type.delegate[transform.name] = regex.test(transform.name) ? map(type.delegate) : transform.fn);
             });
         }
     });
 
     return types;
+}
+
+/**
+ * @signature
+ * @description Accepts a list of monad delegates and applies the associated fantasy-land
+ * synonyms where applicable.
+ * @param {Array} monads - An array containing each monad type factory function and associated delegate object
+ * @return {*} Returns the array of monad 'types' that it received as an argument.
+ */
+function applyFantasyLandSynonyms(monads) {
+    monads.forEach(function _applyFantasyLandSynonyms(monad) {
+        if (monad.delegate) {
+            Object.keys(monad.delegate).forEach(function _forEachKey(key) {
+                if (key in fl) monad.delegate[fl[key]] = monad.delegate[key];
+            });
+        }
+    });
+    return monads;
 }
 
 /**
@@ -50,14 +71,9 @@ function monadIterator() {
         next: function _next() {
             if (first) {
                 first = false;
-                return {
-                    done: false,
-                    value: val
-                };
+                return { done: false, value: val };
             }
-            return {
-                done: true
-            };
+            return { done: true };
         }
     };
 }
@@ -311,9 +327,28 @@ var sharedEitherFns = {
 };
 
 var fl = {
-
+    equals: 'fantasy-land/equals',
+    lte: 'fantasy-land/lte',
+    compose: 'fantasy-land/compose',
+    id: 'fantasy-land/id',
+    concat: 'fantasy-land/concat',
+    empty: 'fantasy-land/empty',
+    map: 'fantasy-land/map',
+    contramap: 'fantasy-land/contramap',
+    ap: 'fantasy-land/ap',
+    of: 'fantasy-land/of',
+    alt: 'fantasy-land/alt',
+    zero: 'fantasy-land/zero',
+    reduce: 'fantasy-land/reduce',
+    traverse: 'fantasy-land/traverse',
+    chain: 'fantasy-land/chain',
+    chainRec: 'fantasy-land/chainRec',
+    extend: 'fantasy-land/extend',
+    extract: 'fantasy-land/extract',
+    bimap: 'fantasy-land/bimap',
+    promap: 'fantasy-land/promap'
 };
 
 export { apply, applyTransforms, chain, monadIterator, disjunctionEqualMaker, equalMaker, lifter, maybeFactoryHelper,
         mjoin, pointMaker, stringMaker, valueOf, get, emptyGet, orElse, emptyOrElse, getOrElse, emptyGetOrElse, sharedMaybeFns,
-        sharedEitherFns };
+        sharedEitherFns, applyFantasyLandSynonyms };

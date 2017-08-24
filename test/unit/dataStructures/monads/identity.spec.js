@@ -409,6 +409,20 @@ describe('Identity monad test', function _testIdentityMonad() {
             Identity(null).factory.should.eql(Identity);
             Identity(null).constructor.should.eql(Identity);
         });
+
+        it('should have the fantasy land aliases', function _testForFantasyLandAliasPresence() {
+            var i = Identity();
+
+            i.map.should.eql(i['fantasy-land/map']);
+            i.chain.should.eql(i['fantasy-land/chain']);
+            i.ap.should.eql(i['fantasy-land/ap']);
+            i.bimap.should.eql(i['fantasy-land/bimap']);
+            i.reduce.should.eql(i['fantasy-land/reduce']);
+            i.traverse.should.eql(i['fantasy-land/traverse']);
+            i.equals.should.eql(i['fantasy-land/equals']);
+            i.empty.should.eql(i['fantasy-land/empty']);
+            i.of.should.eql(i['fantasy-land/of']);
+        });
     });
 
     describe('Identity laws test', function _testIdentityFunctorLaws() {
