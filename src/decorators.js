@@ -30,7 +30,7 @@ var invoker = func => fn => (...args) => func(fn, ...args);
  * @param {*} args - The arguments that each function should be invoked with.
  * @return {*} - The return value of the first function.
  */
-var after = curryN(this, 3, function _after(fn, decoration, ...args) {
+var after = curryN.call(this, 3, function _after(fn, decoration, ...args) {
     var ret = fn(...args);
     decoration(...args);
     return ret;
@@ -56,7 +56,7 @@ var apply = invoker((fn, ...args) => fn(...args));
  * @param {*} args - c
  * @return {*} - d
  */
-var before = curryN(this, 3, function _before(fn, decoration, ...args) {
+var before = curryN.call(this, 3, function _before(fn, decoration, ...args) {
     decoration(...args);
     return fn(...args);
 });
@@ -71,7 +71,7 @@ var before = curryN(this, 3, function _before(fn, decoration, ...args) {
  * binary function.
  * @return {function} - A function waiting for both arguments to be applied.
  */
-var binary = (fn, ...args) => curryN(this, 2, fn, ...args);
+var binary = (fn, ...args) => curryN.call(this, 2, fn, ...args);
 
 /**
  * @signature {*} -> (* -> *) -> (* -> *)
@@ -270,7 +270,7 @@ var tap = curry(function _tap(fn, arg) {
  * and given, the function is invoked immediately with the first three values.
  * @return {function} - c
  */
-var ternary = (fn, ...args) => curryN(this, 3, fn, ...args);
+var ternary = (fn, ...args) => curryN.call(this, 3, fn, ...args);
 
 /**
  * @signature
@@ -281,7 +281,7 @@ var ternary = (fn, ...args) => curryN(this, 3, fn, ...args);
  * @return {function} - c
  */
 var tryCatch = curry(function _tryCatch(catcher, tryer) {
-    return curryN(this, tryer.length, function _tryCatch_(...args) {
+    return curryN.call(this, tryer.length, function _tryCatch_(...args) {
         try {
             return tryer(...args);
         }
@@ -303,7 +303,7 @@ var tryCatch = curry(function _tryCatch(catcher, tryer) {
  * before invocation, or the result of applying the function to the provided
  * argument.
  */
-var unary = (fn, arg) => undefined === arg ? curryN(this, 1, fn) : fn(arg);
+var unary = (fn, arg) => undefined === arg ? curryN.call(this, 1, fn) : fn(arg);
 
 /**
  * @signature

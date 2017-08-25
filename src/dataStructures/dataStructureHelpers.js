@@ -157,6 +157,17 @@ function chain(fn) {
     return Object.getPrototypeOf(this).isPrototypeOf(val) ? val : this.of(val);
 }
 
+function chainRec(fn, val) {
+    var next = x => ({ done: false, value: x }),
+        done = x => ({ done: true, value: x }),
+        state = { done: false, value: val };
+
+    while (!state.done) {
+        state = fn(next, done, state.value).value;
+    }
+    return this.of(state.value);
+}
+
 /**
  * @signature
  * @description d

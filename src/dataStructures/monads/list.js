@@ -628,7 +628,7 @@ var list_core = {
      * @memberOf monads.list_core
      * @instance
      * @function toEvaluatedList
-     * @return {monads.list_core} - a
+     * @return {monads.list} - a
      */
     toEvaluatedList: function _toEvaluatedList() {
         return List.from(this.data /* the .data property is a getter function that forces evaluation */);
@@ -784,7 +784,7 @@ var list_core = {
      * @memberOf monads.list_core
      * @instance
      * @function traverse
-     * @param {function} fa - a
+     * @param {Object} fa - a
      * @param {function} fn - b
      * @return {monads.list} - c
      */

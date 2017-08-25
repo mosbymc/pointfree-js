@@ -123,13 +123,12 @@ function constant(item) {
  */
 function curry(fn) {
     if (!fn.length || 1 >= fn.length) return fn;
-    return curryN(this, fn.length, fn);
+    return curryN.call(this, fn.length, fn);
 }
 
 /**
  * @signature curryN :: (* -> a) -> (* -> a)
  * @description Curries a function to a specified arity
- * @param {Object} context - The context the curried function should be invoked with
  * @param {number} arity - The number of arguments to curry the function for
  * @param {function} fn - The function to be curried
  * @param {Array} [received] - An optional array of the arguments to be applied to the
@@ -142,12 +141,12 @@ function curry(fn) {
  *      var c = curryN(this, 5, (a, b, c) => a + b + c);
  *      c(1, 2)(3)(4, 5)    //6
  */
-function curryN(context, arity, fn, received = []) {
-    if (fn.orig && fn.orig !== fn) return curryN(context, arity, fn.orig, received);
+function curryN(arity, fn, received = []) {
+    if (fn.orig && fn.orig !== fn) return curryN.call(this, arity, fn.orig, received);
     function _curryN(...rest) {
         var combined = received.concat(rest);
-        if (arity > combined.length) return curryN(context, arity, fn, combined);
-        return fn.call(context, ...combined.slice(0, arity));
+        if (arity > combined.length) return curryN.call(this, arity, fn, combined);
+        return fn.call(this, ...combined.slice(0, arity));
     }
 
     _curryN.orig = fn;
@@ -179,7 +178,7 @@ function curryRight(fn) {
      * received yet, other wise it returns whatever the return value of the last function
      * in the pipeline returned.
      */
-    return curryN(this, fn.length, function _wrapper(...args) {
+    return curryN.call(this, fn.length, function _wrapper(...args) {
         return fn.call(this, ...args.reverse());
     });
 }
@@ -463,7 +462,7 @@ function uncurry(fn) {
  *      c(1, 2)     //NaN
  */
 var uncurryN = curry(function uncurryN(depth, fn) {
-    return curryN(this, depth, function _uncurryN(...args) {
+    return curryN.call(this, depth, function _uncurryN(...args) {
         var currentDepth = 1,
             value = fn,
             idx = 0,

@@ -181,10 +181,11 @@ var identity = {
      * @function fold
      * @param {function} fn - Any mapping function that should be applied to the underlying value
      * of the identity monad.
+     * @param {*} acc - An JavaScript value that should be used as an accumulator.
      * @return {*} Returns the return value of the mapping function provided as an argument.
      */
-    fold: function _fold(fn) {
-        return fn(this.value);
+    fold: function _fold(fn, acc) {
+        return fn(acc, this.value);
     },
     /**
      * @signature monad -> monad<monad<T>>
@@ -198,7 +199,7 @@ var identity = {
      * and identity monad that 'wraps' the current identity monad's underlying value.
      */
     sequence: function _sequence(p) {
-        return this.traverse(p.of, p.of);
+        return this.traverse(p, p.of);
     },
     /**
      * @signature Object -> () -> Object
