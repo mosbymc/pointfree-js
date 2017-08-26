@@ -1,7 +1,7 @@
 import { identity } from '../combinators';
 import { map } from '../pointless_data_structures';
 
-/** @module dataStructures/dataStructureHelpers */
+/** @module dataStructures/data_structure_util */
 
 /**
  * @signature
@@ -157,6 +157,15 @@ function chain(fn) {
     return Object.getPrototypeOf(this).isPrototypeOf(val) ? val : this.of(val);
 }
 
+/**
+ * @signature
+ * @description Chain recursive
+ * @param {function} fn - A function that should be called recursively
+ * @param {*} val - Any JavaScript value that should be used as the initial
+ * value for the recursive function.
+ * @return {Object} Returns a monad that wraps the final value 'yielded' out
+ * of the recursive function.
+ */
 function chainRec(fn, val) {
     var next = x => ({ done: false, value: x }),
         done = x => ({ done: true, value: x }),
@@ -362,4 +371,4 @@ var fl = {
 
 export { apply, applyTransforms, chain, monadIterator, disjunctionEqualMaker, equalMaker, lifter, maybeFactoryHelper,
         mjoin, pointMaker, stringMaker, valueOf, get, emptyGet, orElse, emptyOrElse, getOrElse, emptyGetOrElse, sharedMaybeFns,
-        sharedEitherFns, applyFantasyLandSynonyms };
+        sharedEitherFns, applyFantasyLandSynonyms, chainRec };

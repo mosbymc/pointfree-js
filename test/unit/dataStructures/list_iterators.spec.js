@@ -1,7 +1,7 @@
 import { all, any, except, intersect, union, map, chain, groupBy, sortBy, prepend, concat, groupJoin, join, zip, filter, intersperse,
         contains, first, last, count, foldLeft, reduceRight, distinct, ofType, binarySearch, equals, takeWhile, skipWhile, reverse,
         copyWithin, fill, findIndex, findLastIndex, repeat, foldRight, unfold } from '../../../src/dataStructures/list_iterators';
-import { createListCreator } from '../../../src/dataStructures/list_helpers';
+import { createListCreator } from '../../../src/dataStructures/list_util';
 import { list, ordered_list } from '../../../src/dataStructures/monads/list';
 import { cacher, javaScriptTypes, sortDirection, typeNames } from '../../../src/helpers';
 import { testData } from '../../testData';

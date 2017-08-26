@@ -1,6 +1,6 @@
 import { compose, constant } from '../../combinators';
 import { type, strictEquals } from '../../functionalHelpers';
-import { apply, chain, mjoin, pointMaker, equalMaker, stringMaker, valueOf } from '../dataStructureHelpers';
+import { apply, chain, mjoin, pointMaker, equalMaker, stringMaker, valueOf } from '../data_structure_util';
 import { javaScriptTypes } from '../../helpers';
 
 /**

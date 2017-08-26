@@ -6,7 +6,7 @@ import { Io, io } from './io';
 import { List, list_core } from './list';
 import { Maybe, Just, Nothing, just, nothing } from './maybe';
 import { Validation, validation } from './validation';
-import { applyTransforms, monadIterator, lifter, applyFantasyLandSynonyms } from '../dataStructureHelpers';
+import { applyTransforms, monadIterator, lifter, applyFantasyLandSynonyms } from '../data_structure_util';
 
 /**
  * @module dataStructures/monads

@@ -1,4 +1,4 @@
-import { apply, chain, mjoin, pointMaker, equalMaker, stringMaker, valueOf } from '../dataStructureHelpers';
+import { apply, chain, mjoin, pointMaker, equalMaker, stringMaker, valueOf } from '../data_structure_util';
 
 function Validation(val) {
     return Object.create(validation, {

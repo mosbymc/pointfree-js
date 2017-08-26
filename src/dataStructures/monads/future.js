@@ -1,5 +1,5 @@
 import { noop, once, type, strictEquals } from '../../functionalHelpers';
-import { apply, mjoin, pointMaker, valueOf } from '../dataStructureHelpers';
+import { apply, mjoin, pointMaker, valueOf } from '../data_structure_util';
 import { javaScriptTypes } from '../../helpers';
 
 /**

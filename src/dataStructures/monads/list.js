@@ -5,7 +5,7 @@ import { sortDirection, generatorProto } from '../../helpers';
 import { wrap, defaultPredicate, delegatesFrom, isArray, noop, invoke } from '../../functionalHelpers';
 import { when, ifElse, identity } from '../../combinators';
 import { not } from '../../decorators';
-import { createListCreator, taker_skipper, listExtensionHelper } from '../list_helpers';
+import { createListCreator, taker_skipper, listExtensionHelper } from '../list_util';
 
 /**
  * @description: Object that contains the core functionality of a List; both the m_list and ordered_m_list

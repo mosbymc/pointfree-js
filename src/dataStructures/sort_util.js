@@ -1,9 +1,9 @@
 import { deepClone, sortComparer } from '../helpers';
 
-/** @module dataStructures/sortHelpers */
+/** @module dataStructures/sort_util */
 
 /**
- * @sig
+ * @signature
  * @description d
  * @param {Array} data - a
  * @param {Object} sortObject - b
@@ -58,7 +58,7 @@ function sortData(data, sortObject) {
 }
 
 /**
- * @sig
+ * @signature
  * @description d
  * @param {Array} data - a
  * @param {function} keySelector - b
@@ -74,7 +74,7 @@ function mergeSort(data, keySelector, comparer, direction) {
 }
 
 /**
- * @sig
+ * @signature
  * @description d
  * @param {Array} left - a
  * @param {Array} right - b
@@ -93,7 +93,7 @@ function merge(left, right, keySelector, comparer, direction) {
 }
 
 /**
- * @sig
+ * @signature
  * @description d
  * @param {Array} source - a
  * @param {string} dir - b
@@ -114,7 +114,7 @@ function quickSort(source, dir, keySelector, keyComparer) {
 }
 
 /**
- * @sig
+ * @signature
  * @description d
  * @param {Array} data - a
  * @param {number} left - b
@@ -157,7 +157,7 @@ function qSort(data, left, right, dir, keySelector, keyComparer) {
 }
 
 /**
- * @sig
+ * @signature
  * @description d
  * @param {Array} source - a
  * @param {function} keySelector - b
@@ -178,7 +178,7 @@ function insertionSort(source, keySelector, keyComparer, direction) {
 }
 
 /**
- * @sig
+ * @signature
  * @description d
  * @param {Array} source - a
  * @param {function} keySelector - b

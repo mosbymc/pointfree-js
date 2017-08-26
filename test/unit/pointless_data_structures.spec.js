@@ -1,5 +1,5 @@
 import { isConstant, isEither, isFuture, isIdentity, isIo, isJust, isLeft,
-        isList, isMaybe, isMonad, isNothing, isRight, isValidation } from '../../src/functional_data_structure_helpers';
+    isList, isMaybe, isMonad, isNothing, isRight, isValidation } from '../../src/pointless_data_structures';
 import * as monads from '../../src/dataStructures/monads/monads';
 
 describe('Test functionalContainerHelpers', function _testFunctionalContainerHelpers() {

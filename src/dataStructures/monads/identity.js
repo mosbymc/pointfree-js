@@ -1,5 +1,5 @@
 import { nil } from '../../helpers';
-import { apply, chain, mjoin, equalMaker, pointMaker, stringMaker, valueOf, get, orElse, getOrElse } from '../dataStructureHelpers';
+import { apply, chain, mjoin, equalMaker, pointMaker, stringMaker, valueOf, get, orElse, getOrElse } from '../data_structure_util';
 
 /**
  * @signature - :: * -> {@link monads.identity}
