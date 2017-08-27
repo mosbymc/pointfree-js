@@ -306,7 +306,7 @@ function foldLeft(xs, fn, initial = 0) {
 /**
  * @sig
  * @description d
- * @param {Array} arr - a
+ * @param {Array|monads.list_core} arr - a
  * @param {function} op - b
  * @param {*} acc - c
  * @return {*} - d
@@ -709,7 +709,7 @@ function copyWithin(idx, start, end, xs) {
  * @param {*} val - a
  * @param {number} start - b
  * @param {number} end - c
- * @param {Array} xs - d
+ * @param {Array|monads.list_core} xs - d
  * @return {generator} - e
  */
 function fill(val, start, end, xs) {

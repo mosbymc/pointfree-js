@@ -28,11 +28,6 @@ function createListCreator(baseListType, sortedListType, groupedListType) {
                         writable: false,
                         configurable: false
                     },
-                    data: {
-                        get: function _getData() {
-                            return Array.from(this);
-                        }
-                    },
                     [Symbol.iterator]: {
                         value: iterator
                     }
@@ -48,11 +43,6 @@ function createListCreator(baseListType, sortedListType, groupedListType) {
                         value: source,
                         writable: false,
                         configurable: false
-                    },
-                    data: {
-                        get: function _getData() {
-                            return Array.from(this);
-                        }
                     },
                     _appliedSorts: {
                         value: sortObj,
@@ -72,11 +62,6 @@ function createListCreator(baseListType, sortedListType, groupedListType) {
                         value: source,
                         writable: false,
                         configurable: false
-                    },
-                    data: {
-                        get: function _getData() {
-                            return Array.from(this);
-                        }
                     },
                     _appliedSorts: {
                         value: sortObj,
@@ -98,11 +83,6 @@ function createListCreator(baseListType, sortedListType, groupedListType) {
                         value: source,
                         writable: false,
                         configurable: false
-                    },
-                    data: {
-                        get: function _getData() {
-                            return Array.from(this);
-                        }
                     },
                     _key: {
                         value: key,
@@ -126,11 +106,6 @@ function createListCreator(baseListType, sortedListType, groupedListType) {
                         value: source,
                         writable: false,
                         configurable: false
-                    },
-                    data: {
-                        get: function _getData() {
-                            return Array.from(this);
-                        }
                     }
                 });
         }

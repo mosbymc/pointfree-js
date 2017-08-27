@@ -47,6 +47,7 @@ import { createListCreator, taker_skipper, listExtensionHelper } from '../list_u
  * @property {function} any
  * @property {function} count
  * @property {function} equals
+ * @property {function} data
  * @property {function} findIndex
  * @property {function} findLastIndex
  * @property {function} first
@@ -104,6 +105,7 @@ var list_core = {
      * @memberOf monads.list_core
      * @instance
      * @function copyWithin
+     * @this monads.list_core
      * @param {number} index - a
      * @param {number} start - b
      * @param {number} end - c
@@ -122,6 +124,7 @@ var list_core = {
      * @memberOf monads.list_core
      * @instance
      * @function concat
+     * @this monads.list_core
      * @param {Array | *} ys - a
      * @return {monads.list_core} - b
      */
@@ -135,6 +138,7 @@ var list_core = {
      * @memberOf monads.list_core
      * @instance
      * @function distinct
+     * @this monads.list_core
      * @param {function} comparer - a
      * @return {monads.list_core} - b
      */
@@ -155,6 +159,7 @@ var list_core = {
      * @memberOf monads.list_core
      * @instance
      * @function except
+     * @this monads.list_core
      * @param {Array|generator} xs - a
      * @param {function} comparer - b
      * @return {monads.list_core} - c
@@ -169,6 +174,7 @@ var list_core = {
      * @memberOf monads.list_core
      * @instance
      * @function fill
+     * @this monads.list_core
      * @param {number} value - a
      * @param {number} start - b
      * @param {number} end - c
@@ -184,6 +190,7 @@ var list_core = {
      * @memberOf monads.list_core
      * @instance
      * @function filter
+     * @this monads.list_core
      * @param {function} predicate - a
      * @return {monads.list_core} - b
      */
@@ -197,6 +204,7 @@ var list_core = {
      * @memberOf monads.list_core
      * @instance
      * @function groupBy
+     * @this monads.list_core
      * @param {function} keySelector - a
      * @param {function} comparer - b
      * @return {monads.list_core} - c
@@ -212,6 +220,7 @@ var list_core = {
      * @memberOf monads.list_core
      * @instance
      * @function groupByDescending
+     * @this monads.list_core
      * @param {function} keySelector - a
      * @param {function} comparer - b
      * @return {monads.list_core} - c
@@ -233,6 +242,7 @@ var list_core = {
      * @memberOf monads.list_core
      * @instance
      * @function groupJoin
+     * @this monads.list_core
      * @param {monads.list_core | Array} ys - a
      * @param {function} xSelector - b
      * @param {function} ySelector - c
@@ -256,6 +266,7 @@ var list_core = {
      * @memberOf monads.list_core
      * @instance
      * @function intersect
+     * @this monads.list_core
      * @param {Array|generator} xs - a
      * @param {function} comparer - b
      * @return {monads.list_core} - c
@@ -270,6 +281,7 @@ var list_core = {
      * @memberOf monads.list_core
      * @instance
      * @function intersperse
+     * @this monads.list_core
      * @param {*} val - a
      * @return {monads.list_core} - b
      */
@@ -288,6 +300,7 @@ var list_core = {
      * @memberOf monads.list_core
      * @instance
      * @function join
+     * @this monads.list_core
      * @param {Array|List} ys - a
      * @param {function} xSelector - b
      * @param {function} ySelector - c
@@ -305,6 +318,7 @@ var list_core = {
      * @memberOf monads.list_core
      * @instance
      * @function map
+     * @this monads.list_core
      * @param {function} mapFunc - a
      * @return {monads.list_core} - b
      */
@@ -318,6 +332,7 @@ var list_core = {
      * @memberOf monads.list_core
      * @instance
      * @function ofType
+     * @this monads.list_core
      * @param {string|Object} type - a
      * @returns {monads.list_core} - b
      */
@@ -331,6 +346,7 @@ var list_core = {
      * @memberOf monads.list_core
      * @instance
      * @function prepend
+     * @this monads.list_core
      * @param {Array|generator} xs - a
      * @return {monads.list_core} - b
      */
@@ -344,6 +360,7 @@ var list_core = {
      * @memberOf monads.list_core
      * @instance
      * @function reverse
+     * @this monads.list_core
      * @return {monads.list_core} - a
      */
     reverse: function _reverse() {
@@ -359,6 +376,7 @@ var list_core = {
      * @memberOf monads.list_core
      * @instance
      * @function skip
+     * @this monads.list_core
      * @param {number} amt - The number of items in the source to skip before
      * returning the remainder.
      * @return {monads.list_core} - a
@@ -373,6 +391,7 @@ var list_core = {
      * @memberOf monads.list_core
      * @instance
      * @function skipWhile
+     * @this monads.list_core
      * @param {function} predicate - a
      * @return {monads.list_core} - b
      */
@@ -386,6 +405,7 @@ var list_core = {
      * @memberOf monads.list_core
      * @instance
      * @function take
+     * @this monads.list_core
      * @param {number} amt - a
      * @return {monads.list_core} - b
      */
@@ -399,6 +419,7 @@ var list_core = {
      * @memberOf monads.list_core
      * @instance
      * @function takeWhile
+     * @this monads.list_core
      * @param {function} predicate - a
      * @return {monads.list_core} - b
      */
@@ -417,6 +438,7 @@ var list_core = {
      * @memberOf monads.list_core
      * @instance
      * @function union
+     * @this monads.list_core
      * @param {Array|generator} xs - a
      * @param {function} comparer - b
      * @return {monads.list_core} - c
@@ -436,6 +458,7 @@ var list_core = {
      * @memberOf monads.list_core
      * @instance
      * @function zip
+     * @this monads.list_core
      * @param {function} selector - a
      * @param {Array|generator} xs - b
      * @return {monads.list_core} - c
@@ -450,6 +473,7 @@ var list_core = {
      * @memberOf monads.list_core
      * @instance
      * @function all
+     * @this monads.list_core
      * @param {function} predicate - a
      * @return {boolean} - b
      */
@@ -463,6 +487,7 @@ var list_core = {
      * @memberOf monads.list_core
      * @instance
      * @function any
+     * @this monads.list_core
      * @param {function} predicate - a
      * @return {boolean} - b
      */
@@ -476,6 +501,7 @@ var list_core = {
      * @memberOf monads.list_core
      * @instance
      * @function count
+     * @this monads.list_core
      * @param {function} predicate - a
      * @return {Number} -  b
      */
@@ -488,7 +514,21 @@ var list_core = {
      * @description d
      * @memberOf monads.list_core
      * @instance
+     * @this monads.list_core
+     * @return {Array} Returns an array after evaluating the entire pipeline by running
+     * the initial underlying data through each function.
+     */
+    get data() {
+        return Array.from(this);
+    },
+
+    /**
+     * @signature
+     * @description d
+     * @memberOf monads.list_core
+     * @instance
      * @function equals
+     * @this monads.list_core
      * @param {monads.list_core} f - a
      * @param {function} comparer - b
      * @return {boolean} - c
@@ -503,6 +543,7 @@ var list_core = {
      * @memberOf monads.list_core
      * @instance
      * @function findIndex
+     * @this monads.list_core
      * @param {function} comparer - a
      * @return {Number} - b
      */
@@ -516,6 +557,7 @@ var list_core = {
      * @memberOf monads.list_core
      * @instance
      * @function findLastIndex
+     * @this monads.list_core
      * @param {function} comparer - a
      * @return {Number} - b
      */
@@ -529,6 +571,7 @@ var list_core = {
      * @memberOf monads.list_core
      * @instance
      * @function first
+     * @this monads.list_core
      * @param {function} predicate - a
      * @return {*} - b
      */
@@ -542,6 +585,7 @@ var list_core = {
      * @memberOf monads.list_core
      * @instance
      * @function foldl
+     * @this monads.list_core
      * @param {function} fn - a
      * @param {*} acc - b
      * @return {*} - c
@@ -556,6 +600,7 @@ var list_core = {
      * @memberOf monads.list_core
      * @instance
      * @function foldr
+     * @this monads.list_core
      * @param {function} fn - a
      * @param {*} acc - b
      * @return {*} - c
@@ -582,6 +627,7 @@ var list_core = {
      * @memberOf  monads.list_core
      * @instance
      * @function last
+     * @this monads.list_core
      * @param {function} predicate - a
      * @return {*} - b
      */
@@ -595,6 +641,7 @@ var list_core = {
      * @memberOf monads.list_core
      * @instance
      * @function reduceRight
+     * @this monads.list_core
      * @param {function} fn - a
      * @param {*} acc - b
      * @return {*} - c
@@ -719,7 +766,7 @@ var list_core = {
      * @function of
      * @param {*} xs - a
      * @param {generator} [iterator] - b
-     * @param {Array} [sortObj] - c
+     * @param {Array.<Object>} [sortObj] - c
      * @param {string} [key] - d
      * @return {monads.list_core} - e
      */
