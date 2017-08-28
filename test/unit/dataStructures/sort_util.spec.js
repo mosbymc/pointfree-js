@@ -1,6 +1,11 @@
-import { sortData } from '../../../src/dataStructures/sort_util';
+import { sortData, quickSort, insertionSort, mergeSort } from '../../../src/dataStructures/sort_util';
 import { sortDirection } from '../../../src/helpers'
 import { testData } from '../../testData';
+
+function sortComparer(x, y, dir) {
+    var t = x > y ? 1 : x === y ? 0 : -1;
+    return sortDirection.descending === dir ? t : -t;
+}
 
 /*
  describe('sortData', function testSortData() {
@@ -152,6 +157,59 @@ describe('sort data 2', function test() {
                 else {
                     item.FirstName.should.be.at.most(previousFieldsValues[1]);
                 }
+            }
+        });
+    });
+});
+
+describe('Test merge sort', function _testMergeSort() {
+    var previousFieldsValues = [];
+
+    function keySelector(item) {
+        return item.FirstName;
+    }
+
+    it('should sort the data ascending via merge sort algorithm', function _mergeSortAscendingTest() {
+        var sortedData = mergeSort(testData.dataSource.data, keySelector, sortComparer, 1);
+
+        sortedData.forEach(function _validateResults(item) {
+            if (!previousFieldsValues.length) previousFieldsValues.push(item.FirstName);
+            else {
+                item.FirstName.should.be.at.least(previousFieldsValues[0]);
+                if (item.FirstName !== previousFieldsValues[0]) previousFieldsValues[0] = item.FirstName;
+            }
+        });
+    });
+
+    it('should sort the data descending via merge sort algorithm', function _mergeSortDescendingTest() {
+        var sortedData = mergeSort(testData.dataSource.data, keySelector, sortComparer, 2);
+
+        sortedData.forEach(function _validateResults(item) {
+            if (!previousFieldsValues.length) previousFieldsValues.push(item.FirstName);
+            else {
+                item.FirstName.should.be.at.most(previousFieldsValues[0]);
+                if (item.FirstName !== previousFieldsValues[0]) previousFieldsValues[0] = item.FirstName;
+            }
+        });
+    });
+});
+
+
+describe('Test quick sort', function _testQuickSort() {
+    var previousFieldsValues = [];
+
+    function keySelector(item) {
+        return item.FirstName;
+    }
+
+    it('should sort the data in ascending order via the quick sort algorithm', function _quickSortAscendingTest() {
+        var sortedData = quickSort(testData.dataSource.data, 1, keySelector, sortComparer);
+
+        sortedData.forEach(function _validateResults(item) {
+            if (!previousFieldsValues.length) previousFieldsValues.push(item.FirstName);
+            else {
+                item.FirstName.should.be.at.least(previousFieldsValues[0]);
+                if (item.FirstName !== previousFieldsValues[0]) previousFieldsValues[0] = item.FirstName;
             }
         });
     });

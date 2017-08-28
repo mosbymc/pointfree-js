@@ -6,14 +6,14 @@ import { deepClone, sortComparer } from '../helpers';
  * @signature
  * @description d
  * @param {Array} data - a
- * @param {Object} sortObject - b
+ * @param {Array} sortObject - b
  * @return {Array} - Returns an array sorted on 'n' fields in either ascending or descending
  * order for each field as specified in the 'sortObject' parameter
  */
 function sortData(data, sortObject) {
     var sortedData = data;
     sortObject.forEach(function _sortItems(sort, index) {
-        var comparer = sortObject.comparer && 'function' === typeof sort.comparer ? sort.comparer : sortComparer;
+        var comparer = 'function' === typeof sort.comparer ? sort.comparer : sortComparer;
         if (0 === index) sortedData = 5001 > data.length ?
             insertionSort(data, sort.keySelector, comparer, sort.direction) : mergeSort(data, sort.keySelector, comparer, sort.direction);
         //if (index === 0) sortedData = quickSort(data, sort.direction, sort.keySelector, comparer);
@@ -63,7 +63,7 @@ function sortData(data, sortObject) {
  * @param {Array} data - a
  * @param {function} keySelector - b
  * @param {function} comparer - c
- * @param {string} direction - d
+ * @param {number} direction - d
  * @return {Array} - e
  */
 function mergeSort(data, keySelector, comparer, direction) {
@@ -80,7 +80,7 @@ function mergeSort(data, keySelector, comparer, direction) {
  * @param {Array} right - b
  * @param {function} keySelector - c
  * @param {function} comparer - d
- * @param {string} direction - e
+ * @param {number} direction - e
  * @return {Array} - f
  */
 function merge(left, right, keySelector, comparer, direction) {
@@ -96,7 +96,7 @@ function merge(left, right, keySelector, comparer, direction) {
  * @signature
  * @description d
  * @param {Array} source - a
- * @param {string} dir - b
+ * @param {number} dir - b
  * @param {function} keySelector - c
  * @param {function} keyComparer - d
  * @return {Array} - Returns a sort array
@@ -119,20 +119,21 @@ function quickSort(source, dir, keySelector, keyComparer) {
  * @param {Array} data - a
  * @param {number} left - b
  * @param {number} right - c
- * @param {string} dir - d
+ * @param {number} dir - d
  * @param {function} keySelector - f
  * @param {function} keyComparer - g
  * @return {Array} - h
  */
 function qSort(data, left, right, dir, keySelector, keyComparer) {
+    var count = 0;
     do {
         var i = left,
             j = right,
             itemIdx = i + ((j - i) >> 1);
 
         do {
-            while (i < data.length && 0 < keyComparer(keySelector, itemIdx, i, data, dir)) ++i;
-            while (0 <= j && 0 > keyComparer(keySelector, itemIdx, j, data, dir)) --j;
+            while (i < data.length && 0 < keyComparer(keySelector(data[itemIdx]), keySelector(data[i]), dir)) ++i;
+            while (0 <= j && 0 > keyComparer(keySelector(data[itemIdx]), keySelector(data[j]), dir)) --j;
             if (i > j) break;
             if (i < j) {
                 let tmp = data[i];
@@ -152,8 +153,9 @@ function qSort(data, left, right, dir, keySelector, keyComparer) {
             if (i < right) qSort(data, i, right, dir, keySelector, keyComparer);
             right = j;
         }
+         console.log(`left: ${left}`, `right: ${right}`);
     }
-    while (left < right);
+    while (left < right || 2000 < count);
 }
 
 /**
@@ -200,4 +202,4 @@ function iSort(source, keySelector, keyComparer, direction) {
     }
 }
 
-export { sortData, quickSort };
+export { sortData, quickSort, mergeSort, insertionSort };

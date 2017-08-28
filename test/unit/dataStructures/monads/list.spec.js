@@ -242,6 +242,11 @@ describe('List functor test', function _testListFunctor() {
 
     describe('List functor object unique fields tests', function _testListFunctorUniqueFields() {
         describe('Deferred execution list functions', function _testDeferredExecutionListFunctions() {
+            function sortComparer(x, y, dir) {
+                var t = x > y ? 1 : x === y ? 0 : -1;
+                return 2 === dir ? t : -t;
+            }
+
             it('should return two lists concatenated with the non-this list at the front', function _testAddFront() {
                 var list = List.from([1, 2, 3, 4, 5]),
                     arr = [6, 7, 8, 9, 10];
@@ -603,27 +608,27 @@ describe('List functor test', function _testListFunctor() {
 
             it('should sort a list in ascending order', function _testSortBy() {
                 List([10, 9, 8, 7, 6, 5, 4, 3, 2, 1])
-                    .sortBy(x => x)
+                    .sortBy(x => x, sortComparer)
                     .data.should.eql([1, 2, 3, 4, 5, 6, 7, 8, 9, 10]);
             });
 
             it('should sort a list in descending order', function _testSortByDescending() {
                 List([1, 2, 3, 4, 5, 6, 7, 8, 9, 10])
-                    .sortByDescending(x => x)
+                    .sortByDescending(x => x, sortComparer)
                     .data.should.eql([10, 9, 8, 7, 6, 5, 4, 3, 2, 1]);
             });
 
             it('should sort a list in ascending order twice', function _testThenBy() {
                 List([[10, 1], [10, 5], [10, 2], [9, 9], [9, 3], [8, 1], [9, 10], [8, 0], [7, 2], [7, 1]])
-                    .sortBy(x => x[0])
-                    .thenBy(x => x[1])
+                    .sortBy(x => x[0], sortComparer)
+                    .thenBy(x => x[1], sortComparer)
                     .data.should.eql([[7, 1], [7, 2], [8, 0], [8, 1], [9, 3], [9, 9], [9, 10], [10, 1], [10, 2], [10, 5]]);
             });
 
             it('should sort a list in ascending order and then descending order', function _testThenByDescending() {
                 List([[10, 1], [10, 5], [10, 2], [9, 9], [9, 3], [8, 1], [9, 10], [8, 0], [7, 2], [7, 1]])
-                    .sortBy(x => x[0])
-                    .thenByDescending(x => x[1])
+                    .sortBy(x => x[0], sortComparer)
+                    .thenByDescending(x => x[1], sortComparer)
                     .data.should.eql([[7, 2], [7, 1], [8, 1], [8, 0], [9, 10], [9, 9], [9, 3], [10, 5], [10, 2], [10, 1]]);
             });
         });

@@ -967,7 +967,7 @@ var list = Object.create(list_core, {
      * @return {ordered_list} - c
      */
     sortBy: {
-        value: function _orderBy(keySelector, comparer = defaultPredicate) {
+        value: function _orderBy(keySelector = identity, comparer = defaultPredicate) {
             var sortObj = [{ keySelector: keySelector, comparer: comparer, direction: sortDirection.ascending }];
             return this.of(this, sortBy(this, sortObj), sortObj);
         }
