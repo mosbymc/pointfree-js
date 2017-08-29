@@ -1,7 +1,8 @@
 import { identity } from '../combinators';
-import { map } from '../pointless_data_structures';
 
 /** @module dataStructures/data_structure_util */
+
+var map = m => fn => m.map(fn);
 
 /**
  * @signature
@@ -84,6 +85,7 @@ function monadIterator() {
  * @return {*} - a
  */
 function get() {
+    console.log(this.value);
     return this.value;
 }
 
@@ -161,18 +163,16 @@ function chain(fn) {
  * @signature
  * @description Chain recursive
  * @param {function} fn - A function that should be called recursively
- * @param {*} val - Any JavaScript value that should be used as the initial
- * value for the recursive function.
  * @return {Object} Returns a monad that wraps the final value 'yielded' out
  * of the recursive function.
  */
-function chainRec(fn, val) {
+function chainRec(fn) {
     var next = x => ({ done: false, value: x }),
         done = x => ({ done: true, value: x }),
-        state = { done: false, value: val };
+        state = { done: false, value: this.value };
 
     while (!state.done) {
-        state = fn(next, done, state.value).value;
+        state = fn(next, done, state.value);
     }
     return this.of(state.value);
 }
@@ -213,15 +213,15 @@ var lifter = (type) => (fn) => (...args) => type.of(fn(...args));
 /**
  * @signature
  * @description d
- * @param {Object} type - a
- * @return {function} - b
+ * @param {function} type - a
+ * @return {function} val - b
  */
 var maybeFactoryHelper = type => val => type(val);
 
 /**
  * @signature
  * @description d
- * @return {*} - a
+ * @return {Object} Returns a monad flattened by one level if capable.
  */
 function mjoin() {
     return Object.getPrototypeOf(this).isPrototypeOf(this.value) ? this.value : this;

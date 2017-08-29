@@ -26,18 +26,7 @@ function sortData(data, sortObject) {
                 if (!itemsToSort.length || 0 === comparer(prevKeySelector(itemsToSort[0]), prevKeySelector(item), sort.direction))
                     itemsToSort.push(item);
                 else {
-                    //TODO: see if there's a realistic way that length === 1 || 2 could be combined into one statement
                     if (1 === itemsToSort.length) sortedSubData = sortedSubData.concat(itemsToSort);
-                    //else if (itemsToSort.length === 2) {
-                        //sortedSubData = -1 < comparer(sort.keySelector(itemsToSort[0]), sort.keySelector(itemsToSort[1]), sort.direction) ?
-                            //sortedSubData.concat(itemsToSort) : sortedSubData.concat(itemsToSort.reverse());
-                        /*if (sortDirection.descending === sort.ascending)
-                            sortedSubData = -1 < comparer(sort.keySelector(itemsToSort[0]), sort.keySelector(itemsToSort[1]), sort.direction) ?
-                                sortedSubData.concat(itemsToSort) : sortedSubData.concat(itemsToSort.reverse());
-                        else sortedSubData = 1 > comparer(sort.keySelector(itemsToSort[0]), sort.keySelector(itemsToSort[1]), sort.direction) ?
-                            sortedSubData.concat(itemsToSort) : sortedSubData.concat(itemsToSort.reverse());
-                        */
-                    //}
                     else {
                         sortedSubData = sortedSubData.concat(5001 > itemsToSort.length ?
                             insertionSort(itemsToSort, sort.keySelector, comparer, sort.direction) : mergeSort(itemsToSort, sort.keySelector, comparer, sort.direction));
@@ -102,6 +91,7 @@ function merge(left, right, keySelector, comparer, direction) {
  * @return {Array} - Returns a sort array
  */
 function quickSort(source, dir, keySelector, keyComparer) {
+    if (0 === source.length) return source;
     var i = 0,
         copy = [];
 
@@ -109,7 +99,7 @@ function quickSort(source, dir, keySelector, keyComparer) {
         copy[i] = source[i];
         ++i;
     }
-    qSort(copy, 0, source.length - 1, dir, keySelector, keyComparer);
+    _quickSort(copy, 0, source.length - 1, keySelector, keyComparer, dir);
     return copy;
 }
 
@@ -119,43 +109,39 @@ function quickSort(source, dir, keySelector, keyComparer) {
  * @param {Array} data - a
  * @param {number} left - b
  * @param {number} right - c
+ * @param {function} selector - f
+ * @param {function} comparer - g
  * @param {number} dir - d
- * @param {function} keySelector - f
- * @param {function} keyComparer - g
  * @return {Array} - h
  */
-function qSort(data, left, right, dir, keySelector, keyComparer) {
-    var count = 0;
+function _quickSort(data, left, right, selector, comparer, dir) {
     do {
-        var i = left,
-            j = right,
-            itemIdx = i + ((j - i) >> 1);
+        var i = left;
+        var j = right;
+        var currIdx = i + ((j - i) >> 1),
+            curr = selector(data[currIdx]);
 
         do {
-            while (i < data.length && 0 < keyComparer(keySelector(data[itemIdx]), keySelector(data[i]), dir)) ++i;
-            while (0 <= j && 0 > keyComparer(keySelector(data[itemIdx]), keySelector(data[j]), dir)) --j;
+            while (i < data.length && 0 < comparer(selector, currIdx, i, curr, data, dir)) ++i;
+            while (0 <= j && 0 > comparer(selector, currIdx, j, curr, data, dir)) --j;
             if (i > j) break;
             if (i < j) {
-                let tmp = data[i];
+                let temp = data[i];
                 data[i] = data[j];
-                data[j] = tmp;
+                data[j] = temp;
             }
-            ++i;
-            --j;
-        }
-        while (i <= j);
-
+            i++;
+            j--;
+        } while (i <= j);
         if (j - left <= right - i) {
-            if (left < j) qSort(data, left, j, dir, keySelector, keyComparer);
+            if (left < j) _quickSort(data, left, j, selector, comparer, dir);
             left = i;
         }
         else {
-            if (i < right) qSort(data, i, right, dir, keySelector, keyComparer);
+            if (i < right) _quickSort(data, i, right, selector, comparer, dir);
             right = j;
         }
-         console.log(`left: ${left}`, `right: ${right}`);
-    }
-    while (left < right || 2000 < count);
+    } while (left < right);
 }
 
 /**
@@ -168,15 +154,15 @@ function qSort(data, left, right, dir, keySelector, keyComparer) {
  * @return {Array} - e
  */
 function insertionSort(source, keySelector, keyComparer, direction) {
+    if (0 === source.length) return source;
     var i = 0,
-        cop = [];
+        copy = [];
 
     while (i < source.length) {
-        cop[i] = source[i];
+        copy[i] = source[i];
         ++i;
     }
-    iSort(cop, keySelector, keyComparer, direction);
-    return cop;
+    return _insertionSort(copy, keySelector, keyComparer, direction);
 }
 
 /**
@@ -188,7 +174,7 @@ function insertionSort(source, keySelector, keyComparer, direction) {
  * @param {string} direction - d
  * @return {Array} e
  */
-function iSort(source, keySelector, keyComparer, direction) {
+function _insertionSort(source, keySelector, keyComparer, direction) {
     var i, j, item, val;
     for (i = 1; i < source.length; ++i) {
         item = source[i];
@@ -200,6 +186,7 @@ function iSort(source, keySelector, keyComparer, direction) {
         }
         source[j + 1] = item;
     }
+    return source;
 }
 
 export { sortData, quickSort, mergeSort, insertionSort };

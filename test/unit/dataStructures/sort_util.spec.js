@@ -202,13 +202,31 @@ describe('Test quick sort', function _testQuickSort() {
         return item.FirstName;
     }
 
+    function quickSortComparer(keySelector, idx1, idx2, val1, source, dir) {
+        var val2 = keySelector(source[idx2]),
+            t = val1 > val2 ? 1 : val1 === val2 ? idx1 - idx2 : -1;
+        return 1 === dir ? t : -t;
+    }
+
     it('should sort the data in ascending order via the quick sort algorithm', function _quickSortAscendingTest() {
-        var sortedData = quickSort(testData.dataSource.data, 1, keySelector, sortComparer);
+        var sortedData = quickSort(testData.dataSource.data, 1, keySelector, quickSortComparer);
 
         sortedData.forEach(function _validateResults(item) {
             if (!previousFieldsValues.length) previousFieldsValues.push(item.FirstName);
             else {
                 item.FirstName.should.be.at.least(previousFieldsValues[0]);
+                if (item.FirstName !== previousFieldsValues[0]) previousFieldsValues[0] = item.FirstName;
+            }
+        });
+    });
+
+    it('should sort the data descending via merge sort algorithm', function _mergeSortDescendingTest() {
+        var sortedData = quickSort(testData.dataSource.data, 2, keySelector, quickSortComparer);
+
+        sortedData.forEach(function _validateResults(item) {
+            if (!previousFieldsValues.length) previousFieldsValues.push(item.FirstName);
+            else {
+                item.FirstName.should.be.at.most(previousFieldsValues[0]);
                 if (item.FirstName !== previousFieldsValues[0]) previousFieldsValues[0] = item.FirstName;
             }
         });
