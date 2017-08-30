@@ -304,7 +304,7 @@ var isNothing = x => null == x;
  * @param {*} n - a
  * @return {string|boolean} - b
  */
-var isNull = n => type(n) && null === n;
+var isNull = n => null === n;
 
 /**
  * @signature

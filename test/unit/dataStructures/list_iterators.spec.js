@@ -1,7 +1,7 @@
 import { all, any, except, intersect, union, map, chain, groupBy, sortBy, prepend, concat, groupJoin, join, zip, filter, intersperse,
         contains, first, last, count, foldLeft, reduceRight, distinct, ofType, binarySearch, equals, takeWhile, skipWhile, reverse,
         copyWithin, fill, findIndex, findLastIndex, repeat, foldRight, unfold } from '../../../src/dataStructures/list_iterators';
-import { createListCreator } from '../../../src/dataStructures/list_helpers';
+import { createListCreator } from '../../../src/dataStructures/list_util';
 import { list, ordered_list } from '../../../src/dataStructures/monads/list';
 import { cacher, javaScriptTypes, sortDirection, typeNames } from '../../../src/helpers';
 import { testData } from '../../testData';
@@ -1699,8 +1699,9 @@ describe('Test List Iterators', function _testListIterators() {
             return item.LastName;
         }
 
-        function comparer(a, b) {
-            return a <= b;
+        function sortComparer(x, y, dir) {
+            var t = x > y ? 1 : x === y ? 0 : -1;
+            return 2 === dir ? t : -t;
         }
 
         var uniqueStates = [],
@@ -1732,7 +1733,7 @@ describe('Test List Iterators', function _testListIterators() {
 
         describe('...using arrays', function testGroupByUsingArrays() {
             it('should group test data by state descending', function testGroupByOnStateDescending() {
-                var groupObj = [ { keySelector: stateSelector, comparer: comparer, direction: sortDirection.descending } ],
+                var groupObj = [ { keySelector: stateSelector, comparer: sortComparer, direction: sortDirection.descending } ],
                     groupByIterable = groupBy(testData.dataSource.data, groupObj, factoryFn),
                     groupByRes = Array.from(groupByIterable());
 
@@ -1748,7 +1749,7 @@ describe('Test List Iterators', function _testListIterators() {
             });
 
             it('should group test data by state ascending', function testGroupByOnStateAscending() {
-                var groupObj = [ { keySelector: stateSelector, comparer: comparer, direction: sortDirection.ascending } ],
+                var groupObj = [ { keySelector: stateSelector, comparer: sortComparer, direction: sortDirection.ascending } ],
                     groupByIterable = groupBy(testData.dataSource.data, groupObj, factoryFn),
                     groupByRes = Array.from(groupByIterable());
 

@@ -1,5 +1,5 @@
 import { nil } from '../../helpers';
-import { apply, chain, mjoin, equalMaker, pointMaker, stringMaker, valueOf, get, orElse, getOrElse } from '../dataStructureHelpers';
+import { apply, chain, mjoin, equalMaker, pointMaker, stringMaker, valueOf, get, orElse, getOrElse } from '../data_structure_util';
 
 /**
  * @signature - :: * -> {@link monads.identity}
@@ -69,7 +69,7 @@ Identity.empty = () => Identity(Object.create(nil));
  * @property {function} map - maps a single function over the underlying value of the monad
  * @property {function} chain - returns a new identity monad
  * @property {function} mjoin - returns a new identity monad
- * @property {function} apply - returns a new instance of whatever functor type's underlying value this
+ * @property {function} apply - returns a new instance of whatever monad type's underlying value this
  * identity's underlying function value should be mapped over.
  * @property {function} bimap - returns a new identity monad
  * @property {function} fold - Applies a function to the identity's underlying value and returns the result
@@ -160,15 +160,15 @@ var identity = {
     mjoin: mjoin,
     /**
      * @signature Object -> Object
-     * @description Accepts any functor object with a mapping function and invokes that object's mapping
+     * @description Accepts any monad object with a mapping function and invokes that object's mapping
      * function on the identity's underlying value. In order for this function to execute properly and
      * not throw, the identity's underlying value must be a function that can be used as a mapping function
-     * on the functor object supplied as the argument.
+     * on the monad object supplied as the argument.
      * @memberOf monads.identity
      * @instance
      * @function apply
-     * @param {Object} ma - Any object with a map function - i.e. a functor.
-     * @return {Object} Returns an instance of the functor object provide as an argument.
+     * @param {Object} ma - Any object with a map function - i.e. a monad.
+     * @return {Object} Returns an instance of the monad object provide as an argument.
      */
     apply: apply,
     /**
@@ -181,10 +181,11 @@ var identity = {
      * @function fold
      * @param {function} fn - Any mapping function that should be applied to the underlying value
      * of the identity monad.
+     * @param {*} acc - An JavaScript value that should be used as an accumulator.
      * @return {*} Returns the return value of the mapping function provided as an argument.
      */
-    fold: function _fold(fn) {
-        return fn(this.value);
+    fold: function _fold(fn, acc) {
+        return fn(acc, this.value);
     },
     /**
      * @signature monad -> monad<monad<T>>
@@ -193,24 +194,24 @@ var identity = {
      * @memberOf monads.identity
      * @instance
      * @function sequence
-     * @param {Object} p - Any pointed functor with a '#of' function property
+     * @param {Object} p - Any pointed monad with a '#of' function property
      * @return {Object} Returns a monad of the type passed as an argument that 'wraps'
      * and identity monad that 'wraps' the current identity monad's underlying value.
      */
     sequence: function _sequence(p) {
-        return this.traverse(p.of, p.of);
+        return this.traverse(p, p.of);
     },
     /**
      * @signature Object -> () -> Object
-     * @description Accepts a pointed functor with a '#of' function property and a mapping function. The mapping
-     * function is applied to the identity monad's underlying value. The mapping function should return a functor
-     * of any type. Then the {@link monads.Identity.of} function is used to map over the returned functor. Essentially
-     * creating a new object of type: functor<Identity<T>>, where 'functor' is the type of functor the mapping
+     * @description Accepts a pointed monad with a '#of' function property and a mapping function. The mapping
+     * function is applied to the identity monad's underlying value. The mapping function should return a monad
+     * of any type. Then the {@link monads.Identity.of} function is used to map over the returned monad. Essentially
+     * creating a new object of type: monad<Identity<T>>, where 'monad' is the type of monad the mapping
      * function returns.
      * @memberOf monads.identity
      * @instance
      * @function traverse
-     * @param {Object} a - A pointed functor with a '#of' function property. Used only in cases
+     * @param {Object} a - A pointed monad with a '#of' function property. Used only in cases
      * where the mapping function cannot be run.
      * @param {function} f - A mapping function that should be applied to the identity's underlying value.
      * @return {Object} Returns a new identity monad that wraps the mapping function's returned monad type.
@@ -371,8 +372,8 @@ identity.bimap = identity.map;
  * @instance
  * @function ap
  * @see monads.identity#apply
- * @param {Object} ma - Any object with a map function - i.e. a functor.
- * @return {Object} Returns an instance of the functor object provide as an argument.
+ * @param {Object} ma - Any object with a map function - i.e. a monad.
+ * @return {Object} Returns an instance of the monad object provide as an argument.
  */
 identity.ap = identity.apply;
 

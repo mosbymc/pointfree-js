@@ -60,9 +60,9 @@ describe('Test combinators', function _testCombinators() {
                 return arg1 + arg2 + arg3 + arg4;
             }
 
-            var curriedTestFn = curryN(null, 4, testFn),
+            var curriedTestFn = curryN(4, testFn),
                 intermediateFn = curriedTestFn(1),
-                re_curriedFn = curryN(null, 2, intermediateFn);
+                re_curriedFn = curryN(2, intermediateFn);
 
             re_curriedFn(2, 3).should.eql(NaN);
         });

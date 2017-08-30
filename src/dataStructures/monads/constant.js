@@ -1,4 +1,4 @@
-import { apply, mjoin, pointMaker, equalMaker, stringMaker, valueOf, get, orElse, getOrElse } from '../dataStructureHelpers';
+import { apply, mjoin, pointMaker, equalMaker, stringMaker, valueOf, get, orElse, getOrElse } from '../data_structure_util';
 
 /**
  * @signature - :: * -> {@link monads.constant}

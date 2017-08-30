@@ -28,11 +28,6 @@ function createListCreator(baseListType, sortedListType, groupedListType) {
                         writable: false,
                         configurable: false
                     },
-                    data: {
-                        get: function _getData() {
-                            return Array.from(this);
-                        }
-                    },
                     [Symbol.iterator]: {
                         value: iterator
                     }
@@ -48,11 +43,6 @@ function createListCreator(baseListType, sortedListType, groupedListType) {
                         value: source,
                         writable: false,
                         configurable: false
-                    },
-                    data: {
-                        get: function _getData() {
-                            return Array.from(this);
-                        }
                     },
                     _appliedSorts: {
                         value: sortObj,
@@ -72,11 +62,6 @@ function createListCreator(baseListType, sortedListType, groupedListType) {
                         value: source,
                         writable: false,
                         configurable: false
-                    },
-                    data: {
-                        get: function _getData() {
-                            return Array.from(this);
-                        }
                     },
                     _appliedSorts: {
                         value: sortObj,
@@ -98,11 +83,6 @@ function createListCreator(baseListType, sortedListType, groupedListType) {
                         value: source,
                         writable: false,
                         configurable: false
-                    },
-                    data: {
-                        get: function _getData() {
-                            return Array.from(this);
-                        }
                     },
                     _key: {
                         value: key,
@@ -126,11 +106,6 @@ function createListCreator(baseListType, sortedListType, groupedListType) {
                         value: source,
                         writable: false,
                         configurable: false
-                    },
-                    data: {
-                        get: function _getData() {
-                            return Array.from(this);
-                        }
                     }
                 });
         }
@@ -161,4 +136,20 @@ function listExtensionHelper(listFactory, listDelegatee, creatorFunc, ...listTyp
     };
 }
 
-export { createListCreator, taker_skipper, listExtensionHelper };
+var sort_obj = {};
+
+function createSortObject(selector, comparer, direction) {
+    return Object.create(sort_obj, {
+        keySelector: {
+            value: selector
+        },
+        comparer: {
+            value: comparer
+        },
+        direction: {
+            value: direction
+        }
+    });
+}
+
+export { createListCreator, taker_skipper, listExtensionHelper, createSortObject };

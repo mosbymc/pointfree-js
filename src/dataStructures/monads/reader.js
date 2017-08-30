@@ -1,4 +1,4 @@
-import { equalMaker, pointMaker, stringMaker, valueOf, get, orElse, getOrElse } from '../dataStructureHelpers';
+import { equalMaker, pointMaker, stringMaker, valueOf, get, orElse, getOrElse } from '../data_structure_util';
 
 function Reader(run) {
     return Object.create(reader, {

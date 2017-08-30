@@ -390,7 +390,7 @@ describe('Identity monad test', function _testIdentityMonad() {
         });
 
         it('should return underlying value when constant_functor#fold is invoked', function _testConstantDotFold() {
-            Identity(10).fold(x => x * 15).should.eql(150);
+            Identity(10).fold((x, y) => x + y * 15, 0).should.eql(150);
         });
 
         it('should return a Just of an Identity of 10 when #sequence is invoked', function _testConstantDotSequence() {
@@ -408,6 +408,20 @@ describe('Identity monad test', function _testIdentityMonad() {
         it('should have a .factory property that points to the factory function', function _testIdentityFunctorIsStupidViaFantasyLandSpecCompliance() {
             Identity(null).factory.should.eql(Identity);
             Identity(null).constructor.should.eql(Identity);
+        });
+
+        it('should have the fantasy land aliases', function _testForFantasyLandAliasPresence() {
+            var i = Identity();
+
+            i.map.should.eql(i['fantasy-land/map']);
+            i.chain.should.eql(i['fantasy-land/chain']);
+            i.ap.should.eql(i['fantasy-land/ap']);
+            i.bimap.should.eql(i['fantasy-land/bimap']);
+            i.reduce.should.eql(i['fantasy-land/reduce']);
+            i.traverse.should.eql(i['fantasy-land/traverse']);
+            i.equals.should.eql(i['fantasy-land/equals']);
+            i.empty.should.eql(i['fantasy-land/empty']);
+            i.of.should.eql(i['fantasy-land/of']);
         });
     });
 
@@ -450,10 +464,14 @@ describe('Identity monad test', function _testIdentityMonad() {
                 return Identity(val + 7);
             }
 
+            function rightMaker(v1, v2) {
+                return monads.Right(v1 + v2);
+            }
+
             //Associativity
             m.chain(f).chain(h).value.should.eql(m.chain(x => f(x).chain(h)).value);
 
-            Identity(2).map(x => x + 2).fold(monads.Right).value.should.eql(Identity(2).fold(monads.Right).map(x => x + 2).value);
+            Identity(2).map(x => x + 2).fold(rightMaker, 0).value.should.eql(Identity(2).fold(rightMaker, 0).map(x => x + 2).value);
 
             //Traversable Identity
             Identity(2).traverse(monads.Maybe, monads.Maybe.of).toString().should.eql(monads.Maybe.of(Identity(2)).toString());

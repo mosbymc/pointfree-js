@@ -1,20 +1,139 @@
 import { curry, compose, identity } from './combinators';
 import { getWith } from './functionalHelpers';
+import * as monads from './dataStructures/monads/monads';
 
 /** @module pointless_data_structures */
 
-//TODO: I need to figure out how to structure this lib. I'd like to have several different types of containers...
-//TODO: ...specifically, functors (pointed), monads, and maybe one other type. In addition, each container type
-//TODO: would have several implementations: maybe, option, constant, identity, future_functor, io, etc. It would make sense
-//TODO: to let the "higher" level containers delegate to the "lower" level implementations since they share all the
-//TODO: functionality of the "lower" containers and add to them. In addition, a lot of the containers will have the
-//TODO: same mapWith, flatMapWith, chain, apply, etc functionality; it would be nice to share this functionality as well.
-//TODO: Finally, I'd like to have each container in a category be capable of converting their underlying value to
-//TODO: another container of the same category without the use of 'apply', more in the manner of 'toContainerX'.
-//TODO: However, this means that each container in a given category has a dependency on all the other containers in
-//TODO: the same category. This, more than the rest, makes structuring this lib difficult. I'd like to, at the very
-//TODO: least, split each container category up so that they can be imported (and preferably downloaded) individually.
-//TODO: But the more separation between containers, the more they have to 'import' each other.
+/**
+ * @signature
+ * @description d
+ * @param {*} fa - a
+ * @return {boolean} - b
+ */
+function isConstant(fa) {
+    return fa.factory === monads.Constant;
+}
+
+/**
+ * @signature
+ * @description d
+ * @param {*} fa - a
+ * @return {boolean} - b
+ */
+function isEither(fa) {
+    return fa.factory === monads.Either;
+}
+
+/**
+ * @signature
+ * @description d
+ * @param {*} fa - a
+ * @return {boolean} - b
+ */
+function isFuture(fa) {
+    return fa.factory === monads.Future;
+}
+
+/**
+ * @signature
+ * @description d
+ * @param {*} fa - a
+ * @return {boolean} - b
+ */
+function isIdentity(fa) {
+    return fa.factory === monads.Identity;
+}
+
+/**
+ * @signature
+ * @description d
+ * @param {*} fa - a
+ * @return {boolean} - b
+ */
+function isIo(fa) {
+    return fa.factory === monads.Io;
+}
+
+/**
+ * @signature
+ * @description d
+ * @param {*} fa - a
+ * @return {boolean} - b
+ */
+function isJust(fa) {
+    return !!(fa.isJust && fa.factory === monads.Maybe);
+}
+
+/**
+ * @signature
+ * @description d
+ * @param {*} fa - a
+ * @return {boolean} - b
+ */
+function isLeft(fa) {
+    return !!(fa.isLeft && fa.factory === monads.Either);
+}
+
+/**
+ * @signature
+ * @description d
+ * @param {*} fa - a
+ * @return {boolean} - b
+ */
+function isList(fa) {
+    return fa.factory === monads.List;
+}
+
+/**
+ * @signature
+ * @description d
+ * @param {*} fa - a
+ * @return {boolean} - b
+ */
+function isMaybe(fa) {
+    return !!((fa.isNothing && (fa.factory === monads.Maybe)) ||
+        (fa.isJust && (fa.factory === monads.Maybe)));
+}
+
+/**
+ * @signature
+ * @description d
+ * @param {Object} ma - a
+ * @return {boolean} - b
+ */
+function isMonad(ma) {
+    return !!(ma && ma.factory && ma.factory === monads[ma.factory.name]);
+}
+
+/**
+ * @signature
+ * @description d
+ * @param {*} fa - a
+ * @return {boolean} - b
+ */
+function isNothing(fa) {
+    return !!fa.isNothing;
+}
+
+/**
+ * @signature
+ * @description d
+ * @param {*} fa - a
+ * @return {boolean} - b
+ */
+function isRight(fa) {
+    return !!fa.isRight;
+}
+
+/**
+ * @signature
+ * @description d
+ * @param {*} fa - a
+ * @return {boolean} - b
+ */
+function isValidation(fa) {
+    return fa.factory === monads.Validation;
+}
 
 /**
  * @signature
@@ -348,4 +467,5 @@ var except = curry(function _except(xs, comparer, ys) {
 });
 
 export { ap, apply, fmap, map, mapWith, flatMap, flatMapWith, lift2, lift3, lift4, liftN, mjoin, pluckWith,
-        chain, bind, mcompose, filter, intersect, except };
+        chain, bind, mcompose, filter, intersect, except, isConstant, isEither, isFuture, isIdentity, isIo,
+        isJust, isLeft, isList, isMaybe, isMonad, isNothing, isRight, isValidation };

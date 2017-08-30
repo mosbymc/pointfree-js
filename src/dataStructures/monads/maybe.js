@@ -1,6 +1,6 @@
 import { identity } from '../../combinators';
 import { apply, chain, mjoin, disjunctionEqualMaker, maybeFactoryHelper, pointMaker, stringMaker,
-    get, emptyGet, orElse, emptyOrElse, getOrElse, emptyGetOrElse, valueOf, sharedMaybeFns } from '../dataStructureHelpers';
+    get, emptyGet, orElse, emptyOrElse, getOrElse, emptyGetOrElse, valueOf, sharedMaybeFns } from '../data_structure_util';
 
 /**
  * @signature
