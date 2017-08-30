@@ -1,4 +1,5 @@
 import { noop, once, type, strictEquals } from '../../functionalHelpers';
+import { ifElse, constant } from '../../combinators';
 import { apply, mjoin, pointMaker, valueOf } from '../data_structure_util';
 import { javaScriptTypes } from '../../helpers';
 
@@ -73,8 +74,9 @@ Future.is = f => future.isPrototypeOf(f);
  * @return {monads.future} - Returns a new object that delegates to the
  * {@link monads.future}.
  */
-Future.of = val => strictEquals(javaScriptTypes.Function, type(val)) ?
-    Future(val) : Future((_, resolve) => safeFork(noop, resolve(val)));
+Future.of = val => ifElse(constant(strictEquals(javaScriptTypes.Function, type(val))), Future, futureFunctionize, val);
+
+var futureFunctionize = val => Future((_, resolve) => safeFork(noop, resolve(val)));
 
 /**
  * @signature
@@ -97,6 +99,8 @@ Future.reject = val => Future((reject, resolve) => reject(val));
  * @return {future} - b
  */
 Future.unit = val => Future(val).complete();
+
+Future.delay = (val, amt) => Future(val);
 
 /**
  * @signature () -> {@link monads.future}

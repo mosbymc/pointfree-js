@@ -136,4 +136,20 @@ function listExtensionHelper(listFactory, listDelegatee, creatorFunc, ...listTyp
     };
 }
 
-export { createListCreator, taker_skipper, listExtensionHelper };
+var sort_obj = {};
+
+function createSortObject(selector, comparer, direction) {
+    return Object.create(sort_obj, {
+        keySelector: {
+            value: selector
+        },
+        comparer: {
+            value: comparer
+        },
+        direction: {
+            value: direction
+        }
+    });
+}
+
+export { createListCreator, taker_skipper, listExtensionHelper, createSortObject };

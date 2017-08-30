@@ -5,7 +5,7 @@ import { sortDirection, generatorProto } from '../../helpers';
 import { wrap, defaultPredicate, delegatesFrom, isArray, noop, invoke } from '../../functionalHelpers';
 import { when, ifElse, identity } from '../../combinators';
 import { not } from '../../decorators';
-import { createListCreator, taker_skipper, listExtensionHelper } from '../list_util';
+import { createListCreator, taker_skipper, listExtensionHelper, createSortObject } from '../list_util';
 
 /**
  * @description: Object that contains the core functionality of a List; both the m_list and ordered_m_list
@@ -210,8 +210,7 @@ var list_core = {
      * @return {monads.list_core} - c
      */
     groupBy: function _groupBy(keySelector, comparer) {
-        var groupObj = [{ keySelector: keySelector, comparer: comparer, direction: sortDirection.ascending }];
-        return this.of(this, groupBy(this, groupObj, createGroupedListDelegate));
+        return this.of(this, groupBy(this, [createSortObject(keySelector, comparer, sortDirection.ascending)], createGroupedListDelegate));
     },
 
     /**
@@ -226,8 +225,7 @@ var list_core = {
      * @return {monads.list_core} - c
      */
     groupByDescending: function _groupByDescending(keySelector, comparer) {
-        var groupObj = [{ keySelector: keySelector, comparer: comparer, direction: sortDirection.descending }];
-        return this.of(this, groupBy(this, groupObj, createGroupedListDelegate));
+        return this.of(this, groupBy(this, [createSortObject(keySelector, comparer, sortDirection.descending)], createGroupedListDelegate));
     },
 
     /**
@@ -968,7 +966,7 @@ var list = Object.create(list_core, {
      */
     sortBy: {
         value: function _orderBy(keySelector = identity, comparer = defaultPredicate) {
-            var sortObj = [{ keySelector: keySelector, comparer: comparer, direction: sortDirection.ascending }];
+            var sortObj = [createSortObject(keySelector, comparer, sortDirection.ascending)];
             return this.of(this, sortBy(this, sortObj), sortObj);
         }
     },
@@ -984,7 +982,7 @@ var list = Object.create(list_core, {
      */
     sortByDescending: {
         value: function _orderByDescending(keySelector, comparer = defaultPredicate) {
-            var sortObj = [{ keySelector: keySelector, comparer: comparer, direction: sortDirection.descending }];
+            var sortObj = [createSortObject(keySelector, comparer, sortDirection.descending)];
             return this.of(this, sortBy(this, sortObj), sortObj);
         }
     },
@@ -1038,7 +1036,7 @@ var ordered_list = Object.create(list_core, {
      */
     thenBy: {
         value: function _thenBy(keySelector, comparer = defaultPredicate) {
-            var sortObj = this._appliedSorts.concat({ keySelector: keySelector, comparer: comparer, direction: sortDirection.ascending });
+            var sortObj = this._appliedSorts.concat(createSortObject(keySelector, comparer, sortDirection.ascending));
             return this.of(this.value, sortBy(this, sortObj), sortObj);
         }
     },
@@ -1054,7 +1052,7 @@ var ordered_list = Object.create(list_core, {
      */
     thenByDescending: {
         value: function thenByDescending(keySelector, comparer = defaultPredicate) {
-            var sortObj = this._appliedSorts.concat({ keySelector: keySelector, comparer: comparer, direction: sortDirection.descending });
+            var sortObj = this._appliedSorts.concat(createSortObject(keySelector, comparer, sortDirection.descending));
             return this.of(this.value, sortBy(this, sortObj), sortObj);
         }
     },
@@ -1201,7 +1199,7 @@ List.of = List.from;
  * @return {monads.ordered_list} Returns a new list monad
  */
 List.ordered = (source, selector, comparer = defaultPredicate) => createListDelegateInstance(source, null,
-    [{ keySelector: selector, comparer: comparer, direction: sortDirection.ascending }]);
+    [createSortObject(selector, comparer, sortDirection.ascending)]);
 
 /**
  * @signature
@@ -1214,7 +1212,7 @@ List.ordered = (source, selector, comparer = defaultPredicate) => createListDele
  * @return {monads.ordered_list} - a
  */
 List.empty = () => createListDelegateInstance([], null,
-    [{ keySelector: identity, comparer: defaultPredicate, direction: sortDirection.ascending }]);
+    [createSortObject(identity, defaultPredicate, sortDirection.ascending)]);
 
 /**
  * @signature
@@ -1228,7 +1226,7 @@ List.empty = () => createListDelegateInstance([], null,
  * @return {monads.ordered_list} - b
  */
 List.just = val => createListDelegateInstance([val], null,
-    [{ keySelector: identity, comparer: defaultPredicate, direction: sortDirection.ascending }]);
+    [createSortObject(identity, defaultPredicate, sortDirection.ascending)]);
 
 /**
  * @signature
@@ -1271,7 +1269,7 @@ List.is = f => list_core.isPrototypeOf(f);
  * @return {monads.ordered_list} - Returns a new ordered list monad.
  */
 List.repeat = function _repeat(item, count) {
-    return createListDelegateInstance([], repeat(item, count), [{ keySelector: noop, comparer: noop, direction: sortDirection.descending }]);
+    return createListDelegateInstance([], repeat(item, count), [createSortObject(identity, noop, sortDirection.descending)]);
 };
 
 /**
