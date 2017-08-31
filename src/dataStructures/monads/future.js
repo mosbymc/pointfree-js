@@ -100,7 +100,24 @@ Future.reject = val => Future((reject, resolve) => reject(val));
  */
 Future.unit = val => Future(val).complete();
 
-Future.delay = (val, amt) => Future(val);
+/**
+ * @signature
+ * @description Takes any value (function or otherwise) and a delay time in
+ * milliseconds, and returns a new {@link monads.future} that will fork in the amount
+ * of time given as the delay.
+ * @param {*} val - Any JavaScript value; {@link monads.Future#of} is called under the
+ * covers, so it need not be a function.
+ * @param {number} delay - The amount of time in milliseconds the forking operation
+ * should be delayed
+ * @return {monads.future} Returns a new future
+ */
+Future.delay = function _delay(val, delay) {
+    var f = Future.of(fn);
+    setTimeout(function _timeout() {
+        f.fork();
+    }, delay);
+    return f;
+};
 
 /**
  * @signature () -> {@link monads.future}

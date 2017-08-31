@@ -1,5 +1,5 @@
 import { nil } from '../../helpers';
-import { apply, chain, mjoin, equalMaker, pointMaker, stringMaker, valueOf, get, orElse, getOrElse } from '../data_structure_util';
+import { apply, chain, mjoin, equalMaker, pointMaker, stringMaker, valueOf, get, orElse, getOrElse, extendMaker } from '../data_structure_util';
 
 /**
  * @signature - :: * -> {@link monads.identity}
@@ -279,6 +279,16 @@ var identity = {
      * @return {*} Returns the underlying value of the current monad 'instance'.
      */
     getOrElse: getOrElse,
+    /**
+     * @signature (identity<A> -> B) -> identity<B>
+     * @description Takes a function that operates on the current identity monad and returns
+     * any value, invokes that function, passing the current identity monad as the only argument,
+     * and then returns a new identity monad that wraps the return value of the provided function.
+     * @param {function} fn - A function that can operate on an identity monad
+     * @return {Identity<T>} Returns a new identity monad that wraps the return value of the
+     * function that was provided as an argument.
+     */
+    extend: extendMaker(Identity),
     /**
      * @signature * -> {@link monads.identity}
      * @description Factory function used to create a new object that delegates to
