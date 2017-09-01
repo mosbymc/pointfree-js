@@ -100,6 +100,28 @@ function emptyGet() {
 
 /**
  * @signature
+ * @description A factory function that takes a monad factory of any type
+ * and returns a function that acts as an extend for that monad.
+ * @param {function} typeFactory - A reference to a specific monad's factory function.
+ * @return {_extend} Returns a function that acts as an extend for a monad.
+ */
+function extendMaker(typeFactory) {
+    return function _extend(fn) {
+        return typeFactory(fn(this));
+    };
+}
+
+/**
+ * @signature
+ * @description Returns the underlying value of any given monad
+ * @return {*} Returns the underlying value of any given monad
+ */
+function extract() {
+    return this.value;
+}
+
+/**
+ * @signature
  * @description d
  * @param {function} f - a
  * @return {*} - b
@@ -371,4 +393,4 @@ var fl = {
 
 export { apply, applyTransforms, chain, monadIterator, disjunctionEqualMaker, equalMaker, lifter, maybeFactoryHelper,
         mjoin, pointMaker, stringMaker, valueOf, get, emptyGet, orElse, emptyOrElse, getOrElse, emptyGetOrElse, sharedMaybeFns,
-        sharedEitherFns, applyFantasyLandSynonyms, chainRec };
+        sharedEitherFns, applyFantasyLandSynonyms, chainRec, extendMaker, extract };
