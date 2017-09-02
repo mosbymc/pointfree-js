@@ -64,8 +64,9 @@ Future.is = f => future.isPrototypeOf(f);
  * @signature * -> {@link monads.future}
  * @description Takes any value and places it in the correct context if it is
  * not already and creates a new {@link monads.future} object delegator instance.
- * Because the identity functor does not require any specific context for
- * its value, this can be viewed as an alias for {@link future}
+ * Because the future monad 'runs' off of functions, if the value passed to
+ * {@link monads.future#of} is a function, it is not wrapped in a function. If it
+ * is any other type, it is wrapped in a function that will be invoked on fork.
  * @memberOf monads.Future
  * @static
  * @function of
@@ -77,6 +78,18 @@ Future.is = f => future.isPrototypeOf(f);
 Future.of = val => ifElse(constant(strictEquals(javaScriptTypes.Function, type(val))), Future, futureFunctionize, val);
 
 var futureFunctionize = val => Future((_, resolve) => safeFork(noop, resolve(val)));
+
+/**
+ * @description Similar to {@link monads.future#of} except it will wrap any value
+ * passed as the argument, regardless if it is a function or not.
+ * @memberOf monads.future
+ * @static
+ * @function wrap
+ * @param {*} val - The value that should be wrapped in a function and set as the
+ * underlying value of the {@link monads.future}
+ * @return {monads.future} Returns a new object that delegates to the {@link monads.future}
+ */
+Future.wrap = val => futureFunctionize(val);
 
 /**
  * @signature
