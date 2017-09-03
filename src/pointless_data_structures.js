@@ -139,7 +139,7 @@ function isValidation(fa) {
  * @signature
  * @description d
  * @kind function
- * @function apply
+ * @function monad_apply
  * @param {Object} ma - a
  * @param {Object} mb - b
  * @return {Object} - c

@@ -1,5 +1,5 @@
 import { identity } from '../../combinators';
-import { apply, chain, mjoin, disjunctionEqualMaker, maybeFactoryHelper, pointMaker, stringMaker,
+import { monad_apply, chain, mjoin, disjunctionEqualMaker, maybeFactoryHelper, pointMaker, stringMaker,
     get, emptyGet, orElse, emptyOrElse, getOrElse, emptyGetOrElse, valueOf, sharedMaybeFns } from '../data_structure_util';
 
 /**
@@ -359,7 +359,7 @@ var just = {
     map: sharedMaybeFns.justMap,
     chain: chain,
     mjoin: mjoin,
-    apply: apply,
+    apply: monad_apply,
     /**
      * @signature (* -> *) -> (* -> *) -> monads.just<T>
      * @description Acts as a map for the disjunction between a just and a nothing monad. If the
@@ -571,7 +571,7 @@ var nothing = {
     bimap: sharedMaybeFns.nothingBimapMaker(Nothing),
     chain: chain,
     mjoin: mjoin,
-    apply: apply,
+    apply: monad_apply,
     fold: function _fold(fn) {
         return Nothing();
     },

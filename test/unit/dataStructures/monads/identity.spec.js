@@ -338,7 +338,7 @@ describe('Identity monad test', function _testIdentityMonad() {
             i3.mjoin().should.eql(Identity(1));
         });
 
-        it('should apply a mutating function to the underlying value and return the new value unwrapped in an Identity when chain is called', function _testIdentityMonadChain() {
+        it('should monad_apply a mutating function to the underlying value and return the new value unwrapped in an Identity when chain is called', function _testIdentityMonadChain() {
             var i1 = Identity(10),
                 i2 = Identity(Identity({ a: 1, b: 2 })),
                 i3 = Identity(25);
@@ -432,7 +432,7 @@ describe('Identity monad test', function _testIdentityMonad() {
             Identity(identity).ap(v).value.should.eql(v.mjoin());
         });*/
 
-        it('should have a proper algebraic properties apply', function _testIdentityMonadAlgebraicProperties() {
+        it('should have a proper algebraic properties monad_apply', function _testIdentityMonadAlgebraicProperties() {
             function _i(val) { return  val + 2; }
             var x = 2;
             var i = x => x;

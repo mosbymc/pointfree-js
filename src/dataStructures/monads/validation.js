@@ -1,4 +1,4 @@
-import { apply, chain, mjoin, pointMaker, equalMaker, stringMaker, valueOf } from '../data_structure_util';
+import { monad_apply, chain, mjoin, pointMaker, equalMaker, stringMaker, valueOf } from '../data_structure_util';
 
 function Validation(val) {
     return Object.create(validation, {
@@ -52,7 +52,7 @@ validation.bimap = validation.map;
 
 validation.chain = chain;
 validation.mjoin = mjoin;
-validation.apply = apply;
+validation.apply = monad_apply;
 
 //Since FantasyLand is the defacto standard for JavaScript algebraic data structures, and I want to maintain
 //compliance with the standard, a .constructor property must be on the container delegators. In this case, its

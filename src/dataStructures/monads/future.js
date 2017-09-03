@@ -1,6 +1,6 @@
 import { noop, once, type, strictEquals } from '../../functionalHelpers';
 import { ifElse, constant } from '../../combinators';
-import { apply, mjoin, pointMaker, valueOf } from '../data_structure_util';
+import { monad_apply, mjoin, pointMaker, valueOf } from '../data_structure_util';
 import { javaScriptTypes } from '../../helpers';
 
 /**
@@ -300,7 +300,7 @@ var future = {
 };
 
 future.mjoin = mjoin;
-future.apply = apply;
+future.apply = monad_apply;
 future.ap = future.apply;
 future.fmap = future.chain;
 future.flapMap = future.chain;
