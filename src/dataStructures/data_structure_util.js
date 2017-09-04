@@ -9,7 +9,7 @@ function contramap(fn) {
 }
 
 function compose(f, g) {
-    return function _pipe(...args) {
+    return function _compose(...args) {
         return f(g(...args));
     };
 }

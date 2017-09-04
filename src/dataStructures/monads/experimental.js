@@ -174,7 +174,7 @@ var identity = {
     chain: function _chain(fn) {
         return next(() => {
             let val = fn(this.value);
-            return Object.getPrototypeOf(this).isPrototypeOf(val) ? val : this.of(val);
+            return Object.getPrototypeOf(this).isPrototypeOf(val) ? val.value : val;
         });
     },
     /**
@@ -203,7 +203,7 @@ var identity = {
      * @return {Object} Returns an instance of the monad object provide as an argument.
      */
     apply: function _apply(ma) {
-        return ma.map(this.source);
+        return ma.map(this.value);
     },
     /**
      * @signature () -> *
@@ -219,7 +219,7 @@ var identity = {
      * @return {*} Returns the return value of the mapping function provided as an argument.
      */
     fold: function _fold(fn, acc) {
-        return fn(acc, this.source);
+        return fn(acc, this.value);
     },
     /**
      * @signature monad -> monad<monad<T>>
@@ -251,7 +251,7 @@ var identity = {
      * @return {Object} Returns a new identity monad that wraps the mapping function's returned monad type.
      */
     traverse: function _traverse(a, f) {
-        return f(this.source).map(this.of);
+        return f(this.value).map(this.of);
     },
     /**
      * @signature (b -> a) -> monads.Identity
@@ -269,7 +269,7 @@ var identity = {
      * @return {monads.identity} Returns a new identity monad.
      */
     contramap: function contramap(fn) {
-        return next(() => compose(this.value, fn));
+        return next((...args) => this.value(fn(...args)));
     },
     /**
      * @signature () -> {@link monads.identity}
