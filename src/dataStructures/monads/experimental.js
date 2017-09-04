@@ -1,6 +1,8 @@
-import { nil } from '../../helpers';
-import { monad_apply, chain, contramap, mjoin, equalMaker, pointMaker, stringMaker,
-        valueOf, get, orElse, getOrElse, extendMaker } from '../data_structure_util';
+import { nil, javaScriptTypes } from '../../helpers';
+import { type, strictEquals } from '../../functionalHelpers';
+import { not } from '../../decorators';
+import { constant, when } from '../../combinators';
+import { equalMaker, stringMaker, valueOf, get, orElse, getOrElse, extendMaker } from '../data_structure_util';
 
 /**
  * @signature - :: * -> {@link monads.identity}
@@ -19,9 +21,15 @@ import { monad_apply, chain, contramap, mjoin, equalMaker, pointMaker, stringMak
  * {@link monads.identity}.
  */
 function Identity(val) {
+    let fn = when(not(strictEquals(javaScriptTypes.Function, type(val)), constant(val), val));
     return Object.create(identity, {
         _value: {
-            value: val,
+            value: fn,
+            writable: false,
+            configurable: false
+        },
+        _source: {
+            value: fn,
             writable: false,
             configurable: false
         }
@@ -64,13 +72,26 @@ Identity.is = f => identity.isPrototypeOf(f);
  */
 Identity.empty = () => Identity(Object.create(nil));
 
+var next = fn => Object.create(identity, {
+    _value: {
+        value: fn,
+        writable: false,
+        configurable: false
+    },
+    _source: {
+        value: fn,
+        writable: false,
+        configurable: false
+    }
+});
+
 /**
  * @typedef {Object} identity
  * @property {function} value - returns the underlying value of the the monad
  * @property {function} map - maps a single function over the underlying value of the monad
  * @property {function} chain - returns a new identity monad
  * @property {function} mjoin - returns a new identity monad
- * @property {function} apply - returns a new instance of whatever monad type's underlying value this
+ * @property {function} monad_apply - returns a new instance of whatever monad type's underlying value this
  * identity's underlying function value should be mapped over.
  * @property {function} bimap - returns a new identity monad
  * @property {function} fold - Applies a function to the identity's underlying value and returns the result
@@ -113,7 +134,10 @@ var identity = {
      * @return {*} Returns the underlying value of the delegator. May be any value.
      */
     get value() {
-        return this._value;
+        return this.source();
+    },
+    get source() {
+        return this._source;
     },
     /**
      * @signature () -> {@link monads.identity}
@@ -129,7 +153,7 @@ var identity = {
      * just performed.
      */
     map: function _map(fn) {
-        return this.of(fn(this.value));
+        return next(() => fn(this.value));
     },
     /**
      * @signature () -> {@link monads.identity}
@@ -147,7 +171,12 @@ var identity = {
      * @return {Object} Returns a new identity monad that 'wraps' the return value of the
      * mapping function after flattening it by one level.
      */
-    chain: chain,
+    chain: function _chain(fn) {
+        return next(() => {
+            let val = fn(this.value);
+            return Object.getPrototypeOf(this).isPrototypeOf(val) ? val.value : val;
+        });
+    },
     /**
      * @signature () -> {@link monads.identity}
      * @description Returns a new identity monad. If the current identity monad is nested, mjoin
@@ -158,7 +187,9 @@ var identity = {
      * @function mjoin
      * @return {Object} Returns a new identity monad after flattening the nested monads by one level.
      */
-    mjoin: mjoin,
+    mjoin: function _mjoin() {
+        return next(() => Object.getPrototypeOf(this).isPrototypeOf(this.value) ? this.value : this);
+    },
     /**
      * @signature Object -> Object
      * @description Accepts any monad object with a mapping function and invokes that object's mapping
@@ -167,11 +198,13 @@ var identity = {
      * on the monad object supplied as the argument.
      * @memberOf monads.identity
      * @instance
-     * @function apply
+     * @function monad_apply
      * @param {Object} ma - Any object with a map function - i.e. a monad.
      * @return {Object} Returns an instance of the monad object provide as an argument.
      */
-    apply: monad_apply,
+    apply: function _apply(ma) {
+        return ma.map(this.value);
+    },
     /**
      * @signature () -> *
      * @description Accepts a function that is used to map over the identity's underlying value
@@ -235,7 +268,9 @@ var identity = {
      * underling function.
      * @return {monads.identity} Returns a new identity monad.
      */
-    contramap: contramap,
+    contramap: function contramap(fn) {
+        return next((...args) => this.value(fn(...args)));
+    },
     /**
      * @signature () -> {@link monads.identity}
      * @description Creates and returns a new, 'empty' identity monad.
@@ -245,7 +280,7 @@ var identity = {
      * @return {monads.identity} Creates and returns a new, 'empty' identity monad.
      */
     empty: function _empty() {
-        return this.of(Object.create(nil));
+        return next(Object.create(nil));
     },
     /**
      * @signature () -> boolean
@@ -315,12 +350,14 @@ var identity = {
      * @memberOf monads.identity
      * @instance
      * @function
-     * @param {*} item - The value that should be set as the underlying
+     * @param {*} fn - The value that should be set as the underlying
      * value of the {@link monads.identity}.
      * @return {monads.identity} Returns a new {@link monads.identity} delegator object
      * via the {@link monads.Identity#of} function.
      */
-    of: pointMaker(Identity),
+    of: function _of(fn) {
+        return Identity.of(fn);
+    },
     /**
      * @signature () -> *
      * @description Returns the underlying value of the current monad 'instance'. This

@@ -1,4 +1,4 @@
-import { apply, mjoin, pointMaker, equalMaker, stringMaker, valueOf, get, orElse, getOrElse } from '../data_structure_util';
+import { monad_apply, mjoin, pointMaker, equalMaker, stringMaker, valueOf, get, orElse, getOrElse } from '../data_structure_util';
 
 /**
  * @signature - :: * -> {@link monads.constant}
@@ -268,9 +268,9 @@ constant.bimap = constant.map;
 constant.constructor = constant.factory;
 
 constant.mjoin = mjoin;
-constant.apply = apply;
+constant.apply = monad_apply;
 
-constant.ap =constant.apply;
+constant.ap = constant.apply;
 constant.fmap = constant.chain;
 constant.flapMap = constant.chain;
 constant.bind = constant.chain;

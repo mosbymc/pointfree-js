@@ -1,5 +1,5 @@
 import { identity } from '../../combinators';
-import { disjunctionEqualMaker, stringMaker, valueOf, apply, chain, mjoin, pointMaker,
+import { disjunctionEqualMaker, stringMaker, valueOf, monad_apply, chain, mjoin, pointMaker,
     get, emptyGet, orElse, emptyOrElse, getOrElse, emptyGetOrElse, sharedEitherFns } from '../data_structure_util';
 
 /**
@@ -672,11 +672,11 @@ right.constructor = right.factory;
 left.constructor = left.factory;
 right.chain = chain;
 right.mjoin = mjoin;
-right.apply = apply;
+right.apply = monad_apply;
 
 left.chain = chain;
 left.mjoin = mjoin;
-left.apply = apply;
+left.apply = monad_apply;
 
 right.ap = right.apply;
 left.ap = left.apply;

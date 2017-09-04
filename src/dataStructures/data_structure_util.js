@@ -4,6 +4,16 @@ import { identity } from '../combinators';
 
 var map = m => fn => m.map(fn);
 
+function contramap(fn) {
+    return this.of(compose(this.value, fn));
+}
+
+function compose(f, g) {
+    return function _compose(...args) {
+        return f(g(...args));
+    };
+}
+
 /**
  * @signature
  * @description d
@@ -85,7 +95,6 @@ function monadIterator() {
  * @return {*} - a
  */
 function get() {
-    console.log(this.value);
     return this.value;
 }
 
@@ -166,7 +175,7 @@ function emptyGetOrElse(x) {
  * @param {Object} ma - a
  * @return {*} - b
  */
-function apply(ma) {
+function monad_apply(ma) {
     return ma.map(this.value);
 }
 
@@ -368,6 +377,36 @@ var sharedEitherFns = {
     leftBimapMaker
 };
 
+var delegate_aliases = {
+    chain: [ 'bind', 'fmap', 'flatMap' ],
+    apply: [ 'ap' ],
+    factory: [ 'constructor' ]
+};
+
+var factory_aliases = {
+    of: [ 'pure', 'point', 'return' ]
+};
+
+function applyAliases(monads) {
+    monads.forEach(function _applyAliases(monad) {
+        Object.keys(factory_aliases).forEach(function _applyFactoryAliases(fn) {
+            factory_aliases[fn].forEach(function _setAliases(alias) {
+                monad.factory[alias] = monad.factory[fn];
+            });
+        });
+
+        if (monad.delegate) {
+            Object.keys(delegate_aliases).forEach(function _applyDelegateAliases(fn) {
+                delegate_aliases[fn].forEach(function _setAliases(alias) {
+                    monad.delegate[alias] = monad.delegate[fn];
+                });
+            });
+        }
+    });
+
+    return monads;
+}
+
 var fl = {
     equals: 'fantasy-land/equals',
     lte: 'fantasy-land/lte',
@@ -391,6 +430,6 @@ var fl = {
     promap: 'fantasy-land/promap'
 };
 
-export { apply, applyTransforms, chain, monadIterator, disjunctionEqualMaker, equalMaker, lifter, maybeFactoryHelper,
+export { monad_apply, applyTransforms, chain, contramap, monadIterator, disjunctionEqualMaker, equalMaker, lifter, maybeFactoryHelper,
         mjoin, pointMaker, stringMaker, valueOf, get, emptyGet, orElse, emptyOrElse, getOrElse, emptyGetOrElse, sharedMaybeFns,
-        sharedEitherFns, applyFantasyLandSynonyms, chainRec, extendMaker, extract };
+        sharedEitherFns, applyFantasyLandSynonyms, applyAliases, chainRec, extendMaker, extract };

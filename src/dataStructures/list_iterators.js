@@ -9,7 +9,7 @@ import { sortData } from './sort_util';
 var toArray = when(not(isArray), Array.from);
 
 /**
- * @sig 
+ * @signature 
  * @description -
  * @param {Array|generator|monads.list_core} xs - some stuff
  * @param {Array|generator|monads.list_core} ys - some other stuff
@@ -24,7 +24,7 @@ function prepend(xs, ys) {
 }
 
 /**
- * @sig:
+ * @signature:
  * @description description
  * @param {Array|generator|monads.list_core} xs - x
  * @param {Array|generator|monads.list_core} yss - y
@@ -48,7 +48,7 @@ function concat(xs, yss, argsCount) {
 }
 
 /**
- * @sig
+ * @signature
  * @description d
  * @param {Array|generator|monads.list_core} xs - x
  * @param {Array|generator|monads.list_core} ys - y
@@ -67,7 +67,7 @@ function except(xs, ys, comparer = strictEquals) {
 }
 
 /**
- * @sig
+ * @signature
  * @description d
  * @param {Array|generator|monads.list_core} xs - a
  * @param {Array|generator|monads.list_core} ys - b
@@ -98,7 +98,7 @@ function groupJoin(xs, ys, xSelector, ySelector, projector, listFactory, compare
 }
 
 /**
- * @sig
+ * @signature
  * @description d
  * @param {Array|generator|monads.list_core} xs - a
  * @param {Array|generator|monads.list_core} ys - b
@@ -117,7 +117,7 @@ function intersect(xs, ys, comparer = strictEquals) {
 }
 
 /**
- * @sig
+ * @signature
  * @description d
  * @param {Array|generator|monads.list_core} xs - a
  * @param {*} val - b
@@ -137,7 +137,7 @@ function intersperse(xs, val) {
 }
 
 /**
- * @sig
+ * @signature
  * @description d
  * @param {Array|generator|monads.list_core} xs - a
  * @param {Array|generator|monads.list_core} ys - b
@@ -161,7 +161,7 @@ function join(xs, ys, xSelector, ySelector, projector, comparer = strictEquals) 
 }
 
 /**
- * @sig
+ * @signature
  * @description d
  * @param {Array|generator|monads.list_core} xs - a
  * @param {Array|generator|monads.list_core} ys - b
@@ -182,7 +182,7 @@ function union(xs, ys, comparer = strictEquals) {
 }
 
 /**
- * @sig
+ * @signature
  * @description d
  * @param {Array|generator|monads.list_core} xs - a
  * @param {Array|generator|monads.list_core} ys - b
@@ -203,7 +203,7 @@ function zip(xs, ys, selector) {
 }
 
 /**
- * @sig
+ * @signature
  * @description d
  * @param {Array|generator|monads.list_core} xs - a
  * @param {function} predicate - b
@@ -214,7 +214,7 @@ function all(xs, predicate) {
 }
 
 /**
- * @sig
+ * @signature
  * @description d
  * @param {Array|generator|monads.list_core} xs - a
  * @param {function} predicate - b
@@ -225,7 +225,7 @@ function any(xs, predicate) {
 }
 
 /**
- * @sig
+ * @signature
  * @description d
  * @param {Array|generator|monads.list_core} xs - a
  * @param {*} val - b
@@ -238,7 +238,7 @@ function contains(xs, val, comparer) {
 }
 
 /**
- * @sig
+ * @signature
  * @description d
  * @param {Array|generator|monads.list_core} xs - a
  * @param {*} val - b
@@ -250,7 +250,7 @@ function binarySearch(xs, val, comparer) {
 }
 
 /**
- * @sig
+ * @signature
  * @description d
  * @param {Array|generator|monads.list_core} xs - a
  * @param {number} left - b
@@ -269,7 +269,7 @@ function binarySearchRec(xs, left, right, val, comparer) {
 }
 
 /**
- * @sig
+ * @signature
  * @description d
  * @param {Array|generator|monads.list_core} xs - a
  * @param {function} predicate - b
@@ -281,7 +281,7 @@ function count(xs, predicate) {
 }
 
 /**
- * @sig
+ * @signature
  * @description d
  * @param {Array|generator|monads.list_core} xs - a
  * @param {function} predicate - b
@@ -292,7 +292,7 @@ function first(xs, predicate) {
 }
 
 /**
- * @sig
+ * @signature
  * @description d
  * @param {Array|generator|monads.list_core} xs - a
  * @param {function} fn - b
@@ -304,7 +304,7 @@ function foldLeft(xs, fn, initial = 0) {
 }
 
 /**
- * @sig
+ * @signature
  * @description d
  * @param {Array|monads.list_core} arr - a
  * @param {function} op - b
@@ -322,7 +322,7 @@ function foldRight(arr, op, acc) {
 }
 
 /**
- * @sig
+ * @signature
  * @description s
  * @param {Array|generator|monads.list_core} xs - a
  * @param {function} fn - b
@@ -334,7 +334,7 @@ function reduceRight(xs, fn, initial) {
 }
 
 /**
- * @sig
+ * @signature
  * @description d
  * @param {Array|generator|monads.list_core} xs - a
  * @param {function} predicate - b
@@ -347,7 +347,7 @@ function last(xs, predicate) {
 }
 
 /**
- * @sig
+ * @signature
  * @description d
  * @param {Array|generator|monads.list_core} xs - a
  * @param {function} comparer - b
@@ -364,7 +364,7 @@ function distinct(xs, comparer = strictEquals) {
 }
 
 /**
- * @sig
+ * @signature
  * @description d
  * @param {Array|generator|monads.list_core} xs - a
  * @param {string} dataType - b
@@ -415,7 +415,7 @@ function ofType(xs, dataType) {
 }
 
 /**
- * @sig
+ * @signature
  * @description d
  * @param {Array|generator|monads.list_core} xs - a
  * @param {function} predicate - b
@@ -430,7 +430,7 @@ function filter(xs, predicate) {
 }
 
 /**
- * @sig
+ * @signature
  * @description d
  * @param {*} xs - a
  * @param {function} fn - b
@@ -471,7 +471,7 @@ function chain(xs, fn) {
  */
 
 /**
- * @sig
+ * @signature
  * @description d
  * @param {Array|generator|monads.list_core} xs - a
  * @return {generator} - b
@@ -491,10 +491,10 @@ function flatten(xs) {
 }
 
 /**
- * @sig
+ * @signature
  * @description d
  * @param {Array|generator|monads.list_core} xs - a
- * @param {object} groupObject - b
+ * @param {Array} groupObject - b
  * @param {function} queryableConstructor - c
  * @return {generator} - d
  */
@@ -507,11 +507,11 @@ function groupBy(xs, groupObject, queryableConstructor) {
 }
 
 /**
- * @sig
+ * @signature
  * @description d
  * @param {*} data - a
  * @param {number} depth - b
- * @param {string} key - c
+ * @param {string|null} key - c
  * @param {function} queryableConstructor - d
  * @return {Array} - e
  */
@@ -529,10 +529,10 @@ function nestLists(data, depth, key, queryableConstructor) {
 }
 
 /**
- * @sig
+ * @signature
  * @description d
  * @param {*} xs - a
- * @param {object} groupObject - b
+ * @param {Array} groupObject - b
  * @return {Array} - c
  */
 function groupData(xs, groupObject) {
@@ -550,7 +550,7 @@ function groupData(xs, groupObject) {
 }
 
 /**
- * @sig
+ * @signature
  * @description d
  * @param {Array} arr - a
  * @param {string} field - b
@@ -575,7 +575,7 @@ function findGroup(arr, field) {
 }
 
 /**
- * @sig
+ * @signature
  * @description d
  * @param {Array|generator|monads.list_core} xs - a
  * @param {function} fn - b
@@ -591,7 +591,7 @@ function map(xs, fn) {
 }
 
 /**
- * @sig
+ * @signature
  * @description d
  * @param {Array|generator|monads.list_core} xs - a
  * @param {Array} orderObject - b
@@ -606,7 +606,7 @@ function sortBy(xs, orderObject) {
 }
 
 /**
- * @sig
+ * @signature
  * @description d
  * @param {monads.list_core} xs - a
  * @param {monads.list_core} ys - b
@@ -624,7 +624,7 @@ function equals(xs, ys, comparer = strictEquals) {
 }
 
 /**
- * @sig
+ * @signature
  * @description d
  * @param {Array|generator|monads.list_core} xs - a
  * @param {function} predicate - b
@@ -640,7 +640,7 @@ function takeWhile(xs, predicate) {
 }
 
 /**
- * @sig
+ * @signature
  * @description d
  * @param {Array|generator|monads.list_core} xs - a
  * @param {function} predicate - b
@@ -662,7 +662,7 @@ function skipWhile(xs, predicate) {
 }
 
 /**
- * @sig
+ * @signature
  * @description d
  * @param {Array|generator|monads.list_core} xs - a
  * @return {generator} - b
@@ -674,7 +674,7 @@ function reverse(xs) {
 }
 
 /**
- * @sig
+ * @signature
  * @description d
  * @param {*} item - a
  * @param {number} count - b
@@ -689,7 +689,7 @@ function repeat(item, count) {
 }
 
 /**
- * @sig
+ * @signature
  * @description d
  * @param {number} idx - a
  * @param {number} start - b
@@ -704,7 +704,7 @@ function copyWithin(idx, start, end, xs) {
 }
 
 /**
- * @sig
+ * @signature
  * @description d
  * @param {*} val - a
  * @param {number} start - b
@@ -719,7 +719,7 @@ function fill(val, start, end, xs) {
 }
 
 /**
- * @sig
+ * @signature
  * @description d
  * @param {Array|generator|monads.list_core} xs - a
  * @param {function} comparer - b
@@ -730,7 +730,7 @@ function findIndex(xs, comparer = strictEquals) {
 }
 
 /**
- * @sig
+ * @signature
  * @description d
  * @param {Array|generator|monads.list_core} xs - a
  * @param {function} comparer - b

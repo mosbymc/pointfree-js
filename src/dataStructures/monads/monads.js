@@ -6,7 +6,7 @@ import { Io, io } from './io';
 import { List, list_core } from './list';
 import { Maybe, Just, Nothing, just, nothing } from './maybe';
 import { Validation, validation } from './validation';
-import { applyTransforms, monadIterator, lifter, applyFantasyLandSynonyms } from '../data_structure_util';
+import { applyTransforms, monadIterator, lifter, applyFantasyLandSynonyms, applyAliases } from '../data_structure_util';
 
 /**
  * @module dataStructures/monads
@@ -171,7 +171,6 @@ var monads = [
     { factory: Validation, delegate: validation }
 ];
 
-applyTransforms(monads);
-applyFantasyLandSynonyms(monads);
+applyFantasyLandSynonyms(applyTransforms(applyAliases(monads)));
 
 export { Constant, Either, Future, Identity, Io, Just, Left, List, Maybe, Nothing, Right, Validation };

@@ -1,4 +1,4 @@
-import { apply, applyTransforms, chain, monadIterator, disjunctionEqualMaker, equalMaker, lifter, maybeFactoryHelper,
+import { monad_apply, applyTransforms, chain, monadIterator, disjunctionEqualMaker, equalMaker, lifter, maybeFactoryHelper,
     mjoin, pointMaker, stringMaker, valueOf, get, emptyGet, orElse, emptyOrElse, getOrElse, emptyGetOrElse, sharedMaybeFns,
     sharedEitherFns, applyFantasyLandSynonyms, chainRec } from '../../../src/dataStructures/data_structure_util';
 
@@ -42,14 +42,14 @@ var identity = {
 identity.equals = equalMaker(identity);
 
 describe('Test data structure utils', function _testDataStructureUtils() {
-    describe('Test apply', function _testApply() {
+    describe('Test monad_apply', function _testApply() {
         it('should map an object\'s function value over a functor\'s value and return the functor', function _testApply() {
             var list = [1, 2, 3, 4, 5],
                 obj = {
                     value: function _map(num) { return num * num; }
                 };
 
-            var res = apply.call(obj, list);
+            var res = monad_apply.call(obj, list);
             res.should.be.an('array');
             res.should.eql([1, 4, 9, 16, 25]);
         });

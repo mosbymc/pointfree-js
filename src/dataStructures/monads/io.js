@@ -1,6 +1,6 @@
 import { compose, constant } from '../../combinators';
 import { type, strictEquals } from '../../functionalHelpers';
-import { apply, chain, mjoin, pointMaker, equalMaker, stringMaker, valueOf } from '../data_structure_util';
+import { monad_apply, chain, mjoin, pointMaker, equalMaker, stringMaker, valueOf } from '../data_structure_util';
 import { javaScriptTypes } from '../../helpers';
 
 /**
@@ -93,7 +93,7 @@ io.bimap = io.map;
 
 io.chain = chain;
 io.mjoin = mjoin;
-io.apply = apply;
+io.apply = monad_apply;
 
 io.ap =io.apply;
 io.fmap = io.chain;
