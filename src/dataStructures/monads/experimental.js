@@ -85,7 +85,7 @@ var next = fn => Object.create(identity, {
     }
 });
 
-/**
+ /**
  * @typedef {Object} identity
  * @property {function} value - returns the underlying value of the the monad
  * @property {function} map - maps a single function over the underlying value of the monad
@@ -188,7 +188,7 @@ var identity = {
      * @return {Object} Returns a new identity monad after flattening the nested monads by one level.
      */
     mjoin: function _mjoin() {
-        return next(() => Object.getPrototypeOf(this).isPrototypeOf(this.value) ? this.value : this);
+        return next(() => Object.getPrototypeOf(this).isPrototypeOf(this.value) ? this.value.value : this.value);
     },
     /**
      * @signature Object -> Object
@@ -269,7 +269,7 @@ var identity = {
      * @return {monads.identity} Returns a new identity monad.
      */
     contramap: function contramap(fn) {
-        return next((...args) => this.value(fn(...args)));
+        return next(() => (...args) => this.value(fn(...args)));
     },
     /**
      * @signature () -> {@link monads.identity}
@@ -394,7 +394,10 @@ var identity = {
      * value of the {@link monads.identity}.
      * @return {monads.identity} - Returns a new identity monad delegator
      */
-    factory: Identity
+    factory: Identity,
+     [Symbol.iterator]: function *_iterator() {
+        yield this.value;
+     }
 };
 
 /**

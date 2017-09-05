@@ -196,7 +196,7 @@ var future = {
      */
     map: function _map(fn) {
         return this.of((reject, resolve) =>
-            this.fork(a => reject(a), b => resolve(fn(b))));
+            this.fork(err => reject(err), res => resolve(fn(res))));
     },
     //TODO: probably need to compose here, not actually map over the value; this is a temporary fill-in until
     //TODO: I have time to finish working on the Future
@@ -208,6 +208,9 @@ var future = {
                     cancel = fn(b).fork(reject, resolve);
                 });
             return cancel ? cancel : (cancel = outerFork, x => cancel());
+            /*
+            return this.fork(err => reject(err), res => fn(res).fork(reject, resolve));
+             */
         });
     },
     fold: function _fold(f, g) {
