@@ -829,26 +829,26 @@ var list_core = {
      * @memberOf monads.list_core
      * @instance
      * @function traverse
-     * @param {Object} fa - a
-     * @param {function} fn - b
+     * @param {function} f - a
+     * @param {function} g - b
      * @return {monads.list} - c
      */
-    traverse: function _traverse(fa, fn) {
-        return this.value.reduce(function _reduce(xs, x) {
-            fn(x).map(x => y => y.concat([x])).apply(xs);
-        }, fa.of(List.of()));
+    traverse: function _traverse(f, g) {
+        return this.foldl(function _reduce(xs, x) {
+            return g(x).map(x => y => y.concat([x])).apply(xs);
+        }, f(List.of()));
 
         /*
         return this.fold(function _reductioAdAbsurdum(xs, x) {
-            fn(x).map(function _map(x) {
+            g(x).map(function _map(x) {
                 return function _map_(y) {
                     return y.concat([x]);
                 };
             }).ap(xs);
-            return fa(this.empty);
+            return f(this.empty);
         });*/
 
-        //TODO: this exists inside the traverse function. Function should take a typeRep + fn
+        //TODO: this exists inside the traverse function. Function should take a typeRep + g
         /*
          var xs = this;
          function go(idx, n) {

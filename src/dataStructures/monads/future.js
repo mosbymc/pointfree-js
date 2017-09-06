@@ -195,12 +195,13 @@ var future = {
      * just performed.
      */
     map: function _map(fn) {
-        return this.of((reject, resolve) =>
-            this.fork(err => reject(err), res => resolve(fn(res))));
+        return this.of((reject, resolve) => this.fork(err => reject(err), res => resolve(fn(res))));
     },
     //TODO: probably need to compose here, not actually map over the value; this is a temporary fill-in until
     //TODO: I have time to finish working on the Future
     chain: function _chain(fn) {
+        return this.of((resolve, reject) => this.fork(err => reject(err), res => fn(res).fork(reject, resolve)));
+        /*
         return this.of((reject, resolve) =>
         {
             let cancel,
@@ -208,14 +209,34 @@ var future = {
                     cancel = fn(b).fork(reject, resolve);
                 });
             return cancel ? cancel : (cancel = outerFork, x => cancel());
-            /*
-            return this.fork(err => reject(err), res => fn(res).fork(reject, resolve));
-             */
+        });
+        */
+    },
+    mjoin: function _mjoin() {
+        return this.chain(x => x);
+    },
+    apply: function _apply(ma) {
+        return this.of((reject, resolve) => {
+            let rej = once(reject),
+                val, mapper,
+                isDone = safeFork(rej, function _res() {
+                    return null != val && null != mapper ? resolve(mapper(val)) : undefined;
+                });
+
+            this.fork(rej, function _thisRes(fn) {
+                mapper = fn;
+                isDone();
+            });
+
+            ma.fork(rej, function _thatRes(value) {
+                val = value;
+                isDone();
+            });
         });
     },
     fold: function _fold(f, g) {
         return this.of((reject, resolve) =>
-            this.fork(a => resolve(f(a)), b => resolve(g(b))));
+            this.fork(err => resolve(f(err)), res => resolve(g(res))));
     },
     traverse: function _traverse(fa, fn) {
         return this.fold(function _reductioAdAbsurdum(xs, x) {
@@ -227,8 +248,17 @@ var future = {
             return fa(this.empty);
         });
     },
+    bimap: function _bimap(f, g) {
+        return this.of((reject, resolve) => this._fork(safeFork(reject, err => reject(f(err))), safeFork(reject, res => resolve(g(res)))));
+    },
+    empty: function _empty() {
+        return this.of(noop);
+    },
+    isEmpty: function _isEmpty() {
+        return this._fork === noop;
+    },
     fork: function _fork(reject, resolve) {
-        this._fork(reject, resolve);
+        this._fork(reject, safeFork(reject, resolve));
     },
     /**
      * @signature * -> boolean

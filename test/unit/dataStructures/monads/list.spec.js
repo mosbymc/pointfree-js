@@ -91,7 +91,7 @@ describe('List functor test', function _testListFunctor() {
                 .data.should.eql([0, 1, 2, 3, 4, 5]);
         });
 
-        it('should return correct response when checking is a type is an Identity', function _testListDotIs() {
+        it('should return correct response when checking if a type is an Identity', function _testListDotIs() {
             var l = List(2),
                 m = monads.Maybe(2),
                 c = monads.Constant(null),
@@ -110,6 +110,19 @@ describe('List functor test', function _testListFunctor() {
         it('should return a new List delegate with the same value repeated x times', function _testListDotRepeat() {
             List.repeat(1, 5)
                 .data.should.eql([1, 1, 1, 1, 1]);
+        });
+
+        it('should create a new list via unfold', function _testUnfold() {
+            function unfoldFn(val) {
+                return { next: val * val, value: monads.Identity(val), done: 513 < val };
+            }
+
+            var last = 0;
+            List.unfold(unfoldFn, 2).data.forEach(function _validateResult(item) {
+                Object.getPrototypeOf(monads.Identity()).isPrototypeOf(item).should.be.true;
+                item.value.should.be.at.least(last);
+                last = item.value;
+            });
         });
 
         it('should extend the List factory with new functionality', function _testListDotExtend() {
@@ -896,6 +909,35 @@ describe('List functor test', function _testListFunctor() {
                     spyComparer.should.have.been.callCount(16);
                 });
             });
+        });
+    });
+
+    describe('tmp', function _tmp() {
+        it('should do stuff', function _doStuff() {
+            function _TO1(cb) {
+                setTimeout(function _to() {
+                    cb(1);
+                }, 250);
+            }
+
+            function _TO2(cb) {
+                setTimeout(function _to() {
+                    cb(2);
+                }, 300);
+            }
+
+            var fns = List.from([ _TO1, _TO2]);
+
+            var r = fns.traverse(monads.Future.of, fn => monads.Future(fn));
+            console.log(r._fork);
+            console.log(
+                r.fork(err => console.log(err),
+                    res => console.log(res)));
+            //fns.map(val => val);
+
+
+            //var res = fns.map(fn => monads.Future(fn));
+            //console.log(res);
         });
     });
 });

@@ -325,12 +325,12 @@ function unfold(seed) {
  * @return {function} - b
  */
 function unfoldWith(fn) {
-    return function *_unfold (value) {
-        let { next, element, done } = fn(value);
+    return function *_unfold (val) {
+        let { next, value, done } = fn(val);
 
-        if (!done) {
-            yield element;
-            yield * _unfold(next);
+        while (!done) {
+            yield value;
+            ({ next, value, done } = fn(next));
         }
     };
 }
