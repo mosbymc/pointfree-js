@@ -834,8 +834,40 @@ var list_core = {
      * @return {monads.list} - c
      */
     traverse: function _traverse(f, g) {
+
+        /*
+        console.log(Array.from(this).reduce(function _reduce(xs, x) {
+
+            return g(x).map(function _map(x) {
+                return function _map_(y) {
+                    return y.concat([x]).apply(xs);
+                };
+            });
+
+            //return g(x).map(x => y => y.concat([x])).apply(xs);
+        }, f(List.of)));
+        */
+
+
         return this.foldl(function _reduce(xs, x) {
-            return g(x).map(x => y => y.concat([x])).apply(xs);
+            /*
+            console.log(g(x).map(function _map(x) {
+                return function _map_(y) {
+                    return y.concat([x]).apply(xs);
+                };
+            }));
+            */
+
+            return g(x).map(function _map(x) {
+                console.log(x);
+                return function _map_(y) {
+                    console.log(x);
+                    console.log(y);
+                    return y.concat([x]).apply(xs);
+                };
+            });
+
+            //return g(x).map(x => y => y.concat([x])).apply(xs);
         }, f(List.of()));
 
         /*

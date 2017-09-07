@@ -19,8 +19,8 @@ describe('Maybe functor tests', function _testMaybeFunctor() {
                 i7 = Maybe('testing constant'),
                 i8 = Maybe(false);
 
-            nothing.isPrototypeOf(i1).should.be.true;
-            nothing.isPrototypeOf(i2).should.be.true;
+            i1.should.eql(nothing);
+            i2.should.eql(nothing);
             just.isPrototypeOf(i3).should.be.true;
             just.isPrototypeOf(i4).should.be.true;
             just.isPrototypeOf(i5).should.be.true;
@@ -112,14 +112,14 @@ describe('Maybe functor tests', function _testMaybeFunctor() {
                 i7 = Maybe.Nothing('testing constant'),
                 i8 = Maybe.Nothing(false);
 
-            nothing.isPrototypeOf(i1).should.be.true;
-            nothing.isPrototypeOf(i2).should.be.true;
-            nothing.isPrototypeOf(i3).should.be.true;
-            nothing.isPrototypeOf(i4).should.be.true;
-            nothing.isPrototypeOf(i5).should.be.true;
-            nothing.isPrototypeOf(i6).should.be.true;
-            nothing.isPrototypeOf(i7).should.be.true;
-            nothing.isPrototypeOf(i8).should.be.true;
+            i1.should.eql(nothing);
+            i2.should.eql(nothing);
+            i3.should.eql(nothing);
+            i4.should.eql(nothing);
+            i5.should.eql(nothing);
+            i6.should.eql(nothing);
+            i7.should.eql(nothing);
+            i8.should.eql(nothing);
 
             expect(null).to.eql(i1.value);
             expect(null).to.eql(i2.value);
@@ -199,7 +199,7 @@ describe('Maybe functor tests', function _testMaybeFunctor() {
             var m1 = Maybe.fromNullable(null),
                 m2 = Maybe.fromNullable(1);
 
-            nothing.isPrototypeOf(m1).should.be.true;
+            m1.should.eql(nothing);
             just.isPrototypeOf(m2).should.be.true;
 
             m1.isNothing.should.be.true;
@@ -221,10 +221,9 @@ describe('Maybe functor tests', function _testMaybeFunctor() {
             Object.getPrototypeOf(j2).should.eql(just);
             expect(j2.value).to.eql(null);
 
-            Object.getPrototypeOf(n1).should.eql(nothing);
+            n1.should.eql(nothing);
             expect(n1.value).to.eql(null);
 
-            Object.getPrototypeOf(n2).should.eql(nothing);
             expect(n2.value).to.eql(null);
         });
     });

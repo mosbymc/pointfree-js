@@ -913,26 +913,36 @@ describe('List functor test', function _testListFunctor() {
     });
 
     describe('tmp', function _tmp() {
-        it('should do stuff', function _doStuff() {
-            function _TO1(cb) {
+        it('should do stuff', function _doStuff(done) {
+            var count = 0;
+
+            function _TO1(rej, res) {
                 setTimeout(function _to() {
-                    cb(1);
+                    count.should.eql(1);
+                    ++count;
+                    done();
                 }, 250);
             }
 
-            function _TO2(cb) {
+            function _TO2(rej, res) {
                 setTimeout(function _to() {
-                    cb(2);
+                    count.should.eql(0);
+                    ++count;
+                    done();
                 }, 300);
             }
 
             var fns = List.from([ _TO1, _TO2]);
 
             var r = fns.traverse(monads.Future.of, fn => monads.Future(fn));
-            console.log(r._fork);
-            console.log(
-                r.fork(err => console.log(err),
-                    res => console.log(res)));
+
+            console.log(r.value);
+
+            r.fork(function _err(err) {
+                console.log(err);
+            }, function res(res) {
+                console.log(res);
+            });
             //fns.map(val => val);
 
 

@@ -13,6 +13,7 @@ import { javaScriptTypes } from '../../helpers';
  */
 function safeFork(reject, resolve) {
     return function _safeFork(val) {
+        console.log(val);
         try {
             return resolve(val);
         }
@@ -41,12 +42,12 @@ function safeFork(reject, resolve) {
 function Future(fn) {
     return Object.create(future, {
         _value: {
-            value: once(fn),
+            value: fn,
             writable: false,
             configurable: false
         },
         _fork: {
-            value: once(fn),
+            value: fn,
             writable: false
         }
     });
@@ -195,7 +196,10 @@ var future = {
      * just performed.
      */
     map: function _map(fn) {
-        return this.of((reject, resolve) => this.fork(err => reject(err), res => resolve(fn(res))));
+        return this.of((reject, resolve) => {
+            console.log(this._fork);
+            return this.fork(err => reject(err), res => resolve(fn(res)))
+        });
     },
     //TODO: probably need to compose here, not actually map over the value; this is a temporary fill-in until
     //TODO: I have time to finish working on the Future
@@ -258,6 +262,7 @@ var future = {
         return this._fork === noop;
     },
     fork: function _fork(reject, resolve) {
+        console.log(reject, resolve);
         this._fork(reject, safeFork(reject, resolve));
     },
     /**

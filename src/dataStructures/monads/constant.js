@@ -111,7 +111,7 @@ var constant = {
      * just performed.
      */
     map: function _map(fn) {
-        return this.of(this.value);
+        return this;
     },
     chain: function _chain() {
         return this;

@@ -300,6 +300,13 @@ function first(xs, predicate) {
  * @return {*} - d
  */
 function foldLeft(xs, fn, initial = 0) {
+    if (initial.factory) {
+        //console.log(xs);
+        //console.log(fn);
+        //console.log(initial);
+        //console.log(toArray(xs));
+        console.log(toArray(xs).reduce(fn, initial));
+    }
     return toArray(xs).reduce(fn, initial);
 }
 
