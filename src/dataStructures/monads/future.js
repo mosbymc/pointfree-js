@@ -198,7 +198,7 @@ var future = {
     map: function _map(fn) {
         return this.of((reject, resolve) => {
             console.log(this._fork);
-            return this.fork(err => reject(err), res => resolve(fn(res)))
+            return this.fork(err => reject(err), res => resolve(fn(res)));
         });
     },
     //TODO: probably need to compose here, not actually map over the value; this is a temporary fill-in until
