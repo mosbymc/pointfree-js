@@ -849,6 +849,9 @@ var list_core = {
         */
 
 
+        //TODO: Still working on proper implementation of traverse for list...
+        //TODO: I think it might make more sense to first map the function over
+        //TODO: the list, then fold the list<monad<Ta>> into a monad<list<Tb>>
         return this.foldl(function _reduce(xs, x) {
             /*
             console.log(g(x).map(function _map(x) {
