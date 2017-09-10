@@ -821,7 +821,13 @@ var list_core = {
      * @return {monads.list} - b
      */
     sequence: function _sequence(p) {
-        return this.traverse(p, identity);
+        //return this.traverse(p, identity);
+        return this.foldr((m, ma) => {
+            return m.chain(x => {
+                if (0 === ma.value.length) return List.of(x);
+                return ma.chain(xs => List.of(List.of(x).concat(xs)));
+            });
+        }, List.empty());
     },
     /**
      * @signature
@@ -834,6 +840,7 @@ var list_core = {
      * @return {monads.list} - c
      */
     traverse: function _traverse(f, g) {
+        return this.map(g).sequence(f);
 
         /*
         console.log(Array.from(this).reduce(function _reduce(xs, x) {
@@ -852,15 +859,12 @@ var list_core = {
         //TODO: Still working on proper implementation of traverse for list...
         //TODO: I think it might make more sense to first map the function over
         //TODO: the list, then fold the list<monad<Ta>> into a monad<list<Tb>>
-        return this.foldl(function _reduce(xs, x) {
-            /*
-            console.log(g(x).map(function _map(x) {
-                return function _map_(y) {
-                    return y.concat([x]).apply(xs);
-                };
-            }));
-            */
-
+        /*return this.foldl(function _reduce(xs, x) {
+            //console.log(g(x).map(function _map(x) {
+            //    return function _map_(y) {
+            //        return y.concat([x]).apply(xs);
+            //    };
+            //}));
             return g(x).map(function _map(x) {
                 console.log(x);
                 return function _map_(y) {
@@ -871,7 +875,7 @@ var list_core = {
             });
 
             //return g(x).map(x => y => y.concat([x])).apply(xs);
-        }, f(List.of()));
+        }, f(List.of()));*/
 
         /*
         return this.fold(function _reductioAdAbsurdum(xs, x) {

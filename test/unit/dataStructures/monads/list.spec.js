@@ -913,20 +913,19 @@ describe('List functor test', function _testListFunctor() {
     });
 
     describe('tmp', function _tmp() {
-        it('should do stuff', function _doStuff(done) {
+        it('should do stuff', function _doStuff() {
             var count = 0;
 
             function _TO1(rej, res) {
                 setTimeout(function _to() {
-                    count.should.eql(1);
+                    count.should.eql(0);
                     ++count;
-                    done();
                 }, 250);
             }
 
             function _TO2(rej, res) {
                 setTimeout(function _to() {
-                    count.should.eql(0);
+                    count.should.eql(1);
                     ++count;
                     done();
                 }, 300);
