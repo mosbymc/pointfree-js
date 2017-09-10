@@ -197,7 +197,6 @@ var future = {
      */
     map: function _map(fn) {
         return this.of((reject, resolve) => {
-            console.log(this._fork);
             return this.fork(err => reject(err), res => resolve(fn(res)));
         });
     },

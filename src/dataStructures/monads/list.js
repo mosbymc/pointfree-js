@@ -2,10 +2,10 @@ import { all, any, chain, except, intersect, union, map, groupBy, sortBy, prepen
     contains, first, last, count, foldLeft, reduceRight, distinct, ofType, binarySearch, equals, takeWhile, skipWhile, reverse,
     copyWithin, fill, findIndex, findLastIndex, repeat, foldRight, unfold } from '../list_iterators';
 import { sortDirection, generatorProto } from '../../helpers';
-import { wrap, defaultPredicate, delegatesFrom, isArray, noop, invoke } from '../../functionalHelpers';
-import { when, ifElse, identity } from '../../combinators';
+import { wrap, defaultPredicate, delegatesFrom, isArray, noop, invoke, delegatesTo, isString } from '../../functionalHelpers';
+import { when, ifElse, identity, constant } from '../../combinators';
 import { not } from '../../decorators';
-import { createListCreator, taker_skipper, listExtensionHelper, createSortObject } from '../list_util';
+import { taker_skipper, listExtensionHelper, createSortObject } from '../list_util';
 
 /**
  * @description: Object that contains the core functionality of a List; both the m_list and ordered_m_list
@@ -1148,7 +1148,7 @@ var ordered_list = Object.create(list_core, {
  * was grouped on.
  * @return {list_core}
  */
-var createListDelegateInstance = createListCreator(list, ordered_list, list);
+var createListDelegateInstance = listFactory;
 
 /**
  * @signature
@@ -1204,7 +1204,7 @@ function List(source) {
  * @param {*} [source] - Any type, any value; used as the underlying source of the List
  * @return {monads.list} - A new List instance with the value provided as the underlying source.
  */
-List.from = source => List(source);
+List.from = source => ifElse(delegatesFrom(list_core), constant(source), List, source);
 
 /**
  * @signature
@@ -1350,6 +1350,108 @@ List.extend = listExtensionHelper(List, list_core, createListDelegateInstance, l
 
 function createGroupedListDelegate(source, key) {
     return createListDelegateInstance(source, undefined, undefined, key);
+}
+
+function listFactory(source, iterator, sortObj, key) {
+    switch(createBitMask(delegatesTo(iterator, generatorProto), isArray(sortObj), isString(key))) {
+        /**
+         * @description: case 1 = An iterator has been passed, but nothing else. Create a
+         * basic list type object instance and set the iterator as the version provided.
+         */
+        case 1:
+            return Object.create(list, {
+                _value: {
+                    value: source,
+                    writable: false,
+                    configurable: false
+                },
+                [Symbol.iterator]: {
+                    value: iterator
+                }
+            });
+        /**
+         * @description: case 2 = Only a sort object was passed in. The list is presumed to be either
+         * trivially sorted via List.just or List.empty, or was initialized as an ordered list. Create
+         * an ordered list type object instance, setting the _appliedSorts field as the sortObj param.
+         */
+        case 2:
+            return Object.create(ordered_list, {
+                _value: {
+                    value: source,
+                    writable: false,
+                    configurable: false
+                },
+                _appliedSorts: {
+                    value: sortObj,
+                    writable: false,
+                    configurable: false
+                }
+            });
+        /**
+         * @description: case 3 = Both an iterator and a sort object were passed in. The consumer
+         * invoked the sortBy/sortByDescending or thenBy/thenByDescending function properties. Create
+         * an ordered list type object instance, setting the iterator to the version provided (if any) and
+         * the _appliedSorts field as the sortObj param.
+         */
+        case 3:
+            return Object.create(ordered_list, {
+                _value: {
+                    value: source,
+                    writable: false,
+                    configurable: false
+                },
+                _appliedSorts: {
+                    value: sortObj,
+                    writable: false,
+                    configurable: false
+                },
+                [Symbol.iterator]: {
+                    value: iterator
+                }
+            });
+        /**
+         * @description: case 4 = An iterator, sort object, and a key were passed as arguments.
+         * Create a grouped list type and set the iterator as the version provided, the ._appliedSorts
+         * field as the sortObj param, and the ._key field as the key string argument.
+         */
+        case 4:
+            return Object.create(list, {
+                _value: {
+                    value: source,
+                    writable: false,
+                    configurable: false
+                },
+                _key: {
+                    value: key,
+                    writable: false,
+                    configurable: false
+                },
+                key: {
+                    get: function _getKey() {
+                        return this._key;
+                    }
+                }
+            });
+        /**
+         * @description: default = Nothing beyond the 'source' param was passed to this
+         * function; results in a bitwise value of 00. Create a 'basic' list object type
+         * instance.
+         */
+        default:
+            return Object.create(list, {
+                _value: {
+                    value: source,
+                    writable: false,
+                    configurable: false
+                }
+            });
+    }
+}
+
+function createBitMask(...args) {
+    return args.reduce(function _reduce(curr, next, idx) {
+        return curr |= next << idx;
+    }, args[0]);
 }
 
 //Since FantasyLand is the defacto standard for JavaScript algebraic data structures, and I want to maintain

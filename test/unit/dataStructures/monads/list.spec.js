@@ -938,11 +938,7 @@ describe('List functor test', function _testListFunctor() {
 
             console.log(r.value);
 
-            r.fork(function _err(err) {
-                console.log(err);
-            }, function res(res) {
-                console.log(res);
-            });
+            r.fork(console.error, console.log);
             //fns.map(val => val);
 
 
