@@ -840,6 +840,12 @@ var list_core = {
      * @return {monads.list} - c
      */
     traverse: function _traverse(f, g) {
+        //TODO: I think the reason this might not be working as expected is because my list
+        //TODO: implementation is lazy, whereas the other lists I've seen, especially those seen
+        //TODO: with a traverse, are not. This effects the underlying value of the 'Future' data
+        //TODO: structure when forking - from logging during the fork operation, it appears that
+        //TODO: the data is actually present within the list, but it not evaluated when 'stuffed'
+        //TODO: back into the Future.
         return this.map(g).sequence(f);
 
         /*
@@ -883,7 +889,7 @@ var list_core = {
                 return function _map_(y) {
                     return y.concat([x]);
                 };
-            }).ap(xs);
+            }).apply(xs);
             return f(this.empty);
         });*/
 
