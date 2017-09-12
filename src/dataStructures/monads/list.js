@@ -1452,6 +1452,13 @@ function listFactory(source, iterator, sortObj, key) {
     }
 }
 
+/**
+ * @signature
+ * @description creates a bit mask value based on truthy/falsey arguments passed to the function
+ * @param {boolean} args - Zero or more arguments. All arguments are treated as booleans, so truthy,
+ * and falsey values will work.
+ * @return {number} Returns an integer that represents the bit mask value of the boolean arguments.
+ */
 function createBitMask(...args) {
     return args.reduce(function _reduce(curr, next, idx) {
         return curr |= next << idx;
