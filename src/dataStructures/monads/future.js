@@ -221,20 +221,30 @@ var future = {
     apply: function _apply(ma) {
         return this.of((reject, resolve) => {
             let rej = once(reject),
-                val, mapper,
-                isDone = safeFork(rej, function _res() {
-                    return null != val && null != mapper ? resolve(mapper(val)) : undefined;
-                });
+                rejected = false,
+                val, mapper;
 
-            this.fork(rej, function _thisRes(fn) {
-                mapper = fn;
-                isDone();
-            });
+            var cur = this.fork(rej, guardResolve(function _gr(x) {
+                mapper = x;
+            }));
 
-            ma.fork(rej, function _thatRes(value) {
-                val = value;
-                isDone();
-            });
+            var other = ma.fork(rej, guardResolve(function _gr(x) {
+                val = x;
+            }));
+
+            function guardResolve(setter) {
+                return function _guardResolve(x) {
+                    if (rejected) return;
+
+                    setter(x);
+                    if ('function' === typeof mapper && null != val) {
+                        return resolve(mapper(val));
+                    }
+                    return x;
+                };
+            }
+
+            return [cur, other];
         });
     },
     fold: function _fold(f, g) {
