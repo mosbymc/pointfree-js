@@ -584,8 +584,7 @@ function findGroup(arr, field) {
 function map(xs, fn) {
     return function *mapIterator() {
         for (let x of xs) {
-            let res = fn(x);
-            if (!strictEquals(javaScriptTypes.Undefined, type(res))) yield res;
+            yield fn(x);
         }
     };
 }

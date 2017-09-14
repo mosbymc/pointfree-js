@@ -1,6 +1,6 @@
 import { noop, once, type, strictEquals } from '../../functionalHelpers';
 import { ifElse, constant } from '../../combinators';
-import { monad_apply, mjoin, pointMaker, valueOf } from '../data_structure_util';
+import { mjoin, pointMaker, valueOf } from '../data_structure_util';
 import { javaScriptTypes } from '../../helpers';
 
 /**
@@ -13,7 +13,6 @@ import { javaScriptTypes } from '../../helpers';
  */
 function safeFork(reject, resolve) {
     return function _safeFork(val) {
-        console.log(val);
         try {
             return resolve(val);
         }
@@ -76,7 +75,11 @@ Future.is = f => future.isPrototypeOf(f);
  * @return {monads.future} - Returns a new object that delegates to the
  * {@link monads.future}.
  */
-Future.of = val => ifElse(constant(strictEquals(javaScriptTypes.Function, type(val))), Future, futureFunctionize, val);
+Future.of = function _of(val) {
+    if ('function' !== typeof val) return Future((_, resolve) => safeFork(noop, resolve(val)));
+    return Future(val);
+};
+//Future.of = val => ifElse(constant(strictEquals(javaScriptTypes.Function, type(val))), Future, futureFunctionize, val);
 
 var futureFunctionize = val => Future((_, resolve) => safeFork(noop, resolve(val)));
 
@@ -196,9 +199,7 @@ var future = {
      * just performed.
      */
     map: function _map(fn) {
-        return this.of((reject, resolve) => {
-            return this.fork(err => reject(err), res => resolve(fn(res)));
-        });
+        return this.of((reject, resolve) => this.fork(err => reject(err), res => resolve(fn(res))));
     },
     //TODO: probably need to compose here, not actually map over the value; this is a temporary fill-in until
     //TODO: I have time to finish working on the Future
@@ -221,8 +222,8 @@ var future = {
     apply: function _apply(ma) {
         return this.of((reject, resolve) => {
             let rej = once(reject),
-                rejected = false,
-                val, mapper;
+                val, mapper,
+                rejected = false;
 
             var cur = this.fork(rej, guardResolve(function _gr(x) {
                 mapper = x;
@@ -237,7 +238,7 @@ var future = {
                     if (rejected) return;
 
                     setter(x);
-                    if ('function' === typeof mapper && null != val) {
+                    if (mapper && val) {
                         return resolve(mapper(val));
                     }
                     return x;
@@ -271,8 +272,7 @@ var future = {
         return this._fork === noop;
     },
     fork: function _fork(reject, resolve) {
-        console.log(reject, resolve);
-        this._fork(reject, safeFork(reject, resolve));
+        return this._fork(reject, safeFork(reject, resolve));
     },
     /**
      * @signature * -> boolean
@@ -326,7 +326,6 @@ var future = {
      * and its underlying value.
      */
     toString: function _toString() {
-        console.log(this.value, this.value.name, this.value === once);
         return `Future(${this.value.name})`;
     },
     /**
@@ -347,7 +346,6 @@ var future = {
 };
 
 future.mjoin = mjoin;
-future.apply = monad_apply;
 future.ap = future.apply;
 future.fmap = future.chain;
 future.flapMap = future.chain;

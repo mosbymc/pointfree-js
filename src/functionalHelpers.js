@@ -469,12 +469,14 @@ var objectSet = curry(function _objectSet(prop, val, obj) {
  * @return {function} - b
  */
 function once(fn) {
-    var invoked = false;
+    var invoked = false,
+        res;
     return function _once(...args) {
         if (!invoked) {
             invoked = true;
-            fn(...args);
+            res = fn(...args);
         }
+        return res;
     };
 }
 

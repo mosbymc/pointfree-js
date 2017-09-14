@@ -33,7 +33,7 @@ describe('List functor test', function _testListFunctor() {
             expect(arr).to.eql(l4.value);
             expect([obj]).to.eql(l5.value);
             expect('object').to.eql(typeof l6.value);
-            expect('testing constant').to.eql(l7.value);
+            expect(['testing constant']).to.eql(l7.value);
             expect([false]).to.eql(l8.value);
         });
 
@@ -47,7 +47,8 @@ describe('List functor test', function _testListFunctor() {
                 i5 = List.of(obj),
                 i6 = List.of(Symbol()),
                 i7 = List.of('testing constant'),
-                i8 = List.of(false);
+                i8 = List.of(false),
+                i9 = List.of(1, false, arr, obj, 'testing multiple args');
 
             list.isPrototypeOf(i1).should.be.true;
             list.isPrototypeOf(i2).should.be.true;
@@ -57,6 +58,7 @@ describe('List functor test', function _testListFunctor() {
             list.isPrototypeOf(i6).should.be.true;
             list.isPrototypeOf(i7).should.be.true;
             list.isPrototypeOf(i8).should.be.true;
+            list.isPrototypeOf(i9).should.be.true;
 
             expect([undefined]).to.eql(i1.value);
             expect([null]).to.eql(i2.value);
@@ -64,12 +66,13 @@ describe('List functor test', function _testListFunctor() {
             expect(arr).to.eql(i4.value);
             expect([obj]).to.eql(i5.value);
             expect('object').to.eql(typeof i6.value);
-            expect('testing constant').to.eql(i7.value);
+            expect(['testing constant']).to.eql(i7.value);
             expect([false]).to.eql(i8.value);
+            [1, false, arr, obj, 'testing multiple args'].should.eql(i9.value);
         });
 
         it('should return an ordered list delegator', function _testOrderedListCreationFunctionProperties() {
-            var l1 = List.empty(),
+            var l1 = List.empty,
                 l2 = List.just(1),
                 l3 = List.ordered([1, 2, 3, 4, 5], x => x);
 
@@ -233,7 +236,7 @@ describe('List functor test', function _testListFunctor() {
         });
 
         it('should allow "expected" functionality of concatenation for strings and mathematical operators for numbers', function _testListFunctorValueOf() {
-            ('Hello my name is: ' + List('Mark')).should.eql('Hello my name is: Mark');
+            ('Hello my name is: ' + List('Mark').data).should.eql('Hello my name is: Mark');
         });
 
         it('should print the correct container type + value when .toString() is invoked', function _testListFunctorToString() {
@@ -772,7 +775,7 @@ describe('List functor test', function _testListFunctor() {
                 List([1, 2, 3, 4])
                     .isEmpty().should.be.false;
 
-                List.empty().isEmpty().should.be.true;
+                List.empty.isEmpty().should.be.true;
             });
 
             it('should return the last item in the list that matches the predicate', function _testLast() {
@@ -913,36 +916,41 @@ describe('List functor test', function _testListFunctor() {
     });
 
     describe('tmp', function _tmp() {
-        it('should do stuff', function _doStuff() {
+        function noop() {}
+
+        it('should do stuff', function _doStuff(done) {
             var count = 0;
 
-            function _TO1(rej, res) {
+            function _TO1(cb) {
                 setTimeout(function _to() {
-                    count.should.eql(0);
                     ++count;
+                    count.should.eql(1);
+                    cb(null, count);
                 }, 250);
             }
 
-            function _TO2(rej, res) {
+            function _TO2(cb) {
                 setTimeout(function _to() {
-                    count.should.eql(1);
                     ++count;
+                    count.should.eql(2);
+                    cb(null, count);
                     done();
                 }, 300);
             }
 
-            var fns = List.from([ _TO1, _TO2]);
+            List([ _TO1, _TO2])
+                .traverse(monads.Future.of,
+                        fn => monads.Future((reject, result) => fn((err, res) => err ? reject(err) : result(res))))
+                .fork(noop, noop);
+        });
 
-            var r = fns.traverse(monads.Future.of, fn => monads.Future(fn));
+        it('should traverse a list of identity', function _testListDotTraverseWithIdentity() {
+            console.log(List([1, 2, 3])
+                .traverse(monads.Identity.of, val => monads.Identity(val * val)));
 
-            console.log(r.value);
-
-            r.fork(console.error, console.log);
-            //fns.map(val => val);
-
-
-            //var res = fns.map(fn => monads.Future(fn));
-            //console.log(res);
+            List([1, 2, 3])
+                .traverse(monads.Identity.of, val => monads.Identity(val * val))
+                .data;
         });
     });
 });

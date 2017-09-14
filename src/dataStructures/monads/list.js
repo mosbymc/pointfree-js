@@ -817,17 +817,19 @@ var list_core = {
      * @memberOf monads.list_core
      * @instance
      * @function sequence
-     * @param {Object} p - a
+     * @param {function} p - a
      * @return {monads.list} - b
      */
     sequence: function _sequence(p) {
-        //return this.traverse(p, identity);
+        return this.traverse(p, identity);
+        /*
         return this.foldr((m, ma) => {
             return m.chain(x => {
                 if (0 === ma.value.length) return List.of(x);
                 return ma.chain(xs => List.of(List.of(x).concat(xs)));
             });
         }, List.empty());
+        */
     },
     /**
      * @signature
@@ -840,13 +842,21 @@ var list_core = {
      * @return {monads.list} - c
      */
     traverse: function _traverse(f, g) {
+        return this.foldl((ys, x) => {
+            return g(x).map(x => {
+                return y => {
+                    return y.concat([x]);
+                };
+            }).apply(ys);
+        }, f(List.empty));
+
         //TODO: I think the reason this might not be working as expected is because my list
         //TODO: implementation is lazy, whereas the other lists I've seen, especially those seen
         //TODO: with a traverse, are not. This effects the underlying value of the 'Future' data
         //TODO: structure when forking - from logging during the fork operation, it appears that
         //TODO: the data is actually present within the list, but it not evaluated when 'stuffed'
         //TODO: back into the Future.
-        return this.map(g).sequence(f);
+        //return this.map(g).sequence(f);
 
         /*
         console.log(Array.from(this).reduce(function _reduce(xs, x) {
@@ -1167,7 +1177,7 @@ var createListDelegateInstance = listFactory;
  * @param {*} [source] - a
  * @return {monads.list} - b
  */
-var listFromNonGen = source => createListDelegateInstance(source && source[Symbol.iterator] ? source : wrap(source));
+var listFromNonGen = source => createListDelegateInstance(source && source[Symbol.iterator] && 'string' !== typeof source ? source : wrap(source));
 
 /**
  * @signature
@@ -1204,6 +1214,14 @@ function List(source) {
     return ifElse(delegatesFrom(generatorProto), listFromGen, listFromNonGen, source);
 }
 
+function _t(args) {
+    return 1 === args.length && delegatesFrom(list_core, args[0]);
+}
+
+function _t_(args) {
+    return 2 > args.length ? List(...args) : List([...args]);
+}
+
 /**
  * @signature
  * @description Convenience function for listCreate a new List instance; internally calls List.
@@ -1214,7 +1232,7 @@ function List(source) {
  * @param {*} [source] - Any type, any value; used as the underlying source of the List
  * @return {monads.list} - A new List instance with the value provided as the underlying source.
  */
-List.from = source => ifElse(delegatesFrom(list_core), constant(source), List, source);
+List.from = (...source) => ifElse(_t, constant(...source), _t_, source);
 
 /**
  * @signature
@@ -1256,7 +1274,7 @@ List.ordered = (source, selector, comparer = defaultPredicate) => createListDele
  * @see List
  * @return {monads.ordered_list} - a
  */
-List.empty = () => createListDelegateInstance([], null,
+List.empty = createListDelegateInstance([], null,
     [createSortObject(identity, defaultPredicate, sortDirection.ascending)]);
 
 /**
