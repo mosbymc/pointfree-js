@@ -433,57 +433,6 @@ identity.equals = equalMaker(identity);
 identity.bimap = identity.map;
 
 /**
- * @signature Object -> Object
- * @description Alias for {@link monads.identity#apply}
- * @memberOf monads.identity
- * @instance
- * @function ap
- * @see monads.identity#apply
- * @param {Object} ma - Any object with a map function - i.e. a monad.
- * @return {Object} Returns an instance of the monad object provide as an argument.
- */
-identity.ap = identity.apply;
-
-/**
- * @signature () -> {@link monads.identity}
- * @description Alias for {@link monads.identity#chain}
- * @memberOf monads.identity
- * @instance
- * @function fmap
- * @see monads.identity#chain
- * @param {function} fn - A mapping function that returns a monad of the same type
- * @return {Object} Returns a new identity monad that 'wraps' the return value of the
- * mapping function after flattening it by one level.
- */
-identity.fmap = identity.chain;
-
-/**
- * @signature () -> {@link monads.identity}
- * @description Alias for {@link monads.identity#chain}
- * @memberOf monads.identity
- * @instance
- * @function flatMap
- * @see monads.identity#chain
- * @param {function} fn - A mapping function that returns a monad of the same type
- * @return {Object} Returns a new identity monad that 'wraps' the return value of the
- * mapping function after flattening it by one level.
- */
-identity.flapMap = identity.chain;
-
-/**
- * @signature () -> {@link monads.identity}
- * @description Alias for {@link monads.identity#chain}
- * @memberOf monads.identity
- * @instance
- * @function bind
- * @see monads.identity#chain
- * @param {function} fn - A mapping function that returns a monad of the same type
- * @return {Object} Returns a new identity monad that 'wraps' the return value of the
- * mapping function after flattening it by one level.
- */
-identity.bind = identity.chain;
-
-/**
  * @signature () -> *
  * @description Alias for {@link monads.identity#fold}
  * @memberOf monads.identity
@@ -495,17 +444,5 @@ identity.bind = identity.chain;
  * @return {*} Returns the return value of the mapping function provided as an argument.
  */
 identity.reduce = identity.fold;
-
-
-//Since FantasyLand is the defacto standard for JavaScript algebraic data structures, and I want to maintain
-//compliance with the standard, a .constructor property must be on the container delegators. In this case, its
-//just an alias for the true .factory property, which points to the delegator factory. I am isolating this from
-//the actual delegator itself as it encourages poor JavaScript development patterns and ... the myth of Javascript
-//classes and inheritance. I do not recommend using the .constructor property at all since that just encourages
-//FantasyLand and others to continue either not learning how JavaScript actually works, or refusing to use it
-//as it was intended... you know, like Douglas Crockford and his "good parts", which is really just another
-//way of saying: "you're too dumb to understand how JavaScript works, and I either don't know myself, or don't
-//care to know, so just stick with what I tell you to use."
-identity.constructor = identity.factory;
 
 export { Identity, identity };

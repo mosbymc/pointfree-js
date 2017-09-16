@@ -540,7 +540,7 @@ var setSet = curry(function _setSet(val, set) {
 var strictEquals = curry((x, y) => x === y);
 
 /**
- * @signature
+ * @signature strictNotEquals :: * -> * -> boolean
  * @description d
  * @kind function
  * @function strictNotEqual
@@ -551,7 +551,7 @@ var strictEquals = curry((x, y) => x === y);
 var strictNotEqual = curry((x, y) => x !== y);
 
 /**
- * @signature
+ * @signature subtract :: number -> number -> number
  * @description d
  * @kind function
  * @function subtract
@@ -562,7 +562,7 @@ var strictNotEqual = curry((x, y) => x !== y);
 var subtract = curry((x, y) => x - y);
 
 /**
- * @signature
+ * @signature truthy :: * -> boolean
  * @description d
  * @param {*} x - a
  * @return {boolean} - b
@@ -570,7 +570,7 @@ var subtract = curry((x, y) => x - y);
 var truthy = x => flip(falsey(x));
 
 /**
- * @signature
+ * @signature type :: * -> string
  * @description d
  * @param {*} a - a
  * @return {string} - b

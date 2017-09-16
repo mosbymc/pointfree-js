@@ -37,6 +37,21 @@ describe('List functor test', function _testListFunctor() {
             expect([false]).to.eql(l8.value);
         });
 
+        it('should accept lists, generators, comma separated arguments, arrays as a source and result in the same value', function _testListDotFrom() {
+            function *_genny() {
+                var i = 1;
+                while (6 > i) {
+                    yield i;
+                    ++i;
+                }
+            }
+
+            List.from(1, 2, 3, 4, 5).data.should.eql([1, 2, 3, 4, 5]);
+            List.from(1, 2, 3, 4, 5).data.should.eql(List.from([1, 2, 3, 4, 5]).data);
+            List.from(1, 2, 3, 4, 5).data.should.eql(List.from(List([1, 2, 3, 4, 5])).data);
+            List.from(1, 2, 3, 4, 5).data.should.eql(List.from(_genny).data);
+        });
+
         it('should return the same type/value when using the #of function', function _testListDotOf() {
             var arr = [1, 2, 3],
                 obj = { a: 1, b: 2 },
@@ -60,7 +75,7 @@ describe('List functor test', function _testListFunctor() {
             list.isPrototypeOf(i8).should.be.true;
             list.isPrototypeOf(i9).should.be.true;
 
-            expect([undefined]).to.eql(i1.value);
+            expect([]).to.eql(i1.value);
             expect([null]).to.eql(i2.value);
             expect([1]).to.eql(i3.value);
             expect(arr).to.eql(i4.value);
@@ -248,11 +263,29 @@ describe('List functor test', function _testListFunctor() {
             c1.toString().should.eql('List(1)');
             c2.toString().should.eql('List()');
             c3.toString().should.eql('List(1,2,3)');
-            c4.toString().should.eql('List(List(List(5)))');
+            c4.toString().should.eql('List(5)');
         });
 
         it('should have a .constructor property that points to the factory function', function _testListFunctorIsStupidViaFantasyLandSpecCompliance() {
             List(null).constructor.should.eql(List);
+        });
+
+        it('should apply a mutating function to the underlying value and return the new value unwrapped in a List when chain is called', function _testListDotChain() {
+            var l1 = List([1, 2, 3, 4, 5]),
+                l2 = List.from([false, false, true, false, true]),
+                l3 = List(List([{ a: 1, b: 2 }, { a: 3, b: 4 }, { a: 5, b: 6 }, { a: 7, b: 8 }]));
+
+            l1.chain(function _chain(val) {
+                return List.of(5 * val);
+            }).data.should.eql([5, 10, 15, 20, 25]);
+
+            l2.chain(function _chain(val) {
+                return List.of(!val);
+            }).data.should.eql([true, true, false, true, false]);
+
+            l3.chain(function _chain(val) {
+                return val.a + val.b;
+            }).data.should.eql([3, 7, 11, 15]);
         });
     });
 
@@ -388,6 +421,20 @@ describe('List functor test', function _testListFunctor() {
                 res.should.be.an('array');
                 res.should.have.lengthOf(resStandard.length);
                 res.should.eql(resStandard);
+            });
+
+            it('should return the list except where it intersects with the values yielded from a generator', function _testExceptWithAGenerator() {
+                function *_genny() {
+                    var i = 0;
+                    while (10 > i) {
+                        yield i;
+                        i += 2;
+                    }
+                }
+
+                var res = List([1, 2, 3, 4, 5])
+                    .except(_genny).data;
+
             });
 
             it('should group the test data on last name', function _testGroupBy() {
@@ -558,7 +605,7 @@ describe('List functor test', function _testListFunctor() {
                 }));
 
                 List(testData.dataSource.data)
-                    .join(testData.dataSource.data, selector, selector, projector)
+                    .listJoin(testData.dataSource.data, selector, selector, projector)
                     .data.should.have.lengthOf(duplicateFirstNames.length);
             });
 
@@ -646,6 +693,12 @@ describe('List functor test', function _testListFunctor() {
                     .sortBy(x => x[0], sortComparer)
                     .thenByDescending(x => x[1], sortComparer)
                     .data.should.eql([[7, 2], [7, 1], [8, 1], [8, 0], [9, 10], [9, 9], [9, 3], [10, 5], [10, 2], [10, 1]]);
+            });
+
+            it('should be mappable', function _testListMapability() {
+                var l = List([1, 2, 3, 4, 5]);
+
+                for (let item of l.chain(x => List(x * x))) console.log(item);
             });
         });
 
@@ -945,12 +998,16 @@ describe('List functor test', function _testListFunctor() {
         });
 
         it('should traverse a list of identity', function _testListDotTraverseWithIdentity() {
-            console.log(List([1, 2, 3])
-                .traverse(monads.Identity.of, val => monads.Identity(val * val)));
+            var i = List([1, 2, 3])
+                .traverse(monads.Identity.of, val => monads.Identity(val * val));
 
-            List([1, 2, 3])
-                .traverse(monads.Identity.of, val => monads.Identity(val * val))
-                .data;
+            var initial = 1;
+            Object.getPrototypeOf(monads.Identity()).isPrototypeOf(i).should.be.true;
+            Object.getPrototypeOf(List()).isPrototypeOf(i.value).should.be.true;
+            i.value.data.forEach(function _verifyResult(val) {
+                val.should.eql(initial * initial);
+                ++initial;
+            });
         });
     });
 });
