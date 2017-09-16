@@ -11,4 +11,9 @@
 
 A JavaScript library that brings together algebraic data structures, combinators, decorators, lenses, transducers, and more into a single environment.
 
+Currently in progress:
+- monoids and groups
+- semi-group factory for defining your own semi-groups
+- tests and refactoring of existing code base
+
 This is a work in progress and is not yet ready for production use.
