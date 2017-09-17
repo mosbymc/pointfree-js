@@ -696,9 +696,10 @@ describe('List functor test', function _testListFunctor() {
             });
 
             it('should be mappable', function _testListMapability() {
-                var l = List([1, 2, 3, 4, 5]);
-
-                for (let item of l.chain(x => List(x * x))) console.log(item);
+                List([1, 2, 3, 4, 5])
+                    .map(x => List(x * x))
+                    .chain(x => x)
+                    .data.should.eql([1, 4, 9, 16, 25]);
             });
         });
 

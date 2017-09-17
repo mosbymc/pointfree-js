@@ -2,7 +2,7 @@ import { all, any, binarySearch, chain, concat, contains, copyWithin, count, dis
         first, foldLeft, foldRight, groupBy, groupJoin, intersect, intersperse, join, last, map, ofType, prepend, reduceRight, repeat, reverse,
         skipWhile, slice, sortBy, takeWhile, unfold, union, zip } from '../list_iterators';
 import { sortDirection, generatorProto } from '../../helpers';
-import { wrap, defaultPredicate, delegatesFrom, isArray, noop, invoke, delegatesTo, isString } from '../../functionalHelpers';
+import { wrap, defaultPredicate, delegatesFrom, isArray, noop, invoke, delegatesTo, isString, both } from '../../functionalHelpers';
 import { when, ifElse, identity, constant } from '../../combinators';
 import { not } from '../../decorators';
 import { taker_skipper, createSortObject } from '../list_util';
@@ -874,7 +874,8 @@ var list_core = {
      * @memberOf monads.list_core
      * @instance
      * @function toString
-     * @return {string} - a
+     * @return {string} Returns a string representation of the list. NOTE: This functionality
+     * currently forces an evaluation of the pipelined operations.
      */
     toString: function _toString() {
         //console.log(this.value);
@@ -889,9 +890,9 @@ var list_core = {
                 console.log(this.value.toString());
             }
         }*/
-        var val = list_core.isPrototypeOf(this.value) ? this.value.toString() : this.value;
-        return `List(${val})`;
         //return list_core.isPrototypeOf(this.value) ? this.value.toString() : `List(${this.value})`;
+        //var val = list_core.isPrototypeOf(this.value) ? this.value.toString() : this.value;
+        return `List(${this.data})`;
     },
 
     /**
@@ -981,7 +982,6 @@ var list_core = {
     },
 
     /**
-     * @signature
      * @description Base iterator to which all queryable_core delegator objects
      * delegate to for iteration if for some reason an iterator wasn't
      * objectSet on the delegator at the time of creation.
@@ -1230,8 +1230,7 @@ var ordered_list = Object.create(list_core, {
  * @param {*} [source] - a
  * @return {monads.list} - b
  */
-var listFromNonGen = source => ifElse(delegatesFrom(list_core), identity,
-    constant(createListDelegateInstance(source && source[Symbol.iterator] && 'string' !== typeof source ? source : wrap(source))), source);
+var listFromNonGen = source => createListDelegateInstance(source && source[Symbol.iterator] && 'string' !== typeof source ? source : wrap(source));
 
 /**
  * @signature
@@ -1262,13 +1261,13 @@ var listFromGen = source => createListDelegateInstance(invoke(source));
  * @param {*} [source] - Any type, any value; used as the underlying source of the List
  * @return {monads.list} - A new List instance with the value provided as the underlying source.
  */
-//TODO: should I exclude strings from being used as a source directly, or allow it because
-//TODO: they have an iterator?
 function List(source) {
-    return ifElse(delegatesFrom(generatorProto), listFromGen, listFromNonGen, source);
+    return ifElse(isList, identity, ifElse(delegatesFrom(generatorProto), listFromGen, listFromNonGen), source);
 }
 
-var isList = args => 1 === args.length && delegatesFrom(list_core, args[0]);
+var isOneArg = args => 1 === args.length;
+var isList = val => delegatesFrom(list_core, val);
+var isOneArgAndAList = args => !!(isOneArg(args) && isList(args[0]));
 var createListFromArgs = args => 1 !== args.length ? List(args) : Array.isArray(args[0]) || delegatesFrom(generatorProto, args[0]) ? List(args[0]) : List(args);
 
 /**
@@ -1281,7 +1280,7 @@ var createListFromArgs = args => 1 !== args.length ? List(args) : Array.isArray(
  * @param {*} [source] - Any type, any value; used as the underlying source of the List
  * @return {monads.list} - A new List instance with the value provided as the underlying source.
  */
-List.from = (...source) => ifElse(isList, constant(...source), createListFromArgs, source);
+List.from = (...source) => ifElse(isOneArgAndAList, constant(...source), createListFromArgs, source);
 
 /**
  * @signature
@@ -1362,7 +1361,7 @@ List.unfold = (fn, seed) => createListDelegateInstance(unfold(fn)(seed));
  * @param {*} f - Any JavaScript value
  * @return {boolean} - Returns a boolean indicating of the value is a list.
  */
-List.is = f => list_core.isPrototypeOf(f);
+List.is = isList;
 
 /**
  * @signature

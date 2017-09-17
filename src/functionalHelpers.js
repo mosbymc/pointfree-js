@@ -78,10 +78,10 @@ var arraySet = curry(function _arraySet(idx, x, list) {
  * @function both
  * @param {function} f - a
  * @param {function} g - b
- * @return {boolean} - c
+ * @return {function} - c
  */
 var both = curry(function _both(f, g) {
-    return !!(f() && g());
+    return (...args) => !!(f(...args) && g(...args));
 });
 
 /**
