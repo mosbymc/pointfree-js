@@ -870,7 +870,19 @@ var list_core = {
      * @description Returns a string representation of an instance of a List
      * delegator object. This function does not cause evaluation of the source,
      * but this also means the returned value only reflects the underlying
-     * data, not the evaluated data.
+     * data, not the evaluated data. In order to see a string representation of
+     * the evaluated data, an evaluation must occur before .toString in invoked.
+     * The most direct way of doing this is via the {@link list_core#toEvaluatedList}
+     * function property.
+     * @example
+     * var list = List([1, 2, 3, 4, 5])
+     *              .map(x => x * x);
+     *
+     * console.log(list.toString()); // => List(List(1, 2, 3, 4, 5)
+     *
+     * var evaledList = list.toEvaluatedList();
+     *
+     * console.log(evaledList.toString()); // => List(1, 4, 9, 16, 25);
      * @memberOf monads.list_core
      * @instance
      * @function toString
@@ -892,7 +904,7 @@ var list_core = {
         }*/
         //return list_core.isPrototypeOf(this.value) ? this.value.toString() : `List(${this.value})`;
         //var val = list_core.isPrototypeOf(this.value) ? this.value.toString() : this.value;
-        return `List(${this.data})`;
+        return `List(${this.value})`;
     },
 
     /**
