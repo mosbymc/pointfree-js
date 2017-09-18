@@ -1,6 +1,6 @@
 import { noop, once, type, strictEquals } from '../../functionalHelpers';
 import { ifElse, constant } from '../../combinators';
-import { monad_apply, mjoin, pointMaker, valueOf } from '../data_structure_util';
+import { mjoin, pointMaker, valueOf } from '../data_structure_util';
 import { javaScriptTypes } from '../../helpers';
 
 /**
@@ -41,12 +41,12 @@ function safeFork(reject, resolve) {
 function Future(fn) {
     return Object.create(future, {
         _value: {
-            value: once(fn),
+            value: fn,
             writable: false,
             configurable: false
         },
         _fork: {
-            value: once(fn),
+            value: fn,
             writable: false
         }
     });
@@ -75,7 +75,11 @@ Future.is = f => future.isPrototypeOf(f);
  * @return {monads.future} - Returns a new object that delegates to the
  * {@link monads.future}.
  */
-Future.of = val => ifElse(constant(strictEquals(javaScriptTypes.Function, type(val))), Future, futureFunctionize, val);
+Future.of = function _of(val) {
+    if ('function' !== typeof val) return Future((_, resolve) => safeFork(noop, resolve(val)));
+    return Future(val);
+};
+//Future.of = val => ifElse(constant(strictEquals(javaScriptTypes.Function, type(val))), Future, futureFunctionize, val);
 
 var futureFunctionize = val => Future((_, resolve) => safeFork(noop, resolve(val)));
 
@@ -195,12 +199,13 @@ var future = {
      * just performed.
      */
     map: function _map(fn) {
-        return this.of((reject, resolve) =>
-            this.fork(a => reject(a), b => resolve(fn(b))));
+        return this.of((reject, resolve) => this.fork(err => reject(err), res => resolve(fn(res))));
     },
     //TODO: probably need to compose here, not actually map over the value; this is a temporary fill-in until
     //TODO: I have time to finish working on the Future
     chain: function _chain(fn) {
+        return this.of((resolve, reject) => this.fork(err => reject(err), res => fn(res).fork(reject, resolve)));
+        /*
         return this.of((reject, resolve) =>
         {
             let cancel,
@@ -209,10 +214,43 @@ var future = {
                 });
             return cancel ? cancel : (cancel = outerFork, x => cancel());
         });
+        */
+    },
+    mjoin: function _mjoin() {
+        return this.chain(x => x);
+    },
+    apply: function _apply(ma) {
+        return this.of((reject, resolve) => {
+            let rej = once(reject),
+                val, mapper,
+                rejected = false;
+
+            var cur = this.fork(rej, guardResolve(function _gr(x) {
+                mapper = x;
+            }));
+
+            var other = ma.fork(rej, guardResolve(function _gr(x) {
+                val = x;
+            }));
+
+            function guardResolve(setter) {
+                return function _guardResolve(x) {
+                    if (rejected) return;
+
+                    setter(x);
+                    if (mapper && val) {
+                        return resolve(mapper(val));
+                    }
+                    return x;
+                };
+            }
+
+            return [cur, other];
+        });
     },
     fold: function _fold(f, g) {
         return this.of((reject, resolve) =>
-            this.fork(a => resolve(f(a)), b => resolve(g(b))));
+            this.fork(err => resolve(f(err)), res => resolve(g(res))));
     },
     traverse: function _traverse(fa, fn) {
         return this.fold(function _reductioAdAbsurdum(xs, x) {
@@ -224,8 +262,17 @@ var future = {
             return fa(this.empty);
         });
     },
+    bimap: function _bimap(f, g) {
+        return this.of((reject, resolve) => this._fork(safeFork(reject, err => reject(f(err))), safeFork(reject, res => resolve(g(res)))));
+    },
+    empty: function _empty() {
+        return this.of(noop);
+    },
+    isEmpty: function _isEmpty() {
+        return this._fork === noop;
+    },
     fork: function _fork(reject, resolve) {
-        this._fork(reject, resolve);
+        return this._fork(reject, safeFork(reject, resolve));
     },
     /**
      * @signature * -> boolean
@@ -279,7 +326,6 @@ var future = {
      * and its underlying value.
      */
     toString: function _toString() {
-        console.log(this.value, this.value.name, this.value === once);
         return `Future(${this.value.name})`;
     },
     /**
@@ -300,7 +346,6 @@ var future = {
 };
 
 future.mjoin = mjoin;
-future.apply = monad_apply;
 future.ap = future.apply;
 future.fmap = future.chain;
 future.flapMap = future.chain;

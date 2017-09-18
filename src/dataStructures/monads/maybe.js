@@ -15,6 +15,9 @@ function fromNullable(x) {
     return null != x ? Just(x) : Nothing();
 }
 
+var returnNothing = () => nothing;
+
+
 /**
  * @signature - :: * -> monads.just|monads.nothing
  * @description Factory function used to create a new object that delegates to
@@ -38,27 +41,11 @@ function fromNullable(x) {
  */
 function Maybe(val) {
     return null == val ?
-        Object.create(nothing, {
-            _value: {
-                value: null
-            },
-            isJust: {
-                value: false
-            },
-            isNothing: {
-                value: true
-            }
-        }) :
+        nothing :
         Object.create(just, {
-            _value: {
-                value: val
-            },
-            isJust: {
-                value: true
-            },
-            isNothing: {
-                value: false
-            }
+            _value: { value: val },
+            isJust: { value: true },
+            isNothing: { value: false }
         });
 }
 
@@ -103,7 +90,7 @@ Maybe.of = function _of(val) {
  * @return {boolean} Returns a boolean that indicates whether the
  * argument provided delegates to the {@link monads.just|monads.nothing} delegate.
  */
-Maybe.is = f => just.isPrototypeOf(f) || nothing.isPrototypeOf(f);
+Maybe.is = f => just.isPrototypeOf(f) || nothing === f;
 
 /**
  * @signature
@@ -144,7 +131,7 @@ Maybe.isJust = m => just.isPrototypeOf(m);
  * @param {Object} [m] - a
  * @return {boolean} - b
  */
-Maybe.isNothing = m => nothing.isPrototypeOf(m);
+Maybe.isNothing = m => nothing === m;
 
 /**
  * @signature * -> monads.left|monads.right
@@ -250,21 +237,7 @@ Just.is = f => just.isPrototypeOf(f);
  * @return {monads.nothing} - Returns a new object that delegates to the
  * {@link monads.nothing}.
  */
-function Nothing() {
-    return Object.create(nothing, {
-        _value: {
-            value: null,
-            writable: false,
-            configurable: false
-        },
-        isJust: {
-            value: false
-        },
-        isNothing: {
-            value: true
-        }
-    });
-}
+var Nothing = returnNothing;
 
 /**
  * @signature * -> {@link monads.nothing}
@@ -287,11 +260,11 @@ Nothing.of = Nothing;
  * {@link left}'s factory function as monads.Nothing#is
  * @memberOf monads.Nothing
  * @function is
- * @param {*} [f] - Any value may be used as an argument to this function.
+ * @param {*} [n] - Any value may be used as an argument to this function.
  * @return {boolean} Returns a boolean that indicates whether the
  * argument provided delegates to the {@link monads.nothing} delegate.
  */
-Nothing.is = f => nothing.isPrototypeOf(f);
+Nothing.is = n => nothing === n;
 
 //TODO: Using this.of in order to create a new instance of a Maybe container (functor/monad) will
 //TODO: not work as it is implemented here in terms of creating a new maybe container with the
@@ -535,9 +508,15 @@ var nothing = {
      * @function
      * @return {*} Returns the underlying value of the delegator. May be any value.
      */
-    get value() {
-        return this._value;
-    },
+    value: null,
+    /**
+     *
+     */
+    isJust: false,
+    /**
+     *
+     */
+    isNothing: true,
     /**
      * @signature () -> {@link monads.nothing}
      * @description Takes a function that is applied to the underlying value of the
@@ -551,7 +530,7 @@ var nothing = {
      * delegator whose underlying value is the result of the mapping operation
      * just performed.
      */
-    map: sharedMaybeFns.nothingMapMaker(Nothing),
+    map: returnNothing,
     /**
      * @signature (* -> *) -> (* -> *) -> monads.nothing<T>
      * @description Since the nothing monad does not represent a disjunction, the Maybe's
@@ -568,9 +547,9 @@ var nothing = {
      * @return {monads.nothing} - Returns a new {@link monads.nothing} delegator after applying
      * the mapping function to the underlying data.
      */
-    bimap: sharedMaybeFns.nothingBimapMaker(Nothing),
-    chain: chain,
-    mjoin: mjoin,
+    bimap: returnNothing,
+    chain: returnNothing,
+    mjoin: returnNothing,
     apply: monad_apply,
     fold: function _fold(fn) {
         return Nothing();
@@ -581,9 +560,7 @@ var nothing = {
     traverse: function _traverse(a, f) {
         return a.of(Maybe.Nothing());
     },
-    nothing: function _nothing() {
-        return Nothing();
-    },
+    nothing: returnNothing,
     /**
      * @signature () -> *
      * @description Returns the underlying value of the current monad 'instance'.
@@ -638,6 +615,19 @@ var nothing = {
      */
     of: pointMaker(Just),
     /**
+     * @signature * -> boolean
+     * @description Determines if 'this' left functor is equal to another monad. Equality
+     * is defined as:
+     * 1) The other monad shares the same delegate object as 'this' nothing monad
+     * 2) Both underlying values are strictly equal to each other
+     * @memberOf monads.nothing
+     * @instance
+     * @function
+     * @param {Object} ma - The other monad to check for equality with 'this' monad.
+     * @return {boolean} - Returns a boolean indicating equality
+     */
+    equals: Nothing.is,
+    /**
      * @signature () -> *
      * @description Returns the underlying value of the current monad 'instance'. This
      * function property is not meant for explicit use. Rather, the JavaScript engine uses
@@ -677,20 +667,6 @@ var nothing = {
      */
     factory: Maybe
 };
-
-/**
- * @signature * -> boolean
- * @description Determines if 'this' left functor is equal to another monad. Equality
- * is defined as:
- * 1) The other monad shares the same delegate object as 'this' nothing monad
- * 2) Both underlying values are strictly equal to each other
- * @memberOf monads.nothing
- * @instance
- * @function
- * @param {Object} ma - The other monad to check for equality with 'this' monad.
- * @return {boolean} - Returns a boolean indicating equality
- */
-nothing.equals = disjunctionEqualMaker(nothing, 'isNothing');
 
 just.ap = just.apply;
 just.fmap = just.chain;

@@ -117,7 +117,7 @@ describe('Constant monad tests', function _testConstantMonad() {
                 d = c.map();
 
             c.value.should.eql(d.value);
-            c.should.not.equal(d);
+            c.should.equal(d);
         });
 
         it('should properly indicate equality when constant monads are indeed equal', function _testConstantFunctorEquality() {

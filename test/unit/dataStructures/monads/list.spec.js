@@ -33,8 +33,23 @@ describe('List functor test', function _testListFunctor() {
             expect(arr).to.eql(l4.value);
             expect([obj]).to.eql(l5.value);
             expect('object').to.eql(typeof l6.value);
-            expect('testing constant').to.eql(l7.value);
+            expect(['testing constant']).to.eql(l7.value);
             expect([false]).to.eql(l8.value);
+        });
+
+        it('should accept lists, generators, comma separated arguments, arrays as a source and result in the same value', function _testListDotFrom() {
+            function *_genny() {
+                var i = 1;
+                while (6 > i) {
+                    yield i;
+                    ++i;
+                }
+            }
+
+            List.from(1, 2, 3, 4, 5).data.should.eql([1, 2, 3, 4, 5]);
+            List.from(1, 2, 3, 4, 5).data.should.eql(List.from([1, 2, 3, 4, 5]).data);
+            List.from(1, 2, 3, 4, 5).data.should.eql(List.from(List([1, 2, 3, 4, 5])).data);
+            List.from(1, 2, 3, 4, 5).data.should.eql(List.from(_genny).data);
         });
 
         it('should return the same type/value when using the #of function', function _testListDotOf() {
@@ -47,7 +62,8 @@ describe('List functor test', function _testListFunctor() {
                 i5 = List.of(obj),
                 i6 = List.of(Symbol()),
                 i7 = List.of('testing constant'),
-                i8 = List.of(false);
+                i8 = List.of(false),
+                i9 = List.of(1, false, arr, obj, 'testing multiple args');
 
             list.isPrototypeOf(i1).should.be.true;
             list.isPrototypeOf(i2).should.be.true;
@@ -57,19 +73,21 @@ describe('List functor test', function _testListFunctor() {
             list.isPrototypeOf(i6).should.be.true;
             list.isPrototypeOf(i7).should.be.true;
             list.isPrototypeOf(i8).should.be.true;
+            list.isPrototypeOf(i9).should.be.true;
 
-            expect([undefined]).to.eql(i1.value);
+            expect([]).to.eql(i1.value);
             expect([null]).to.eql(i2.value);
             expect([1]).to.eql(i3.value);
             expect(arr).to.eql(i4.value);
             expect([obj]).to.eql(i5.value);
             expect('object').to.eql(typeof i6.value);
-            expect('testing constant').to.eql(i7.value);
+            expect(['testing constant']).to.eql(i7.value);
             expect([false]).to.eql(i8.value);
+            [1, false, arr, obj, 'testing multiple args'].should.eql(i9.value);
         });
 
         it('should return an ordered list delegator', function _testOrderedListCreationFunctionProperties() {
-            var l1 = List.empty(),
+            var l1 = List.empty,
                 l2 = List.just(1),
                 l3 = List.ordered([1, 2, 3, 4, 5], x => x);
 
@@ -91,7 +109,7 @@ describe('List functor test', function _testListFunctor() {
                 .data.should.eql([0, 1, 2, 3, 4, 5]);
         });
 
-        it('should return correct response when checking is a type is an Identity', function _testListDotIs() {
+        it('should return correct response when checking if a type is an Identity', function _testListDotIs() {
             var l = List(2),
                 m = monads.Maybe(2),
                 c = monads.Constant(null),
@@ -110,6 +128,19 @@ describe('List functor test', function _testListFunctor() {
         it('should return a new List delegate with the same value repeated x times', function _testListDotRepeat() {
             List.repeat(1, 5)
                 .data.should.eql([1, 1, 1, 1, 1]);
+        });
+
+        it('should create a new list via unfold', function _testUnfold() {
+            function unfoldFn(val) {
+                return { next: val * val, value: monads.Identity(val), done: 513 < val };
+            }
+
+            var last = 0;
+            List.unfold(unfoldFn, 2).data.forEach(function _validateResult(item) {
+                Object.getPrototypeOf(monads.Identity()).isPrototypeOf(item).should.be.true;
+                item.value.should.be.at.least(last);
+                last = item.value;
+            });
         });
 
         it('should extend the List factory with new functionality', function _testListDotExtend() {
@@ -220,7 +251,7 @@ describe('List functor test', function _testListFunctor() {
         });
 
         it('should allow "expected" functionality of concatenation for strings and mathematical operators for numbers', function _testListFunctorValueOf() {
-            ('Hello my name is: ' + List('Mark')).should.eql('Hello my name is: Mark');
+            ('Hello my name is: ' + List('Mark').data).should.eql('Hello my name is: Mark');
         });
 
         it('should print the correct container type + value when .toString() is invoked', function _testListFunctorToString() {
@@ -232,11 +263,29 @@ describe('List functor test', function _testListFunctor() {
             c1.toString().should.eql('List(1)');
             c2.toString().should.eql('List()');
             c3.toString().should.eql('List(1,2,3)');
-            c4.toString().should.eql('List(List(List(5)))');
+            c4.toString().should.eql('List(5)');
         });
 
         it('should have a .constructor property that points to the factory function', function _testListFunctorIsStupidViaFantasyLandSpecCompliance() {
             List(null).constructor.should.eql(List);
+        });
+
+        it('should apply a mutating function to the underlying value and return the new value unwrapped in a List when chain is called', function _testListDotChain() {
+            var l1 = List([1, 2, 3, 4, 5]),
+                l2 = List.from([false, false, true, false, true]),
+                l3 = List(List([{ a: 1, b: 2 }, { a: 3, b: 4 }, { a: 5, b: 6 }, { a: 7, b: 8 }]));
+
+            l1.chain(function _chain(val) {
+                return List.of(5 * val);
+            }).data.should.eql([5, 10, 15, 20, 25]);
+
+            l2.chain(function _chain(val) {
+                return List.of(!val);
+            }).data.should.eql([true, true, false, true, false]);
+
+            l3.chain(function _chain(val) {
+                return val.a + val.b;
+            }).data.should.eql([3, 7, 11, 15]);
         });
     });
 
@@ -372,6 +421,20 @@ describe('List functor test', function _testListFunctor() {
                 res.should.be.an('array');
                 res.should.have.lengthOf(resStandard.length);
                 res.should.eql(resStandard);
+            });
+
+            it('should return the list except where it intersects with the values yielded from a generator', function _testExceptWithAGenerator() {
+                function *_genny() {
+                    var i = 0;
+                    while (10 > i) {
+                        yield i;
+                        i += 2;
+                    }
+                }
+
+                var res = List([1, 2, 3, 4, 5])
+                    .except(_genny).data;
+
             });
 
             it('should group the test data on last name', function _testGroupBy() {
@@ -542,7 +605,7 @@ describe('List functor test', function _testListFunctor() {
                 }));
 
                 List(testData.dataSource.data)
-                    .join(testData.dataSource.data, selector, selector, projector)
+                    .listJoin(testData.dataSource.data, selector, selector, projector)
                     .data.should.have.lengthOf(duplicateFirstNames.length);
             });
 
@@ -630,6 +693,13 @@ describe('List functor test', function _testListFunctor() {
                     .sortBy(x => x[0], sortComparer)
                     .thenByDescending(x => x[1], sortComparer)
                     .data.should.eql([[7, 2], [7, 1], [8, 1], [8, 0], [9, 10], [9, 9], [9, 3], [10, 5], [10, 2], [10, 1]]);
+            });
+
+            it('should be mappable', function _testListMapability() {
+                List([1, 2, 3, 4, 5])
+                    .map(x => List(x * x))
+                    .chain(x => x)
+                    .data.should.eql([1, 4, 9, 16, 25]);
             });
         });
 
@@ -759,7 +829,7 @@ describe('List functor test', function _testListFunctor() {
                 List([1, 2, 3, 4])
                     .isEmpty().should.be.false;
 
-                List.empty().isEmpty().should.be.true;
+                List.empty.isEmpty().should.be.true;
             });
 
             it('should return the last item in the list that matches the predicate', function _testLast() {
@@ -895,6 +965,49 @@ describe('List functor test', function _testListFunctor() {
 
                     spyComparer.should.have.been.callCount(16);
                 });
+            });
+        });
+    });
+
+    describe('tmp', function _tmp() {
+        function noop() {}
+
+        it('should do stuff', function _doStuff(done) {
+            var count = 0;
+
+            function _TO1(cb) {
+                setTimeout(function _to() {
+                    ++count;
+                    count.should.eql(1);
+                    cb(null, count);
+                }, 250);
+            }
+
+            function _TO2(cb) {
+                setTimeout(function _to() {
+                    ++count;
+                    count.should.eql(2);
+                    cb(null, count);
+                    done();
+                }, 300);
+            }
+
+            List([ _TO1, _TO2])
+                .traverse(monads.Future.of,
+                        fn => monads.Future((reject, result) => fn((err, res) => err ? reject(err) : result(res))))
+                .fork(noop, noop);
+        });
+
+        it('should traverse a list of identity', function _testListDotTraverseWithIdentity() {
+            var i = List([1, 2, 3])
+                .traverse(monads.Identity.of, val => monads.Identity(val * val));
+
+            var initial = 1;
+            Object.getPrototypeOf(monads.Identity()).isPrototypeOf(i).should.be.true;
+            Object.getPrototypeOf(List()).isPrototypeOf(i.value).should.be.true;
+            i.value.data.forEach(function _verifyResult(val) {
+                val.should.eql(initial * initial);
+                ++initial;
             });
         });
     });

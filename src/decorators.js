@@ -228,7 +228,7 @@ var repeat = curry(function _repeat(num, fn) {
 });
 
 /**
- * @signature
+ * @signature rightApply :: (*... -> a) -> [*] -> a
  * @description d
  * @note This function is partially applied, not curried.
  * @function rightApply
@@ -250,7 +250,7 @@ var rightApply = invoker((fn, ...args) => fn(...args.reverse()));
 var safe = invoker((fn, ...args) => !args.length || args.includes(null) || args.includes(undefined) ? undefined : fn(...args));
 
 /**
- * @signature
+ * @signature tap :: () -> * -> *
  * @description d
  * @function tap
  * @param {*} arg - a
@@ -263,7 +263,7 @@ var tap = curry(function _tap(fn, arg) {
 });
 
 /**
- * @signature (* -> *) -> [*] -> (*, *, * -> *)
+ * @signature ternary :: (* -> *) -> [*] -> (*, *, * -> *)
  * @description Takes any function and turns it into a curried ternary function.
  * @param {function} fn - a
  * @param {*} [args] - Accepts zero or more optional arguments. If three or more arguments
@@ -273,7 +273,7 @@ var tap = curry(function _tap(fn, arg) {
 var ternary = (fn, ...args) => curryN.call(this, 3, fn, ...args);
 
 /**
- * @signature
+ * @signature tryCatch :: () -> () -> *
  * @description d
  * @function tryCatch
  * @param {function} catcher - a
@@ -292,7 +292,7 @@ var tryCatch = curry(function _tryCatch(catcher, tryer) {
 });
 
 /**
- * @signature (*... -> *) -> * -> *
+ * @signature unary :: (*... -> *) -> * -> *
  * @description - Takes a single function of any arity and turns it into
  * a unary function. An optional argument may be provided. If it is, the
  * immediate result of the function's application to the argument is returned,
@@ -325,12 +325,12 @@ function unfold(seed) {
  * @return {function} - b
  */
 function unfoldWith(fn) {
-    return function *_unfold (value) {
-        let { next, element, done } = fn(value);
+    return function *_unfold (val) {
+        let { next, value, done } = fn(val);
 
-        if (!done) {
-            yield element;
-            yield * _unfold(next);
+        while (!done) {
+            yield value;
+            ({ next, value, done } = fn(next));
         }
     };
 }

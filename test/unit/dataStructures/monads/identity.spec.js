@@ -338,7 +338,7 @@ describe('Identity monad test', function _testIdentityMonad() {
             i3.mjoin().should.eql(Identity(1));
         });
 
-        it('should monad_apply a mutating function to the underlying value and return the new value unwrapped in an Identity when chain is called', function _testIdentityMonadChain() {
+        it('should apply a mutating function to the underlying value and return the new value unwrapped in an Identity when chain is called', function _testIdentityMonadChain() {
             var i1 = Identity(10),
                 i2 = Identity(Identity({ a: 1, b: 2 })),
                 i3 = Identity(25);

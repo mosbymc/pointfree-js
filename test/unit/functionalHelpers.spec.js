@@ -96,10 +96,10 @@ describe('Test both', function _testBoth() {
             res3 = both(two, two),
             res4 = both(two, one);
 
-        res1.should.be.false;
-        res2.should.be.true;
-        res3.should.be.false;
-        res4.should.be.false;
+        res1().should.be.false;
+        res2().should.be.true;
+        res3().should.be.false;
+        res4().should.be.false;
     });
 });
 

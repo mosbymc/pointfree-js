@@ -673,7 +673,7 @@ describe('Test List Iterators', function _testListIterators() {
         });
     });
 
-    describe('Test join...', function testJoin() {
+    describe('Test listJoin...', function testJoin() {
         var joinTestData = new Array(54).fill(1).map(function _mapTestData(item, idx) {
             return item * idx * idx;
         });
@@ -1140,7 +1140,7 @@ describe('Test List Iterators', function _testListIterators() {
         }
 
         it('should return false when no predicate is supplied', function testAllWithNoPredicate() {
-            all(testData.dataSource.data).should.not.be.true;
+            all(testData.dataSource.data).should.be.false;
         });
 
         it('should return true when predicate is supplied and data passes', function testAllWithAllDataPassingPredicate() {
@@ -1159,7 +1159,7 @@ describe('Test List Iterators', function _testListIterators() {
             }
 
             all(gen([])).should.not.be.true;
-            all(gen(testData.dataSource.data)).should.not.be.true;
+            all(gen(testData.dataSource.data)).should.be.false;
             all(gen(testData.dataSource.data), isObject).should.be.true;
             all(gen([1, 2, 3, 4, 5, 6, 7, 8, 9]), isObject).should.not.be.true;
         });

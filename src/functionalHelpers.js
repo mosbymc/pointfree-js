@@ -78,10 +78,10 @@ var arraySet = curry(function _arraySet(idx, x, list) {
  * @function both
  * @param {function} f - a
  * @param {function} g - b
- * @return {boolean} - c
+ * @return {function} - c
  */
 var both = curry(function _both(f, g) {
-    return !!(f() && g());
+    return (...args) => !!(f(...args) && g(...args));
 });
 
 /**
@@ -469,12 +469,14 @@ var objectSet = curry(function _objectSet(prop, val, obj) {
  * @return {function} - b
  */
 function once(fn) {
-    var invoked = false;
+    var invoked = false,
+        res;
     return function _once(...args) {
         if (!invoked) {
             invoked = true;
-            fn(...args);
+            res = fn(...args);
         }
+        return res;
     };
 }
 
@@ -538,7 +540,7 @@ var setSet = curry(function _setSet(val, set) {
 var strictEquals = curry((x, y) => x === y);
 
 /**
- * @signature
+ * @signature strictNotEquals :: * -> * -> boolean
  * @description d
  * @kind function
  * @function strictNotEqual
@@ -549,7 +551,7 @@ var strictEquals = curry((x, y) => x === y);
 var strictNotEqual = curry((x, y) => x !== y);
 
 /**
- * @signature
+ * @signature subtract :: number -> number -> number
  * @description d
  * @kind function
  * @function subtract
@@ -560,7 +562,7 @@ var strictNotEqual = curry((x, y) => x !== y);
 var subtract = curry((x, y) => x - y);
 
 /**
- * @signature
+ * @signature truthy :: * -> boolean
  * @description d
  * @param {*} x - a
  * @return {boolean} - b
@@ -568,7 +570,7 @@ var subtract = curry((x, y) => x - y);
 var truthy = x => flip(falsey(x));
 
 /**
- * @signature
+ * @signature type :: * -> string
  * @description d
  * @param {*} a - a
  * @return {string} - b

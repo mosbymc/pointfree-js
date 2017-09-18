@@ -118,21 +118,20 @@ function createListCreator(baseListType, sortedListType, groupedListType) {
     }
 }
 
+/**
+ * @signature Number -> () -> boolean
+ * @description Rather than define a new iterator function, take/skip utilize the takeWhile
+ * skipWhile iterator via this function. This function accepts an integer that indicates the
+ * number of items that should be taken or skipped and returns a function that acts as a predicate
+ * function for takeWhile/skipWhile iterators.
+ * @param {number} amt - An integer the indicates the number of items to either take or skip
+ * @return {function} Returns a function that is used as a predicate in the takeWhile/skipWhile
+ * list iterators.
+ */
 function taker_skipper(amt) {
     var count = -1;
     return function _skipAmt() {
         return ++count < amt;
-    };
-}
-
-function listExtensionHelper(listFactory, listDelegatee, creatorFunc, ...listTypes) {
-    return function _extend(prop, fn) {
-        if (!listTypes.some(type => prop in type)) {
-            listDelegatee[prop] = function _extension(...args) {
-                return creatorFunc(this, fn(this, ...args));
-            };
-        }
-        return listFactory;
     };
 }
 
@@ -152,4 +151,4 @@ function createSortObject(selector, comparer, direction) {
     });
 }
 
-export { createListCreator, taker_skipper, listExtensionHelper, createSortObject };
+export { createListCreator, taker_skipper, createSortObject };

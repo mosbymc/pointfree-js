@@ -502,7 +502,7 @@ var w = curry((a, b) => a(b)(b));
 var when = curry((predicate, transform, data) => predicate(data) ? transform(data) : data);
 
 /**
- * @signature
+ * @signature whenNot :: () -> () -> * -> *
  * @description d
  * @kind function
  * @function whenNot
