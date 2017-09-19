@@ -13,9 +13,9 @@ A JavaScript library that brings together algebraic data structures, combinators
 
 This is a work in progress and is not yet ready for production use.
 
-|               | Data Structures |
---------------- | -------------------------------------------------------------------------------------------------------------------------------------------------
-| Types         |    Identity     |    Constant     |    Either     |     Maybe     |    Future     |     List      |    Additive   |  Conjunctive  | Disjunctive |
+
+
+|               |    Identity     |    Constant     |    Either     |     Maybe     |    Future     |     List      |    Additive   |  Conjunctive  | Disjunctive |
 --------------- | :-------------: | :-------------: | :-----------: | :-----------: | :-----------: | :-----------: | :-----------: | :-----------: | :---------: |
 | Functor       |    **✔︎**    |    **✔︎**     |    **✔︎**  |    **✔︎**   |   **✔︎**   |   **✔︎**   |               |               |              |
 | Apply         |    **✔︎**    |    **✔︎**     |    **✔︎**  |    **✔︎**   |   **✔︎**   |   **✔︎**   |               |               |              |
