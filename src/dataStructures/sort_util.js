@@ -2,6 +2,22 @@ import { deepClone, sortComparer } from '../helpers';
 
 /** @module dataStructures/sort_util */
 
+var sort_obj = {};
+
+function createSortObject(selector, comparer, direction) {
+    return Object.create(sort_obj, {
+        keySelector: {
+            value: selector
+        },
+        comparer: {
+            value: comparer
+        },
+        direction: {
+            value: direction
+        }
+    });
+}
+
 /**
  * @signature
  * @description d
@@ -189,4 +205,4 @@ function _insertionSort(source, keySelector, keyComparer, direction) {
     return source;
 }
 
-export { sortData, quickSort, mergeSort, insertionSort };
+export { sortData, quickSort, mergeSort, insertionSort, createSortObject };

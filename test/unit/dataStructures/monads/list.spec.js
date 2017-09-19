@@ -331,7 +331,7 @@ describe('List functor test', function _testListFunctor() {
                     arr1 = [6, 7, 8, 9, 10],
                     arr2 = [11, 12, 13, 14, 15],
                     arr3 = [16, 17, 18, 19, 20],
-                    concatIterator = list.concat(arr1, arr2, arr3),
+                    concatIterator = list.concat(arr1).concat(arr2).concat(arr3),
                     res = concatIterator.data;
 
                 res.should.be.an('array');

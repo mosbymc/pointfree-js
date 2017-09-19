@@ -1,11 +1,11 @@
-import { all, any, binarySearch, chain, concat, contains, copyWithin, count, distinct, equals, except, fill, filter, findIndex, findLastIndex,
-        first, foldLeft, foldRight, groupBy, groupJoin, intersect, intersperse, join, last, map, ofType, prepend, reduceRight, repeat, reverse,
-        skipWhile, slice, sortBy, takeWhile, unfold, union, zip } from '../list_iterators';
+import { all, any, binarySearch, chain, concat, concatAll, contains, copyWithin, count, distinct, equals, except, fill, filter,
+        findIndex, findLastIndex, first, foldLeft, foldRight, groupBy, groupJoin, intersect, intersperse, join, last, map, ofType,
+        prepend, prependAll, reduceRight, repeat, reverse, skipWhile, slice, sortBy, takeWhile, unfold, union, zip } from '../list_iterators';
 import { sortDirection, generatorProto } from '../../helpers';
 import { wrap, defaultPredicate, delegatesFrom, isArray, noop, invoke, delegatesTo, isString, both } from '../../functionalHelpers';
 import { when, ifElse, identity, constant } from '../../combinators';
 import { not } from '../../decorators';
-import { taker_skipper, createSortObject } from '../list_util';
+import { createSortObject } from '../sort_util';
 
 /**
  * @description: Object that contains the core functionality of a List; both the m_list and ordered_m_list
@@ -17,9 +17,11 @@ import { taker_skipper, createSortObject } from '../list_util';
  * @property {function} value
  * @property {function} apply
  * @property {function} append
+ * @property {function} appendAll
  * @property {function} bimap
  * @property {function} chain
  * @property {function} concat
+ * @property {function} concatAll
  * @property {function} copyWithin
  * @property {function} distinct
  * @property {function} except
@@ -35,6 +37,7 @@ import { taker_skipper, createSortObject } from '../list_util';
  * @property {function} mjoin
  * @property {function} ofType
  * @property {function} prepend
+ * @property {function} prependAll
  * @property {function} reverse
  * @property {function} sequence
  * @property {function} skip
@@ -143,8 +146,22 @@ var list_core = {
      * @param {Array | *} ys - a
      * @return {monads.list} - b
      */
-    concat: function _concat(...ys) {
-        return this.of(this, concat(this, ys, ys.length));
+    concat: function _concat(ys) {
+        return this.of(this, concat(this, List.of(ys)));
+    },
+
+    /**
+     * @signature
+     * @description d
+     * @memberOf monads.list_core
+     * @instance
+     * @function concatAll
+     * @this monads.list
+     * @param {list|ordered_list} ys - One or more lists to concatenate with this list
+     * @return {monads.list} Returns a new list
+     */
+    concatAll: function _concatAll(...ys) {
+        return this.of(this, concatAll(this, ys.map(y => List.of(y))));
     },
 
     /**
@@ -396,7 +413,21 @@ var list_core = {
      * @return {monads.list_core} - b
      */
     prepend: function _prepend(xs) {
-        return this.of(this, prepend(this, xs));
+        return this.of(this, prepend(this, List.of(xs)));
+    },
+
+    /**
+     * @signature
+     * @description d
+     * @memberOf monads.list_core
+     * @instance
+     * @function prependAll
+     * @this list
+     * @param {Array|monads.list|monads.ordered_list} xs - A list
+     * @return {monads.list|monads.ordered_list} Returns a new list
+     */
+    prependAll: function _prependAll(...xs) {
+        return this.of(this, prependAll(this, xs.map(x => List.of(x))));
     },
 
     /**
@@ -429,7 +460,8 @@ var list_core = {
      * @return {monads.list_core} - a
      */
     skip: function _skip(amt) {
-        return this.skipWhile(taker_skipper(amt));
+        var count = -1;
+        return this.skipWhile(idx => ++count < amt);
     },
 
     /**
@@ -478,7 +510,8 @@ var list_core = {
      * @return {monads.list_core} - b
      */
     take: function _take(amt) {
-        return this.takeWhile(taker_skipper(amt));
+        var count = -1;
+        return this.takeWhile(idx => ++count < amt);
     },
 
     /**
@@ -949,7 +982,7 @@ var list_core = {
      * @memberOf monads.list_core
      * @instance
      * @function of
-     * @param {*} xs - a
+     * @param {list_core|list|ordered_list} xs - a
      * @param {generator} [iterator] - b
      * @param {Array.<Object>} [sortObj] - c
      * @param {string} [key] - d
