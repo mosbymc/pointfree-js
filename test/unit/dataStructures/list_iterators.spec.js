@@ -1,7 +1,6 @@
 import { all, any, except, intersect, union, map, chain, groupBy, sortBy, prepend, concat, groupJoin, join, zip, filter, intersperse,
         contains, first, last, count, foldLeft, reduceRight, distinct, ofType, binarySearch, equals, takeWhile, skipWhile, reverse,
         copyWithin, fill, findIndex, findLastIndex, repeat, foldRight, unfold } from '../../../src/dataStructures/list_iterators';
-import { createListCreator } from '../../../src/dataStructures/list_util';
 import { list, ordered_list } from '../../../src/dataStructures/monads/list';
 import { cacher, javaScriptTypes, sortDirection, typeNames } from '../../../src/helpers';
 import { testData } from '../../testData';
@@ -80,7 +79,7 @@ describe('Test List Iterators', function _testListIterators() {
         }
 
         it('should return test data x 2', function testConcatSourceWithItself() {
-            var concatIterable = concat(testData.dataSource.data, [testData.dataSource.data], 1),
+            var concatIterable = concat(testData.dataSource.data, testData.dataSource.data),
                 concatRes = Array.from(concatIterable());
 
             concatRes.should.have.lengthOf(testData.dataSource.data.length * 2);
@@ -89,7 +88,7 @@ describe('Test List Iterators', function _testListIterators() {
         });
 
         it('should concat sources of different value types', function testConcatWithDifferingValueTypes() {
-            var concatIterable = concat(testData.dataSource.data, [[1, 2, 3, 4, 5]], 1),
+            var concatIterable = concat(testData.dataSource.data, [1, 2, 3, 4, 5]),
                 concatRes = Array.from(concatIterable());
 
             concatRes.should.have.lengthOf(testData.dataSource.data.length + 5);
@@ -98,7 +97,7 @@ describe('Test List Iterators', function _testListIterators() {
         });
 
         it('should return test data when second param is empty array', function testConcatWithSecondParameterAnEmptyArray() {
-            var concatIterable = concat(testData.dataSource.data, [[]], 1),
+            var concatIterable = concat(testData.dataSource.data, []),
                 concatRes = Array.from(concatIterable());
 
             concatRes.should.have.lengthOf(testData.dataSource.data.length);
@@ -106,7 +105,7 @@ describe('Test List Iterators', function _testListIterators() {
         });
 
         it('should return test data when first param is empty and second param is test data', function testConcatWithFirstParameterAnEmptyArray() {
-            var concatIterable = concat([], [testData.dataSource.data], 1),
+            var concatIterable = concat([], testData.dataSource.data),
                 concatRes = Array.from(concatIterable());
 
             concatRes.should.have.lengthOf(testData.dataSource.data.length);
@@ -114,7 +113,7 @@ describe('Test List Iterators', function _testListIterators() {
         });
 
         it('should return test data when first param is an empty generator', function testConcatWithFirstParameterAnEmptyGenerator() {
-            var concatIterable = concat(gen([]), [testData.dataSource.data], 1),
+            var concatIterable = concat(gen([]), testData.dataSource.data),
                 concatRes = Array.from(concatIterable());
 
             concatRes.should.have.lengthOf(testData.dataSource.data.length);
@@ -122,7 +121,7 @@ describe('Test List Iterators', function _testListIterators() {
         });
 
         it('should return test data when second param is an empty generator', function testConcatWithSecondParameterAnEmptyGenerator() {
-            var concatIterable = concat(testData.dataSource.data, [gen([])], 1),
+            var concatIterable = concat(testData.dataSource.data, gen([])),
                 concatRes = Array.from(concatIterable());
 
             concatRes.should.have.lengthOf(testData.dataSource.data.length);
@@ -130,7 +129,7 @@ describe('Test List Iterators', function _testListIterators() {
         });
 
         it('should return test data x 2 when fed two generators', function testConcatWithTwoGenerators() {
-            var concatIterable = concat(gen(testData.dataSource.data), [gen(testData.dataSource.data)], 1),
+            var concatIterable = concat(gen(testData.dataSource.data), gen(testData.dataSource.data)),
                 concatRes = Array.from(concatIterable());
 
             concatRes.should.have.lengthOf(testData.dataSource.data.length * 2);
@@ -238,7 +237,7 @@ describe('Test List Iterators', function _testListIterators() {
     });
 
     describe('Test groupJoin...', function testGroupJoin() {
-        var factoryFn = createListCreator(list, ordered_list, list);
+        var factoryFn = list.of;
         var preViewed = {};
         var uniqueCities = testData.dataSource.data.filter(function _gatherUniqueCities(item) {
             if (!(item.City in preViewed)) {
@@ -1729,7 +1728,7 @@ describe('Test List Iterators', function _testListIterators() {
                 uniqueLastNames.push(item.LastName);
         });
 
-        var factoryFn = createListCreator(list, ordered_list, list);
+        var factoryFn = list.of;
 
         describe('...using arrays', function testGroupByUsingArrays() {
             it('should group test data by state descending', function testGroupByOnStateDescending() {

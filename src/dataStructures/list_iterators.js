@@ -110,23 +110,29 @@ function chain(xs, fn) {
  * @signature:
  * @description description
  * @param {Array|generator|monads.list_core} xs - x
- * @param {Array|generator|monads.list_core} yss - y
- * @param {number} argsCount - z
+ * @param {Array|generator|monads.list_core} ys - y
  * @return {generator} - a
  */
-function concat(xs, yss, argsCount) {
+function concat(xs, ys) {
     return function *concatIterator() {
         for (let x of xs) yield x;
+        for (let y of ys) yield y;
+    };
+}
 
-        if (1 === argsCount) {
-            let ys = yss[0];
+/**
+ * @signature
+ * @description d
+ * @param {monads.list_core|monads.list|monads.ordered_list} xs - A list
+ * @param {Array} yss - An array of one or more lists
+ * @return {generator} Returns a generator to be used as an
+ * iterator when the list is evaluated.
+ */
+function concatAll(xs, yss) {
+    return function *_concatAllIterator() {
+        for (let x of xs) yield x;
+        for (let ys of yss)
             for (let y of ys) yield y;
-        }
-        else {
-            for (let ys of yss) {
-                for (let y of ys) yield y;
-            }
-        }
     };
 }
 
@@ -582,11 +588,18 @@ function ofType(xs, dataType) {
  * @return {generator} - some other other stuff
  */
 function prepend(xs, ys) {
-    return function *addFront() {
-        for (let y of ys) yield y;
+    return concat(ys, xs);
+}
 
-        for (let x of xs) yield x;
-    };
+/**
+ * @signature
+ * @description d
+ * @param {monads.list|monads.ordered_list} xs - A list
+ * @param {Array} yss - An array of one or more lists
+ * @return {generator} Returns a generator
+ */
+function prependAll(xs, yss) {
+    return concatAll(yss.shift(), [xs].concat(yss).reverse());
 }
 
 /**
@@ -740,6 +753,6 @@ function zip(xs, ys, selector) {
     };
 }
 
-export { all, any, binarySearch, chain, concat, contains, copyWithin, count, distinct, equals, except, fill, filter, findIndex, findLastIndex,
-        first, foldLeft, foldRight, groupBy, groupJoin, intersect, intersperse, join, last, map, ofType, prepend, reduceRight, repeat, reverse,
-        skipWhile, slice, sortBy, takeWhile, unfold, union, zip };
+export { all, any, binarySearch, chain, concat, concatAll, contains, copyWithin, count, distinct, equals, except, fill, filter,
+        findIndex, findLastIndex, first, foldLeft, foldRight, groupBy, groupJoin, intersect, intersperse, join, last, map, ofType,
+        prepend, prependAll, reduceRight, repeat, reverse, skipWhile, slice, sortBy, takeWhile, unfold, union, zip };
