@@ -13,6 +13,11 @@ A JavaScript library that brings together algebraic data structures, combinators
 
 This is a work in progress and is not yet ready for production use.
 
+Currently in progress:
+- monoids and groups
+- semi-group factory for defining your own semi-groups
+- tests and refactoring of existing code base
+
 
 
 |               |    Identity     |    Constant     |    Either     |     Maybe     |    Future     |     List      |    Additive   |  Conjunctive  | Disjunctive |
@@ -35,3 +40,4 @@ This is a work in progress and is not yet ready for production use.
 | Monoid        |                 |                 |               |               |               |   **✔︎**   |   **✔︎**   |    **✔︎**   |   **✔︎**  |
 | Setoid        |    **✔︎**    |    **✔︎**     |    **✔︎**  |    **✔︎**   |   **✔︎**   |   **✔︎**   |   **✔︎**   |    **✔︎**   |   **✔︎**  |
 | Group         |                 |                 |               |               |               |               |   **✔︎**   |   **✔︎**   |   **✔︎**  |
+
