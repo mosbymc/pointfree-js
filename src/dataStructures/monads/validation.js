@@ -1,4 +1,4 @@
-import { monad_apply, chain, mjoin, pointMaker, equalMaker, stringMaker, valueOf } from '../data_structure_util';
+import { monad_apply, chain, mjoin, pointMaker, equals, stringMaker, valueOf } from '../data_structure_util';
 
 function Validation(val) {
     return Object.create(validation, {
@@ -26,19 +26,13 @@ var validation = {
     },
     of: pointMaker(Validation),
     valueOf: valueOf,
+    equals: equals,
     toString: stringMaker('Validation'),
     factory: Validation
 };
 
 /**
- * @sig
- * @description d
- * @return {boolean} - a
- */
-validation.equals = equalMaker(validation);
-
-/**
- * @sig
+ * @signature
  * @description Since the constant functor does not represent a disjunction, the Validation's
  * bimap function property behaves just as its map function property. It is merely here as a
  * convenience so that swapping out functors/monads does not break an application that is
