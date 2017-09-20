@@ -985,6 +985,24 @@ describe('List functor test', function _testListFunctor() {
         });
     });
 
+    describe('Array aliases', function _testListAliases() {
+        it('should return the keys of the list', function _testKeys() {
+            var res = [];
+
+            for (let val of List([1, 2, 3, 4, 5, 6, 7, 8, 9, 10]).keys()) {
+                res = res.concat(val);
+            }
+
+            res.should.eql([0, 1, 2, 3, 4, 5, 6, 7, 8, 9]);
+        });
+
+        it('should return a string of the values joined separated by a delimiter', function _testArrayJoin() {
+            List([1, 2, 3, 4, 5])
+                .join(' - ')
+                .should.eql('1 - 2 - 3 - 4 - 5');
+        });
+    });
+
     describe('tmp', function _tmp() {
         function noop() {}
 
