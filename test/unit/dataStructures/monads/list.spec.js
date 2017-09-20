@@ -631,6 +631,12 @@ describe('List functor test', function _testListFunctor() {
                     .data.should.eql([1, 2, 3, 4, 5]);
             });
 
+            it('should skip the values starting from the end', function _testSkipWithNegativeIndexValue() {
+                List([1, 2, 3, 4, 5, 6, 7, 8, 9, 10])
+                    .skip(-5)
+                    .data.should.eql([1, 2, 3, 4, 5]);
+            });
+
             it('should skip values until the first time predicate returns false', function _testSkipWhile() {
                 List([1, 2, 3, 4, 5])
                     .skipWhile(x => 1 === x % 2)
@@ -641,6 +647,16 @@ describe('List functor test', function _testListFunctor() {
                 List(testData.dataSource.data)
                     .take(15)
                     .data.should.have.lengthOf(15);
+
+                List(testData.dataSource.data)
+                    .take()
+                    .data.should.eql([]);
+            });
+
+            it('should take values from the end of the list', function _testTakeLast() {
+                List([1, 2, 3, 4, 5, 6, 7, 8, 9, 10])
+                    .take(-5)
+                    .data.should.eql([6, 7, 8, 9, 10]);
             });
 
             it('should take values until the first time the predicate returns false', function _testTakeWhile() {

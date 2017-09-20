@@ -123,7 +123,7 @@
     "proxyquire": "^1.7.4",
     "proxyquireify": "^3.2.1",
     "rootpath": "^0.1.2",
-    "sinon": "^1.17.6",
+    "sinon": "^1.17.7",
     "sinon-chai": "^2.13.0",
     "snyk": "^1.38.2",
     "source-map-support": "^0.4.15",

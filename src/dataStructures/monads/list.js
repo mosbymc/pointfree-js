@@ -461,9 +461,8 @@ var list_core = {
      */
     skip: function _skip(amt) {
         if (!amt) return this;
-        var count = -1;
-        return 0 < amt ? this.skipWhile(idx => ++count < amt) : this.reverse().skipWhile(idx => ++count < amt);
-        //return this.skipWhile(idx => ++count < amt);
+        var count = 0 < amt ? -1 : 1;
+        return 0 < amt ? this.skipWhile(idx => ++count < amt) : this.reverse().skipWhile(idx => --count > amt).reverse();
     },
 
     /**
@@ -513,9 +512,8 @@ var list_core = {
      */
     take: function _take(amt) {
         if (!amt) return List.empty;
-        var count = -1;
-        return 0 < amt ? this.takeWhile(idx => ++count < amt) : this.reverse().takeWhile(idx => ++count < amt);
-        //return this.takeWhile(idx => ++count < amt);
+        var count = 0 < amt ? -1 : 1;
+        return 0 < amt ? this.takeWhile(idx => ++count < amt) : this.reverse().takeWhile(idx => --count > amt).reverse();
     },
 
     /**
