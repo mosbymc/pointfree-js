@@ -1001,6 +1001,16 @@ describe('List functor test', function _testListFunctor() {
                 .join(' - ')
                 .should.eql('1 - 2 - 3 - 4 - 5');
         });
+
+        it('should return the arrary\'s entries', function _testEntries() {
+            var res = [];
+
+            for (let val of List([1, 2, 3, 4, 5, 6, 7, 8, 9, 10]).entries()) {
+                res = res.concat(val);
+            }
+
+            res.should.eql([0, 1, 1, 2, 2, 3, 3, 4, 4, 5, 5, 6, 6, 7, 7, 8, 8, 9, 9, 10]);
+        });
     });
 
     describe('tmp', function _tmp() {
