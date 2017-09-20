@@ -1,6 +1,6 @@
 import { compose, constant } from '../../combinators';
 import { type, strictEquals } from '../../functionalHelpers';
-import { monad_apply, chain, mjoin, pointMaker, equalMaker, stringMaker, valueOf } from '../data_structure_util';
+import { monad_apply, chain, mjoin, pointMaker, equals, stringMaker, valueOf } from '../data_structure_util';
 import { javaScriptTypes } from '../../helpers';
 
 /**
@@ -68,16 +68,11 @@ var io = {
         return this.run(...args);
     },
     of: pointMaker(Io),
+    equals: equals,
     valueOf: valueOf,
     toString: stringMaker('Io'),
     factory: Io
 };
-
-/**
- * @description:
- * @return:
- */
-io.equals = equalMaker(io);
 
 /**
  * @description: Since the constant functor does not represent a disjunction, the Io's

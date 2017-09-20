@@ -460,8 +460,9 @@ var list_core = {
      * @return {monads.list_core} - a
      */
     skip: function _skip(amt) {
-        var count = -1;
-        return this.skipWhile(idx => ++count < amt);
+        if (!amt) return this;
+        var count = 0 < amt ? -1 : 1;
+        return 0 < amt ? this.skipWhile(idx => ++count < amt) : this.reverse().skipWhile(idx => --count > amt).reverse();
     },
 
     /**
@@ -510,8 +511,9 @@ var list_core = {
      * @return {monads.list_core} - b
      */
     take: function _take(amt) {
-        var count = -1;
-        return this.takeWhile(idx => ++count < amt);
+        if (!amt) return List.empty;
+        var count = 0 < amt ? -1 : 1;
+        return 0 < amt ? this.takeWhile(idx => ++count < amt) : this.reverse().takeWhile(idx => --count > amt).reverse();
     },
 
     /**

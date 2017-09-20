@@ -1,4 +1,4 @@
-import { monad_apply, applyTransforms, chain, monadIterator, disjunctionEqualMaker, equalMaker, lifter, maybeFactoryHelper,
+import { monad_apply, applyTransforms, chain, monadIterator, disjunctionEqualMaker, equals, lifter, maybeFactoryHelper,
     mjoin, pointMaker, stringMaker, valueOf, get, emptyGet, orElse, emptyOrElse, getOrElse, emptyGetOrElse, sharedMaybeFns,
     sharedEitherFns, applyFantasyLandSynonyms, chainRec } from '../../../src/dataStructures/data_structure_util';
 
@@ -36,10 +36,10 @@ var identity = {
     orElse: orElse,
     getOrElse: getOrElse,
     of: pointMaker(Identity),
+    equals: equals,
     valueOf: valueOf,
     toString: stringMaker('Identity')
 };
-identity.equals = equalMaker(identity);
 
 describe('Test data structure utils', function _testDataStructureUtils() {
     describe('Test monad_apply', function _testApply() {

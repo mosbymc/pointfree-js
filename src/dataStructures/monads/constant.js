@@ -1,4 +1,4 @@
-import { monad_apply, mjoin, pointMaker, equalMaker, stringMaker, valueOf, get, orElse, getOrElse } from '../data_structure_util';
+import { monad_apply, mjoin, pointMaker, equals, stringMaker, valueOf, get, orElse, getOrElse } from '../data_structure_util';
 
 /**
  * @signature - :: * -> {@link monads.constant}
@@ -179,6 +179,19 @@ var constant = {
      */
     of: pointMaker(Constant),
     /**
+     * @signature * -> boolean
+     * @description Determines if 'this' identity functor is equal to another functor. Equality
+     * is defined as:
+     * 1) The other functor shares the same delegate object as 'this' identity functor
+     * 2) Both underlying values are strictly equal to each other
+     * @memberOf monads.constant
+     * @instance
+     * @function
+     * @param {Object} ma - The other functor to check for equality with 'this' functor.
+     * @return {boolean} - Returns a boolean indicating equality
+     */
+    equals: equals,
+    /**
      * @signature () -> *
      * @description Returns the underlying value of the current functor 'instance'. This
      * function property is not meant for explicit use. Rather, the JavaScript engine uses
@@ -216,20 +229,6 @@ var constant = {
      */
     factory: Constant
 };
-
-/**
- * @signature * -> boolean
- * @description Determines if 'this' identity functor is equal to another functor. Equality
- * is defined as:
- * 1) The other functor shares the same delegate object as 'this' identity functor
- * 2) Both underlying values are strictly equal to each other
- * @memberOf monads.constant
- * @instance
- * @function
- * @param {Object} ma - The other functor to check for equality with 'this' functor.
- * @return {boolean} - Returns a boolean indicating equality
- */
-constant.equals = equalMaker(constant);
 
 /**
  * @signature (* -> *) -> (* -> *) -> monads.constant<T>
