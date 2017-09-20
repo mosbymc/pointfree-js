@@ -224,13 +224,12 @@ function disjunctionEqualMaker(type, prop) {
 /**
  * @signature
  * @description d
- * @param {Object} type - a
- * @return {function} - b
+ * @param {Object} a - a
+ * @return {boolean} - b
  */
-function equalMaker(type) {
-    return function _equal(a) {
-        return Object.getPrototypeOf(type).isPrototypeOf(a) && this.value === a.value;
-    };
+function equals(a) {
+    return this.value && this.value.equals === equals ? this.value.equals(a) :
+        a.value && a.value.equals === equals ? a.value.equals(this) : Object.getPrototypeOf(this).isPrototypeOf(a) && this.value === a.value;
 }
 
 /**
@@ -430,6 +429,6 @@ var fl = {
     promap: 'fantasy-land/promap'
 };
 
-export { monad_apply, applyTransforms, chain, contramap, monadIterator, disjunctionEqualMaker, equalMaker, lifter, maybeFactoryHelper,
+export { monad_apply, applyTransforms, chain, contramap, monadIterator, disjunctionEqualMaker, equals, lifter, maybeFactoryHelper,
         mjoin, pointMaker, stringMaker, valueOf, get, emptyGet, orElse, emptyOrElse, getOrElse, emptyGetOrElse, sharedMaybeFns,
         sharedEitherFns, applyFantasyLandSynonyms, applyAliases, chainRec, extendMaker, extract };

@@ -1,5 +1,5 @@
 import { nil } from '../../helpers';
-import { monad_apply, chain, contramap, mjoin, equalMaker, pointMaker, stringMaker,
+import { monad_apply, chain, contramap, mjoin, equals, pointMaker, stringMaker,
         valueOf, get, orElse, getOrElse, extendMaker } from '../data_structure_util';
 
 /**
@@ -322,6 +322,19 @@ var identity = {
      */
     of: pointMaker(Identity),
     /**
+     * @signature * -> boolean
+     * @description Determines if 'this' identity monad is equal to another monad. Equality
+     * is defined as:
+     * 1) The other monad shares the same delegate object as 'this' identity monad
+     * 2) Both underlying values are strictly equal to each other
+     * @memberOf monads.identity
+     * @instance
+     * @function
+     * @param {Object} ma - The other monad to check for equality with 'this' monad.
+     * @return {boolean} - Returns a boolean indicating equality
+     */
+    equals: equals,
+    /**
      * @signature () -> *
      * @description Returns the underlying value of the current monad 'instance'. This
      * function property is not meant for explicit use. Rather, the JavaScript engine uses
@@ -359,20 +372,6 @@ var identity = {
      */
     factory: Identity
 };
-
-/**
- * @signature * -> boolean
- * @description Determines if 'this' identity monad is equal to another monad. Equality
- * is defined as:
- * 1) The other monad shares the same delegate object as 'this' identity monad
- * 2) Both underlying values are strictly equal to each other
- * @memberOf monads.identity
- * @instance
- * @function
- * @param {Object} ma - The other monad to check for equality with 'this' monad.
- * @return {boolean} - Returns a boolean indicating equality
- */
-identity.equals = equalMaker(identity);
 
 /**
  * @signature (* -> *) -> (* -> *) -> monads.identity<T>
