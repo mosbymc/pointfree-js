@@ -1,3 +1,5 @@
+import { compose } from '../combinators';
+
 //TODO: Abelian Groups:
 //TODO: - addition
 //TODO: - multiplication
@@ -25,6 +27,9 @@ var baseGroupObject = {
     get value() {
         return this._value;
     },
+    extract: function _extract() {
+        return this.value;
+    },
     /**
      * @signature valueOf :: () -> *
      * @description Returns the underlying value of the current monoid. Used natively in
@@ -33,17 +38,6 @@ var baseGroupObject = {
      */
     valueOf: function _valueOf() {
         return this.value;
-    },
-    /**
-     * @signature toString :: () -> String
-     * @description Returns a string representation of the current monoid and its
-     * underlying value. If the 'type' param was set upon creation of this specific
-     * monoid factory, the type name will be included in the returned string. Otherwise,
-     * simply 'Monoid' will be used.
-     * @return {string} Returns a string
-     */
-    toString: function _toString() {
-        return `${type}(${this.value})`;
     },
     /**
      * @description Allows the monoid to be iterated, regardless of what the underlying value is.
@@ -75,7 +69,9 @@ var baseGroupObject = {
  * @return {function} - E
  */
 function groupFactoryCreator(concatFn, identity, inverseFn, type) {
-    switch (createBitMask(!!concatFn, identity, !!inverseFn)) {
+    //console.log(createBitMask('function' === typeof concatFn, null != identity, 'function' === typeof inverseFn));
+
+    switch (createBitMask('function' === typeof concatFn, null != identity, 'function' === typeof inverseFn)) {
         case 1:
             return semigroupFactory(concatFn, type);
         case 3: return monoidFactory(concatFn, identity, type);
@@ -96,7 +92,7 @@ function groupFactoryCreator(concatFn, identity, inverseFn, type) {
     }
 }
 
-function semigroupFactory(concatFn) {
+function semigroupFactory(concatFn, type) {
     function semigroupFactory(val) {
         return Object.create(baseGroupObject, {
             _value: {
@@ -118,6 +114,19 @@ function semigroupFactory(concatFn) {
             },
             factory: {
                 value: semigroupFactory
+            },
+            /**
+             * @signature toString :: () -> String
+             * @description Returns a string representation of the current monoid and its
+             * underlying value. If the 'type' param was set upon creation of this specific
+             * monoid factory, the type name will be included in the returned string. Otherwise,
+             * simply 'Monoid' will be used.
+             * @return {string} Returns a string
+             */
+            toString: {
+                value: function _toString() {
+                    return `${type}(${this.value})`;
+                }
             }
         });
     }
@@ -125,10 +134,10 @@ function semigroupFactory(concatFn) {
     return semigroupFactory;
 }
 
-function monoidFactory(concatFn, identity) {
-    var sgFactory = semigroupFactory(concatFn);
+function monoidFactory(concatFn, identity, type) {
+    var sgFactory = semigroupFactory(concatFn, type);
     function monoidFactory(val) {
-        return Object.create(sgFactory(val), {
+        return Object.create(sgFactory(typeValidator(val)), {
             isEmpty: {
                 value: val === identity
             },
@@ -136,14 +145,21 @@ function monoidFactory(concatFn, identity) {
                 value: monoidFactory
             }
         });
+
+        function typeValidator(val) {
+            return 'object' !== typeof identity ?
+                typeof val === typeof identity ? val : identity :
+                Object.getPrototypeOf(identity).isPrototypeOf(val) ||
+                Object.keys(identity).every(key => key in val) && Object.keys(val).every(key => key in val) ? val : identity;
+        }
     }
 
     monoidFactory.empty = monoidFactory(identity);
     return monoidFactory;
 }
 
-function groupFactory(concatFn, identity, inverseFn) {
-    var mFactory = monoidFactory(concatFn, identity);
+function groupFactory(concatFn, identity, inverseFn, type) {
+    var mFactory = monoidFactory(concatFn, identity, type);
     function groupFactory(val) {
         return Object.create(mFactory(val), {
             inverseConcat: {
@@ -166,9 +182,10 @@ var additionGroupFactory = groupFactoryCreator((x, y) => x + y, 0, x => -x, 'Add
 
 var stringMonoidFactory = groupFactoryCreator((x, y) => x.concat(y), '', null, 'String'),
     subtractionMonoidFactory = groupFactoryCreator((x, y) => x - y, 0, null, 'Subtraction'),
-    xorMonoidFactory = groupFactoryCreator((x, y) => x !==y, false, null, 'XOR');
+    xorMonoidFactory = groupFactoryCreator((x, y) => x !==y, false, null, 'XOR'),
+    functionMonoidFactory = groupFactoryCreator((x, y) => compose(x, y), x => x, null, 'Function');
 
 var divisionSemigroupFactory = groupFactoryCreator((x, y) => x / y, null, null, 'Division');
 
 export { additionGroupFactory, multiplicationGroupFactory, andGroupFactory, orGroupFactory,
-        stringMonoidFactory, subtractionMonoidFactory, xorMonoidFactory, divisionSemigroupFactory };
+        stringMonoidFactory, subtractionMonoidFactory, xorMonoidFactory, functionMonoidFactory, divisionSemigroupFactory };

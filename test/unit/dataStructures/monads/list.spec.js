@@ -1002,7 +1002,7 @@ describe('List functor test', function _testListFunctor() {
                 .should.eql('1 - 2 - 3 - 4 - 5');
         });
 
-        it('should return the arrary\'s entries', function _testEntries() {
+        it('should return the array\'s entries', function _testEntries() {
             var res = [];
 
             for (let val of List([1, 2, 3, 4, 5, 6, 7, 8, 9, 10]).entries()) {

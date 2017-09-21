@@ -1,18 +1,10 @@
 import { curry, compose, identity } from './combinators';
 import { getWith } from './functionalHelpers';
-import * as monads from './dataStructures/monads/monads';
+import { Constant, Either, Future, Identity, Io, Just, Left, List, Maybe, Nothing, Right, Validation } from './dataStructures/monads/monads';
 
 /** @module pointless_data_structures */
 
-/**
- * @signature
- * @description d
- * @param {*} fa - a
- * @return {boolean} - b
- */
-function isConstant(fa) {
-    return fa.factory === monads.Constant;
-}
+var factoryList = [Constant, Either, Future, Identity, Io, Just, Left, List, Maybe, Nothing, Right, Validation];
 
 /**
  * @signature
@@ -20,9 +12,7 @@ function isConstant(fa) {
  * @param {*} fa - a
  * @return {boolean} - b
  */
-function isEither(fa) {
-    return fa.factory === monads.Either;
-}
+var isConstant = Constant.is;
 
 /**
  * @signature
@@ -30,9 +20,7 @@ function isEither(fa) {
  * @param {*} fa - a
  * @return {boolean} - b
  */
-function isFuture(fa) {
-    return fa.factory === monads.Future;
-}
+var isEither = Either.is;
 
 /**
  * @signature
@@ -40,9 +28,15 @@ function isFuture(fa) {
  * @param {*} fa - a
  * @return {boolean} - b
  */
-function isIdentity(fa) {
-    return fa.factory === monads.Identity;
-}
+var isFuture = Future.is;
+
+/**
+ * @signature
+ * @description d
+ * @param {*} fa - a
+ * @return {boolean} - b
+ */
+var isIdentity = Identity.is;
 
 /**
  * @signature
@@ -51,7 +45,7 @@ function isIdentity(fa) {
  * @return {boolean} - b
  */
 function isIo(fa) {
-    return fa.factory === monads.Io;
+    return fa.factory === Io;
 }
 
 /**
@@ -60,9 +54,7 @@ function isIo(fa) {
  * @param {*} fa - a
  * @return {boolean} - b
  */
-function isJust(fa) {
-    return !!(fa.isJust && fa.factory === monads.Maybe);
-}
+var isJust = Just.is;
 
 /**
  * @signature
@@ -70,9 +62,7 @@ function isJust(fa) {
  * @param {*} fa - a
  * @return {boolean} - b
  */
-function isLeft(fa) {
-    return !!(fa.isLeft && fa.factory === monads.Either);
-}
+var isLeft = Left.is;
 
 /**
  * @signature
@@ -80,9 +70,7 @@ function isLeft(fa) {
  * @param {*} fa - a
  * @return {boolean} - b
  */
-function isList(fa) {
-    return fa.factory === monads.List;
-}
+var isList = List.is;
 
 /**
  * @signature
@@ -90,10 +78,7 @@ function isList(fa) {
  * @param {*} fa - a
  * @return {boolean} - b
  */
-function isMaybe(fa) {
-    return !!((fa.isNothing && (fa.factory === monads.Maybe)) ||
-        (fa.isJust && (fa.factory === monads.Maybe)));
-}
+var isMaybe = Maybe.is;
 
 /**
  * @signature
@@ -102,7 +87,7 @@ function isMaybe(fa) {
  * @return {boolean} - b
  */
 function isMonad(ma) {
-    return !!(ma && ma.factory && ma.factory === monads[ma.factory.name]);
+    return !!(ma && ma.factory && factoryList.some(factory => ma.factory === factory));
 }
 
 /**
@@ -111,9 +96,7 @@ function isMonad(ma) {
  * @param {*} fa - a
  * @return {boolean} - b
  */
-function isNothing(fa) {
-    return !!fa.isNothing;
-}
+var isNothing = Nothing.is;
 
 /**
  * @signature
@@ -121,9 +104,7 @@ function isNothing(fa) {
  * @param {*} fa - a
  * @return {boolean} - b
  */
-function isRight(fa) {
-    return !!fa.isRight;
-}
+var isRight = Right.is;
 
 /**
  * @signature
@@ -131,9 +112,7 @@ function isRight(fa) {
  * @param {*} fa - a
  * @return {boolean} - b
  */
-function isValidation(fa) {
-    return fa.factory === monads.Validation;
-}
+var isValidation = Validation.is;
 
 /**
  * @signature
@@ -159,32 +138,6 @@ var apply = curry(function _apply(ma, mb) {
  * @return {Object} - c
  */
 var ap = apply;
-
-/**
- * @signature
- * @description d
- * @kind function
- * @function flatMap
- * @param {Object} m - a
- * @param {function} fn :: (a) -> Monad b - b
- * @return {Object} - c
- */
-var flatMap = curry(function _flatMap(m, fn) {
-    return m.flatMap(fn);
-});
-
-/**
- * @signature
- * @description d
- * @kind function
- * @function flatMapWith
- * @param {function} fn - a
- * @param {Object} m - b
- * @return {Object} - c
- */
-var flatMapWith = curry(function _flatMapWith(fn, m) {
-    return m.flatMap(fn);
-});
 
 /**
  * @signature
@@ -236,13 +189,110 @@ var fmap = mapWith;
  * @signature
  * @description d
  * @kind function
+ * @function fold
+ * @param {function} fn - a
+ * @param {*} acc - b
+ * @param {Object} ma - c
+ * @return {*} - d
+ */
+var fold = curry(function _fold(fn, acc, ma) {
+    return ma.fold(fn, acc);
+});
+
+/**
+ * @signature
+ * @description d
+ * @param {Object} p - a
+ * @param {Object} m - b
+ * @return {*|monads.list|Object} - c
+ */
+var sequence = curry(function _sequence(p, m) {
+    return m.sequence(p);
+});
+
+/**
+ * @signature
+ * @description d
+ * @param {Object} a - a
+ * @param {function} f - b
+ * @param {Object} ma - c
+ * @return {Object} - d
+ */
+var traverse = curry(function _traverse(a, f, ma) {
+    return ma.traverse(a, f);
+});
+
+/**
+ * @signature
+ * @description d
+ * @param {function} fn - a
+ * @type {Function|*}
+ */
+var contramap = curry(function _contramap(fn, ma) {
+    return ma.contramap(fn);
+});
+
+/**
+ * @signature
+ * @description d
+ * @param {Object} ma - a
+ * @return {boolean} - b
+ */
+function isEmpty(ma) {
+    return ma.isEmpty;
+}
+
+/**
+ * @signature
+ * @description d
+ * @kind function
+ * @function equals
+ * @param {Object} a - a
+ * @param {Object} b - b
+ * @return {boolean} - c
+ */
+var equals = curry(function _equals(a, b) {
+    return a.equals(b);
+});
+
+/**
+ * @signature
+ * @description d
+ * @kind function
+ * @function bimap
+ * @param {function} f - a
+ * @param {function} g = b
+ * @param {Object} ma - c
+ * @return {Object} d
+ */
+var bimap = curry(function _bimap(f, g, ma) {
+    return ma.bimap(f, g);
+});
+
+/**
+ * @signature
+ * @description d
+ * @kind function
  * @function chain
  * @param {function} f - a
  * @param {Object} m - b
  * @return {*} - c
  */
 var chain = curry(function _chain(f, m){
-    return m.map(f).join(); // or compose(join, mapWith(f))(m)
+    return m.chain(f); // or compose(join, mapWith(f))(m)
+});
+
+/**
+ * @signature
+ * @description d
+ * @kind function
+ * @function chainRec
+ * @param {function} fn - a
+ * @param {Object} ma - b
+ * @return {Object} b
+ */
+var chainRec = curry(function _chainRec(fn, ma) {
+    return ma.chainRec(fn);
 });
 
 /**
@@ -251,7 +301,8 @@ var chain = curry(function _chain(f, m){
  * @kind function
  * @function bind
  */
-var bind = chain;
+var bind = chain,
+    flatMap = chain;
 
 /**
  * @signature
@@ -344,7 +395,7 @@ var liftN = curry(function _liftN(f, ...ms) {
  * @return {Object} - b
  */
 function mjoin(ma) {
-    return ma.join();
+    return ma.mjoin();
 }
 
 /**
@@ -354,7 +405,7 @@ function mjoin(ma) {
  * @return {Object} - b
  */
 function toList(ma) {
-    return List(mjoin(ma));
+    return List.of(ma.value);
 }
 
 /**
@@ -364,7 +415,7 @@ function toList(ma) {
  * @return {Object} - b
  */
 function toMaybe(ma) {
-    //return Maybe(mjoin(ma));
+    return Maybe(ma.value);
 }
 
 /**
@@ -374,7 +425,7 @@ function toMaybe(ma) {
  * @return {Object} - b
  */
 function toFuture(ma) {
-    //return Future(mjoin(ma));
+    return Future.of(ma.value);
 }
 
 /**
@@ -384,7 +435,7 @@ function toFuture(ma) {
  * @return {Object} - b
  */
 function toIdentity(ma) {
-    //return Identity(mjoin(ma));
+    return Identity(ma.value);
 }
 
 /**
@@ -394,29 +445,27 @@ function toIdentity(ma) {
  * @return {Object} - b
  */
 function toJust(ma) {
-    //return Just(mjoin(ma));
+    return Just(ma.value);
 }
 
-//===========================================================================================//
-//===========================================================================================//
-//=======================           CONTAINER TRANSFORMERS            =======================//
-//===========================================================================================//
-//===========================================================================================//
-
-function _toIdentity() {
-    //return Identity.from(this.value);
+function toConstant(ma) {
+    return Constant(ma.value);
 }
 
-function _toJust() {
-    //return Just.from(this.value);
+function toNothing(ma) {
+    return Nothing();
 }
 
-function _toList() {
-    //return List.from(this.value);
+function toEither(ma) {
+    return Either(ma);
 }
 
-function _toMaybe() {
-    //return Maybe.from(this.value);
+function toRight(ma) {
+    return Right(ma);
+}
+
+function toLeft(ma) {
+    return Left(ma);
 }
 
 //===========================================================================================//
@@ -466,6 +515,8 @@ var except = curry(function _except(xs, comparer, ys) {
     return ys.except(xs, comparer);
 });
 
-export { ap, apply, fmap, map, mapWith, flatMap, flatMapWith, lift2, lift3, lift4, liftN, mjoin, pluckWith,
+export { ap, apply, fmap, map, mapWith, flatMap, lift2, lift3, lift4, liftN, mjoin, pluckWith,
         chain, bind, mcompose, filter, intersect, except, isConstant, isEither, isFuture, isIdentity, isIo,
-        isJust, isLeft, isList, isMaybe, isMonad, isNothing, isRight, isValidation };
+        isJust, isLeft, isList, isMaybe, isMonad, isNothing, isRight, isValidation, fold, sequence, traverse,
+        contramap, isEmpty, equals, bimap, toList, toLeft, toRight, toEither, toIdentity, toMaybe, toNothing,
+        toJust, toFuture, toConstant };
