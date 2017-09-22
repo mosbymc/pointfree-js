@@ -39,7 +39,7 @@ function applyTransforms(types) {
             { name: `to${type.factory.name}`, fn: function _toType() { return type.factory(this.value); } }
         ]);
 
-    types.forEach(function _applyTransforms(type) {
+    return types.map(function _applyTransforms(type) {
         if (type.delegate) {
             let regex = new RegExp(type.factory.name, 'i');
 
@@ -47,9 +47,8 @@ function applyTransforms(types) {
                 transforms.forEach(transform => type.delegate[transform.name] = regex.test(transform.name) ? map(type.delegate) : transform.fn);
             });
         }
+        return type;
     });
-
-    return types;
 }
 
 /**
@@ -60,14 +59,14 @@ function applyTransforms(types) {
  * @return {*} Returns the array of monad 'types' that it received as an argument.
  */
 function applyFantasyLandSynonyms(monads) {
-    monads.forEach(function _applyFantasyLandSynonyms(monad) {
+    return monads.map(function _applyFantasyLandSynonyms(monad) {
         if (monad.delegate) {
             Object.keys(monad.delegate).forEach(function _forEachKey(key) {
                 if (key in fl) monad.delegate[fl[key]] = monad.delegate[key];
             });
         }
+        return monad;
     });
-    return monads;
 }
 
 /**
@@ -386,8 +385,18 @@ var factory_aliases = {
     of: [ 'pure', 'point', 'return' ]
 };
 
+function setIteratorAndLift(dataStructures) {
+    return dataStructures.map(function _forEachStructure(dataStructure) {
+        dataStructure.factory.lift = lifter(dataStructure.factory);
+        if (dataStructure.delegate && !dataStructure.delegate[Symbol.iterator]) {
+            dataStructure.delegate[Symbol.iterator] = monadIterator;
+        }
+        return dataStructure;
+    });
+}
+
 function applyAliases(monads) {
-    monads.forEach(function _applyAliases(monad) {
+    return monads.map(function _applyAliases(monad) {
         Object.keys(factory_aliases).forEach(function _applyFactoryAliases(fn) {
             factory_aliases[fn].forEach(function _setAliases(alias) {
                 monad.factory[alias] = monad.factory[fn];
@@ -401,9 +410,8 @@ function applyAliases(monads) {
                 });
             });
         }
+        return monad;
     });
-
-    return monads;
 }
 
 var fl = {
@@ -431,4 +439,4 @@ var fl = {
 
 export { monad_apply, applyTransforms, chain, contramap, monadIterator, disjunctionEqualMaker, equals, lifter, maybeFactoryHelper,
         mjoin, pointMaker, stringMaker, valueOf, get, emptyGet, orElse, emptyOrElse, getOrElse, emptyGetOrElse, sharedMaybeFns,
-        sharedEitherFns, applyFantasyLandSynonyms, applyAliases, chainRec, extendMaker, extract };
+        sharedEitherFns, applyFantasyLandSynonyms, applyAliases, chainRec, extendMaker, extract, setIteratorAndLift };

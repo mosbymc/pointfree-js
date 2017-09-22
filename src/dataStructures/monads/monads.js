@@ -6,7 +6,7 @@ import { Io, io } from './io';
 import { List, list_core } from './list';
 import { Maybe, Just, Nothing, just, nothing } from './maybe';
 import { Validation, validation } from './validation';
-import { applyTransforms, monadIterator, lifter, applyFantasyLandSynonyms, applyAliases } from '../data_structure_util';
+import { applyTransforms, applyFantasyLandSynonyms, applyAliases, setIteratorAndLift } from '../data_structure_util';
 
 /**
  * @module dataStructures/monads
@@ -80,83 +80,6 @@ import { applyTransforms, monadIterator, lifter, applyFantasyLandSynonyms, apply
         > p.promap(a => f(g(a)), b => h(i(b))) is equivalent to p.promap(f, i).promap(g, h) (composition)
  */
 
-/**
- * @memberOf monads.constant
- * @type {monadIterator}
- * @description Iterator for the constant functor. Allows the constant functor
- * to be iterated via for-of or Array#from.
- */
-constant[Symbol.iterator] = monadIterator;
-future[Symbol.iterator] = monadIterator;
-
-/**
- * @memberOf monads.identity
- * @type {monadIterator}
- * @description Iterator for the identity functor. Allows the identity functor
- * to be iterated via for-or of Array#from.
- */
-identity[Symbol.iterator] = monadIterator;
-io[Symbol.iterator] = monadIterator;
-
-/**
- * @memberOf monads.left
- * @type {monadIterator}
- * @description Iterator for the left functor. Allows the left functor to
- * be iterated via for-of or Array#from.
- */
-left[Symbol.iterator] = monadIterator;
-just[Symbol.iterator] = monadIterator;
-nothing[Symbol.iterator] = monadIterator;
-
-/**
- * @memberOf monads.right
- * @type {monadIterator}
- * @description Iterator for the right functor. Allows the right functor to
- * be iterated via for-of or Array#from.
- */
-right[Symbol.iterator] = monadIterator;
-validation[Symbol.iterator] = monadIterator;
-
-/**
- * @memberOf monads.Constant
- * @type {Function}
- * @description Lifts any non-constant returning function into a {@link monads.Constant}
- * returning function.
- */
-Constant.lift = lifter(Constant);
-Either.lift = lifter(Either);
-Future.lift = lifter(Future);
-
-/**
- * @memberOf monads.Identity
- * @type {Function}
- * @description Lifts any non-identity returning function into a {@link monads.identity}
- * returning function.
- */
-Identity.lift = lifter(Identity);
-Io.lift = lifter(Io);
-Just.lift = lifter(Just);
-
-/**
- * @memberOf monads.Left
- * @type {Function}
- * @description Lifts any non-left returning function into a {@link monads.left}
- * returning function.
- */
-Left.lift = lifter(Left);
-List.lift = lifter(List);
-Maybe.lift = lifter(Maybe);
-Nothing.lift = lifter(Nothing);
-
-/**
- * @memberOf monads.Right
- * @type {Function}
- * @description Lifts any non-right returning function into a {@link monads.right}
- * returning function.
- */
-Right.lift = lifter(Right);
-Validation.lift = lifter(Validation);
-
 var monads = [
     { factory: Constant, delegate: constant },
     { factory: Future, delegate: future },
@@ -171,6 +94,6 @@ var monads = [
     { factory: Validation, delegate: validation }
 ];
 
-applyFantasyLandSynonyms(applyTransforms(applyAliases(monads)));
+applyFantasyLandSynonyms(applyTransforms(applyAliases(setIteratorAndLift(monads))));
 
 export { Constant, Either, Future, Identity, Io, Just, Left, List, Maybe, Nothing, Right, Validation };

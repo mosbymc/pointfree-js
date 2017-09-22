@@ -254,42 +254,65 @@ describe('Test functionalContainerHelpers', function _testFunctionalContainerHel
         it('should return something');
     });
 
+    describe('Test apply', function _testApply() {
+        it('should apply a function to an underlying value both contained within a data structure', function _testApply() {
+            var i1 = Identity(x => x * x),
+                i2 = Identity(15);
+
+            var res = apply(i2, i1);
+            Object.getPrototypeOf(i1).isPrototypeOf(res).should.be.true;
+            res.value.should.eql(225);
+        });
+    });
+
+    describe('Test fold', function _testFold() {
+        it('should fold the data structure and return a value', function _testFold() {
+            var i = Identity(10);
+
+            fold((val, acc) => val + acc, 3, i).should.eql(13);
+        });
+    });
+
+    describe('Test sequence', function _testSequence() {
+        it('should sequence the identity', function _testSequence() {
+            var i = Identity(1);
+            var res = sequence(Maybe, i);
+
+            Object.getPrototypeOf(Maybe(1)).isPrototypeOf(res).should.be.true;
+            res.toString().should.eql('Just(Identity(1))');
+        });
+    });
+
+    describe('Test traverse', function _testTraverse() {
+        it('should traverse the identity', function _testTraverse() {
+            var i = Identity(1),
+                res = traverse(Maybe, x => Maybe(x * 10), i);
+
+            Object.getPrototypeOf(Maybe(1)).isPrototypeOf(res).should.be.true;
+            res.toString().should.eql('Just(Identity(10))');
+        });
+    });
+
+    describe('Test contramap', function _testContramap() {
+        it('should contramap the identity', function _testContramap() {
+            var i1 = Identity(x => x * x),
+                i2 = Identity(2);
+
+            var res = chain(x => x, apply(i2, contramap(x => x + 5, i1)));
+            Object.getPrototypeOf(Identity()).isPrototypeOf(res).should.be.true;
+            res.value.should.eql(49);
+        });
+    });
+
     describe('Test lift', function _testLift() {
         it('should accept four data structures and a single function and return a data structure', function _testLift4() {
-            var m1 = Identity(x => y => x(y) + 5),
-                m2 = Identity(x => y => x(y) * x(y)),
-                m3 = Identity(x => y => x(y) - 33),
+            var m1 = Identity(x => x + 5),
+                m2 = Identity(x => x * x),
+                m3 = Identity(x => x - 33),
                 m4 = Identity(10);
 
-            var mm1 = Identity(function _mm1(x) {
-                return function _y(y) {
-                    console.log(x, y);
-                    return x(y) + 5;
-                };
-            });
-
-            var mm2 = Identity(function _mm2(x) {
-                return function _y(y) {
-                    console.log(x, y);
-                    return x(y) * x(y);
-                };
-            });
-
-            var mm3 = Identity(function _mm3(x) {
-                return function _y(y) {
-                    console.log(x, y);
-                    return x(y) - 33;
-                };
-            });
-
-            function mapper(fn) {
-                return function _mapper(val) {
-                    console.log(val);
-                    return fn(val) + 6;
-                };
-            }
-
-            var res = lift2(mapper, mm1, mm2);//, mm3, m4);
+            var mapper = f => g => h => i => h(g(f(i)));
+            lift4(mapper, m1, m2, m3, m4).value.should.eql(192);
         });
     });
 });
