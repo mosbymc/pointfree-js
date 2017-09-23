@@ -96,13 +96,11 @@ function semigroupFactory(concatFn, type) {
     function semigroupFactory(val) {
         return Object.create(baseGroupObject, {
             _value: {
-                value: val,
-                writable: false,
-                configurable: false
+                value: val
             },
             concat: {
                 value: function _concat(g) {
-                    return Object.getPrototypeOf(this) === Object.getPrototypeOf(g) ? this.factory(concatFn(this, g)) : this;
+                    return Object.getPrototypeOf(this) === Object.getPrototypeOf(g) ? this.factory(concatFn(this.value, g.value)) : this;
                 }
             },
             concatAll: {
@@ -135,9 +133,14 @@ function semigroupFactory(concatFn, type) {
 }
 
 function monoidFactory(concatFn, identity, type) {
-    var sgFactory = semigroupFactory(concatFn, type);
+    var sgFactory = semigroupFactory(concatFn, type),
+        base = Object.create(sgFactory());
     function monoidFactory(val) {
-        return Object.create(sgFactory(typeValidator(val)), {
+        val = typeValidator(val);
+        return Object.create(base, {
+            _value: {
+                value: val
+            },
             isEmpty: {
                 value: val === identity
             },
@@ -175,6 +178,10 @@ function groupFactory(concatFn, identity, inverseFn, type) {
     return groupFactory;
 }
 
+function _compose(x, y) {
+    return compose(x, y);
+}
+
 var additionGroupFactory = groupFactoryCreator((x, y) => x + y, 0, x => -x, 'Add'),
     multiplicationGroupFactory = groupFactoryCreator((x, y) => x * y, 1, x => 1/x, 'Multiplication'),
     andGroupFactory = groupFactoryCreator((x, y) => x && y, true, x => !x, 'AND'),
@@ -183,7 +190,7 @@ var additionGroupFactory = groupFactoryCreator((x, y) => x + y, 0, x => -x, 'Add
 var stringMonoidFactory = groupFactoryCreator((x, y) => x.concat(y), '', null, 'String'),
     subtractionMonoidFactory = groupFactoryCreator((x, y) => x - y, 0, null, 'Subtraction'),
     xorMonoidFactory = groupFactoryCreator((x, y) => x !==y, false, null, 'XOR'),
-    functionMonoidFactory = groupFactoryCreator((x, y) => compose(x, y), x => x, null, 'Function');
+    functionMonoidFactory = groupFactoryCreator(_compose, x => x, null, 'Function');
 
 var divisionSemigroupFactory = groupFactoryCreator((x, y) => x / y, null, null, 'Division');
 

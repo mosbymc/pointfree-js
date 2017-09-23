@@ -216,7 +216,8 @@ function chainRec(fn) {
  */
 function disjunctionEqualMaker(type, prop) {
     return function _disjunctionEquals(a) {
-        return Object.getPrototypeOf(type).isPrototypeOf(a) && a[prop] && this.value === a.value;
+        return this.value && this.value.equals === _disjunctionEquals ? this.value.equals(a) :
+            a.value && a.value.equals === _disjunctionEquals ? a.value.equals(this) : Object.getPrototypeOf(this).isPrototypeOf(a) && a[prop] && this.value === a.value;
     };
 }
 

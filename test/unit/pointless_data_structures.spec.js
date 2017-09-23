@@ -314,5 +314,57 @@ describe('Test functionalContainerHelpers', function _testFunctionalContainerHel
             var mapper = f => g => h => i => h(g(f(i)));
             lift4(mapper, m1, m2, m3, m4).value.should.eql(192);
         });
+
+        it('should arrive at the same value at lift4', function _testLiftNSameness() {
+            var m1 = Identity(x => x + 5),
+                m2 = Identity(x => x * x),
+                m3 = Identity(x => x - 33),
+                m4 = Identity(10),
+                mapper = f => g => h => i => h(g(f(i)));
+            liftN(mapper, m1, m2, m3, m4).value.should.eql(192);
+        });
+
+        it('should accept n data structures and a single function and return a data structure of the same shape', function _testLiftN() {
+            var m1 = Identity(x => x + 5),
+                m2 = Identity(x => x * (x - 1204145)),
+                m3 = Identity(x => x - 178931),
+                m4 = Identity(x => Math.pow(x, (x / 2))),
+                m5 = Identity(x => x + 13),
+                m6 = Identity(x => x - 4),
+                m7 = Identity(3),
+                mapper = f => g => h => i => j => k => l => k(f(g(h(i(j(k(l)))))));
+            liftN(mapper, m1, m2, m3, m4, m5, m6, m7).value.should.eql(4499447710125);
+        });
+    });
+
+    describe('Test equals', function _testEquals() {
+        it('should not return true when the same data structure type has different values', function _testEqualsWithDifferentValues() {
+            equals(Identity(1), Identity(2)).should.be.false;
+            equals(Identity(true), Identity(2)).should.be.false;
+            equals(Identity(1), Identity(true)).should.be.false;
+            equals(Identity({}), Identity({})).should.be.false;
+        });
+
+        it('should not return true when different data structure types are compared', function _testEqualsWithDifferentTypes() {
+            equals(Identity(1), Maybe(1)).should.be.false;
+            equals(Maybe(1), Identity(1)).should.be.false;
+            equals(Identity(true), Maybe(true)).should.be.false;
+            equals(Maybe(true), Identity(true)).should.be.false;
+        });
+
+        it('should return false when both types and values are different', function _testEqualsWithDifferentTypesAndValues() {
+            equals(Identity(1), Maybe(1)).should.be.false;
+            equals(Maybe(false), Identity(true)).should.be.false;
+        });
+
+        it('should return true when types and values are the same', function _testEqualsWithSameTypesAndValues() {
+            equals(Identity(1), Identity(1)).should.be.true;
+            equals(Maybe(1), Maybe(1)).should.be.true;
+        });
+
+        it('should work with nested data structures', function _testEqualsWithNestedTypes() {
+            equals(Identity(Identity(1)), Identity(1)).should.be.true;
+            equals(Maybe(true), Maybe(Maybe(false))).should.be.false;
+        });
     });
 });
