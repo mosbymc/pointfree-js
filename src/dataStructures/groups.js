@@ -194,5 +194,5 @@ var stringMonoidFactory = groupFactoryCreator((x, y) => x.concat(y), '', null, '
 
 var divisionSemigroupFactory = groupFactoryCreator((x, y) => x / y, null, null, 'Division');
 
-export { additionGroupFactory, multiplicationGroupFactory, andGroupFactory, orGroupFactory,
+export { groupFactoryCreator, additionGroupFactory, multiplicationGroupFactory, andGroupFactory, orGroupFactory,
         stringMonoidFactory, subtractionMonoidFactory, xorMonoidFactory, functionMonoidFactory, divisionSemigroupFactory };
