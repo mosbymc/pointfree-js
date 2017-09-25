@@ -4,7 +4,27 @@ import { groupFactoryCreator, additionGroupFactory, multiplicationGroupFactory, 
 describe('Test groups, monoids, and semigroups', function _testGroupCommaMonoidsCommaAndSemigroups() {
     describe('Test groups', function _testGroups() {
         describe('Test additiveGroup', function _testAdditiveGroup() {
+            it('should perform addition using valueOf', function _testValueOf() {
+                var a1 = additionGroupFactory(5),
+                    a2 = additionGroupFactory(7),
+                    res = a1 + a2;
 
+                res.should.eql(12);
+            });
+
+            it('should return a string representation of the group', function _testToString() {
+                additionGroupFactory(10).toString().should.eql('Add(10)');
+            });
+        });
+
+        describe('Test multiplicativeGroup', function _testMultiplicativeGroup() {
+            it('should multiply two values during concatenation', function _testConcat() {
+                var m1 = multiplicationGroupFactory(10),
+                    m2 = multiplicationGroupFactory(3),
+                    res = m1.concat(m2);
+
+                res.extract().should.eql(30);
+            });
         });
     });
 
@@ -80,11 +100,11 @@ describe('Test groups, monoids, and semigroups', function _testGroupCommaMonoids
 
     });
 
-    describe('Test user-defined semigroup', function _testUserDefinedSemigroup() {
-        describe('Test object delegation semigroup', function _testSemiGroupWithObjectDelegation() {
+    describe('Test user-defined groups', function _testUserDefinedGroup() {
+        describe('Test object delegation monoid', function _testMonoidWithObjectDelegation() {
             var obj = { };
 
-            it('should concatenate two semigroups objects that share the same prototype delegation chain', function _testObjectConcatenation() {
+            it('should concatenate two monoids objects that share the same prototype delegation chain', function _testObjectConcatenation() {
                 function objectConcat(x, y) {
                     return Object.create(obj, {
                         name: {
@@ -116,11 +136,41 @@ describe('Test groups, monoids, and semigroups', function _testGroupCommaMonoids
                         }
                     }));
 
-                console.log(o1.age);
                 var res = o1.concat(o2);
-                //Object.getPrototypeOf(o1).isPrototypeOf(res).should.be.true;
-                //console.log(o1);
-                //res.age.extract().should.eql(69);
+                Object.getPrototypeOf(o1).isPrototypeOf(res).should.be.true;
+                res.extract().age.extract().should.eql(71);
+                res.extract().name.extract().should.eql('MarkMike');
+            });
+        });
+
+        describe('Test object key delegation monoid', function _testMonoidWithObjectKeys() {
+            var obj = {
+                age: 0,
+                name: ''
+            };
+
+            it('should concatenate two monoids objects that share the same keys', function _testObjectConcatenation() {
+                function objectConcat(x, y) {
+                    return {
+                        name: x.name.concat(y.name),
+                        age: x.age.concat(y.age)
+                    };
+                }
+                var objectSemigroupFactory = groupFactoryCreator(objectConcat, obj, null, 'Obj');
+                var o1 = objectSemigroupFactory({
+                        name: stringMonoidFactory('Mark'),
+                        age: additionGroupFactory(32)
+                    }),
+                    o2 = objectSemigroupFactory({
+                        name: stringMonoidFactory('Mike'),
+                        age: additionGroupFactory(39),
+                        address: '123 Easy Street'
+                    });
+
+                var res = o1.concat(o2);
+                Object.getPrototypeOf(o1).isPrototypeOf(res).should.be.true;
+                res.extract().age.extract().should.eql(71);
+                res.extract().name.extract().should.eql('MarkMike');
             });
         });
     });

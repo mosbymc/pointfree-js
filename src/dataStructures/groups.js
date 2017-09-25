@@ -134,7 +134,8 @@ function semigroupFactory(concatFn, type) {
 
 function monoidFactory(concatFn, identity, type) {
     var sgFactory = semigroupFactory(concatFn, type),
-        base = Object.create(sgFactory());
+        base = Object.create(sgFactory()),
+        objectProto = Object.getPrototypeOf({});
     function monoidFactory(val) {
         val = typeValidator(val);
         return Object.create(base, {
@@ -152,7 +153,8 @@ function monoidFactory(concatFn, identity, type) {
         function typeValidator(val) {
             return 'object' !== typeof identity ?
                 typeof val === typeof identity ? val : identity :
-                Object.getPrototypeOf(identity).isPrototypeOf(val) ||
+                (objectProto !== Object.getPrototypeOf(val) &&
+                Object.getPrototypeOf(identity).isPrototypeOf(val)) ||
                 Object.keys(identity).every(key => key in val) && Object.keys(val).every(key => key in val) ? val : identity;
         }
     }
@@ -162,9 +164,13 @@ function monoidFactory(concatFn, identity, type) {
 }
 
 function groupFactory(concatFn, identity, inverseFn, type) {
-    var mFactory = monoidFactory(concatFn, identity, type);
+    var mFactory = monoidFactory(concatFn, identity, type),
+        base = Object.create(mFactory());
     function groupFactory(val) {
-        return Object.create(mFactory(val), {
+        return Object.create(base, {
+            _value: {
+                value: val
+            },
             inverseConcat: {
                 value: inverseFn
             },
