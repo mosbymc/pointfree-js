@@ -1,5 +1,4 @@
 import { subscriber } from '../../../../src/streams/subscribers/subscriber';
-import { mapSubscriber } from '../../../../src/streams/subscribers/mapSubscriber';
 import { observableStatus } from '../../../../src/helpers';
 
 describe('Test subscriber', function _testSubscriber() {
@@ -60,5 +59,46 @@ describe('Test subscriber', function _testSubscriber() {
         count.should.eql(10);
         s.error(1);
         count.should.eql(11);
+    });
+
+    it('should set remove the subscriptions', function _testRemoveSubscriberSubscriptions() {
+        function noop(){}
+
+        var s = Object.create(subscriber).initialize(noop, noop, noop);
+        s.subscriptions.should.eql([]);
+        s.subscriber.should.be.a('object');
+
+        var testObj = {};
+        s.subscriptions = s.subscriptions.concat([1, 2, 3, 4, testObj, 5, 6, 7, 8, 9, 10]);
+        s.subscriptions.should.eql([1, 2, 3, 4, testObj, 5, 6, 7, 8, 9, 10]);
+
+        s.removeSubscription(testObj);
+        s.subscriptions.should.eql([1, 2, 3, 4, 5, 6, 7, 8, 9, 10]);
+
+        s.removeSubscriptions();
+        s.subscriptions.should.eql([]);
+
+        s.removeSubscriber();
+        expect(s.subscriber).to.be.null;
+    });
+
+    it('should allow the error and complete handlers to be changed', function _testSubscriberHandlerSet() {
+        function result(val) { return val; }
+        function error() { return 2; }
+        function complete() { return 3; }
+
+        var s = Object.create(subscriber).initialize(result, error, complete);
+        s.subscriber.next.should.eql(result);
+        s.subscriber.error.should.eql(error);
+        s.subscriber.complete.should.eql(complete);
+
+        function updatedErrorHandler() {}
+        function updatedCompleteHandler() {}
+
+        s.onError(updatedErrorHandler);
+        s.onComplete(updatedCompleteHandler);
+
+        s.subscriber.error.should.eql(updatedErrorHandler);
+        s.subscriber.complete.should.eql(updatedCompleteHandler);
     });
 });

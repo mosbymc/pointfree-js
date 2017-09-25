@@ -409,6 +409,45 @@ describe('Maybe functor tests', function _testMaybeFunctor() {
             c4.toString().should.eql('Just(Just(Just(5)))');
         });
 
+        it('should return underlying value when just#fold is invoked', function _testJustFold() {
+            Just(10).fold((x, y) => x + y * 15, 0).should.eql(150);
+        });
+
+        it('should return itself when fold is invoked on a nothing', function _testNothingFold() {
+            var n = Nothing(),
+                res = n.fold((x, y) => x + y * 15, 0);
+
+            res.should.eql(n);
+        });
+
+        it('should return a Identity of a Just of 10 when #sequence is invoked', function _testJustSequence() {
+            Just(10).sequence(monads.Identity).toString().should.eql('Identity(Just(10))');
+        });
+
+        it('should return a different data structure wrapping the nothing', function _testNothingSequence() {
+            var n = Nothing(),
+                res = n.sequence(monads.Identity);
+
+            Object.getPrototypeOf(monads.Identity()).isPrototypeOf(res).should.be.true;
+            res.value.should.eql(n);
+        });
+
+        it('should return a Just of an Identity of 3 when #traverse is invoked', function _testJustTraverse() {
+            function test(val) {
+                return monads.Identity(val + 2);
+            }
+
+            Just(1).traverse(monads.Identity, test).toString().should.eql('Identity(Just(3))');
+        });
+
+        it('should return a different data structure wrapping nothing', function _testNothingTraverse() {
+            var n = Nothing(),
+                res = n.traverse(monads.Identity, x => monads.Identity(x));
+
+            Object.getPrototypeOf(monads.Identity()).isPrototypeOf(res).should.be.true;
+            res.value.should.eql(n);
+        });
+
         it('should have a .constructor property that points to the factory function', function _testMaybeFunctorIsStupidViaFantasyLandSpecCompliance() {
             Just(1).constructor.should.eql(Maybe);
             Nothing().constructor.should.eql(Maybe);

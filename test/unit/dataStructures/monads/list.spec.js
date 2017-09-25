@@ -161,7 +161,7 @@ describe('List functor test', function _testListFunctor() {
         });
     });
 
-    describe('List functor object shared fields tests', function _testListFunctorSharedFields() {
+    describe('List functor object shared fields tests', function _testListSharedFields() {
         it('should not allow the ._value property to be updated', function _testWritePrevention() {
             var l = List(1),
                 err1 = false,
@@ -186,7 +186,7 @@ describe('List functor test', function _testListFunctor() {
             err2.should.be.true;
         });
 
-        it('should return a new List functor instance with the mapped value', function _testListFunctorMap() {
+        it('should return a new List instance with the mapped value', function _testListMap() {
             var l = List(1),
                 d = l.map(function _t() { return 2; });
 
@@ -194,7 +194,7 @@ describe('List functor test', function _testListFunctor() {
             l.should.not.equal(d);
         });
 
-        it('should return a new List functor regardless of data type', function _testListFactoryObjectCreation() {
+        it('should return a new List regardless of data type', function _testListFactoryObjectCreation() {
             var arr = [1, 2, 3],
                 obj = { a: 1, b: 2 },
                 l = List();
@@ -218,7 +218,7 @@ describe('List functor test', function _testListFunctor() {
             expect(false).to.eql(l8.value);
         });
 
-        it('should transform an List functor to the other functor types', function _testListFunctorTransforms() {
+        it('should transform a List to the other data structures', function _testListTransforms() {
             var l = List(1);
             var c = l.mapToConstant(),
                 f = l.mapToFuture(),
@@ -287,6 +287,24 @@ describe('List functor test', function _testListFunctor() {
                 return val.a + val.b;
             }).data.should.eql([3, 7, 11, 15]);
         });
+
+        it('should apply each function contained within to the provided data structure', function _testListApply() {
+            var fn1 = x => x * 1,
+                fn2 = x => x * 2,
+                fn3 = x => x * 3,
+                fn4 = x => x * 4,
+                fn5 = x => x * 5,
+                list = List.from(fn1, fn2, fn3, fn4, fn5),
+                identity = monads.Identity(1),
+                res = list.apply(identity);
+
+            res.should.be.an('array');
+            res.should.have.lengthOf(5);
+            res.forEach(function _testTypeAndValue(item, idx) {
+                Object.getPrototypeOf(identity).isPrototypeOf(item).should.be.true;
+                item.value.should.eql(1 * (idx + 1));
+            });
+        });
     });
 
     describe('List functor object unique fields tests', function _testListFunctorUniqueFields() {
@@ -308,6 +326,16 @@ describe('List functor test', function _testListFunctor() {
                 res.should.eql([6, 7, 8, 9, 10, 1, 2, 3, 4, 5]);
             });
 
+            it('should return a single list after concatenating the list of lists', function _testConcatAll() {
+                var list = List.from([16, 17, 18, 19, 20]),
+                    res = list.prependAll([1, 2, 3,], [4, 5, 6, 7, 8, 9, 10, 11, 12, 13], [14, 15]).data;
+
+                res.should.be.an('array');
+                res.should.have.lengthOf(20);
+                console.log(res);
+                res.should.eql([1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20]);
+            });
+
             it('should return a list of copied values', function _testCopyWithin() {
                 var list = List.from([1, 2, 3, 4, 5]),
                     listRes = list.copyWithin(3, 0);
@@ -324,6 +352,15 @@ describe('List functor test', function _testListFunctor() {
                 res.should.be.an('array');
                 res.should.have.lengthOf(10);
                 res.should.eql([1, 2, 3, 4, 5, 6, 7, 8, 9, 10]);
+            });
+
+            it('should return a single list after concatenating the list of lists', function _testConcatAll() {
+                var list = List.from([1, 2, 3, 4, 5]),
+                    res = list.concatAll([6, 7, 8], [9, 10, 11, 12, 13, 14, 15, 16, 17, 18], [19, 20]).data;
+
+                res.should.be.an('array');
+                res.should.have.lengthOf(20);
+                res.should.eql([1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20]);
             });
 
             it('should return a single list after concatenating multiple lists', function _testConcatWithMutlipleLists() {
@@ -1002,7 +1039,7 @@ describe('List functor test', function _testListFunctor() {
                 .should.eql('1 - 2 - 3 - 4 - 5');
         });
 
-        it('should return the arrary\'s entries', function _testEntries() {
+        it('should return the array\'s entries', function _testEntries() {
             var res = [];
 
             for (let val of List([1, 2, 3, 4, 5, 6, 7, 8, 9, 10]).entries()) {
@@ -1010,6 +1047,41 @@ describe('List functor test', function _testListFunctor() {
             }
 
             res.should.eql([0, 1, 1, 2, 2, 3, 3, 4, 4, 5, 5, 6, 6, 7, 7, 8, 8, 9, 9, 10]);
+        });
+
+        it('should return a new list, containing only the values that fall within the indices provided', function _testSlice() {
+            var list = List([1, 2, 3, 4, 5, 6, 7, 8, 9, 10]),
+                res = list.slice(2, 6);
+
+            Object.getPrototypeOf(list).isPrototypeOf(res).should.be.true;
+            res.data.should.have.lengthOf(4);
+            res.data.should.eql([3, 4, 5, 6]);
+        });
+
+        it('should do something for each value in the list', function _testForEach() {
+            var count = 0,
+                list = List([1, 2, 3, 4, 5]);
+            list.forEach(x => count++);
+
+            count.should.eql(5);
+        });
+
+        it('should return the index of the item if it exists or \'-1\' if it does not', function _testIndexOf() {
+            var list = List([1, 2, 3, 4, 5]),
+                res1 = list.indexOf(3),
+                res2 = list.indexOf(10);
+
+            res1.should.be.a('number');
+            res1.should.eql(2);
+
+            res2.should.be.a('number');
+            res2.should.eql(-1);
+        });
+
+        it('should return the value of the list', function _testValueOf() {
+            var list = List([1, 2, 3, 4, 5]),
+                res = list + list;
+            res.should.eql(NaN);
         });
     });
 
@@ -1053,6 +1125,11 @@ describe('List functor test', function _testListFunctor() {
                 val.should.eql(initial * initial);
                 ++initial;
             });
+        });
+
+        it('should run sequence', function _testSequence() {
+            //var list = List([1, 2, 3, 4, 5]),
+              //  res = list.sequence(monads.Identity);
         });
     });
 });

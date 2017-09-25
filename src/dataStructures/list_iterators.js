@@ -123,7 +123,7 @@ function concat(xs, ys) {
 /**
  * @signature
  * @description d
- * @param {monads.list_core|monads.list|monads.ordered_list} xs - A list
+ * @param {monads.list_core|monads.list|monads.ordered_list|Array} xs - A list
  * @param {Array} yss - An array of one or more lists
  * @return {generator} Returns a generator to be used as an
  * iterator when the list is evaluated.
@@ -132,7 +132,7 @@ function concatAll(xs, yss) {
     return function *_concatAllIterator() {
         for (let x of xs) yield x;
         for (let ys of yss)
-            for (let y of ys) yield y;
+            for (let y of toArray(ys)) yield y;
     };
 }
 
@@ -594,12 +594,12 @@ function prepend(xs, ys) {
 /**
  * @signature
  * @description d
- * @param {monads.list|monads.ordered_list} xs - A list
+ * @param {monads.list|monads.ordered_list|Array|generator} xs - A list
  * @param {Array} yss - An array of one or more lists
  * @return {generator} Returns a generator
  */
 function prependAll(xs, yss) {
-    return concatAll(yss.shift(), [xs].concat(yss).reverse());
+    return concatAll(toArray(yss[0]), yss.slice(1).concat([xs]));
 }
 
 /**

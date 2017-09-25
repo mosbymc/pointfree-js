@@ -113,10 +113,11 @@ var list_core = {
      * @function apply
      * @this monads.list_core
      * @param {Object} ma - a
-     * @return {monads.list} - b
+     * @return {*} - b
      */
     apply: function _apply(ma) {
-        return this.map(ma.value);
+        //TODO: ensure this is the correct way to implement apply on a list
+        return this.data.map(x => ma.map(x));
     },
 
     /**
@@ -951,7 +952,7 @@ var list_core = {
      * @return {*} - a
      */
     valueOf: function _valueOf() {
-        return this.value;
+        return this.data.value;
     },
 
     /**

@@ -351,13 +351,13 @@ var just = {
      * the mapping function to the underlying data.
      */
     bimap: sharedMaybeFns.justBimap,
-    fold: function _fold(fn) {
-        return fn(this.value);
+    fold: function _fold(fn, acc) {
+        return fn(acc, this.value);
     },
     sequence: function _sequence(p) {
         return this.traverse(identity, p);
     },
-    traverse: function _traverse(a, f, g) {
+    traverse: function _traverse(a, f) {
         return f(this.value).map(this.of);
     },
     nothing: function _nothing() {
@@ -554,8 +554,8 @@ var nothing = {
     fold: function _fold(fn) {
         return Nothing();
     },
-    sequence: function _sequence(a) {
-        return this.traverse(identity, a);
+    sequence: function _sequence(p) {
+        return this.traverse(p, p.of);
     },
     traverse: function _traverse(a, f) {
         return a.of(Maybe.Nothing());

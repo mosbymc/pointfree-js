@@ -1,4 +1,4 @@
-import { all, any, except, intersect, union, map, chain, groupBy, sortBy, prepend, concat, groupJoin, join, zip, filter, intersperse,
+import { all, any, except, intersect, union, map, chain, groupBy, sortBy, prepend, prependAll, concat, concatAll, groupJoin, join, zip, filter, intersperse,
         contains, first, last, count, foldLeft, reduceRight, distinct, ofType, binarySearch, equals, takeWhile, skipWhile, reverse,
         copyWithin, fill, findIndex, findLastIndex, repeat, foldRight, unfold } from '../../../src/dataStructures/list_iterators';
 import { list, ordered_list } from '../../../src/dataStructures/monads/list';
@@ -72,6 +72,29 @@ describe('Test List Iterators', function _testListIterators() {
         });
     });
 
+    describe('Test prependAll...', function _testPrependAll() {
+        it('should prepend everything in the array to the iterable', function _testPrependAllWithArrays() {
+            var prependIterator = prependAll([21, 22, 23, 24, 25], [[1, 2, 3, 4, 5], [6, 7, 8, 9, 10], [11, 12, 13, 14, 15], [16, 17, 18, 19, 20]]),
+                res = Array.from(prependIterator());
+
+            res.should.be.an('array');
+            res.should.eql([1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25]);
+        });
+
+        it('should prepend an array of generators to an array', function _testPrependAllWithGenerators() {
+            function *gen() {
+                var i = 0;
+                while (6 > i) {
+                    yield ++i;
+                }
+            }
+
+            var prependIterator = prependAll([10], [gen, gen, gen]),
+                res = Array.from(prependIterator());
+            res.should.eql([1, 2, 3, 4, 5, 6, 1, 2, 3, 4, 5, 6, 1, 2, 3, 4, 5, 6, 10])
+        });
+    });
+
     describe('Test concat...', function testConcat() {
         function *gen(data) {
             for (let item of data)
@@ -122,6 +145,63 @@ describe('Test List Iterators', function _testListIterators() {
 
         it('should return test data when second param is an empty generator', function testConcatWithSecondParameterAnEmptyGenerator() {
             var concatIterable = concat(testData.dataSource.data, gen([])),
+                concatRes = Array.from(concatIterable());
+
+            concatRes.should.have.lengthOf(testData.dataSource.data.length);
+            concatRes.should.eql(testData.dataSource.data);
+        });
+
+        it('should return test data x 2 when fed two generators', function testConcatWithTwoGenerators() {
+            var concatIterable = concat(gen(testData.dataSource.data), gen(testData.dataSource.data)),
+                concatRes = Array.from(concatIterable());
+
+            concatRes.should.have.lengthOf(testData.dataSource.data.length * 2);
+            concatRes.slice(0, testData.dataSource.data.length).should.eql(testData.dataSource.data);
+            concatRes.slice(testData.dataSource.data.length).should.eql(testData.dataSource.data);
+        });
+    });
+
+    describe('Test concatAll...', function _testConcatAll() {
+        function *gen(data) {
+            for (let item of data)
+                yield item;
+        }
+
+        it('should return test data x 2', function testConcatAllSourceWithItself() {
+            var concatIterable = concatAll(testData.dataSource.data, [testData.dataSource.data]),
+                concatRes = Array.from(concatIterable());
+
+            concatRes.should.have.lengthOf(testData.dataSource.data.length * 2);
+            concatRes.slice(0, testData.dataSource.data.length).should.eql(testData.dataSource.data);
+            concatRes.slice(testData.dataSource.data.length).should.eql(testData.dataSource.data);
+        });
+
+        it('should return test data when second param is empty array', function testConcatAllWithSecondParameterAnEmptyArray() {
+            var concatIterable = concatAll(testData.dataSource.data, []),
+                concatRes = Array.from(concatIterable());
+
+            concatRes.should.have.lengthOf(testData.dataSource.data.length);
+            concatRes.should.eql(testData.dataSource.data);
+        });
+
+        it('should return test data when first param is empty and second param is test data', function testConcatAllWithFirstParameterAnEmptyArray() {
+            var concatIterable = concatAll([], [testData.dataSource.data]),
+                concatRes = Array.from(concatIterable());
+
+            concatRes.should.have.lengthOf(testData.dataSource.data.length);
+            concatRes.should.eql(testData.dataSource.data);
+        });
+
+        it('should return test data when first param is an empty generator', function testConcatAllWithFirstParameterAnEmptyGenerator() {
+            var concatIterable = concatAll(gen([]), [testData.dataSource.data]),
+                concatRes = Array.from(concatIterable());
+
+            concatRes.should.have.lengthOf(testData.dataSource.data.length);
+            concatRes.should.eql(testData.dataSource.data);
+        });
+
+        it('should return test data when second param is an empty generator', function testConcatAllWithSecondParameterAnEmptyGenerator() {
+            var concatIterable = concatAll(testData.dataSource.data, [gen([])]),
                 concatRes = Array.from(concatIterable());
 
             concatRes.should.have.lengthOf(testData.dataSource.data.length);
