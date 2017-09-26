@@ -34,7 +34,7 @@
     "plato": "plato -r -d plato -l .jshintrc -e .eslintrc.json -t 'pointfree-js' -n src",
     "snyk": "./node_modules/.bin/snyk test",
     "start": "node app.js 3000",
-    "test": "cross-env NODE_ENV=test nyc mocha test/unit/**/*.spec.js"
+    "test": "cross-env NODE_ENV=test mocha test/unit/**/*.spec.js --require babel-polyfill --require test/test_helper --compilers js:babel-register"
   },
   "nyc": {
     "sourceMap": false,
