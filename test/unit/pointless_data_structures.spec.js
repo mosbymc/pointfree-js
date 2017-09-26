@@ -5,7 +5,7 @@ import { ap, apply, fmap, map, mapWith, flatMap, lift2, lift3, lift4, liftN, mjo
     toJust, toFuture, toConstant } from '../../src/pointless_data_structures';
 import { Constant, Either, Future, Identity, Io, Just, Left, List, Maybe, Nothing, Right, Validation } from '../../src/dataStructures/monads/monads';
 
-describe('Test functionalContainerHelpers', function _testFunctionalContainerHelpers() {
+describe('Test pointless_data_structures', function _testFunctionalContainerHelpers() {
     describe('Test isMonad', function _testIsMonad() {
         it('should return true for any monad', function _testIsMonadWithMonads() {
             isMonad(Constant(1)).should.be.true;
@@ -251,7 +251,7 @@ describe('Test functionalContainerHelpers', function _testFunctionalContainerHel
     });
 
     describe('Test mcompose', function _testMCompose() {
-        it('should return something');
+        //it('should return something');
     });
 
     describe('Test apply', function _testApply() {

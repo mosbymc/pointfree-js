@@ -1,7 +1,5 @@
 import { observable } from '../../../src/streams/observable';
 
-//TODO: temporarily disabled these test to see if this is the cause of the tests that aren't being run
-/*
 describe('Test streams', function _testStreams() {
     it('should eventually increment the count', function _testAllOperators(done) {
         var count = 0,
@@ -49,13 +47,13 @@ describe('Test streams', function _testStreams() {
             var idx = 0;
             return setInterval(function _setInterval() {
                 cb(++idx);
-            }, 40);
+            }, 10);
         }
 
         var count = 0,
             o = observable.fromInterval(interval)
-                .debounce(25)
-                .timeBuffer(50)
+                .debounce(5)
+                .timeBuffer(10)
                 .itemBuffer(5);
 
 
@@ -73,4 +71,3 @@ describe('Test streams', function _testStreams() {
         });
     });
 });
-*/
