@@ -3,7 +3,7 @@ import { subscriber } from './subscribers/subscriber';
 import { debounceOperator, chainOperator, filterOperator, groupByOperator, itemBufferOperator, mapOperator, mergeOperator, timeBufferOperator } from './streamOperators/operators';
 import { generatorProto } from '../helpers';
 import { wrap, noop, delegatesTo } from '../functionalHelpers';
-import { compose, all } from '../combinators';
+import { compose, all, identity } from '../combinators';
 
 //TODO: I thinking about implementing an 'observable watcher' functionality. the concept would be
 //TODO: that you have an observable that is registered to watch one or more other observables. When
@@ -71,7 +71,7 @@ var observable = {
      * @return {observable} - d
      */
     groupBy: function _groupBy(keySelector, comparer, bufferAmt = 0) {
-        return op.call(this, groupByOperator, keySelector, comparer, bufferAmt);
+        return this.lift(Object.create(groupByOperator).init(keySelector, comparer, bufferAmt));
     },
     /**
      * @sig
@@ -90,9 +90,16 @@ var observable = {
      * @return {observable} - c
      */
     mergeMap: function _mergeMap(fn, ...observables) {
+        fn = fn || identity;
+        if (mergeOperator.isPrototypeOf(this.operator))
+            return this.lift.call(this.source, Object.create(mergeOperator).init([this].concat(observables, this.operator.observables)));
+        return this.lift(Object.create(mergeOperator).init([this].concat(observables)), fn);
+
+        /*
         if (delegatesTo(this.operator, mergeOperator))
             return this.lift.call(this.source, Object.create(mergeOperator).init(fn, [this].concat(observables, this.operator.observables)));
         return op.call(this, mergeOperator, fn, [this].concat(observables));
+        */
     },
     /**
      * @sig
@@ -157,6 +164,25 @@ var observable = {
             subscriber.unsubscribe = unSub;
             return subscriber;
         };
+        return o;
+    },
+    //Not actual property, just naming it this temporarily until I figure out how to make this work
+    //and determine a better name for it.
+    fromInterval: function _fromInterval(fn) {
+        var o = Object.create(observable);
+        o.subscribe = function _subscribe(subscriber) {
+            var res = fn(function _cb(val) {
+                return subscriber.next(val);
+            });
+
+            subscriber.unsubscribe = function _unSub() {
+                subscriber.status = observableStatus.complete;
+                clearInterval(res);
+            };
+
+            return subscriber;
+        };
+
         return o;
     },
     /**

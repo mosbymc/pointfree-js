@@ -2,9 +2,12 @@ import { debounceSubscriber } from '../subscribers/debounceSubscriber';
 import { initOperator, subscribe } from './operator_helpers';
 
 var debounceOperator = {
-    init: initOperator(['interval', 0]),
+    init: function _init(amt) {
+        this.interval = amt;
+        return this;
+    },
     subscribe: function _subscribe(subscriber, source) {
-        return subscribe.call(this, subscriber, source, debounceSubscriber);
+        return source.subscribe(Object.create(debounceSubscriber).init(subscriber, this.interval));
     }
 };
 
