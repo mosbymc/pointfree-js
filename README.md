@@ -15,7 +15,7 @@ This is a work in progress and is not yet ready for production use.
 
 Currently in progress:
 - monoids and groups
-- semi-group factory for defining your own semi-groups
+- semi-group/monoid/group factory for defining your own semi-groups/monoids/groups
 - tests and refactoring of existing code base
 
 

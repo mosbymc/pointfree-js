@@ -32,9 +32,7 @@ module.exports = function _wallaby(wallaby) {
             '!playground.js',
             '!test/test_helper.js',
             '!./observations.js',
-            '!./src/streams/stream_test_file.js',
-            '!./src/streams/stream.js',
-            '!./src/streams/source.js'
+            '!./src/dataStructures/monads/experimental.js',
         ],
 
         /*

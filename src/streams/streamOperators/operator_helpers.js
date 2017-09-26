@@ -24,6 +24,10 @@ function createGettersAndSetters(obj, ...props) {
 }
 
 function subscribe(subscriber, source, operatorSubscriber) {
+    if (this.observables) {
+        //console.log(...getSetters(this).map(prop => this[prop]));
+        //console.log(Object.getPrototypeOf(operatorSubscriber));
+    }
     return source.subscribe(Object.create(operatorSubscriber).init(subscriber, ...getSetters(this).map(prop => this[prop])));
 }
 

@@ -1130,6 +1130,18 @@ list_core.every = list_core.all;
 list_core.some = list_core.any;
 
 /**
+ * @signature
+ * @description Alias for {@link monads.list_core#isEmpty}
+ * @memberOf monads.list_core
+ * @instance
+ * @function isIdentity
+ * @type {monads.list_core#isEmpty}
+ * @this monads.list_core
+ * @return {boolean} - b
+ */
+list_core.isIdentity = list_core.isEmpty;
+
+/**
  * @delegate
  * @delegator {@link monads.list_core}
  * @description: A list_core delegator object that, in addition to the delegatable functionality
@@ -1369,6 +1381,8 @@ List.ordered = (source, selector, comparer = defaultPredicate) => createListDele
  */
 List.empty = createListDelegateInstance([], null,
     [createSortObject(identity, defaultPredicate, sortDirection.ascending)]);
+
+List.identity = List.empty;
 
 /**
  * @signature

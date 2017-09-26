@@ -172,7 +172,9 @@ function groupFactory(concatFn, identity, inverseFn, type) {
                 value: val
             },
             inverseConcat: {
-                value: inverseFn
+                value: function _concat(g) {
+                    return Object.getPrototypeOf(this) === Object.getPrototypeOf(g) ? this.factory(concatFn(this.value, inverseFn(g.value))) : this;
+                }
             },
             factory: {
                 value: groupFactory

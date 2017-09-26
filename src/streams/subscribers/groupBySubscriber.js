@@ -4,9 +4,9 @@ import { sortData } from '../../dataStructures/sort_util';
 var groupBySubscriber = Object.create(subscriber, {
     next: {
         value: function _next(item) {
-            if (this.buffer.length + 1 >= this.bufferSize) {
+            if (this.buffer.length + 1 >= this.bufferAmount) {
                 try {
-                    var res = groupData(this.buffer, [ { keySelector: this.keySelector, comparer: this.comparer, direction: 'desc' } ]);
+                    var res = groupData(this.buffer.concat(item), [ { keySelector: this.keySelector, comparer: this.comparer, direction: 2 } ]);
                     this.subscriber.next(res);
                     this.buffer.length = 0;
                 }
