@@ -62,7 +62,7 @@ Identity.is = f => identity.isPrototypeOf(f);
  * @description Creates and returns an 'empty' identity monad.
  * @return {monads.identity} - Returns a new identity monad.
  */
-Identity.empty = () => Identity(Object.create(nil));
+Identity.empty = () => Identity();
 
 /**
  * @typedef {Object} identity
@@ -244,9 +244,7 @@ var identity = {
      * @function empty
      * @return {monads.identity} Creates and returns a new, 'empty' identity monad.
      */
-    empty: function _empty() {
-        return this.of(Object.create(nil));
-    },
+    empty: Identity.empty,
     /**
      * @signature () -> boolean
      * @description Returns a boolean indicating if the monad is 'empty'
@@ -255,8 +253,8 @@ var identity = {
      * @function isEmpty
      * @return {boolean} Returns a boolean indicating if the monad is 'empty'
      */
-    isEmpty: function _getIsEmpty() {
-        return nil.isPrototypeOf(this.value);
+    isEmpty: function _isEmpty() {
+        return false;
     },
     /**
      * @signature () -> *

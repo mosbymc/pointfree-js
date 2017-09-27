@@ -85,6 +85,12 @@ describe('Identity monad test', function _testIdentityMonad() {
             Identity.is(b).should.be.false;
         });
 
+        it('should return an \'empty\' identity and no identity should be empty', function _testEmptyIdentity() {
+            var i = Identity.empty();
+            i.empty.should.eql(Identity.empty);
+            i.isEmpty().should.be.false;
+        });
+
         it('should lift any function to return an Identity wrapped value', function _testIdentityDotLift() {
             function t1() { return -1; }
             function t2() { return '-1'; }
