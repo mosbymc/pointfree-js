@@ -136,43 +136,7 @@ describe('Identity monad test', function _testIdentityMonad() {
             err2.should.be.true;
         });
 
-        it('all get/getOrElse functions should return the underlying value of an Identity', function _testGetOrElse() {
-            function orElseFunc() { return 15; }
-            var orElseVal = orElseFunc();
-
-            var obj = { a: 1 },
-                arr = [1, 2, 3];
-
-            var nullI = Identity(null),
-                undefinedI = Identity(),
-                numberI = Identity(2),
-                stringI = Identity('2'),
-                objectI = Identity(obj),
-                arrayI = Identity(arr);
-
-            expect(nullI.get()).to.be.null;
-            expect(nullI.getOrElse(orElseFunc)).to.be.null;
-            expect(nullI.orElse(orElseVal)).to.be.null;
-
-            expect(undefinedI.get()).to.be.undefined;
-            expect(undefinedI.getOrElse(orElseFunc)).to.be.undefined;
-            expect(undefinedI.orElse(orElseVal)).to.be.undefined;
-
-            numberI.get().should.eql(2);
-            numberI.getOrElse(orElseFunc).should.eql(2);
-            numberI.orElse(orElseVal).should.eql(2);
-
-            stringI.get().should.eql('2');
-            stringI.getOrElse(orElseFunc).should.eql('2');
-            stringI.orElse(orElseVal).should.eql('2');
-
-            objectI.get().should.eql(obj);
-            objectI.getOrElse(orElseFunc).should.eql(obj);
-            objectI.orElse(orElseVal).should.eql(obj);
-
-            arrayI.get().should.eql(arr);
-            arrayI.getOrElse(orElseFunc).should.eql(arr);
-            arrayI.orElse(orElseVal).should.eql(arr);
+        it('all get/getOrElse functions should return the underlying value of an Identity', function _testExtract() {
         });
 
         it('should return a new identity functor instance with the mapped value', function _testIdentityFunctorMap() {

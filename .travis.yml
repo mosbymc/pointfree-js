@@ -18,7 +18,7 @@ before_script:
   - ./cc-test-reporter before-build
 
 script:
-- "npm run coverage"
+- "npm run lint:test:coverage"
 
 
 # Preferably you will run test-reporter on branch update events. But

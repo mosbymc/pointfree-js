@@ -1,6 +1,5 @@
-import { nil } from '../../helpers';
 import { monad_apply, chain, contramap, mjoin, equals, pointMaker, stringMaker,
-        valueOf, get, orElse, getOrElse, extendMaker } from '../data_structure_util';
+        valueOf, extendMaker } from '../data_structure_util';
 
 /**
  * @signature - :: * -> {@link monads.identity}
@@ -103,17 +102,31 @@ var identity = {
      * getter is not expected to be used directly by consumers - it is meant as an internal
      * access only. To manipulate the underlying value of an identity delegator,
      * see {@link monads.identity#map} and {@link monads.identity#bimap}.
-     * To retrieve the underlying value of an identity delegator, see {@link monads.identity#get},
-     * {@link monads.identity#orElse}, {@link monads.identity#getOrElse},
+     * To retrieve the underlying value of an identity delegator, see {@link monads.identity#extract}
      * and {@link monads.identity#valueOf}.
      * @memberOf monads.identity
      * @instance
-     * @protected
+     * @private
      * @function
      * @return {*} Returns the underlying value of the delegator. May be any value.
      */
     get value() {
         return this._value;
+    },
+    /**
+     * @signature () -> *
+     * @description Returns the underlying value of an identity delegator. This is a getter function
+     * and thus works differently than the fantasy-land specification; rather than invoking identity#extract
+     * as a function, you merely need to reference as a non-function property. This makes infinitely more
+     * sense to me, especially if the underlying is a function... who wants to: identity.extract()(x, y, z)?
+     * @memberOf monads.identity
+     * @instance
+     * @private
+     * @function
+     * @return {*} Returns the underlying value of the delegator. May be any value.
+     */
+    get extract() {
+        return this.value;
     },
     /**
      * @signature () -> {@link monads.identity}
@@ -256,44 +269,6 @@ var identity = {
     isEmpty: function _isEmpty() {
         return false;
     },
-    /**
-     * @signature () -> *
-     * @description Returns the underlying value of the current monad 'instance'.
-     * @memberOf monads.identity
-     * @instance
-     * @function
-     * @return {*} - Returns the underlying value of the current monad 'instance'.
-     */
-    get: get,
-    /**
-     * @signature () -> *
-     * @description Takes an optional function parameter as a default to be invoked and
-     * returned in cases where the current monad 'instance\'s' underlying value is not
-     * 'mappable'. Because the identity does not support disjunctions, the
-     * parameter is entirely optional and will always be ignored. Whatever the actual
-     * underlying value is, it will always be returned.
-     * @memberOf monads.identity
-     * @instance
-     * @function
-     * @param {function} [f] - An optional function argument which is invoked and the result
-     * returned in cases where the underlying value is not 'mappable'.
-     * @return {*} - b
-     */
-    orElse: orElse,
-    /**
-     * @signature * -> *
-     * @description Takes an optional parameter of any value as a default return value in
-     * cases where the current monad 'instance\'s' underlying value is not 'mappable'.
-     * Because the identity does not support disjunctions, the parameter is entirely
-     * optional and will always be ignored. Whatever the actual underlying value is, it will
-     * always be returned.
-     * @memberOf monads.identity
-     * @instance
-     * @function
-     * @param {*} [x] - a
-     * @return {*} Returns the underlying value of the current monad 'instance'.
-     */
-    getOrElse: getOrElse,
     /**
      * @signature (identity<A> -> B) -> identity<B>
      * @description Takes a function that operates on the current identity monad and returns
