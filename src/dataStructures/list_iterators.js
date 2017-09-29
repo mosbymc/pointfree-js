@@ -12,8 +12,8 @@ var toArray = ifElse(delegatesFrom(generatorProto), arrayFromGenerator, asArray)
 
 /**
  * @description d
- * @param {Array|monads.list|monads.ordered_list|generator} iterable - Any iterable item
- * @return {Array|monads.list|monads.ordered_list|generator} Returns an iterator
+ * @param {Array|dataStructures.list|dataStructures.ordered_list|generator} iterable - Any iterable item
+ * @return {Array|dataStructures.list|dataStructures.ordered_list|generator} Returns an iterator
  */
 var getIterator = iterable => delegatesFrom(generatorProto, iterable) ? invoke(iterable) : iterable;
 
@@ -24,7 +24,7 @@ function *_iterate(iterable, fn) {
 /**
  * @signature
  * @description d
- * @param {Array|generator|monads.list_core} xs - a
+ * @param {Array|generator|dataStructures.list_core} xs - a
  * @param {function} [predicate] - b
  * @return {boolean} - c
  */
@@ -36,7 +36,7 @@ function all(xs, predicate) {
 /**
  * @signature
  * @description d
- * @param {Array|generator|monads.list_core} xs - a
+ * @param {Array|generator|dataStructures.list_core} xs - a
  * @param {function} [predicate] - b
  * @return {boolean} - c
  */
@@ -47,7 +47,7 @@ function any(xs, predicate) {
 /**
  * @signature
  * @description d
- * @param {Array|generator|monads.list_core} xs - a
+ * @param {Array|generator|dataStructures.list_core} xs - a
  * @param {*} val - b
  * @param {function} comparer - c
  * @return {boolean} - d
@@ -59,7 +59,7 @@ function binarySearch(xs, val, comparer) {
 /**
  * @signature
  * @description d
- * @param {Array|generator|monads.list_core} xs - a
+ * @param {Array|generator|dataStructures.list_core} xs - a
  * @param {number} left - b
  * @param {number} right - c
  * @param {*} val - d
@@ -109,8 +109,8 @@ function chain(xs, fn) {
 /**
  * @signature:
  * @description description
- * @param {Array|generator|monads.list_core} xs - x
- * @param {Array|generator|monads.list_core} ys - y
+ * @param {Array|generator|dataStructures.list_core} xs - x
+ * @param {Array|generator|dataStructures.list_core} ys - y
  * @return {generator} - a
  */
 function concat(xs, ys) {
@@ -123,7 +123,7 @@ function concat(xs, ys) {
 /**
  * @signature
  * @description d
- * @param {monads.list_core|monads.list|monads.ordered_list|Array} xs - A list
+ * @param {dataStructures.list_core|dataStructures.list|dataStructures.ordered_list|Array} xs - A list
  * @param {Array} yss - An array of one or more lists
  * @return {generator} Returns a generator to be used as an
  * iterator when the list is evaluated.
@@ -139,7 +139,7 @@ function concatAll(xs, yss) {
 /**
  * @signature
  * @description d
- * @param {Array|generator|monads.list_core} xs - a
+ * @param {Array|generator|dataStructures.list_core} xs - a
  * @param {*} val - b
  * @param {function} comparer - c
  * @return {*} - d
@@ -155,7 +155,7 @@ function contains(xs, val, comparer) {
  * @param {number} idx - a
  * @param {number} start - b
  * @param {number} end - c
- * @param {monads.list_core|monads.list|monads.ordered_list} xs - d
+ * @param {dataStructures.list_core|dataStructures.list|dataStructures.ordered_list} xs - d
  * @returns {generator} - e
  */
 function copyWithin(idx, start, end, xs) {
@@ -167,7 +167,7 @@ function copyWithin(idx, start, end, xs) {
 /**
  * @signature
  * @description d
- * @param {Array|generator|monads.list_core} xs - a
+ * @param {Array|generator|dataStructures.list_core} xs - a
  * @param {function} [predicate] - b
  * @return {Number} - c
  */
@@ -179,7 +179,7 @@ function count(xs, predicate) {
 /**
  * @signature
  * @description d
- * @param {Array|generator|monads.list_core} xs - a
+ * @param {Array|generator|dataStructures.list_core} xs - a
  * @param {function} [comparer] - b
  * @return {generator} - c
  */
@@ -196,8 +196,8 @@ function distinct(xs, comparer = strictEquals) {
 /**
  * @signature
  * @description d
- * @param {monads.list_core} xs - a
- * @param {monads.list_core} ys - b
+ * @param {dataStructures.list_core} xs - a
+ * @param {dataStructures.list_core} ys - b
  * @param {function} [comparer] - c
  * @return {boolean} - d
  */
@@ -214,8 +214,8 @@ function equals(xs, ys, comparer = strictEquals) {
 /**
  * @signature
  * @description d
- * @param {Array|generator|monads.list_core|monads.list|monads.ordered_list} xs - x
- * @param {Array|generator|monads.list_core|monads.list|monads.ordered_list} ys - y
+ * @param {Array|generator|dataStructures.list_core|dataStructures.list|dataStructures.ordered_list} xs - x
+ * @param {Array|generator|dataStructures.list_core|dataStructures.list|dataStructures.ordered_list} ys - y
  * @param {function} [comparer] - z
  * @return {generator} - a
  */
@@ -236,7 +236,7 @@ function except(xs, ys, comparer = strictEquals) {
  * @param {*} val - a
  * @param {number} start - b
  * @param {number} end - c
- * @param {Array|monads.list_core|monads.list|monads.ordered_list} xs - d
+ * @param {Array|dataStructures.list_core|dataStructures.list|dataStructures.ordered_list} xs - d
  * @return {generator} - e
  */
 function fill(val, start, end, xs) {
@@ -248,7 +248,7 @@ function fill(val, start, end, xs) {
 /**
  * @signature
  * @description d
- * @param {Array|generator|monads.list_core} xs - a
+ * @param {Array|generator|dataStructures.list_core} xs - a
  * @param {function} predicate - b
  * @return {generator} - c
  */
@@ -263,7 +263,7 @@ function filter(xs, predicate) {
 /**
  * @signature
  * @description d
- * @param {Array|generator|monads.list_core} xs - a
+ * @param {Array|generator|dataStructures.list_core} xs - a
  * @param {function} [comparer] - b
  * @return {Number} - c
  */
@@ -274,7 +274,7 @@ function findIndex(xs, comparer = strictEquals) {
 /**
  * @signature
  * @description d
- * @param {Array|generator|monads.list_core} xs - a
+ * @param {Array|generator|dataStructures.list_core} xs - a
  * @param {function} [comparer] - b
  * @return {Number} - c
  */
@@ -285,7 +285,7 @@ function findLastIndex(xs, comparer = strictEquals) {
 /**
  * @signature
  * @description d
- * @param {Array|generator|monads.list_core} xs - a
+ * @param {Array|generator|dataStructures.list_core} xs - a
  * @param {function} [predicate] - b
  * @return {*} - c
  */
@@ -296,7 +296,7 @@ function first(xs, predicate) {
 /**
  * @signature
  * @description d
- * @param {Array|generator|monads.list_core} xs - a
+ * @param {Array|generator|dataStructures.list_core} xs - a
  * @param {function} fn - b
  * @param {*} [initial] - c
  * @return {*} - d
@@ -308,7 +308,7 @@ function foldLeft(xs, fn, initial = 0) {
 /**
  * @signature
  * @description d
- * @param {Array|monads.list_core} arr - a
+ * @param {Array|dataStructures.list_core} arr - a
  * @param {function} op - b
  * @param {*} acc - c
  * @return {*} - d
@@ -326,7 +326,7 @@ function foldRight(arr, op, acc) {
 /**
  * @signature
  * @description d
- * @param {Array|generator|monads.list_core} xs - a
+ * @param {Array|generator|dataStructures.list_core} xs - a
  * @param {Array} groupObject - b
  * @param {function} queryableConstructor - c
  * @return {generator} - d
@@ -410,8 +410,8 @@ function findGroup(arr, field) {
 /**
  * @signature
  * @description d
- * @param {Array|generator|monads.list_core} xs - a
- * @param {Array|generator|monads.list_core} ys - b
+ * @param {Array|generator|dataStructures.list_core} xs - a
+ * @param {Array|generator|dataStructures.list_core} ys - b
  * @param {function} xSelector - c
  * @param {function} ySelector - d
  * @param {function} projector - e
@@ -441,8 +441,8 @@ function groupJoin(xs, ys, xSelector, ySelector, projector, listFactory, compare
 /**
  * @signature
  * @description d
- * @param {Array|generator|monads.list_core} xs - a
- * @param {Array|generator|monads.list_core} ys - b
+ * @param {Array|generator|dataStructures.list_core} xs - a
+ * @param {Array|generator|dataStructures.list_core} ys - b
  * @param {function} [comparer] - c
  * @return {generator} - d
  */
@@ -460,7 +460,7 @@ function intersect(xs, ys, comparer = strictEquals) {
 /**
  * @signature
  * @description d
- * @param {Array|generator|monads.list_core} xs - a
+ * @param {Array|generator|dataStructures.list_core} xs - a
  * @param {*} val - b
  * @return {generator} - c
  */
@@ -480,8 +480,8 @@ function intersperse(xs, val) {
 /**
  * @signature
  * @description d
- * @param {Array|generator|monads.list_core} xs - a
- * @param {Array|generator|monads.list_core} ys - b
+ * @param {Array|generator|dataStructures.list_core} xs - a
+ * @param {Array|generator|dataStructures.list_core} ys - b
  * @param {function} xSelector - c
  * @param {function} ySelector - d
  * @param {function} projector - e
@@ -504,7 +504,7 @@ function join(xs, ys, xSelector, ySelector, projector, comparer = strictEquals) 
 /**
  * @signature
  * @description d
- * @param {Array|generator|monads.list_core} xs - a
+ * @param {Array|generator|dataStructures.list_core} xs - a
  * @param {function} [predicate] - b
  * @return {*} - c
  */
@@ -517,7 +517,7 @@ function last(xs, predicate) {
 /**
  * @signature
  * @description d
- * @param {Array|generator|monads.list_core} xs - a
+ * @param {Array|generator|dataStructures.list_core} xs - a
  * @param {function} fn - b
  * @return {generator} - c
  */
@@ -532,7 +532,7 @@ function map(xs, fn) {
 /**
  * @signature
  * @description d
- * @param {Array|generator|monads.list_core} xs - a
+ * @param {Array|generator|dataStructures.list_core} xs - a
  * @param {string} dataType - b
  * @return {generator} - c
  */
@@ -583,8 +583,8 @@ function ofType(xs, dataType) {
 /**
  * @signature 
  * @description -
- * @param {Array|generator|monads.list_core} xs - some stuff
- * @param {Array|generator|monads.list_core} ys - some other stuff
+ * @param {Array|generator|dataStructures.list_core} xs - some stuff
+ * @param {Array|generator|dataStructures.list_core} ys - some other stuff
  * @return {generator} - some other other stuff
  */
 function prepend(xs, ys) {
@@ -594,7 +594,7 @@ function prepend(xs, ys) {
 /**
  * @signature
  * @description d
- * @param {monads.list|monads.ordered_list|Array|generator} xs - A list
+ * @param {dataStructures.list|dataStructures.ordered_list|Array|generator} xs - A list
  * @param {Array} yss - An array of one or more lists
  * @return {generator} Returns a generator
  */
@@ -605,7 +605,7 @@ function prependAll(xs, yss) {
 /**
  * @signature
  * @description s
- * @param {Array|generator|monads.list_core} xs - a
+ * @param {Array|generator|dataStructures.list_core} xs - a
  * @param {function} fn - b
  * @param {*} initial - c
  * @return {*} - d
@@ -632,7 +632,7 @@ function repeat(item, count) {
 /**
  * @signature
  * @description d
- * @param {Array|generator|monads.list_core} xs - a
+ * @param {Array|generator|dataStructures.list_core} xs - a
  * @return {generator} - b
  */
 function reverse(xs) {
@@ -644,7 +644,7 @@ function reverse(xs) {
 /**
  * @signature
  * @description d
- * @param {Array|generator|monads.list_core} xs - a
+ * @param {Array|generator|dataStructures.list_core} xs - a
  * @param {function} predicate - b
  * @return {generator} - c
  */
@@ -666,7 +666,7 @@ function skipWhile(xs, predicate) {
 /**
  * @signature
  * @description d
- * @param {Array|monads.list_core} xs - Any iterable object that may be treated as an array
+ * @param {Array|dataStructures.list_core} xs - Any iterable object that may be treated as an array
  * @param {number} [start] - A number representing the index of the array to being the slice
  * @param {number} [end] - A number representing the index of the array to end the slice
  * @return {generator} Returns a generator function that can be used to iterate the values
@@ -681,7 +681,7 @@ function slice(xs, start, end) {
 /**
  * @signature
  * @description d
- * @param {Array|generator|monads.list_core} xs - a
+ * @param {Array|generator|dataStructures.list_core} xs - a
  * @param {Array} orderObject - b
  * @return {generator} - d
  */
@@ -696,7 +696,7 @@ function sortBy(xs, orderObject) {
 /**
  * @signature
  * @description d
- * @param {Array|generator|monads.list_core} xs - a
+ * @param {Array|generator|dataStructures.list_core} xs - a
  * @param {function} predicate - b
  * @return {generator} - c
  */
@@ -714,8 +714,8 @@ var unfold = unfoldWith;
 /**
  * @signature
  * @description d
- * @param {Array|generator|monads.list_core} xs - a
- * @param {Array|generator|monads.list_core} ys - b
+ * @param {Array|generator|dataStructures.list_core} xs - a
+ * @param {Array|generator|dataStructures.list_core} ys - b
  * @param {function} comparer - c
  * @return {generator} - d
  */
@@ -735,8 +735,8 @@ function union(xs, ys, comparer = strictEquals) {
 /**
  * @signature
  * @description d
- * @param {Array|generator|monads.list_core} xs - a
- * @param {Array|generator|monads.list_core} ys - b
+ * @param {Array|generator|dataStructures.list_core} xs - a
+ * @param {Array|generator|dataStructures.list_core} ys - b
  * @param {function} selector - c
  * @return {generator} - d
  */

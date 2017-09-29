@@ -1,6 +1,15 @@
-import { equalMaker, pointMaker, stringMaker, valueOf, get, orElse, getOrElse } from '../data_structure_util';
-import { constant } from '../../combinators';
+import { equals, pointMaker, stringMaker, valueOf, get, orElse, getOrElse } from './data_structure_util';
+import { constant } from '../combinators';
 
+/**
+ * @description d
+ * @namespace State
+ * @memberOf dataStructures
+ * @property {function} of
+ * @property {function} is
+ * @param {*} val - a
+ * @return {dataStructures.state} - b
+ */
 function State(val) {
     var t = tuple(val);
     return Object.create(state, {
@@ -17,19 +26,36 @@ function State(val) {
     });
 }
 
+/**
+ * @description d
+ * @memberOf dataStructures.State
+ * @param {*} a - a
+ * @return {dataStructures.state} - b
+ */
 State.of = function _of(a) {
     return 'function' === typeof a ? State(a) : State(b => tuple(a, b));
 };
 
+/**
+ * @description d
+ * @memberOf dataStructures.State
+ * @param {Object} fa - a
+ * @return {boolean} - b
+ */
 State.is = function _is(fa) {
     return state.isPrototypeOf(fa);
 };
 
+/**
+ * @description d
+ * @namespace state
+ * @memberOf dataStructures
+ */
 var state = {
     /**
-     * @sig
+     * @signature
      * @description d
-     * @return {identity_functor} - a
+     * @return {*} - a
      */
     get value() {
         return this._value;
@@ -44,40 +70,40 @@ var state = {
 
     },
     /**
-     * @sig
+     * @signature
      * @description d
      * @return {*} - a
      */
     get: get,
     /**
-     * @sig
+     * @signature
      * @description d
      * @param {function} f - a
      * @return {*} - b
      */
     orElse: orElse,
     /**
-     * @sig
+     * @signature
      * @description d
      * @param {*} x - a
      * @return {*} - b
      */
     getOrElse: getOrElse,
     /**
-     * @sig
+     * @signature
      * @description d
      * @param {*} item - a
-     * @return {identity_functor} - b
+     * @return {dataStructures.state} - b
      */
     of: pointMaker(State),
     /**
-     * @sig
+     * @signature
      * @description d
      * @return {*} - a
      */
     valueOf: valueOf,
     /**
-     * @sig
+     * @signature
      * @description d
      * @return {string} - a
      */

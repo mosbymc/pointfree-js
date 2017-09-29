@@ -1,6 +1,6 @@
 import { identity } from '../combinators';
 
-/** @module dataStructures/data_structure_util */
+/** @module data_structure_util */
 
 var map = m => fn => m.map(fn);
 

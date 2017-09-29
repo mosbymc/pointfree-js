@@ -1,5 +1,5 @@
-import * as monads from '../../../../src/dataStructures/monads/monads';
-import { list, ordered_list } from '../../../../src/dataStructures/monads/list';
+import * as monads from '../../../../src/dataStructures/dataStructures';
+import { list, ordered_list } from '../../../../src/dataStructures/list';
 import { testData } from '../../../testData';
 
 var List = monads.List;

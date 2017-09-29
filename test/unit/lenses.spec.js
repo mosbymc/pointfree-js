@@ -2,7 +2,7 @@ import { arrayLens, objectLens, view, over, put, set, lens, prismPath, makeLense
 import { reverse } from '../../src/functionalHelpers';
 import { compose, curry } from '../../src/combinators';
 import { map, mapWith } from '../../src/pointless_data_structures';
-import * as monads from '../../src/dataStructures/monads/monads';
+import * as monads from '../../src/dataStructures/dataStructures';
 
 var Identity = monads.Identity,
     Future = monads.Future;

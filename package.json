@@ -51,7 +51,7 @@
     ],
     "exclude": [
       "test",
-      "src/dataStructures/monads/experimental.js"
+      "src/dataStructures/_lazy_identity.js"
     ]
   },
   "repository": {

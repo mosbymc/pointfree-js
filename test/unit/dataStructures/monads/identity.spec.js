@@ -1,5 +1,5 @@
-import * as monads from '../../../../src/dataStructures/monads/monads';
-import { identity } from '../../../../src/dataStructures/monads/identity';
+import * as monads from '../../../../src/dataStructures/dataStructures';
+import { identity } from '../../../../src/dataStructures/identity';
 
 var Identity = monads.Identity;
 

@@ -3,7 +3,7 @@ import { ap, apply, fmap, map, mapWith, flatMap, lift2, lift3, lift4, liftN, mjo
     isJust, isLeft, isList, isMaybe, isMonad, isNothing, isRight, isValidation, fold, sequence, traverse,
     contramap, isEmpty, equals, bimap, toList, toLeft, toRight, toEither, toIdentity, toMaybe, toNothing,
     toJust, toFuture, toConstant } from '../../src/pointless_data_structures';
-import { Constant, Either, Future, Identity, Io, Just, Left, List, Maybe, Nothing, Right, Validation } from '../../src/dataStructures/monads/monads';
+import { Constant, Either, Future, Identity, Io, Just, Left, List, Maybe, Nothing, Right, Validation } from '../../src/dataStructures/dataStructures';
 
 describe('Test pointless_data_structures', function _testFunctionalContainerHelpers() {
     describe('Test isMonad', function _testIsMonad() {
