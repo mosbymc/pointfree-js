@@ -6,7 +6,7 @@ import { monad_apply, chain, mjoin, pointMaker, equals, stringMaker, valueOf } f
  * @memberOf dataStructures
  * @property {function} of
  * @property {function} is
- * @param {*} val
+ * @param {*} val - a
  * @return {dataStructures.validation} - b
  */
 function Validation(val) {
