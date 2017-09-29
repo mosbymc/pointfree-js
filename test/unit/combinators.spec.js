@@ -5,7 +5,7 @@ import {
 } from '../../src/combinators';
 
 describe('Test combinators', function _testCombinators() {
-    describe('Test all', function _testAll() {
+    describe('all', function _testAll() {
         function one(arg) { return arg; }
         function two(arg) { return !arg; }
 
@@ -18,7 +18,7 @@ describe('Test combinators', function _testCombinators() {
         });
     });
 
-    describe('Test any', function _testAny() {
+    describe('any', function _testAny() {
         function one(arg) { return arg; }
         function two(arg) { return !arg; }
 
@@ -31,7 +31,7 @@ describe('Test combinators', function _testCombinators() {
         });
     });
 
-    describe('Test c combinator', function _testC_Combinator() {
+    describe('c combinator', function _testC_Combinator() {
         it('should return application of x to y to z', function _testC_CombinatorAppliesArgsCorrectly() {
             function one(fn) {
                 return function _one(arg) {
@@ -44,7 +44,7 @@ describe('Test combinators', function _testCombinators() {
         });
     });
 
-    describe('Test reverse', function _testReverse() {
+    describe('reverse', function _testReverse() {
         it('should reverse the arguments', function _reverseTest() {
             function revTest(arg1, arg2, arg3) {
                 return rev(arg1, arg2, arg3);
@@ -54,7 +54,7 @@ describe('Test combinators', function _testCombinators() {
         });
     });
 
-    describe('Test curryN', function _testCurryN() {
+    describe('curryN', function _testCurryN() {
         it('should re-curry successfully', function _testCurryN_Re_Currying() {
             function testFn(arg1, arg2, arg3, arg4) {
                 return arg1 + arg2 + arg3 + arg4;
@@ -65,6 +65,15 @@ describe('Test combinators', function _testCombinators() {
                 re_curriedFn = curryN(2, intermediateFn);
 
             re_curriedFn(2, 3).should.eql(NaN);
+        });
+
+        it('should give a user-friendly string representation of the curried function', function _testCurryNToString() {
+            function iHaveThreeArgs(arg1, arg2, arg3) { return arg1 + arg2 + arg3; }
+
+            var curriedFunc = curryN(3, iHaveThreeArgs, []),
+                res = curriedFunc(1)(2);
+
+            //res.toString().should.eql();
         });
     });
 

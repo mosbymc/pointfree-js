@@ -42,7 +42,6 @@
     "tempDirectory": "./coverage/nyc_raw",
     "reporter": [
       "text",
-      "html",
       "lcov"
     ],
     "require": [
@@ -57,7 +56,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/mosbymc/queryable-js"
+    "url": "git+https://github.com/mosbymc/pointfree-js"
   },
   "keywords": [
     "combinator",
