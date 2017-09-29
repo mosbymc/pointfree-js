@@ -1,0 +1,35 @@
+branches:
+  only:
+  - "develop"
+  - "master"
+
+# Test against the latest version of this Node.js version
+environment:
+  nodejs_version: "6"
+  nodejs_version: "7"
+
+# Install scripts. (runs after repo cloning)
+install:
+  # Get the latest stable version of Node.js or io.js
+  - ps: Install-Product node $env:nodejs_version
+  # install modules
+  - npm install
+
+before_test:
+  #- curl -L https://codeclimate.com/downloads/test-reporter/test-reporter-latest-linux-amd64 > ./cc-test-reporter
+  #- chmod +x ./cc-test-reporter
+  #- ./cc-test-reporter before-build
+
+# Post-install test scripts.
+test_script:
+  # Output useful info for debugging.
+  - node --version
+  - npm --version
+  # run tests
+  - npm run lint:test:coverage
+
+after_test:
+  #- if [[ "$APPVEYOR_JOB_NUMBER" =~ [.]1$ ]]; then ./cc-test-reporter after-build --exit-code $TRAVIS_TEST_RESULT; fi
+
+# Don't actually build.
+build: off

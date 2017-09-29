@@ -149,7 +149,7 @@ function curryN(arity, fn, received = []) {
     }
 
     _curryN.orig = fn;
-    _curryN.toString = () => `${fn.toString()}(${received.join(',')})`;
+    _curryN.toString = () => `${fn.toString()}(${received.join(', ')})`;
     return _curryN;
 }
 
