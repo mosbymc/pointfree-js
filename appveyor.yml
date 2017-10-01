@@ -17,9 +17,6 @@ install:
   - npm install
 
 before_test:
-  #- curl -L https://codeclimate.com/downloads/test-reporter/test-reporter-latest-linux-amd64 > ./cc-test-reporter
-  #- chmod +x ./cc-test-reporter
-  #- ./cc-test-reporter before-build
 
 # Post-install test scripts.
 test_script:
@@ -31,6 +28,9 @@ test_script:
 
 after_test:
   #- if [[ "$APPVEYOR_JOB_NUMBER" =~ [.]1$ ]]; then ./cc-test-reporter after-build --exit-code $TRAVIS_TEST_RESULT; fi
+
+on_success:
+  - "npm run codeclimate:coverage"
 
 # Don't actually build.
 build: off
