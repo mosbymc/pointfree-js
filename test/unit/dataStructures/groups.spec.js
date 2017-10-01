@@ -15,6 +15,21 @@ describe('Test groups, monoids, and semigroups', function _testGroupCommaMonoids
             it('should return a string representation of the group', function _testToString() {
                 additionGroupFactory(10).toString().should.eql('Add(10)');
             });
+
+            it('should perform an inverse concatenation', function _testInverseConcat() {
+                var a1 = additionGroupFactory(5),
+                    a2 = additionGroupFactory(7),
+                    res = a1.inverseConcat(a2);
+
+                res.extract().should.eql(-2);
+            });
+
+            it('should return itself if inverseConcat is invoked with a different type', function _testInverseConcatWithDifferentType() {
+                var a = additionGroupFactory(5),
+                    res = a.inverseConcat(10);
+
+                res.should.eql(a);
+            });
         });
 
         describe('Test multiplicativeGroup', function _testMultiplicativeGroup() {
@@ -171,6 +186,20 @@ describe('Test groups, monoids, and semigroups', function _testGroupCommaMonoids
                 Object.getPrototypeOf(o1).isPrototypeOf(res).should.be.true;
                 res.extract().age.extract().should.eql(71);
                 res.extract().name.extract().should.eql('MarkMike');
+            });
+
+            it('should return an identity monoid if the object does not share the same shape', function _testIdentityReturn() {
+                function objectConcat(x, y) {
+                    return {
+                        name: x.name.concat(y.name),
+                        age: x.age.concat(y.age)
+                    };
+                }
+                var objectMonoidFactory = groupFactoryCreator(objectConcat, obj, null, 'Obj'),
+                    res = objectMonoidFactory({});
+
+                res.isEmpty.should.be.true;
+                res.extract().should.eql(obj);
             });
         });
     });

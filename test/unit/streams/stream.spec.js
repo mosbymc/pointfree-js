@@ -7,7 +7,7 @@ describe('Test streams', function _testStreams() {
             o = observable.fromList([1, 2, 3, 4, 5, 6, 7, 8, 9, 10]);
 
         o.map(x => x * 2)
-            .chain(x => observable.from(x * 3))
+            .chain(x => observable.fromList([x * 3]))
             .filter(x => 10 < x)
             .itemBuffer(5)
             .merge(observable.fromList(list), observable.fromList(list))
@@ -47,13 +47,13 @@ describe('Test streams', function _testStreams() {
             var idx = 0;
             return setInterval(function _setInterval() {
                 cb(++idx);
-            }, 40);
+            }, 10);
         }
 
         var count = 0,
             o = observable.fromInterval(interval)
-                .debounce(25)
-                .timeBuffer(50)
+                .debounce(5)
+                .timeBuffer(10)
                 .itemBuffer(5);
 
 

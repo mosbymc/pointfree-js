@@ -1,7 +1,7 @@
-import { noop, once, type, strictEquals } from '../../functionalHelpers';
-import { ifElse, constant } from '../../combinators';
-import { mjoin, pointMaker, valueOf } from '../data_structure_util';
-import { javaScriptTypes } from '../../helpers';
+import { noop, once, type, strictEquals } from '../functionalHelpers';
+import { ifElse, constant } from '../combinators';
+import { mjoin, pointMaker, valueOf } from './data_structure_util';
+import { javaScriptTypes } from '../helpers';
 
 /**
  * @signature
@@ -23,20 +23,20 @@ function safeFork(reject, resolve) {
 }
 
 /**
- * @signature - :: * -> {@link monads.future}
+ * @signature - :: * -> {@link dataStructures.future}
  * @description Factory function used to create a new object that delegates to
- * the {@link monads.future} object. Any single value may be provided as an argument
- * which will be used to set the underlying value of the new {@link monads.future}
+ * the {@link dataStructures.future} object. Any single value may be provided as an argument
+ * which will be used to set the underlying value of the new {@link dataStructures.future}
  * delegator. If no argument is provided, the underlying value will be 'undefined'.
  * @namespace Future
- * @memberOf monads
+ * @memberOf dataStructures
  * @property {function} of
  * @property {function} is
  * @property {function} lift
  * @param {*} fn - The value that should be set as the underlying
- * value of the {@link monads.future}.
- * @return {monads.future} - Returns a new object that delegates to the
- * {@link monads.future}.
+ * value of the {@link dataStructures.future}.
+ * @return {dataStructures.future} - Returns a new object that delegates to the
+ * {@link dataStructures.future}.
  */
 function Future(fn) {
     return Object.create(future, {
@@ -61,19 +61,19 @@ function Future(fn) {
 Future.is = f => future.isPrototypeOf(f);
 
 /**
- * @signature * -> {@link monads.future}
+ * @signature * -> {@link dataStructures.future}
  * @description Takes any value and places it in the correct context if it is
- * not already and creates a new {@link monads.future} object delegator instance.
+ * not already and creates a new {@link dataStructures.future} object delegator instance.
  * Because the future monad 'runs' off of functions, if the value passed to
- * {@link monads.future#of} is a function, it is not wrapped in a function. If it
+ * {@link dataStructures.future#of} is a function, it is not wrapped in a function. If it
  * is any other type, it is wrapped in a function that will be invoked on fork.
- * @memberOf monads.Future
+ * @memberOf dataStructures.Future
  * @static
  * @function of
  * @param {*} [val] - The value that should be set as the underlying
- * value of the {@link monads.future}.
- * @return {monads.future} - Returns a new object that delegates to the
- * {@link monads.future}.
+ * value of the {@link dataStructures.future}.
+ * @return {dataStructures.future} - Returns a new object that delegates to the
+ * {@link dataStructures.future}.
  */
 Future.of = function _of(val) {
     if ('function' !== typeof val) return Future((_, resolve) => safeFork(noop, resolve(val)));
@@ -84,21 +84,21 @@ Future.of = function _of(val) {
 var futureFunctionize = val => Future((_, resolve) => safeFork(noop, resolve(val)));
 
 /**
- * @description Similar to {@link monads.future#of} except it will wrap any value
+ * @description Similar to {@link dataStructures.future#of} except it will wrap any value
  * passed as the argument, regardless if it is a function or not.
- * @memberOf monads.future
+ * @memberOf dataStructures.future
  * @static
  * @function wrap
  * @param {*} val - The value that should be wrapped in a function and set as the
- * underlying value of the {@link monads.future}
- * @return {monads.future} Returns a new object that delegates to the {@link monads.future}
+ * underlying value of the {@link dataStructures.future}
+ * @return {dataStructures.future} Returns a new object that delegates to the {@link dataStructures.future}
  */
 Future.wrap = val => futureFunctionize(val);
 
 /**
  * @signature
  * @description d
- * @memberOf monads.Future
+ * @memberOf dataStructures.Future
  * @static
  * @function reject
  * @param {*} val - a
@@ -109,7 +109,7 @@ Future.reject = val => Future((reject, resolve) => reject(val));
 /**
  * @signature
  * @description d
- * @memberOf monads.Future
+ * @memberOf dataStructures.Future
  * @static
  * @function unit
  * @param {function} val - a
@@ -120,13 +120,13 @@ Future.unit = val => Future(val).complete();
 /**
  * @signature
  * @description Takes any value (function or otherwise) and a delay time in
- * milliseconds, and returns a new {@link monads.future} that will fork in the amount
+ * milliseconds, and returns a new {@link dataStructures.future} that will fork in the amount
  * of time given as the delay.
- * @param {*} val - Any JavaScript value; {@link monads.Future#of} is called under the
+ * @param {*} val - Any JavaScript value; {@link dataStructures.Future#of} is called under the
  * covers, so it need not be a function.
  * @param {number} delay - The amount of time in milliseconds the forking operation
  * should be delayed
- * @return {monads.future} Returns a new future
+ * @return {dataStructures.future} Returns a new future
  */
 Future.delay = function _delay(val, delay) {
     var f = Future.of(fn);
@@ -137,9 +137,9 @@ Future.delay = function _delay(val, delay) {
 };
 
 /**
- * @signature () -> {@link monads.future}
+ * @signature () -> {@link dataStructures.future}
  * @description Creates and returns an 'empty' identity monad.
- * @return {monads.future} - Returns a new identity monad.
+ * @return {dataStructures.future} - Returns a new identity monad.
  */
 Future.empty = () => Future(noop);
 
@@ -157,11 +157,11 @@ Future.empty = () => Future(noop);
  * @property {function} factory - a reference to the future factory function
  * @property {function} [Symbol.Iterator] - Iterator for the future monad
  * @kind {Object}
- * @memberOf monads
+ * @memberOf dataStructures
  * @namespace future
  * @description This is the delegate object that specifies the behavior of the identity functor. All
  * operations that may be performed on an future monad 'instance' delegate to this object. Future
- * functor 'instances' are created by the {@link monads.Future} factory function via Object.create,
+ * functor 'instances' are created by the {@link dataStructures.Future} factory function via Object.create,
  * during which the underlying value is placed directly on the newly created object. No other
  * properties exist directly on an identity functor delegator object beyond the ._value property.
  * All behavior delegates to this object, or higher up the prototype chain.
@@ -172,11 +172,11 @@ var future = {
      * @description Returns the underlying value of an future delegator. This
      * getter is not expected to be used directly by consumers - it is meant as an internal
      * access only. To manipulate the underlying value of an future delegator,
-     * see {@link monads.future#map} and {@link monads.future#bimap}.
-     * To retrieve the underlying value of an future delegator, see {@link monads.future#get},
-     * {@link monads.future#orElse}, {@link monads.future#getOrElse},
-     * and {@link monads.future#valueOf}.
-     * @memberOf monads.future
+     * see {@link dataStructures.future#map} and {@link dataStructures.future#bimap}.
+     * To retrieve the underlying value of an future delegator, see {@link dataStructures.future#get},
+     * {@link dataStructures.future#orElse}, {@link dataStructures.future#getOrElse},
+     * and {@link dataStructures.future#valueOf}.
+     * @memberOf dataStructures.future
      * @instance
      * @protected
      * @function
@@ -186,15 +186,15 @@ var future = {
         return this._value;
     },
     /**
-     * @signature () -> {@link monads.future}
+     * @signature () -> {@link dataStructures.future}
      * @description Takes a function that is applied to the underlying value of the
-     * monad, the result of which is used to create a new {@link monads.future}
+     * monad, the result of which is used to create a new {@link dataStructures.future}
      * delegator instance.
-     * @memberOf monads.future
+     * @memberOf dataStructures.future
      * @instance
      * @param {function} fn - A mapping function that can operate on the underlying
-     * value of the {@link monads.future}.
-     * @return {monads.future} Returns a new {@link monads.future}
+     * value of the {@link dataStructures.future}.
+     * @return {dataStructures.future} Returns a new {@link dataStructures.future}
      * delegator whose underlying value is the result of the mapping operation
      * just performed.
      */
@@ -280,7 +280,7 @@ var future = {
      * is defined as:
      * 1) The other monad shares the same delegate object as 'this' future monad
      * 2) Both underlying values are strictly equal to each other
-     * @memberOf monads.future
+     * @memberOf dataStructures.future
      * @instance
      * @function
      * @param {Object} ma - The other monad to check for equality with 'this' monad.
@@ -290,18 +290,18 @@ var future = {
         return Object.getPrototypeOf(this).isPrototypeOf(ma) && ma.value === this.value;
     },
     /**
-     * @signature * -> {@link monads.future}
+     * @signature * -> {@link dataStructures.future}
      * @description Factory function used to create a new object that delegates to
-     * the {@link monads.future} object. Any single value may be provided as an argument
-     * which will be used to set the underlying value of the new {@link monads.future}
+     * the {@link dataStructures.future} object. Any single value may be provided as an argument
+     * which will be used to set the underlying value of the new {@link dataStructures.future}
      * delegator. If no argument is provided, the underlying value will be 'undefined'.
-     * @memberOf monads.future
+     * @memberOf dataStructures.future
      * @instance
      * @function
      * @param {*} item - The value that should be set as the underlying
-     * value of the {@link monads.future}.
-     * @return {monads.future} Returns a new {@link monads.future} delegator object
-     * via the {@link monads.Future#of} function.
+     * value of the {@link dataStructures.future}.
+     * @return {dataStructures.future} Returns a new {@link dataStructures.future} delegator object
+     * via the {@link dataStructures.Future#of} function.
      */
     of: pointMaker(Future),
     /**
@@ -309,7 +309,7 @@ var future = {
      * @description Returns the underlying value of the current monad 'instance'. This
      * function property is not meant for explicit use. Rather, the JavaScript engine uses
      * this property during implicit coercion like addition and concatenation.
-     * @memberOf monads.future
+     * @memberOf dataStructures.future
      * @instance
      * @function
      * @return {*} Returns the underlying value of the current monad 'instance'.
@@ -319,7 +319,7 @@ var future = {
      * @signature () -> string
      * @description Returns a string representation of the monad and its
      * underlying value
-     * @memberOf monads.future
+     * @memberOf dataStructures.future
      * @instance
      * @function
      * @return {string} Returns a string representation of the future
@@ -329,18 +329,18 @@ var future = {
         return `Future(${this.value.name})`;
     },
     /**
-     * @signature * -> {@link monads.future}
+     * @signature * -> {@link dataStructures.future}
      * @description Factory function used to create a new object that delegates to
-     * the {@link monads.future} object. Any single value may be provided as an argument
-     * which will be used to set the underlying value of the new {@link monads.future}
+     * the {@link dataStructures.future} object. Any single value may be provided as an argument
+     * which will be used to set the underlying value of the new {@link dataStructures.future}
      * delegator. If no argument is provided, the underlying value will be 'undefined'.
-     * @memberOf monads.future
+     * @memberOf dataStructures.future
      * @instance
      * @function
-     * @see monads.Future
+     * @see dataStructures.Future
      * @param {*} val - The value that should be set as the underlying
-     * value of the {@link monads.future}.
-     * @return {monads.future} - Returns a new future monad delegator
+     * value of the {@link dataStructures.future}.
+     * @return {dataStructures.future} - Returns a new future monad delegator
      */
     factory: Future
 };
@@ -351,16 +351,6 @@ future.fmap = future.chain;
 future.flapMap = future.chain;
 future.bind = future.chain;
 future.reduce = future.fold;
-
-//Since FantasyLand is the defacto standard for JavaScript algebraic data structures, and I want to maintain
-//compliance with the standard, a .constructor property must be on the container delegators. In this case, its
-//just an alias for the true .factory property, which points to the delegator factory. I am isolating this from
-//the actual delegator itself as it encourages poor JavaScript development patterns and ... the myth of Javascript
-//classes and inheritance. I do not recommend using the .constructor property at all since that just encourages
-//FantasyLand and others to continue either not learning how JavaScript actually works, or refusing to use it
-//as it was intended... you know, like Douglas Crockford and his "good parts", which is really just another
-//way of saying: "your too dumb to understand how JavaScript works, and I either don't know myself, or don't
-//care to know, so just stick with what I tell you to use."
 future.constructor = future.factory;
 
 export { Future, future };

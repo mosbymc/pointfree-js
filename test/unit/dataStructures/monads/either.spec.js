@@ -1,5 +1,5 @@
-import * as monads from '../../../../src/dataStructures/monads/monads';
-import { right, left } from '../../../../src/dataStructures/monads/either';
+import * as monads from '../../../../src/dataStructures/dataStructures';
+import { right, left } from '../../../../src/dataStructures/either';
 
 var Either = monads.Either,
     Left = monads.Left,

@@ -18,11 +18,15 @@ before_script:
   - ./cc-test-reporter before-build
 
 script:
-- "npm run coverage"
+  - "npm run lint:test:coverage"
+
+
 # Preferably you will run test-reporter on branch update events. But
 # if you setup travis to build PR updates only, you don't need to run
 # the line below
-- if [[ "$TRAVIS_PULL_REQUEST" == 'false' && "$TRAVIS_JOB_NUMBER" =~ [.]1$ ]]; then ./cc-test-reporter after-build --exit-code $TRAVIS_TEST_RESULT; fi
+  - if [[ "$TRAVIS_PULL_REQUEST" == 'false' && "$TRAVIS_JOB_NUMBER" =~ [.]1$ ]]; then ./cc-test-reporter after-build --exit-code $TRAVIS_TEST_RESULT; fi
+
+
 # In the case where travis is setup to build PR updates only,
 # uncomment the line below
 # - ./cc-test-reporter after-build --exit-code $TRAVIS_TEST_RESULT
@@ -38,4 +42,5 @@ group: "stable"
 
 dist: "trusty"
 
-os: "linux"
+os:
+  - "linux"

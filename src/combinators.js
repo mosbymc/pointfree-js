@@ -121,7 +121,7 @@ function constant(item) {
  *      c(1)(2, 3)(4)   //10
  */
 function curry(fn) {
-    if (!fn.length || 1 >= fn.length) return fn;
+    if (1 >= fn.length) return fn;
     return curryN.call(this, fn.length, fn);
 }
 
@@ -149,6 +149,7 @@ function curryN(arity, fn, received = []) {
     }
 
     _curryN.orig = fn;
+    _curryN.toString = () => `${fn.toString()}(${received.join(', ')})`;
     return _curryN;
 }
 

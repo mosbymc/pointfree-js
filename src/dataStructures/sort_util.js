@@ -1,6 +1,6 @@
 import { deepClone, sortComparer } from '../helpers';
 
-/** @module dataStructures/sort_util */
+/** @module sort_util */
 
 var sort_obj = {};
 

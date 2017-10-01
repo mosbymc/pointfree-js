@@ -1,6 +1,6 @@
-import { identity } from '../../combinators';
+import { identity } from '../combinators';
 import { disjunctionEqualMaker, stringMaker, valueOf, monad_apply, chain, mjoin, pointMaker,
-    get, emptyGet, orElse, emptyOrElse, getOrElse, emptyGetOrElse, sharedEitherFns } from '../data_structure_util';
+    get, emptyGet, orElse, emptyOrElse, getOrElse, emptyGetOrElse, sharedEitherFns } from './data_structure_util';
 
 /**
  * @signature
@@ -9,20 +9,20 @@ import { disjunctionEqualMaker, stringMaker, valueOf, monad_apply, chain, mjoin,
  * a right.
  * @private
  * @param {*} x - Any value that should be placed inside an either functor.
- * @return {monads.left|monads.right} - Either a left or a right functor
+ * @return {dataStructures.left|dataStructures.right} - Either a left or a right functor
  */
 function fromNullable(x) {
     return null != x ? Right(x) : Left(x);
 }
 
 /**
- * @signature - :: * -> monads.left|monads.right
+ * @signature - :: * -> dataStructures.left|dataStructures.right
  * @description Factory function used to create a new object that delegates to
- * the {@link monads.left|monads.right} object. Any single value may be provided as an argument
- * which will be used to set the underlying value of the new {@link monads.left|monads.right}
+ * the {@link dataStructures.left|dataStructures.right} object. Any single value may be provided as an argument
+ * which will be used to set the underlying value of the new {@link dataStructures.left|dataStructures.right}
  * delegator. If no argument is provided, the underlying value will be 'undefined'.
  * @namespace Either
- * @memberOf monads
+ * @memberOf dataStructures
  * @property {function} of
  * @property {function} is
  * @property {function} isRight
@@ -32,11 +32,11 @@ function fromNullable(x) {
  * @property {function} fromNullable
  * @property {function} lift
  * @param {*} [val] - The value that should be set as the underlying
- * value of the {@link monads.left|monads.right}.
+ * value of the {@link dataStructures.left|dataStructures.right}.
  * @param {string} [fork] - Specifies if the either should be a left or a right. If no value
  * is provided, the result is created as a left.
- * @return {monads.left|monads.right} - Returns a new object that delegates to the
- * {@link monads.left|monads.right}.
+ * @return {dataStructures.left|dataStructures.right} - Returns a new object that delegates to the
+ * {@link dataStructures.left|dataStructures.right}.
  */
 function Either(val, fork) {
     return 'right' === fork ?
@@ -69,31 +69,31 @@ function Either(val, fork) {
 }
 
 /**
- * @signature * -> {@link monads.right}
+ * @signature * -> {@link dataStructures.right}
  * @description Takes any value and places it in the correct context if it is
- * not already and creates a new {@link monads.right} object delegator instance.
+ * not already and creates a new {@link dataStructures.right} object delegator instance.
  * Because the either functor does not require any specific context for
- * its value, this can be viewed as an alias for {@link monads.Right}
- * @memberOf monads.Either
+ * its value, this can be viewed as an alias for {@link dataStructures.Right}
+ * @memberOf dataStructures.Either
  * @static
  * @function of
  * @param {*} [x] - The value that should be set as the underlying
- * value of the {@link monads.right}.
- * @return {monads.right} - Returns a new object that delegates to the
- * {@link monads.right}.
+ * value of the {@link dataStructures.right}.
+ * @return {dataStructures.right} - Returns a new object that delegates to the
+ * {@link dataStructures.right}.
  */
 Either.of = x => Either(x, 'right');
 
 /**
  * @signature * -> boolean
  * @description Convenience function for determining if a value is an
- * {@link monads.left|monads.right} delegate or not. Available on the
- * {@link left|monads.right}'s factory function as monads.Either#is
- * @memberOf monads.Either
+ * {@link dataStructures.left|dataStructures.right} delegate or not. Available on the
+ * {@link left|dataStructures.right}'s factory function as dataStructures.Either#is
+ * @memberOf dataStructures.Either
  * @function is
  * @param {*} [f] - Any value may be used as an argument to this function.
  * @return {boolean} Returns a boolean that indicates whether the
- * argument provided delegates to the {@link monads.left|monads.right} delegate.
+ * argument provided delegates to the {@link dataStructures.left|dataStructures.right} delegate.
  */
 Either.is = f => Left.is(f) || Right.is(f);
 
@@ -101,7 +101,7 @@ Either.is = f => Left.is(f) || Right.is(f);
  * @signature Object -> boolean
  * @description Takes any object and returns a boolean indicating if the object is
  * a 'right' monad.
- * @memberOf monads.Either
+ * @memberOf dataStructures.Either
  * @function is
  * @param {Object} [f] - a
  * @return {boolean} - b
@@ -112,7 +112,7 @@ Either.isRight = f => f.isRight;
  * @signature Object -> boolean
  * @description Takes any object and returns a boolean indicating if the object is
  * a 'left' monad.
- * @memberOf monads.Either
+ * @memberOf dataStructures.Either
  * @function is
  * @param {Object} [f] - a
  * @return {boolean} - b
@@ -120,53 +120,53 @@ Either.isRight = f => f.isRight;
 Either.isLeft = f => f.isLeft;
 
 /**
- * @signature * -> monads.right
+ * @signature * -> dataStructures.right
  * @description Takes any value and creates a 'right' functor. Shorthand function
  * for Either(*, right)
- * @memberOf monads.Either
+ * @memberOf dataStructures.Either
  * @function is
  * @param {*} x - a
- * @return {monads.right} - b
+ * @return {dataStructures.right} - b
  */
 Either.Right = x => Either(x, 'right');
 
 /**
- * @signature * -> monads.left
+ * @signature * -> dataStructures.left
  * @description Takes any value and creates a 'left' functor. Shorthand function
  * for Either(*, 'left')
- * @memberOf monads.Either
+ * @memberOf dataStructures.Either
  * @function is
  * @param {*} [x] - a
- * @return {monads.left} - b
+ * @return {dataStructures.left} - b
  */
 Either.Left = x => Either(x);
 
 /**
- * @signature * -> monads.left|monads.right
+ * @signature * -> dataStructures.left|dataStructures.right
  * @description Takes any value and returns a 'left' monad is the value
  * loose equals null; other wise returns a 'right' monad.
- * @memberOf monads.Either
+ * @memberOf dataStructures.Either
  * @function is
  * @param {*} [x] - a
- * @return {monads.left|monads.right} - b
+ * @return {dataStructures.left|dataStructures.right} - b
  */
 Either.fromNullable = fromNullable;
 
 /**
- * @signature - :: * -> monads.left
+ * @signature - :: * -> dataStructures.left
  * @description Factory function used to create a new object that delegates to
- * the {@link monads.left} object. Any single value may be provided as an argument
- * which will be used to set the underlying value of the new {@link monads.left}
+ * the {@link dataStructures.left} object. Any single value may be provided as an argument
+ * which will be used to set the underlying value of the new {@link dataStructures.left}
  * delegator. If no argument is provided, the underlying value will be 'undefined'.
  * @namespace Left
- * @memberOf monads
+ * @memberOf dataStructures
  * @property {function} of
  * @property {function} is
  * @property {function} lift
  * @param {*} [val] - The value that should be set as the underlying
- * value of the {@link monads.left}.
- * @return {monads.left} - Returns a new object that delegates to the
- * {@link monads.left}.
+ * value of the {@link dataStructures.left}.
+ * @return {dataStructures.left} - Returns a new object that delegates to the
+ * {@link dataStructures.left}.
  */
 function Left(val) {
     return Object.create(left, {
@@ -189,49 +189,49 @@ function Left(val) {
 }
 
 /**
- * @signature * -> {@link monads.left}
+ * @signature * -> {@link dataStructures.left}
  * @description Takes any value and places it in the correct context if it is
- * not already and creates a new {@link monads.left} object delegator instance.
+ * not already and creates a new {@link dataStructures.left} object delegator instance.
  * Because the either functor does not require any specific context for
- * its value, this can be viewed as an alias for {@link monads.Left}
- * @memberOf monads.Left
+ * its value, this can be viewed as an alias for {@link dataStructures.Left}
+ * @memberOf dataStructures.Left
  * @static
  * @function of
  * @param {*} [x] - The value that should be set as the underlying
- * value of the {@link monads.left}.
- * @return {monads.left} - Returns a new object that delegates to the
- * {@link monads.left}.
+ * value of the {@link dataStructures.left}.
+ * @return {dataStructures.left} - Returns a new object that delegates to the
+ * {@link dataStructures.left}.
  */
 Left.of = x => Left(x);
 
 /**
  * @signature * -> boolean
  * @description Convenience function for determining if a value is an
- * {@link monads.left} delegate or not. Available on the
- * {@link left}'s factory function as monads.Left#is
- * @memberOf monads.Left
+ * {@link dataStructures.left} delegate or not. Available on the
+ * {@link left}'s factory function as dataStructures.Left#is
+ * @memberOf dataStructures.Left
  * @function is
  * @param {*} [f] - Any value may be used as an argument to this function.
  * @return {boolean} Returns a boolean that indicates whether the
- * argument provided delegates to the {@link monads.left} delegate.
+ * argument provided delegates to the {@link dataStructures.left} delegate.
  */
 Left.is = f => left.isPrototypeOf(f);
 
 /**
- * @signature - :: * -> monads.right
+ * @signature - :: * -> dataStructures.right
  * @description Factory function used to create a new object that delegates to
- * the {@link monads.right} object. Any single value may be provided as an argument
- * which will be used to set the underlying value of the new {@link monads.right}
+ * the {@link dataStructures.right} object. Any single value may be provided as an argument
+ * which will be used to set the underlying value of the new {@link dataStructures.right}
  * delegator. If no argument is provided, the underlying value will be 'undefined'.
  * @namespace Right
- * @memberOf monads
+ * @memberOf dataStructures
  * @property {function} of
  * @property {function} is
  * @property {function} lift
  * @param {*} [val] - The value that should be set as the underlying
- * value of the {@link monads.right}.
- * @return {monads.right} - Returns a new object that delegates to the
- * {@link monads.right}.
+ * value of the {@link dataStructures.right}.
+ * @return {dataStructures.right} - Returns a new object that delegates to the
+ * {@link dataStructures.right}.
  */
 function Right(val) {
     return Object.create(right, {
@@ -256,29 +256,29 @@ function Right(val) {
 /**
  * @signature * -> boolean
  * @description Convenience function for determining if a value is an
- * {@link monads.right} delegate or not. Available on the
- * {@link monads.right}'s factory function as monads.Right#is
- * @memberOf monads.Right
+ * {@link dataStructures.right} delegate or not. Available on the
+ * {@link dataStructures.right}'s factory function as dataStructures.Right#is
+ * @memberOf dataStructures.Right
  * @function is
  * @param {*} [x] - Any value may be used as an argument to this function.
  * @return {boolean} Returns a boolean that indicates whether the
- * argument provided delegates to the {@link monads.right} delegate.
+ * argument provided delegates to the {@link dataStructures.right} delegate.
  */
 Right.is = x => right.isPrototypeOf(x);
 
 /**
- * @signature * -> {@link monads.right}
+ * @signature * -> {@link dataStructures.right}
  * @description Takes any value and places it in the correct context if it is
- * not already and creates a new {@link monads.right} object delegator instance.
+ * not already and creates a new {@link dataStructures.right} object delegator instance.
  * Because the either functor does not require any specific context for
- * its value, this can be viewed as an alias for {@link monads.Right}
- * @memberOf monads.Right
+ * its value, this can be viewed as an alias for {@link dataStructures.Right}
+ * @memberOf dataStructures.Right
  * @static
  * @function of
  * @param {*} [x] - The value that should be set as the underlying
- * value of the {@link monads.right}.
- * @return {monads.right} - Returns a new object that delegates to the
- * {@link monads.right}.
+ * value of the {@link dataStructures.right}.
+ * @return {dataStructures.right} - Returns a new object that delegates to the
+ * {@link dataStructures.right}.
  */
 Right.of = x => Right(x);
 
@@ -296,11 +296,11 @@ Right.of = x => Right(x);
  * @property {function} factory - a reference to the right factory function
  * @property {function} [Symbol.Iterator] - Iterator for the right
  * @kind {Object}
- * @memberOf monads
+ * @memberOf dataStructures
  * @namespace right
  * @description This is the delegate object that specifies the behavior of the right functor. All
  * operations that may be performed on an right functor 'instance' delegate to this object. Right
- * functor 'instances' are created by the {@link monads.Either|monads.Right} factory function via Object.create,
+ * functor 'instances' are created by the {@link dataStructures.Either|dataStructures.Right} factory function via Object.create,
  * during which the underlying value is placed directly on the newly created object. No other
  * properties exist directly on an right functor delegator object beyond the ._value property.
  * All behavior delegates to this object, or higher up the prototype chain.
@@ -311,11 +311,11 @@ var right = {
      * @description Returns the underlying value of an right delegator. This
      * getter is not expected to be used directly by consumers - it is meant as an internal
      * access only. To manipulate the underlying value of a right delegator,
-     * see {@link monads.right#map} and {@link monads.right#bimap}. To
-     * retrieve the underlying value of a right delegator, see {@link monads.right#get},
-     * {@link monads.right#orElse}, {@link monads.right#getOrElse},
-     * and {@link monads.right#valueOf}.
-     * @memberOf monads.right
+     * see {@link dataStructures.right#map} and {@link dataStructures.right#bimap}. To
+     * retrieve the underlying value of a right delegator, see {@link dataStructures.right#get},
+     * {@link dataStructures.right#orElse}, {@link dataStructures.right#getOrElse},
+     * and {@link dataStructures.right#valueOf}.
+     * @memberOf dataStructures.right
      * @instance
      * @protected
      * @function
@@ -325,33 +325,33 @@ var right = {
         return this._value;
     },
     /**
-     * @signature () -> {@link monads.right}
+     * @signature () -> {@link dataStructures.right}
      * @description Takes a function that is applied to the underlying value of the
-     * functor, the result of which is used to create a new {@link monads.right}
+     * functor, the result of which is used to create a new {@link dataStructures.right}
      * delegator instance.
-     * @memberOf monads.right
+     * @memberOf dataStructures.right
      * @instance
      * @param {function} fn - A mapping function that can operate on the underlying
-     * value of the {@link monads.right}.
-     * @return {monads.right} Returns a new {@link monads.right}
+     * value of the {@link dataStructures.right}.
+     * @return {dataStructures.right} Returns a new {@link dataStructures.right}
      * delegator whose underlying value is the result of the mapping operation
      * just performed.
      */
     map: sharedEitherFns.rightMap,
     /**
-     * @signature (* -> *) -> (* -> *) -> monads.right<T>
+     * @signature (* -> *) -> (* -> *) -> dataStructures.right<T>
      * @description Since the constant functor does not represent a disjunction, the Identity's
      * bimap function property behaves just as its map function property. It is merely here as a
      * convenience so that swapping out monads/monads does not break an application that is
      * relying on its existence.
-     * @memberOf monads.right
+     * @memberOf dataStructures.right
      * @instance
      * @function
      * @param {function} f - A function that will be used to map over the underlying data of the
-     * {@link monads.right} delegator.
-     * @param {function} [g] - An optional function that is simply ignored on the {@link monads.right}
+     * {@link dataStructures.right} delegator.
+     * @param {function} [g] - An optional function that is simply ignored on the {@link dataStructures.right}
      * since there is no disjunction present.
-     * @return {monads.right} - Returns a new {@link monads.right} delegator after applying
+     * @return {dataStructures.right} - Returns a new {@link dataStructures.right} delegator after applying
      * the mapping function to the underlying data.
      */
     bimap: sharedEitherFns.rightBiMap,
@@ -367,7 +367,7 @@ var right = {
     /**
      * @signature () -> *
      * @description Returns the underlying value of the current functor 'instance'.
-     * @memberOf monads.right
+     * @memberOf dataStructures.right
      * @instance
      * @function
      * @return {*} - Returns the underlying value of the current functor 'instance'.
@@ -380,7 +380,7 @@ var right = {
      * Because the identity_functor does not support disjunctions, the parameter is entirely
      * optional and will always be ignored. Whatever the actual underlying value is, it will
      * always be returned.
-     * @memberOf monads.right
+     * @memberOf dataStructures.right
      * @instance
      * @function
      * @param {*} [x] - a
@@ -394,7 +394,7 @@ var right = {
      * 'mappable'. Because the identity_functor does not support disjunctions, the
      * parameter is entirely optional and will always be ignored. Whatever the actual
      * underlying value is, it will always be returned.
-     * @memberOf monads.right
+     * @memberOf dataStructures.right
      * @instance
      * @function
      * @param {function} [f] - An optional function argument which is invoked and the result
@@ -403,18 +403,18 @@ var right = {
      */
     orElse: orElse,
     /**
-     * @signature * -> {@link monads.right}
+     * @signature * -> {@link dataStructures.right}
      * @description Factory function used to create a new object that delegates to
-     * the {@link monads.right} object. Any single value may be provided as an argument
-     * which will be used to set the underlying value of the new {@link monads.right}
+     * the {@link dataStructures.right} object. Any single value may be provided as an argument
+     * which will be used to set the underlying value of the new {@link dataStructures.right}
      * delegator. If no argument is provided, the underlying value will be 'undefined'.
-     * @memberOf monads.right
+     * @memberOf dataStructures.right
      * @instance
      * @function
      * @param {*} item - The value that should be set as the underlying
-     * value of the {@link monads.right}.
-     * @return {monads.right} Returns a new {@link monads.right} delegator object
-     * via the {@link monads.Either#of} function.
+     * value of the {@link dataStructures.right}.
+     * @return {dataStructures.right} Returns a new {@link dataStructures.right} delegator object
+     * via the {@link dataStructures.Either#of} function.
      */
     of: pointMaker(Right),
     /**
@@ -422,7 +422,7 @@ var right = {
      * @description Returns the underlying value of the current functor 'instance'. This
      * function property is not meant for explicit use. Rather, the JavaScript engine uses
      * this property during implicit coercion like addition and concatenation.
-     * @memberOf monads.right
+     * @memberOf dataStructures.right
      * @instance
      * @function
      * @return {*} Returns the underlying value of the current functor 'instance'.
@@ -432,7 +432,7 @@ var right = {
      * @signature () -> string
      * @description Returns a string representation of the functor and its
      * underlying value
-     * @memberOf monads.right
+     * @memberOf dataStructures.right
      * @instance
      * @function
      * @return {string} Returns a string representation of the right
@@ -440,18 +440,18 @@ var right = {
      */
     toString: stringMaker('Right'),
     /**
-     * @signature * -> {@link monads.right}
+     * @signature * -> {@link dataStructures.right}
      * @description Factory function used to create a new object that delegates to
-     * the {@link monads.right} object. Any single value may be provided as an argument
-     * which will be used to set the underlying value of the new {@link monads.right}
+     * the {@link dataStructures.right} object. Any single value may be provided as an argument
+     * which will be used to set the underlying value of the new {@link dataStructures.right}
      * delegator. If no argument is provided, the underlying value will be 'undefined'.
-     * @memberOf monads.right
+     * @memberOf dataStructures.right
      * @instance
      * @function
-     * @see monads.Either
+     * @see dataStructures.Either
      * @param {*} val - The value that should be set as the underlying
-     * value of the {@link monads.right}.
-     * @return {monads.right} - Returns a new identity functor delegator
+     * value of the {@link dataStructures.right}.
+     * @return {dataStructures.right} - Returns a new identity functor delegator
      */
     factory: Either
 };
@@ -462,7 +462,7 @@ var right = {
  * is defined as:
  * 1) The other functor shares the same delegate object as 'this' identity functor
  * 2) Both underlying values are strictly equal to each other
- * @memberOf monads.right
+ * @memberOf dataStructures.right
  * @instance
  * @function
  * @param {Object} ma - The other functor to check for equality with 'this' functor.
@@ -484,11 +484,11 @@ right.equals = disjunctionEqualMaker(right, 'isRight');
  * @property {function} factory - a reference to the left factory function
  * @property {function} [Symbol.Iterator] - Iterator for the left
  * @kind {Object}
- * @memberOf monads
+ * @memberOf dataStructures
  * @namespace left
  * @description This is the delegate object that specifies the behavior of the left functor. All
  * operations that may be performed on an left functor 'instance' delegate to this object. Left
- * functor 'instances' are created by the {@link monads.Either|monads.Left} factory function via Object.create,
+ * functor 'instances' are created by the {@link dataStructures.Either|dataStructures.Left} factory function via Object.create,
  * during which the underlying value is placed directly on the newly created object. No other
  * properties exist directly on an identity functor delegator object beyond the ._value property.
  * All behavior delegates to this object, or higher up the prototype chain.
@@ -499,11 +499,11 @@ var left = {
      * @description Returns the underlying value of an identity_functor delegator. This
      * getter is not expected to be used directly by consumers - it is meant as an internal
      * access only. To manipulate the underlying value of an identity_functor delegator,
-     * see {@link monads.left#map} and {@link monads.left#bimap}.
-     * To retrieve the underlying value of an identity_functor delegator, see {@link monads.left#get},
-     * {@link monads.left#orElse}, {@link monads.left#getOrElse},
-     * and {@link monads.left#valueOf}.
-     * @memberOf monads.left
+     * see {@link dataStructures.left#map} and {@link dataStructures.left#bimap}.
+     * To retrieve the underlying value of an identity_functor delegator, see {@link dataStructures.left#get},
+     * {@link dataStructures.left#orElse}, {@link dataStructures.left#getOrElse},
+     * and {@link dataStructures.left#valueOf}.
+     * @memberOf dataStructures.left
      * @instance
      * @protected
      * @function
@@ -513,33 +513,33 @@ var left = {
         return this._value;
     },
     /**
-     * @signature () -> {@link monads.left}
+     * @signature () -> {@link dataStructures.left}
      * @description Takes a function that is applied to the underlying value of the
-     * functor, the result of which is used to create a new {@link monads.left}
+     * functor, the result of which is used to create a new {@link dataStructures.left}
      * delegator instance.
-     * @memberOf monads.left
+     * @memberOf dataStructures.left
      * @instance
      * @param {function} fn - A mapping function that can operate on the underlying
-     * value of the {@link monads.left}.
-     * @return {monads.left} Returns a new {@link monads.left}
+     * value of the {@link dataStructures.left}.
+     * @return {dataStructures.left} Returns a new {@link dataStructures.left}
      * delegator whose underlying value is the result of the mapping operation
      * just performed.
      */
     map: sharedEitherFns.leftMapMaker(Left),
     /**
-     * @signature (* -> *) -> (* -> *) -> monads.left<T>
+     * @signature (* -> *) -> (* -> *) -> dataStructures.left<T>
      * @description Since the constant functor does not represent a disjunction, the Identity's
      * bimap function property behaves just as its map function property. It is merely here as a
      * convenience so that swapping out monads/monads does not break an application that is
      * relying on its existence.
-     * @memberOf monads.left
+     * @memberOf dataStructures.left
      * @instance
      * @function
      * @param {function} f - A function that will be used to map over the underlying data of the
-     * {@link monads.left} delegator.
-     * @param {function} [g] - An optional function that is simply ignored on the {@link monads.left}
+     * {@link dataStructures.left} delegator.
+     * @param {function} [g] - An optional function that is simply ignored on the {@link dataStructures.left}
      * since there is no disjunction present.
-     * @return {monads.left} - Returns a new {@link monads.left} delegator after applying
+     * @return {dataStructures.left} - Returns a new {@link dataStructures.left} delegator after applying
      * the mapping function to the underlying data.
      */
     bimap: sharedEitherFns.leftBimapMaker(Left),
@@ -555,7 +555,7 @@ var left = {
     /**
      * @signature () -> *
      * @description Returns the underlying value of the current functor 'instance'.
-     * @memberOf monads.left
+     * @memberOf dataStructures.left
      * @instance
      * @function
      * @return {*} - Returns the underlying value of the current functor 'instance'.
@@ -568,7 +568,7 @@ var left = {
      * Because the left does not support disjunctions, the parameter is entirely
      * optional and will always be ignored. Whatever the actual underlying value is, it will
      * always be returned.
-     * @memberOf monads.left
+     * @memberOf dataStructures.left
      * @instance
      * @function
      * @param {*} [x] - a
@@ -582,7 +582,7 @@ var left = {
      * 'mappable'. Because the identity_functor does not support disjunctions, the
      * parameter is entirely optional and will always be ignored. Whatever the actual
      * underlying value is, it will always be returned.
-     * @memberOf monads.left
+     * @memberOf dataStructures.left
      * @instance
      * @function
      * @param {function} [f] - An optional function argument which is invoked and the result
@@ -591,18 +591,18 @@ var left = {
      */
     orElse: emptyOrElse,
     /**
-     * @signature * -> {@link monads.left}
+     * @signature * -> {@link dataStructures.left}
      * @description Factory function used to create a new object that delegates to
-     * the {@link monads.left} object. Any single value may be provided as an argument
-     * which will be used to set the underlying value of the new {@link monads.left}
+     * the {@link dataStructures.left} object. Any single value may be provided as an argument
+     * which will be used to set the underlying value of the new {@link dataStructures.left}
      * delegator. If no argument is provided, the underlying value will be 'undefined'.
-     * @memberOf monads.left
+     * @memberOf dataStructures.left
      * @instance
      * @function
      * @param {*} item - The value that should be set as the underlying
-     * value of the {@link monads.left}.
-     * @return {monads.left} Returns a new {@link monads.left} delegator object
-     * via the {@link monads.Either#of} function.
+     * value of the {@link dataStructures.left}.
+     * @return {dataStructures.left} Returns a new {@link dataStructures.left} delegator object
+     * via the {@link dataStructures.Either#of} function.
      */
     of: pointMaker(Right),
     /**
@@ -610,7 +610,7 @@ var left = {
      * @description Returns the underlying value of the current functor 'instance'. This
      * function property is not meant for explicit use. Rather, the JavaScript engine uses
      * this property during implicit coercion like addition and concatenation.
-     * @memberOf monads.left
+     * @memberOf dataStructures.left
      * @instance
      * @function
      * @return {*} Returns the underlying value of the current functor 'instance'.
@@ -620,7 +620,7 @@ var left = {
      * @signature () -> string
      * @description Returns a string representation of the functor and its
      * underlying value
-     * @memberOf monads.left
+     * @memberOf dataStructures.left
      * @instance
      * @function
      * @return {string} Returns a string representation of the left
@@ -628,18 +628,18 @@ var left = {
      */
     toString: stringMaker('Left'),
     /**
-     * @signature * -> {@link monads.left}
+     * @signature * -> {@link dataStructures.left}
      * @description Factory function used to create a new object that delegates to
-     * the {@link monads.left} object. Any single value may be provided as an argument
-     * which will be used to set the underlying value of the new {@link monads.left}
+     * the {@link dataStructures.left} object. Any single value may be provided as an argument
+     * which will be used to set the underlying value of the new {@link dataStructures.left}
      * delegator. If no argument is provided, the underlying value will be 'undefined'.
-     * @memberOf monads.left
+     * @memberOf dataStructures.left
      * @instance
      * @function
-     * @see monads.Either
+     * @see dataStructures.Either
      * @param {*} val - The value that should be set as the underlying
-     * value of the {@link monads.left}.
-     * @return {monads.left} - Returns a new identity functor delegator
+     * value of the {@link dataStructures.left}.
+     * @return {dataStructures.left} - Returns a new identity functor delegator
      */
     factory: Either
 };
@@ -650,7 +650,7 @@ var left = {
  * is defined as:
  * 1) The other functor shares the same delegate object as 'this' identity functor
  * 2) Both underlying values are strictly equal to each other
- * @memberOf monads.left
+ * @memberOf dataStructures.left
  * @instance
  * @function
  * @param {Object} ma - The other functor to check for equality with 'this' functor.
@@ -658,18 +658,6 @@ var left = {
  */
 left.equals = disjunctionEqualMaker(left, 'isLeft');
 
-
-//Since FantasyLand is the defacto standard for JavaScript algebraic data structures, and I want to maintain
-//compliance with the standard, a .constructor property must be on the container delegators. In this case, its
-//just an alias for the true .factory property, which points to the delegator factory. I am isolating this from
-//the actual delegator itself as it encourages poor JavaScript development patterns and ... the myth of Javascript
-//classes and inheritance. I do not recommend using the .constructor property at all since that just encourages
-//FantasyLand and others to continue either not learning how JavaScript actually works, or refusing to use it
-//as it was intended... you know, like Douglas Crockford and his "good parts", which is really just another
-//way of saying: "your too dumb to understand how JavaScript works, and I either don't know myself, or don't
-//care to know, so just stick with what I tell you to use."
-right.constructor = right.factory;
-left.constructor = left.factory;
 right.chain = chain;
 right.mjoin = mjoin;
 right.apply = monad_apply;
@@ -687,15 +675,6 @@ left.bind = left.chain;
 right.reduce = right.fold;
 left.reduce = left.fold;
 
-//Since FantasyLand is the defacto standard for JavaScript algebraic data structures, and I want to maintain
-//compliance with the standard, a .constructor property must be on the container delegators. In this case, its
-//just an alias for the true .factory property, which points to the delegator factory. I am isolating this from
-//the actual delegator itself as it encourages poor JavaScript development patterns and ... the myth of Javascript
-//classes and inheritance. I do not recommend using the .constructor property at all since that just encourages
-//FantasyLand and others to continue either not learning how JavaScript actually works, or refusing to use it
-//as it was intended... you know, like Douglas Crockford and his "good parts", which is really just another
-//way of saying: "your too dumb to understand how JavaScript works, and I either don't know myself, or don't
-//care to know, so just stick with what I tell you to use."
 right.constructor = right.factory;
 left.constructor = left.factory;
 

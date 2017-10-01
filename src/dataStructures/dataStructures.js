@@ -6,11 +6,10 @@ import { Io, io } from './io';
 import { List, list_core } from './list';
 import { Maybe, Just, Nothing, just, nothing } from './maybe';
 import { Validation, validation } from './validation';
-import { applyTransforms, applyFantasyLandSynonyms, applyAliases, setIteratorAndLift } from '../data_structure_util';
+import { applyTransforms, applyFantasyLandSynonyms, applyAliases, setIteratorAndLift } from './data_structure_util';
 
 /**
- * @module dataStructures/monads
- * @namespace monads
+ * @namespace dataStructures
  */
 
 /*

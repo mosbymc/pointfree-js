@@ -9,7 +9,7 @@ var chainSubscriber = Object.create(subscriber, {
             try {
                 mappedResult = this.transform(item, this.count++);
                 //TODO: figure out what needs to be done to pull the item out of the inner observable
-                this.subscriber.next(delegatesTo(mappedResult, observable) ? mappedResult.value : mappedResult);
+                this.subscriber.next(delegatesTo(mappedResult, observable) ? mappedResult.source : mappedResult);
             }
             catch (err) {
                 this.subscriber.error(err);

@@ -1,5 +1,5 @@
-import * as monads from '../../../../src/dataStructures/monads/monads';
-import { list, ordered_list } from '../../../../src/dataStructures/monads/list';
+import * as monads from '../../../../src/dataStructures/dataStructures';
+import { list, ordered_list } from '../../../../src/dataStructures/list';
 import { testData } from '../../../testData';
 
 var List = monads.List;
@@ -332,7 +332,6 @@ describe('List functor test', function _testListFunctor() {
 
                 res.should.be.an('array');
                 res.should.have.lengthOf(20);
-                console.log(res);
                 res.should.eql([1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20]);
             });
 
@@ -1096,7 +1095,7 @@ describe('List functor test', function _testListFunctor() {
                     ++count;
                     count.should.eql(1);
                     cb(null, count);
-                }, 250);
+                }, 25);
             }
 
             function _TO2(cb) {
@@ -1105,7 +1104,7 @@ describe('List functor test', function _testListFunctor() {
                     count.should.eql(2);
                     cb(null, count);
                     done();
-                }, 300);
+                }, 30);
             }
 
             List([ _TO1, _TO2])

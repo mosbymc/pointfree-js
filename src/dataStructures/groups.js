@@ -19,6 +19,14 @@ import { compose } from '../combinators';
 //TODO: Semigroups:
 //TODO: - division
 
+/**
+ * @description d
+ * @namespace baseGroupObject
+ * @memberOf dataStructures
+ * @typedef {Object}
+ * @property {function} extract
+ * @property {function} valueOf
+ */
 var baseGroupObject = {
     /**
      * @description d

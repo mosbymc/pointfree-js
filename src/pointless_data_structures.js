@@ -1,6 +1,6 @@
 import { curry, compose, identity } from './combinators';
 import { getWith } from './functionalHelpers';
-import { Constant, Either, Future, Identity, Io, Just, Left, List, Maybe, Nothing, Right, Validation } from './dataStructures/monads/monads';
+import { Constant, Either, Future, Identity, Io, Just, Left, List, Maybe, Nothing, Right, Validation } from './dataStructures/dataStructures';
 
 /** @module pointless_data_structures */
 

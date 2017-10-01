@@ -32,7 +32,7 @@ module.exports = function _wallaby(wallaby) {
             '!playground.js',
             '!test/test_helper.js',
             '!./observations.js',
-            '!./src/dataStructures/monads/experimental.js',
+            '!./src/dataStructures/_lazy_identity.js',
         ],
 
         /*

@@ -1,5 +1,5 @@
-import * as monads from '../../../../src/dataStructures/monads/monads';
-import { just, nothing } from '../../../../src/dataStructures/monads/maybe';
+import * as monads from '../../../../src/dataStructures/dataStructures';
+import { just, nothing } from '../../../../src/dataStructures/maybe';
 
 var Maybe = monads.Maybe,
     Just = monads.Just,
