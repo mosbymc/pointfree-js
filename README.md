@@ -1,6 +1,7 @@
 # pointfree-js
 
 [![Build Status](https://travis-ci.org/mosbymc/pointfree-js.svg?branch=master)](https://travis-ci.org/mosbymc/pointfree-js)
+[![Build status](https://ci.appveyor.com/api/projects/status/duhd4ljv1to5apbq/branch/master?svg=true)](https://ci.appveyor.com/project/mosbymc/pointfree-js/branch/master)
 [![Code Climate](https://codeclimate.com/github/mosbymc/pointfree-js/badges/gpa.svg)](https://codeclimate.com/github/mosbymc/pointfree-js)
 [![Test Coverage](https://codeclimate.com/github/mosbymc/pointfree-js/badges/coverage.svg)](https://codeclimate.com/github/mosbymc/pointfree-js/coverage)
 [![Issue Count](https://codeclimate.com/github/mosbymc/pointfree-js/badges/issue_count.svg)](https://codeclimate.com/github/mosbymc/pointfree-js)
