@@ -1,5 +1,5 @@
-import { noop, once, type, strictEquals } from '../functionalHelpers';
-import { ifElse, constant } from '../combinators';
+import { once, type, strictEquals } from '../functionalHelpers';
+import { ifElse, constant, identity } from '../combinators';
 import { mjoin, pointMaker, valueOf } from './data_structure_util';
 import { javaScriptTypes } from '../helpers';
 
@@ -75,13 +75,13 @@ Future.is = f => future.isPrototypeOf(f);
  * @return {dataStructures.future} - Returns a new object that delegates to the
  * {@link dataStructures.future}.
  */
-Future.of = function _of(val) {
+/*Future.of = function _of(val) {
     if ('function' !== typeof val) return Future((_, resolve) => safeFork(noop, resolve(val)));
     return Future(val);
-};
-//Future.of = val => ifElse(constant(strictEquals(javaScriptTypes.Function, type(val))), Future, futureFunctionize, val);
+};*/
+Future.of = val => ifElse(constant(strictEquals(javaScriptTypes.Function, type(val))), Future, futureFunctionize, val);
 
-var futureFunctionize = val => Future((_, resolve) => safeFork(noop, resolve(val)));
+var futureFunctionize = val => Future((_, resolve) => safeFork(identity, resolve(val)));
 
 /**
  * @description Similar to {@link dataStructures.future#of} except it will wrap any value
@@ -141,7 +141,7 @@ Future.delay = function _delay(val, delay) {
  * @description Creates and returns an 'empty' identity monad.
  * @return {dataStructures.future} - Returns a new identity monad.
  */
-Future.empty = () => Future(noop);
+Future.empty = () => Future(identity);
 
 /**
  * @typedef {Object} future
@@ -266,10 +266,10 @@ var future = {
         return this.of((reject, resolve) => this._fork(safeFork(reject, err => reject(f(err))), safeFork(reject, res => resolve(g(res)))));
     },
     empty: function _empty() {
-        return this.of(noop);
+        return this.of(identity);
     },
     isEmpty: function _isEmpty() {
-        return this._fork === noop;
+        return this._fork === identity;
     },
     fork: function _fork(reject, resolve) {
         return this._fork(reject, safeFork(reject, resolve));
@@ -288,6 +288,18 @@ var future = {
      */
     equals: function _equals(ma) {
         return Object.getPrototypeOf(this).isPrototypeOf(ma) && ma.value === this.value;
+    },
+    /**
+     * @signature
+     * @description d
+     * @memberOf dataStructures.future
+     * @instance
+     * @function
+     * @return {*} - a
+     */
+    get extract()  {
+        //return this.value();
+        return this.value;
     },
     /**
      * @signature * -> {@link dataStructures.future}

@@ -1,23 +1,23 @@
 import { ap, apply, fmap, map, mapWith, flatMap, lift2, lift3, lift4, liftN, mjoin, pluckWith,
     chain, bind, mcompose, filter, intersect, except, isConstant, isEither, isFuture, isIdentity, isIo,
-    isJust, isLeft, isList, isMaybe, isMonad, isNothing, isRight, isValidation, fold, sequence, traverse,
+    isJust, isLeft, isList, isMaybe, isImmutableDataStructure, isNothing, isRight, isValidation, fold, sequence, traverse,
     contramap, isEmpty, equals, bimap, toList, toLeft, toRight, toEither, toIdentity, toMaybe, toNothing,
     toJust, toFuture, toConstant } from '../../src/pointless_data_structures';
 import { Constant, Either, Future, Identity, Io, Just, Left, List, Maybe, Nothing, Right, Validation } from '../../src/dataStructures/dataStructures';
 
 describe('Test pointless_data_structures', function _testFunctionalContainerHelpers() {
-    describe('Test isMonad', function _testIsMonad() {
+    describe('Test isImmutableDataStructure', function _testIsMonad() {
         it('should return true for any monad', function _testIsMonadWithMonads() {
-            isMonad(Constant(1)).should.be.true;
-            isMonad(List(1)).should.be.true;
-            isMonad(Identity(1)).should.be.true;
-            isMonad(Right(1)).should.be.true;
-            isMonad(Just(1)).should.be.true;
-            isMonad(Io(1)).should.be.true;
-            isMonad(Future(1)).should.be.true;
-            isMonad(Validation(1)).should.be.true;
-            isMonad(Nothing()).should.be.true;
-            isMonad(Left(1)).should.be.true;
+            isImmutableDataStructure(Constant(1)).should.be.true;
+            isImmutableDataStructure(List(1)).should.be.true;
+            isImmutableDataStructure(Identity(1)).should.be.true;
+            isImmutableDataStructure(Right(1)).should.be.true;
+            isImmutableDataStructure(Just(1)).should.be.true;
+            isImmutableDataStructure(Io(1)).should.be.true;
+            isImmutableDataStructure(Future(1)).should.be.true;
+            isImmutableDataStructure(Validation(1)).should.be.true;
+            isImmutableDataStructure(Nothing()).should.be.true;
+            isImmutableDataStructure(Left(1)).should.be.true;
         });
     });
 
