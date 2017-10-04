@@ -213,6 +213,9 @@ var constant = {
      * and its underlying value.
      */
     toString: stringMaker('Constant'),
+    get [Symbol.toStringTag]() {
+        return 'Constant';
+    },
     /**
      * @signature * -> {@link dataStructures.constant}
      * @description Factory function used to create a new object that delegates to

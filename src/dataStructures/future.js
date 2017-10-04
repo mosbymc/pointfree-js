@@ -340,6 +340,9 @@ var future = {
     toString: function _toString() {
         return `Future(${this.value.name})`;
     },
+    get [Symbol.toStringTag]() {
+        return 'Future';
+    },
     /**
      * @signature * -> {@link dataStructures.future}
      * @description Factory function used to create a new object that delegates to

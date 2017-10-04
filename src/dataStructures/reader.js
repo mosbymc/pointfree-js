@@ -41,5 +41,8 @@ var reader = {
     },
     apply: function _apply(m) {
         return this.chain(f => m.map(f));
+    },
+    get [Symbol.toStringTag]() {
+        return 'Reader';
     }
 };

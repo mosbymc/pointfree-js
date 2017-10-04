@@ -943,6 +943,13 @@ var list_core = {
         return `List(${this.value})`;
     },
 
+    toJSON: function _toJSON() {
+        return this.data;
+    },
+    get [Symbol.toStringTag]() {
+        return 'List';
+    },
+
     /**
      * @signature
      * @description d
@@ -1493,6 +1500,15 @@ List.extend = function _extend(prop, fn) {
 function createGroupedListDelegate(source, key) {
     return createListDelegateInstance(source, undefined, undefined, key);
 }
+
+var listProxyHandler = {
+    get(target, prop, ctx) {
+        if (prop in target) return target[prop];
+        let num = Number(prop);
+        if (Number.isInteger(num) && -1 < num) return target.toArray()[num];
+        return undefined;
+    }
+};
 
 /**
  * @description Creates a new list object delegate instance; list type is determined by

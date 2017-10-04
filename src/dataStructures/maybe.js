@@ -438,6 +438,9 @@ var just = {
      * and its underlying value.
      */
     toString: stringMaker('Just'),
+    get [Symbol.toStringTag]() {
+        return 'Just';
+    },
     /**
      * @signature * -> {@link dataStructures.just}
      * @description Factory function used to create a new object that delegates to
@@ -650,6 +653,9 @@ var nothing = {
      */
     toString: function _toString() {
         return 'Nothing()';
+    },
+    get [Symbol.toStringTag]() {
+        return 'Nothing';
     },
     /**
      * @signature * -> {@link dataStructures.nothing}

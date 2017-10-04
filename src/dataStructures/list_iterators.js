@@ -6,9 +6,26 @@ import { sortData } from './sort_util';
 
 /** @module dataStructures/list_iterators */
 
+//TODO: see about adding an 'evaluatedData' property to a list once the generator is done yielding out
+//TODO: values. It would be nice to wrap each returned iterator in a generic iterator that just forwards
+//TODO: the values it receives from the primary, but also remember each value. Once there are no more value
+//TODO: to yield out, it can set the 'evaluatedData' property on the list object and from then on, the
+//TODO: list won't need to be iterated as it has already been evaluated.
+
 var asArray = when(not(isArray), Array.from);
 var arrayFromGenerator = val => Array.from(invoke(val));
 var toArray = ifElse(delegatesFrom(generatorProto), arrayFromGenerator, asArray);
+
+function _iteratorWrapper(it) {
+    return function *iterator() {
+        var res = [];
+        for (let item of it) {
+            res[res.length] = item;
+            yield item;
+        }
+        this.evaluatedData = res;
+    };
+}
 
 /**
  * @description d

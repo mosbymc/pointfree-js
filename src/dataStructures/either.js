@@ -439,6 +439,9 @@ var right = {
      * and its underlying value.
      */
     toString: stringMaker('Right'),
+    get [Symbol.toStringTag]() {
+        return 'Right';
+    },
     /**
      * @signature * -> {@link dataStructures.right}
      * @description Factory function used to create a new object that delegates to
@@ -627,6 +630,9 @@ var left = {
      * and its underlying value.
      */
     toString: stringMaker('Left'),
+    get [Symbol.toStringTag]() {
+        return 'Left';
+    },
     /**
      * @signature * -> {@link dataStructures.left}
      * @description Factory function used to create a new object that delegates to

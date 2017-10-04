@@ -136,9 +136,6 @@ describe('Identity monad test', function _testIdentityMonad() {
             err2.should.be.true;
         });
 
-        it('all get/getOrElse functions should return the underlying value of an Identity', function _testExtract() {
-        });
-
         it('should return a new identity functor instance with the mapped value', function _testIdentityFunctorMap() {
             var i = Identity(1),
                 d = i.map(function _t() { return 2; });
@@ -203,25 +200,12 @@ describe('Identity monad test', function _testIdentityMonad() {
                 m = i.mapToMaybe(),
                 r = i.mapToRight();
 
-            c.should.be.an('object');
             Object.getPrototypeOf(c).should.eql(Object.getPrototypeOf(monads.Constant()));
-
-            f.should.be.an('object');
             Object.getPrototypeOf(f).should.eql(Object.getPrototypeOf(monads.Future()));
-
-            io.should.be.an('object');
             Object.getPrototypeOf(io).should.eql(Object.getPrototypeOf(monads.Io()));
-
-            l.should.be.an('object');
             Object.getPrototypeOf(l).should.eql(Object.getPrototypeOf(monads.List()));
-
-            left.should.be.an('object');
             Object.getPrototypeOf(left).should.eql(Object.getPrototypeOf(monads.Left()));
-
-            m.should.be.an('object');
             Object.getPrototypeOf(m).should.eql(Object.getPrototypeOf(monads.Maybe(1)));
-
-            r.should.be.an('object');
             Object.getPrototypeOf(r).should.eql(Object.getPrototypeOf(monads.Right()));
         });
 
@@ -236,26 +220,21 @@ describe('Identity monad test', function _testIdentityMonad() {
                 m = i.toMaybe(),
                 r = i.toRight();
 
-            c.should.be.an('object');
             Object.getPrototypeOf(c).should.eql(Object.getPrototypeOf(monads.Constant()));
-
-            f.should.be.an('object');
             Object.getPrototypeOf(f).should.eql(Object.getPrototypeOf(monads.Future()));
-
-            io.should.be.an('object');
             Object.getPrototypeOf(io).should.eql(Object.getPrototypeOf(monads.Io()));
-
-            l.should.be.an('object');
             Object.getPrototypeOf(l).should.eql(Object.getPrototypeOf(monads.List()));
-
-            left.should.be.an('object');
             Object.getPrototypeOf(left).should.eql(Object.getPrototypeOf(monads.Left()));
-
-            m.should.be.an('object');
             Object.getPrototypeOf(m).should.eql(Object.getPrototypeOf(monads.Maybe(1)));
-
-            r.should.be.an('object');
             Object.getPrototypeOf(r).should.eql(Object.getPrototypeOf(monads.Right()));
+        });
+
+        it('should represent the identity\'s \'type\' when \'Object.prototype.toString.call\' is invoked', function _testIdentityTypeString() {
+            var i = Identity();
+
+            console.log(Object.prototype.toString.call(i));
+
+            //Object.prototype.toString.call(i).should.eql('[object Identity]');
         });
 
         it('should have a functioning iterator', function _testIdentityFunctorIterator() {

@@ -88,6 +88,26 @@ function monadIterator() {
     };
 }
 
+function _toPrimitive(hint) {
+    console.log(hint);
+    console.log(this.value);
+
+    if (Array.isArray(this.value) && 5 === this.value.length) {
+        console.log(this.value);
+        console.log(hint);
+        console.log(+this.value);
+    }
+    //if the underlying is a function, an object, or we didn't receive a hint, let JS determine how
+    //to turn the underlying value into a primitive if it is not already...
+    if ('object' !== typeof this.value && 'function' !== typeof this.value && null != hint) {
+        //..if the hint is a number or default, coerce the underlying to a number and return...
+        if ('number' === hint || 'default' === hint) return +this.value;
+        //...else the hint was 'string', so coerce to a string a return
+        return '' + this.value;
+    }
+    return this.value;
+}
+
 /**
  * @signature
  * @description d
@@ -268,12 +288,15 @@ var pointMaker = type => val => type.of(val);
 /**
  * @signature
  * @description d
- * @param {string} typeString - a
+ * @param {string} factory - a
  * @return {function} - b
  */
-function stringMaker(typeString) {
+function stringMaker(factory) {
     return function _toString() {
-        return `${typeString}(${this.value})`;
+        //String(this.value)
+        //this.value.toString()
+        //null == this.value ? this.value : this.value.toString()
+        return `${factory}(${null == this.value ? this.value : this.value.toString()})`;
     };
 }
 
@@ -389,8 +412,11 @@ var factory_aliases = {
 function setIteratorAndLift(dataStructures) {
     return dataStructures.map(function _forEachStructure(dataStructure) {
         dataStructure.factory.lift = lifter(dataStructure.factory);
-        if (dataStructure.delegate && !dataStructure.delegate[Symbol.iterator]) {
-            dataStructure.delegate[Symbol.iterator] = monadIterator;
+        if (dataStructure.delegate) {
+            //TODO: for now, don't apply the toPrimitive symbol function - it's messing with operations I
+            //TODO: would not expect it to mess with.
+            //dataStructure.delegate[Symbol.toPrimitive] = _toPrimitive;
+            if (!dataStructure.delegate[Symbol.iterator]) dataStructure.delegate[Symbol.iterator] = monadIterator;
         }
         return dataStructure;
     });

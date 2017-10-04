@@ -228,25 +228,12 @@ describe('List functor test', function _testListFunctor() {
                 m = l.mapToMaybe(),
                 r = l.mapToRight();
 
-            c.should.be.an('object');
             Object.getPrototypeOf(c).should.eql(Object.getPrototypeOf(monads.Constant()));
-
-            f.should.be.an('object');
             Object.getPrototypeOf(f).should.eql(Object.getPrototypeOf(monads.Future()));
-
-            io.should.be.an('object');
             Object.getPrototypeOf(io).should.eql(Object.getPrototypeOf(monads.Io()));
-
-            i.should.be.an('object');
             Object.getPrototypeOf(i).should.eql(Object.getPrototypeOf(monads.Identity()));
-
-            left.should.be.an('object');
             Object.getPrototypeOf(left).should.eql(Object.getPrototypeOf(monads.Left()));
-
-            m.should.be.an('object');
             Object.getPrototypeOf(m).should.eql(Object.getPrototypeOf(monads.Just(1)));
-
-            r.should.be.an('object');
             Object.getPrototypeOf(r).should.eql(Object.getPrototypeOf(monads.Right()));
         });
 

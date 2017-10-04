@@ -81,6 +81,9 @@ var io = {
     equals: equals,
     valueOf: valueOf,
     toString: stringMaker('Io'),
+    get [Symbol.toStringTag]() {
+        return 'Io';
+    },
     factory: Io
 };
 

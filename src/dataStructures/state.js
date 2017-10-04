@@ -108,6 +108,9 @@ var state = {
      * @return {string} - a
      */
     toString: stringMaker('State'),
+    get [Symbol.toStringTag]() {
+        return 'State';
+    },
     factory: State
 };
 

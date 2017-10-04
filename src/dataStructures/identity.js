@@ -142,7 +142,7 @@ var identity = {
      * just performed.
      */
     map: function _map(fn) {
-        return this.of(fn(this.value));
+        return Identity.of(fn(this.value));
     },
     /**
      * @signature () -> {@link dataStructures.identity}
@@ -329,6 +329,9 @@ var identity = {
      * and its underlying value.
      */
     toString: stringMaker('Identity'),
+    get [Symbol.toStringTag]() {
+        return 'Identity';
+    },
     /**
      * @signature * -> {@link dataStructures.identity}
      * @description Factory function used to create a new object that delegates to
