@@ -7,6 +7,17 @@ import { when, ifElse, identity, constant } from '../combinators';
 import { not } from '../decorators';
 import { createSortObject } from './sort_util';
 
+var listProxyHandler = {
+    get(target, prop, ctx) {
+        if (prop in target) return target[prop];
+        if ('symbol' !== typeof prop) {
+            let num = Number(prop);
+            if (Number.isInteger(num) && -1 < num) return target.toArray()[num];
+        }
+        return undefined;
+    }
+};
+
 /**
  * @description: Object that contains the core functionality of a List; both the m_list and ordered_m_list
  * objects delegate to this object for all functionality besides orderBy/orderByDescending
@@ -131,7 +142,7 @@ var list_core = {
      * @return {list} - b
      */
     chain: function _chain(fn) {
-        return this.of(this, chain(this, fn));
+        return this.of(this, _iteratorWrapper(chain(this, fn)));
     },
 
     /**
@@ -148,7 +159,7 @@ var list_core = {
      * @return {list} - b
      */
     concat: function _concat(ys) {
-        return this.of(this, concat(this, List.of(ys)));
+        return this.of(this, _iteratorWrapper(concat(this, List.of(ys))));
     },
 
     /**
@@ -162,7 +173,7 @@ var list_core = {
      * @return {list} Returns a new list
      */
     concatAll: function _concatAll(...ys) {
-        return this.of(this, concatAll(this, ys.map(y => List.of(y))));
+        return this.of(this, _iteratorWrapper(concatAll(this, ys.map(y => List.of(y)))));
     },
 
     /**
@@ -180,7 +191,7 @@ var list_core = {
      * @return {list} - d
      */
     copyWithin: function _copyWithin(index, start, end) {
-        return this.of(this, copyWithin(index, start, end, this));
+        return this.of(this, _iteratorWrapper(copyWithin(index, start, end, this)));
     },
 
     /**
@@ -194,7 +205,7 @@ var list_core = {
      * @return {list} - b
      */
     distinct: function _distinct(comparer) {
-        return this.of(this, distinct(this, comparer));
+        return this.of(this, _iteratorWrapper(distinct(this, comparer)));
     },
 
     /**
@@ -216,7 +227,7 @@ var list_core = {
      * @return {list} - c
      */
     except: function _except(xs, comparer) {
-        return this.of(this, except(this, xs, comparer));
+        return this.of(this, _iteratorWrapper(except(this, xs, comparer)));
     },
 
     /**
@@ -234,7 +245,7 @@ var list_core = {
      * @return {list} - d
      */
     fill: function _fill(value, start, end) {
-        return this.of(this, fill(value, start, end, this));
+        return this.of(this, _iteratorWrapper(fill(value, start, end, this)));
     },
 
     /**
@@ -248,7 +259,7 @@ var list_core = {
      * @return {dataStructures.list_core} - b
      */
     filter: function _filter(predicate) {
-        return this.of(this, filter(this, predicate));
+        return this.of(this, _iteratorWrapper(filter(this, predicate)));
     },
 
     /**
@@ -263,7 +274,7 @@ var list_core = {
      * @return {dataStructures.list_core} - c
      */
     groupBy: function _groupBy(keySelector, comparer) {
-        return this.of(this, groupBy(this, [createSortObject(keySelector, comparer, sortDirection.ascending)], createGroupedListDelegate));
+        return this.of(this, _iteratorWrapper(groupBy(this, [createSortObject(keySelector, comparer, sortDirection.ascending)], createGroupedListDelegate)));
     },
 
     /**
@@ -278,7 +289,7 @@ var list_core = {
      * @return {dataStructures.list_core} - c
      */
     groupByDescending: function _groupByDescending(keySelector, comparer) {
-        return this.of(this, groupBy(this, [createSortObject(keySelector, comparer, sortDirection.descending)], createGroupedListDelegate));
+        return this.of(this, _iteratorWrapper(groupBy(this, [createSortObject(keySelector, comparer, sortDirection.descending)], createGroupedListDelegate)));
     },
 
     /**
@@ -302,7 +313,7 @@ var list_core = {
      * @return {dataStructures.list_core} - f
      */
     groupJoin: function _groupJoin(ys, xSelector, ySelector, projector, comparer) {
-        return this.of(this, groupJoin(this, ys, xSelector, ySelector, projector, createGroupedListDelegate, comparer));
+        return this.of(this, _iteratorWrapper(groupJoin(this, ys, xSelector, ySelector, projector, createGroupedListDelegate, comparer)));
     },
 
     /**
@@ -323,7 +334,7 @@ var list_core = {
      * @return {dataStructures.list_core} - c
      */
     intersect: function _intersect(xs, comparer) {
-        return this.of(this, intersect(this, xs, comparer));
+        return this.of(this, _iteratorWrapper(intersect(this, xs, comparer)));
     },
 
     /**
@@ -337,7 +348,7 @@ var list_core = {
      * @return {dataStructures.list_core} - b
      */
     intersperse: function _intersperse(val) {
-        return this.of(this, intersperse(this, val));
+        return this.of(this, _iteratorWrapper(intersperse(this, val)));
     },
 
     /**
@@ -360,7 +371,7 @@ var list_core = {
      * @return {dataStructures.list_core} - f
      */
     listJoin: function _join(ys, xSelector, ySelector, projector, comparer) {
-        return this.of(this, join(this, ys, xSelector, ySelector, projector, comparer));
+        return this.of(this, _iteratorWrapper(join(this, ys, xSelector, ySelector, projector, comparer)));
     },
 
     /**
@@ -374,7 +385,7 @@ var list_core = {
      * @return {dataStructures.list_core} - b
      */
     map: function _map(mapFunc) {
-        return this.of(this, map(this, mapFunc));
+        return this.of(this, _iteratorWrapper(map(this, mapFunc)));
     },
 
     /**
@@ -400,7 +411,7 @@ var list_core = {
      * @returns {dataStructures.list_core} - b
      */
     ofType: function _ofType(type) {
-        return this.of(this, ofType(this, type));
+        return this.of(this, _iteratorWrapper(ofType(this, type)));
     },
 
     /**
@@ -414,7 +425,7 @@ var list_core = {
      * @return {dataStructures.list_core} - b
      */
     prepend: function _prepend(xs) {
-        return this.of(this, prepend(this, List.of(xs)));
+        return this.of(this, _iteratorWrapper(prepend(this, List.of(xs))));
     },
 
     /**
@@ -428,7 +439,7 @@ var list_core = {
      * @return {list|ordered_list} Returns a new list
      */
     prependAll: function _prependAll(...xs) {
-        return this.of(this, prependAll(this, xs.map(x => List.of(x))));
+        return this.of(this, _iteratorWrapper(prependAll(this, xs.map(x => List.of(x)))));
     },
 
     /**
@@ -443,7 +454,7 @@ var list_core = {
      * @return {dataStructures.list_core} - a
      */
     reverse: function _reverse() {
-        return this.of(this, reverse(this));
+        return this.of(this, _iteratorWrapper(reverse(this)));
     },
 
     /**
@@ -477,7 +488,7 @@ var list_core = {
      * @return {dataStructures.list_core} - b
      */
     skipWhile: function _skipWhile(predicate = defaultPredicate) {
-        return this.of(this, skipWhile(this, predicate));
+        return this.of(this, _iteratorWrapper(skipWhile(this, predicate)));
     },
 
     /**
@@ -498,7 +509,7 @@ var list_core = {
      * @return {dataStructures.list_core} Returns a new list
      */
     slice: function _slice(start, end) {
-        return this.of(this, slice(this, start, end));
+        return this.of(this, _iteratorWrapper(slice(this, start, end)));
     },
 
     /**
@@ -528,7 +539,7 @@ var list_core = {
      * @return {dataStructures.list_core} - b
      */
     takeWhile: function _takeWhile(predicate = defaultPredicate) {
-        return this.of(this, takeWhile(this, predicate));
+        return this.of(this, _iteratorWrapper(takeWhile(this, predicate)));
     },
 
     /**
@@ -548,7 +559,7 @@ var list_core = {
      * @return {dataStructures.list_core} - c
      */
     union: function _union(xs, comparer) {
-        return this.of(this, union(this, xs, comparer));
+        return this.of(this, _iteratorWrapper(union(this, xs, comparer)));
     },
 
     /**
@@ -568,7 +579,7 @@ var list_core = {
      * @return {dataStructures.list_core} - c
      */
     zip: function _zip(selector, xs) {
-        return this.of(this, zip(this, xs, selector));
+        return this.of(this, _iteratorWrapper(zip(this, xs, selector)));
     },
 
     /**
@@ -623,6 +634,7 @@ var list_core = {
      * the initial underlying data through each function.
      */
     get data() {
+        if (this.evaluatedData) return this.evaluatedData;
         return Array.from(this);
     },
 
@@ -996,7 +1008,7 @@ var list_core = {
      * @param {generator} [iterator] - b
      * @param {Array.<Object>} [sortObj] - c
      * @param {string} [key] - d
-     * @return {list|ordered_list} - e
+     * @return {Proxy} - e
      */
     of: function _of(xs, iterator, sortObj, key) {
         return createListDelegateInstance(xs, iterator, sortObj, key);
@@ -1046,7 +1058,7 @@ var list_core = {
      * @return {Array} - a
      */
     [Symbol.iterator]: function *_iterator() {
-        var data = Array.from(this.value);
+        var data = this.evaluatedData ? this.evaluatedData : Array.from(this.value);
         for (let item of data) {
             yield item;
         }
@@ -1443,7 +1455,7 @@ List.is = isList;
  * @see List
  * @param {*} item - Any JavaScript value that should be used to build a new list monad.
  * @param {number} count - The number of times the value should be repeated to build the list.
- * @return {ordered_list} - Returns a new ordered list monad.
+ * @return {Proxy} - Returns a new ordered list monad.
  */
 List.repeat = function _repeat(item, count) {
     return createListDelegateInstance([], repeat(item, count), [createSortObject(identity, noop, sortDirection.descending)]);
@@ -1501,15 +1513,6 @@ function createGroupedListDelegate(source, key) {
     return createListDelegateInstance(source, undefined, undefined, key);
 }
 
-var listProxyHandler = {
-    get(target, prop, ctx) {
-        if (prop in target) return target[prop];
-        let num = Number(prop);
-        if (Number.isInteger(num) && -1 < num) return target.toArray()[num];
-        return undefined;
-    }
-};
-
 /**
  * @description Creates a new list object delegate instance; list type is determined by
  * the parameters passed to the function. If only the 'source' parameter is provided, a
@@ -1536,106 +1539,60 @@ var listProxyHandler = {
  * anything javascript object that has an iterator.
  * @param {generator|null} [iterator] - A generator function that is to be used on the new list delegate
  * object instance's iterator.
- * @param {Array|undefined} [sortObj] - An array of the sort(s) (field and direction} to be used when the
+ * @param {Array|undefined} [sortObject] - An array of the sort(s) (field and direction} to be used when the
  * instance is evaluated.
  * @param {string} [key] - A string that denotes what value the new list delegate object instance
  * was grouped on.
- * @return {list|ordered_list} Returns either a {@link list} delegator object
+ * @return {Proxy} Returns either a {@link list} delegator object
  * or an {@link ordered_list} delegator object based on the values passed as arguments.
  */
-function createListDelegateInstance(source, iterator, sortObj, key) {
-    switch(createBitMask(delegatesTo(iterator, generatorProto), isArray(sortObj), isString(key))) {
+function createListDelegateInstance(source, iterator, sortObject, key) {
+    var bm = createBitMask(delegatesTo(iterator, generatorProto), isString(key), isArray(sortObject));
+    var proxiedList = 3 > bm ? new Proxy(
+        Object.create(list, {
+            _value: { value: source, writable: false, configurable: false }
+        }) , listProxyHandler) :
+        new Proxy(
+            Object.create(
+                ordered_list, {
+                    _value: { value: source, writable: false, configurable: false },
+                    _appliedSorts: { value: sortObject, writable: false, configurable: false }
+                }), listProxyHandler);
+
+    switch(bm) {
         /**
          * @description: case 1 = An iterator has been passed, but nothing else. Create a
          * basic list type object instance and set the iterator as the version provided.
          */
         case 1:
-            return Object.create(list, {
-                _value: {
-                    value: source,
-                    writable: false,
-                    configurable: false
-                },
-                [Symbol.iterator]: {
-                    value: iterator
-                }
-            });
-        /**
-         * @description: case 2 = Only a sort object was passed in. The list is presumed to be either
-         * trivially sorted via List.just or List.empty, or was initialized as an ordered list. Create
-         * an ordered list type object instance, setting the _appliedSorts field as the sortObj param.
-         */
+            proxiedList[Symbol.iterator] = iterator;
+            return proxiedList;
         case 2:
-            return Object.create(ordered_list, {
-                _value: {
-                    value: source,
-                    writable: false,
-                    configurable: false
-                },
-                _appliedSorts: {
-                    value: sortObj,
-                    writable: false,
-                    configurable: false
-                }
-            });
+            /**
+             * @description: case 2 = A key was passed as the only argument. Create a list
+             * object and set the ._key field as the key string argument.
+             */
+            return Object.defineProperties(
+                proxiedList, {
+                    '_key': { value: key, writable: false, configurable: false },
+                    'key': { get: function _getKey() { return this._key; } }
+                });
         /**
-         * @description: case 3 = Both an iterator and a sort object were passed in. The consumer
+         * @description: case 5 = Both an iterator and a sort object were passed in. The consumer
          * invoked the sortBy/sortByDescending or thenBy/thenByDescending function properties. Create
          * an ordered list type object instance, setting the iterator to the version provided (if any) and
-         * the _appliedSorts field as the sortObj param.
+         * the _appliedSorts field as the sortObject param.
          */
-        case 3:
-            return Object.create(ordered_list, {
-                _value: {
-                    value: source,
-                    writable: false,
-                    configurable: false
-                },
-                _appliedSorts: {
-                    value: sortObj,
-                    writable: false,
-                    configurable: false
-                },
-                [Symbol.iterator]: {
-                    value: iterator
-                }
-            });
-        /**
-         * @description: case 4 = An iterator, sort object, and a key were passed as arguments.
-         * Create a grouped list type and set the iterator as the version provided, the ._appliedSorts
-         * field as the sortObj param, and the ._key field as the key string argument.
-         */
-        case 4:
-            return Object.create(list, {
-                _value: {
-                    value: source,
-                    writable: false,
-                    configurable: false
-                },
-                _key: {
-                    value: key,
-                    writable: false,
-                    configurable: false
-                },
-                key: {
-                    get: function _getKey() {
-                        return this._key;
-                    }
-                }
-            });
+        case 5:
+            proxiedList[Symbol.iterator] = iterator;
+            return proxiedList;
         /**
          * @description: default = Nothing beyond the 'source' param was passed to this
          * function; results in a bitwise value of 00. Create a 'basic' list object type
          * instance.
          */
         default:
-            return Object.create(list, {
-                _value: {
-                    value: source,
-                    writable: false,
-                    configurable: false
-                }
-            });
+            return proxiedList;
     }
 }
 
@@ -1650,6 +1607,22 @@ function createBitMask(...args) {
     return args.reduce(function _reduce(curr, next, idx) {
         return curr |= next << idx;
     }, args[0]);
+}
+
+function _iteratorWrapper(it) {
+    return function *iterator() {
+        if (this.evaluatedData) {
+            for (let item of this.evaluatedData) yield item;
+        }
+        else {
+            var res = [];
+            for (let item of it()) {
+                res[res.length] = item;
+                yield item;
+            }
+            this.evaluatedData = res;
+        }
+    };
 }
 
 //Since FantasyLand is the defacto standard for JavaScript algebraic data structures, and I want to maintain

@@ -16,17 +16,6 @@ var asArray = when(not(isArray), Array.from);
 var arrayFromGenerator = val => Array.from(invoke(val));
 var toArray = ifElse(delegatesFrom(generatorProto), arrayFromGenerator, asArray);
 
-function _iteratorWrapper(it) {
-    return function *iterator() {
-        var res = [];
-        for (let item of it) {
-            res[res.length] = item;
-            yield item;
-        }
-        this.evaluatedData = res;
-    };
-}
-
 /**
  * @description d
  * @param {Array|dataStructures.list|dataStructures.ordered_list|generator} iterable - Any iterable item
