@@ -8,7 +8,7 @@ import { not } from '../decorators';
 import { createSortObject } from './sort_util';
 
 var listProxyHandler = {
-    get(target, prop, ctx) {
+    get(target, prop) {
         if (prop in target) return target[prop];
         if ('symbol' !== typeof prop) {
             let num = Number(prop);
@@ -16,7 +16,8 @@ var listProxyHandler = {
         }
         return undefined;
     }
-};
+},
+    bitMaskMaxListValue = 3;
 
 /**
  * @description: Object that contains the core functionality of a List; both the m_list and ordered_m_list
@@ -639,6 +640,24 @@ var list_core = {
     },
 
     /**
+     * @description Returns the _evaluatedData property if it has been set, or null otherwise.
+     * @return {Array|null} Returns either an array of values or null if there are none
+     */
+    get evaluatedData() {
+        return this._evaluatedData || null;
+    },
+
+    /**
+     * @description Sets the _evaluatedData property on a list object. This is only used
+     * internally to prevent multiple enumerations and the underlying data won't change
+     * and so can be cached after evaluation.
+     * @param {Array} val - An array of values
+     */
+    set evaluatedData(val) {
+        this._evaluatedData = val;
+    },
+
+    /**
      * @signature
      * @description d
      * @external Array
@@ -1189,7 +1208,7 @@ var list = Object.create(list_core, {
     sortBy: {
         value: function _orderBy(keySelector = identity, comparer = defaultPredicate) {
             var sortObj = [createSortObject(keySelector, comparer, sortDirection.ascending)];
-            return this.of(this, sortBy(this, sortObj), sortObj);
+            return this.of(this, _iteratorWrapper(sortBy(this, sortObj)), sortObj);
         }
     },
     /**
@@ -1205,7 +1224,7 @@ var list = Object.create(list_core, {
     sortByDescending: {
         value: function _orderByDescending(keySelector, comparer = defaultPredicate) {
             var sortObj = [createSortObject(keySelector, comparer, sortDirection.descending)];
-            return this.of(this, sortBy(this, sortObj), sortObj);
+            return this.of(this, _iteratorWrapper(sortBy(this, sortObj)), sortObj);
         }
     },
     /**
@@ -1259,7 +1278,7 @@ var ordered_list = Object.create(list_core, {
     thenBy: {
         value: function _thenBy(keySelector, comparer = defaultPredicate) {
             var sortObj = this._appliedSorts.concat(createSortObject(keySelector, comparer, sortDirection.ascending));
-            return this.of(this.value, sortBy(this, sortObj), sortObj);
+            return this.of(this.value, _iteratorWrapper(sortBy(this, sortObj)), sortObj);
         }
     },
     /**
@@ -1275,7 +1294,7 @@ var ordered_list = Object.create(list_core, {
     thenByDescending: {
         value: function thenByDescending(keySelector, comparer = defaultPredicate) {
             var sortObj = this._appliedSorts.concat(createSortObject(keySelector, comparer, sortDirection.descending));
-            return this.of(this.value, sortBy(this, sortObj), sortObj);
+            return this.of(this.value, _iteratorWrapper(sortBy(this, sortObj)), sortObj);
         }
     },
     /**
@@ -1548,7 +1567,7 @@ function createGroupedListDelegate(source, key) {
  */
 function createListDelegateInstance(source, iterator, sortObject, key) {
     var bm = createBitMask(delegatesTo(iterator, generatorProto), isString(key), isArray(sortObject));
-    var proxiedList = 3 > bm ? new Proxy(
+    var proxiedList = bitMaskMaxListValue > bm ? new Proxy(
         Object.create(list, {
             _value: { value: source, writable: false, configurable: false }
         }) , listProxyHandler) :
