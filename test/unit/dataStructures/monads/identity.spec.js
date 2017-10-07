@@ -87,7 +87,6 @@ describe('Identity monad test', function _testIdentityMonad() {
 
         it('should return an \'empty\' identity and no identity should be empty', function _testEmptyIdentity() {
             var i = Identity.empty();
-            i.empty.should.eql(Identity.empty);
             i.isEmpty().should.be.false;
         });
 
@@ -369,7 +368,6 @@ describe('Identity monad test', function _testIdentityMonad() {
             i.reduce.should.eql(i['fantasy-land/reduce']);
             i.traverse.should.eql(i['fantasy-land/traverse']);
             i.equals.should.eql(i['fantasy-land/equals']);
-            i.empty.should.eql(i['fantasy-land/empty']);
             i.of.should.eql(i['fantasy-land/of']);
         });
     });

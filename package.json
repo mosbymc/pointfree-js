@@ -20,7 +20,7 @@
     "clean:plato": "del-cli plato/*",
     "codeclimate:coverage": "cross-env CODECLIMATE_REPO_TOKEN=88f6338a30b9b3b63e26685f78c813c4ca0448d6e21b7f2fed6878ccc11e7f47 ./node_modules/.bin/codeclimate-test-reporter < ./coverage/lcov.info",
     "precoverage": "del-cli coverage/*",
-    "coverage": "cross-env NODE_ENV=test nyc mocha test/unit/**/*.spec.js",
+    "coverage": "cross-env NODE_ENV=test nyc mocha --recursive test/unit",
     "coverage:report": "nyc report --reporter=text-lcov",
     "predocumentation": "del-cli documentation/*",
     "documentation": "./node_modules/.bin/jsdoc -r src -d documentation -R ./README.md -c jsdoc.conf.json",
@@ -34,7 +34,7 @@
     "plato": "plato -r -d plato -l .jshintrc -e .eslintrc.json -t 'pointfree-js' -n src",
     "snyk": "./node_modules/.bin/snyk test",
     "start": "node app.js 3000",
-    "test": "cross-env NODE_ENV=test mocha test/unit/**/*.spec.js --require babel-polyfill --require test/test_helper --compilers js:babel-register"
+    "test": "cross-env NODE_ENV=test mocha --recursive test/unit --require babel-polyfill --require test/test_helper --compilers js:babel-register"
   },
   "nyc": {
     "sourceMap": false,
