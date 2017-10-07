@@ -142,7 +142,7 @@ var identity = {
      * just performed.
      */
     map: function _map(fn) {
-        return this.of(fn(this.value));
+        return Identity.of(fn(this.value));
     },
     /**
      * @signature () -> {@link dataStructures.identity}
@@ -236,8 +236,8 @@ var identity = {
     /**
      * @signature (b -> a) -> dataStructures.Identity
      * @description This property will only function correctly if the underlying value of the
-     * current identity monad is a function type. Accepts a function argument and returns a new
-     * identity monad with the composition of the function argument and the underlying function
+     * current identity is a function. Contramap accepts a function argument and returns a new
+     * identity with the composition of the function argument and the underlying function
      * value as the new underlying. The supplied function argument is executed first in the
      * composition, so its signature must be (b -> a) so that the value it passes as an argument
      * to the previous underlying function will be of the expected type.
@@ -245,26 +245,18 @@ var identity = {
      * @instance
      * @function contramap
      * @param {function} fn - A function that should be composed with the current identity's
-     * underling function.
-     * @return {dataStructures.identity} Returns a new identity monad.
+     * underlying function.
+     * @return {dataStructures.identity} Returns a new identity data structure.
      */
     contramap: contramap,
     /**
-     * @signature () -> {@link dataStructures.identity}
-     * @description Creates and returns a new, 'empty' identity monad.
-     * @memberOf dataStructures.identity
-     * @instance
-     * @function empty
-     * @return {dataStructures.identity} Creates and returns a new, 'empty' identity monad.
-     */
-    empty: Identity.empty,
-    /**
      * @signature () -> boolean
-     * @description Returns a boolean indicating if the monad is 'empty'
+     * @description Returns a boolean indicating if the identity is 'empty'. Because there is
+     * no innate 'empty' value for an identity data structure, isEmpty will always return false.
      * @memberOf dataStructures.identity
      * @instance
      * @function isEmpty
-     * @return {boolean} Returns a boolean indicating if the monad is 'empty'
+     * @return {boolean} Returns a boolean indicating if the identity instance is 'empty'.
      */
     isEmpty: function _isEmpty() {
         return false;
@@ -329,6 +321,9 @@ var identity = {
      * and its underlying value.
      */
     toString: stringMaker('Identity'),
+    get [Symbol.toStringTag]() {
+        return 'Identity';
+    },
     /**
      * @signature * -> {@link dataStructures.identity}
      * @description Factory function used to create a new object that delegates to

@@ -49,6 +49,9 @@ var validation = {
     valueOf: valueOf,
     equals: equals,
     toString: stringMaker('Validation'),
+    get [Symbol.toStringTag]() {
+        return 'Validation';
+    },
     factory: Validation
 };
 

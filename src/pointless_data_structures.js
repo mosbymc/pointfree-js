@@ -86,7 +86,7 @@ var isMaybe = Maybe.is;
  * @param {Object} ma - a
  * @return {boolean} - b
  */
-function isMonad(ma) {
+function isImmutableDataStructure(ma) {
     return !!(ma && ma.factory && factoryList.some(factory => ma.factory === factory));
 }
 
@@ -474,6 +474,10 @@ function toLeft(ma) {
 //===========================================================================================//
 //===========================================================================================//
 
+function count(xs, predicate) {
+    return xs.count(predicate);
+}
+
 /**
  * @signature
  * @description d
@@ -486,6 +490,10 @@ function toLeft(ma) {
 var filter = curry(function _filter(predicate, xs) {
     xs.filter(predicate);
 });
+
+function first(xs, predicate) {
+    return xs.first(predicate);
+}
 
 /**
  * @signature
@@ -515,8 +523,28 @@ var except = curry(function _except(xs, comparer, ys) {
     return ys.except(xs, comparer);
 });
 
+function last(xs, predicate) {
+    return xs.last(predicate);
+}
+
+var skip = curry(function _skip(xs, amt) {
+    return xs.skip(amt);
+});
+
+var skipWhile = curry(function _skipWhile(xs, predicate) {
+    return xs.skipWhile(predicate);
+});
+
+var take = curry(function _take(xs, amt) {
+    return xs.take(amt);
+});
+
+var takeWhile = curry(function _takeWhile(xs, predicate) {
+    return xs.takeWhile(predicate);
+});
+
 export { ap, apply, fmap, map, mapWith, flatMap, lift2, lift3, lift4, liftN, mjoin, pluckWith,
         chain, bind, mcompose, filter, intersect, except, isConstant, isEither, isFuture, isIdentity, isIo,
-        isJust, isLeft, isList, isMaybe, isMonad, isNothing, isRight, isValidation, fold, sequence, traverse,
+        isJust, isLeft, isList, isMaybe, isImmutableDataStructure, isNothing, isRight, isValidation, fold, sequence, traverse,
         contramap, isEmpty, equals, bimap, toList, toLeft, toRight, toEither, toIdentity, toMaybe, toNothing,
         toJust, toFuture, toConstant };

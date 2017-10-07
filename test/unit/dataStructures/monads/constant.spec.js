@@ -176,25 +176,12 @@ describe('Constant monad tests', function _testConstantMonad() {
                 m = i.mapToMaybe(),
                 r = i.mapToRight();
 
-            c.should.be.an('object');
             Object.getPrototypeOf(c).should.eql(Object.getPrototypeOf(monads.Identity()));
-
-            f.should.be.an('object');
             Object.getPrototypeOf(f).should.eql(Object.getPrototypeOf(monads.Future()));
-
-            io.should.be.an('object');
             Object.getPrototypeOf(io).should.eql(Object.getPrototypeOf(monads.Io()));
-
-            l.should.be.an('object');
             Object.getPrototypeOf(l).should.eql(Object.getPrototypeOf(monads.List()));
-
-            left.should.be.an('object');
             Object.getPrototypeOf(left).should.eql(Object.getPrototypeOf(monads.Left()));
-
-            m.should.be.an('object');
             Object.getPrototypeOf(m).should.eql(Object.getPrototypeOf(monads.Just(1)));
-
-            r.should.be.an('object');
             Object.getPrototypeOf(r).should.eql(Object.getPrototypeOf(monads.Right()));
         });
 

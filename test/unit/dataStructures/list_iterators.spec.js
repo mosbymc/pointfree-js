@@ -378,7 +378,6 @@ describe('Test List Iterators', function _testListIterators() {
                 groupJoinRes.should.have.lengthOf(uniqueCities.length);
                 groupJoinRes.forEach(function _validateEntries(item) {
                     item.should.have.keys('City', 'People');
-                    item.People.should.be.an('object');
                     item.People.data.forEach(function _ensurePeopleLiveInCity(person) {
                         item.City.should.eql(person.City);
                     });
@@ -392,7 +391,6 @@ describe('Test List Iterators', function _testListIterators() {
                 groupJoinRes.should.have.lengthOf(uniqueStates.length);
                 groupJoinRes.forEach(function _validateEntries(item) {
                     item.should.have.keys('State', 'People');
-                    item.People.should.be.an('object');
                     item.People.data.forEach(function _ensurePeopleLiveInState(person) {
                         item.State.should.eql(person.State);
                     });
@@ -406,7 +404,6 @@ describe('Test List Iterators', function _testListIterators() {
                 groupJoinRes.should.have.lengthOf(uniqueStates.length);
                 groupJoinRes.forEach(function _validateEntries(item) {
                     item.should.have.keys('State', 'People');
-                    item.People.should.be.an('object');
                     item.People.data.should.have.lengthOf(0);
                 });
             });
@@ -427,7 +424,6 @@ describe('Test List Iterators', function _testListIterators() {
                 groupJoinRes.should.have.lengthOf(uniqueCities.length);
                 groupJoinRes.forEach(function _ensurePeopleLiveInCities(item) {
                     item.should.have.keys('City', 'People');
-                    item.People.should.be.an('object');
                     item.People.data.forEach(function _ensurePeopleLiveInCity(person) {
                         item.City.should.eql(person.City);
                     });
@@ -441,7 +437,6 @@ describe('Test List Iterators', function _testListIterators() {
                 groupJoinRes.should.have.lengthOf(uniqueStates.length);
                 groupJoinRes.forEach(function _validateEntries(item) {
                     item.should.have.keys('State', 'People');
-                    item.People.should.be.an('object');
                     item.People.data.forEach(function _ensurePeopleLiveInState(person) {
                         item.State.should.eql(person.State);
                     });
@@ -459,7 +454,6 @@ describe('Test List Iterators', function _testListIterators() {
                 groupJoinRes.should.have.lengthOf(uniqueCities.length);
                 groupJoinRes.forEach(function _ensurePeopleLiveInCities(item) {
                     item.should.have.keys('City', 'People');
-                    item.People.should.be.an('object');
                     item.People.data.should.have.lengthOf(0);
                 });
             });
@@ -471,7 +465,6 @@ describe('Test List Iterators', function _testListIterators() {
                 groupJoinRes.should.have.lengthOf(uniqueStates.length);
                 groupJoinRes.forEach(function _validateEntries(item) {
                     item.should.have.keys('State', 'People');
-                    item.People.should.be.an('object');
                     item.People.data.should.have.lengthOf(0);
                 });
             });
@@ -497,7 +490,6 @@ describe('Test List Iterators', function _testListIterators() {
                 groupJoinRes.should.have.lengthOf(uniqueCities.length);
                 groupJoinRes.forEach(function _validateEntries(item) {
                     item.should.have.keys('City', 'People');
-                    item.People.should.be.an('object');
                     item.People.data.forEach(function _ensurePeopleLiveInState(person) {
                         item.City.should.eql(person.City);
                     });
@@ -511,7 +503,6 @@ describe('Test List Iterators', function _testListIterators() {
                 groupJoinRes.should.have.lengthOf(uniqueStates.length);
                 groupJoinRes.forEach(function _validateEntries(item) {
                     item.should.have.keys('State', 'People');
-                    item.People.should.be.an('object');
                     item.People.data.forEach(function _ensurePeopleLiveInState(person) {
                         item.State.should.eql(person.State);
                     });
@@ -529,7 +520,6 @@ describe('Test List Iterators', function _testListIterators() {
                 groupJoinRes.should.have.lengthOf(uniqueCities.length);
                 groupJoinRes.forEach(function _ensurePeopleLiveInCities(item) {
                     item.should.have.keys('City', 'People');
-                    item.People.should.be.an('object');
                     item.People.data.should.have.lengthOf(0);
                 });
             });
@@ -541,7 +531,6 @@ describe('Test List Iterators', function _testListIterators() {
                 groupJoinRes.should.have.lengthOf(uniqueStates.length);
                 groupJoinRes.forEach(function _validateEntries(item) {
                     item.should.have.keys('State', 'People');
-                    item.People.should.be.an('object');
                     item.People.data.should.have.lengthOf(0);
                 });
             });

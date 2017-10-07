@@ -3,6 +3,7 @@ import { reverse } from '../../src/functionalHelpers';
 import { compose, curry } from '../../src/combinators';
 import { map, mapWith } from '../../src/pointless_data_structures';
 import * as monads from '../../src/dataStructures/dataStructures';
+import { testData } from '../testData';
 
 var Identity = monads.Identity,
     Future = monads.Future;
@@ -34,6 +35,14 @@ describe('Test lenses', function _testLenses() {
                 .should.eql({ id: 3, name: 'Richard Branson', addresses: [{ street: '99 Walnut Dr.', zip: '04821' }, { street: '2321 Crane Way', zip: '08082' }]});
             over(name, toUpper, user)
                 .should.eql({ id: 3, name: 'CHARLES BRONSON', addresses: [{ street: '99 Walnut Dr.', zip: '04821' }, { street: '2321 Crane Way', zip: '08082' }]});
+        });
+
+        it('should work', function _createPathOnList() {
+            var list = monads.List(testData.dataSource.data),
+                drillDown = lensPath('drillDownData'),
+                year = lensPath('Year');
+
+            //view(compose(year, drillDown), list);
         });
 
         it('should do stuff', function _doStuff() {
