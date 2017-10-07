@@ -4,6 +4,16 @@ import { identity } from '../combinators';
 
 var map = m => fn => m.map(fn);
 
+/**
+ * @signature contramap :: (b -> a) -> Ma
+ * @description Contramap accepts a single function as an argument and returns a
+ * new instance of the same data structure with an underlying function that is
+ * the result of the composition of the original underlying function and the
+ * function argument.
+ * @param {function} fn - A function that should be composed with the data structure's
+ * underlying function.
+ * @return {*} Returns a data structure of the same type.
+ */
 function contramap(fn) {
     return this.of(compose(this.value, fn));
 }
@@ -140,9 +150,9 @@ function extendMaker(typeFactory) {
 }
 
 /**
- * @signature
- * @description Returns the underlying value of any given monad
- * @return {*} Returns the underlying value of any given monad
+ * @signature extract :: () -> *
+ * @description Returns the underlying value of the data structure
+ * @return {*} Returns the underlying value of the data structure
  */
 function extract() {
     return this.value;
