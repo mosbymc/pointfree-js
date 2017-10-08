@@ -150,6 +150,11 @@ function curryN(arity, fn, received = []) {
 
     _curryN.orig = fn;
     _curryN.toString = () => `${fn.toString()}(${received.join(', ')})`;
+
+    //Although Object.defineProperty works just fine to change a function's length, mocha freaks
+    //out for no apparent reason, so it won't do for testing purposed.
+    Object.defineProperties(_curryN, { length: { value: arity - received.length } });
+
     return _curryN;
 }
 
@@ -316,11 +321,16 @@ var o = curry((a, b) => b(a(b)));
  *      p(10)  //0
  */
 function pipe(fn, ...fns) {
-    return function _pipe(...args) {
+    function _pipe(...args) {
         return fns.reduce(function pipeReduce(item, f) {
             return f(item);
         }, fn(...args));
-    };
+    }
+
+    _pipe.toString = () => [fn].concat(fns).reduce((str, f, idx) => str + `${f.toString()}${idx < fns.length ? '(' : ''}`, '') + ')'.repeat(fns.length);
+    //return fn.orig ? fn : curryN(fn.length : _pipe);
+    //return curryN(fn.orig ? fn.orig.length : fn.length, _pipe);
+    return _pipe;
 }
 
 /**

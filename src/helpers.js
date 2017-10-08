@@ -360,8 +360,8 @@ function deepCopy(arr) {
  */
 function shallowClone(obj) {
     var clone = {};
-    for (var p in obj) {
-        clone[p] = obj[p];
+    for (var item in obj) {
+        clone[item] = obj[item];
     }
     return clone;
 }

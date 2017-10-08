@@ -164,6 +164,10 @@ describe('test helpers', function _testHelpers() {
             clonedObj.a.should.eql(obj.a);
             clonedObj.b.should.eql(obj.b);
             clonedObj.g.should.eql(obj.g);
+            clonedObj.g.f.should.eql(clonedObj);
+
+            Object.keys(obj).every(key => key in clonedObj).should.be.true;
+            Object.keys(clonedObj).every(key => key in obj).should.be.true;
         });
     });
 });
