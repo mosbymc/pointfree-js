@@ -122,7 +122,30 @@ function constant(item) {
  */
 function curry(fn) {
     if (1 >= fn.length) return fn;
-    return curryN.call(this, fn.length, fn);
+    return _curry.call(this, fn.length, fn);
+}
+
+/**
+ * @signature
+ * @description d
+ * @private
+ * @param {number} arity - a
+ * @param {function} fn - b
+ * @param {Array} received - c
+ * @return {*} - d
+ */
+function _curry(arity, fn, received = []) {
+    if (fn.orig && fn.orig !== fn) return _curry.call(this, arity, fn.orig, received);
+    function _curry_(...rest) {
+        var combined = received.concat(rest);
+        if (arity > combined.length) return _curry.call(this, arity, fn, combined);
+        return fn.call(this, ...combined);
+    }
+
+    _curry_.orig = fn;
+    _curry_.toString = () => `${fn.toString()}(${received.join(', ')})`;
+    Object.defineProperties(_curry_, { length: { value: arity - received.length } });
+    return _curry_;
 }
 
 /**
@@ -152,7 +175,7 @@ function curryN(arity, fn, received = []) {
     _curryN.toString = () => `${fn.toString()}(${received.join(', ')})`;
 
     //Although Object.defineProperty works just fine to change a function's length, mocha freaks
-    //out for no apparent reason, so it won't do for testing purposed.
+    //out for no apparent reason, so it won't do for testing purposes.
     Object.defineProperties(_curryN, { length: { value: arity - received.length } });
 
     return _curryN;
@@ -328,9 +351,8 @@ function pipe(fn, ...fns) {
     }
 
     _pipe.toString = () => [fn].concat(fns).reduce((str, f, idx) => str + `${f.toString()}${idx < fns.length ? '(' : ''}`, '') + ')'.repeat(fns.length);
-    //return fn.orig ? fn : curryN(fn.length : _pipe);
-    //return curryN(fn.orig ? fn.orig.length : fn.length, _pipe);
-    return _pipe;
+    //only curry the pipe if the leading function is not already curried - otherwise, leave as is
+    return fn.orig ? _pipe : _curry(fn.length, _pipe);
 }
 
 /**
