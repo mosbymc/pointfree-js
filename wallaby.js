@@ -2,6 +2,17 @@ var wallabify = require('wallabify');
 
 process.env.BABEL_ENV = 'test';
 
+/*
+    npm install watch -D
+    watch 'npm run build src'
+
+    watchify
+    https://www.npmjs.com/package/livereload
+    https://www.npmjs.com/package/gulp-strip-comments
+    https://www.npmjs.com/package/decomment
+    https://www.npmjs.com/search?q=comment
+ */
+
 module.exports = function _wallaby(wallaby) {
     return {
         //debug: true,
