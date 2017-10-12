@@ -1,8 +1,8 @@
-import { nil, javaScriptTypes } from '../helpers';
-import { type, strictEquals } from '../functionalHelpers';
-import { not } from '../decorators';
-import { constant, when } from '../combinators';
-import { equals, stringMaker, valueOf, extendMaker } from './data_structure_util';
+import { nil, javaScriptTypes } from '../../helpers';
+import { type, strictEquals } from '../../functionalHelpers';
+import { not } from '../../decorators';
+import { constant, when } from '../../combinators';
+import { equals, stringMaker, valueOf, extendMaker } from '../data_structure_util';
 
 /**
  * @signature - :: * -> {@link dataStructures.lazy_identity}
@@ -139,6 +139,9 @@ var lazy_identity = {
     get source() {
         return this._source;
     },
+    get extract() {
+        return this.source();
+    },
     /**
      * @signature () -> {@link dataStructures.lazy_identity}
      * @description Takes a function that is applied to the underlying value of the
@@ -270,17 +273,6 @@ var lazy_identity = {
      */
     contramap: function contramap(fn) {
         return next(() => (...args) => this.value(fn(...args)));
-    },
-    /**
-     * @signature () -> {@link dataStructures.lazy_identity}
-     * @description Creates and returns a new, 'empty' identity monad.
-     * @memberOf dataStructures.lazy_identity
-     * @instance
-     * @function empty
-     * @return {dataStructures.lazy_identity} Creates and returns a new, 'empty' identity monad.
-     */
-    empty: function _empty() {
-        return next(Object.create(nil));
     },
     /**
      * @signature () -> boolean

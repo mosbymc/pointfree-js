@@ -9,13 +9,25 @@ import { createSortObject } from './sort_util';
 
 var listProxyHandler = {
     get(target, prop) {
-        if (prop in target) return target[prop];
+        if (Reflect.has(target, prop)) return target[prop];
         if ('symbol' !== typeof prop) {
             let num = Number(prop);
             if (Number.isInteger(num) && -1 < num) return target.toArray()[num];
         }
         return undefined;
     }
+    //TODO: this won't work exactly as the setter must have a return value - which is likely not allowed.
+    //TODO: In addition, the return value must be assigned to a new variable or property, which would look
+    //TODO: something like this: var x = list[10] = 15.
+    //TODO: Which is obviously weird and syntactically incorrect. Most likely this cannot be supported.
+    /*,
+    set(target, prop, value) {
+        if (prop in target) target[prop] = value;
+        if ('symbol' !== typeof prop) {
+            let num = Number(prop);
+            if (Number.isInteger(num) && -1 < num) return this.of();//target.toArray();
+        }
+    }*/
 },
     bitMaskMaxListValue = 3;
 
@@ -63,6 +75,7 @@ var listProxyHandler = {
  * @property {function} count
  * @property {function} equals
  * @property {function} data
+ * @property {function} extract
  * @property {function} findIndex
  * @property {function} findLastIndex
  * @property {function} first
@@ -114,7 +127,9 @@ var list_core = {
     get value() {
         return this._value;
     },
-
+    get extract() {
+        return this._value;
+    },
     /**
      * @signature dataStructures.list_core -> dataStructures.list_core
      * @description Applies a function contained in another functor to the source
@@ -1082,6 +1097,23 @@ var list_core = {
             yield item;
         }
     }
+};
+
+list_core.set = function _set(idx, val) {
+    let len = this.count();
+    let normalizedIdx = 0 > idx ? len + idx : idx;
+    if (0 <= normalizedIdx) {
+        let arr = new Array(normalizedIdx > len ? normalizedIdx : len);
+        let data = this.toArray();
+        return List(arr.map((val, idx) => idx === normalizedIdx ? val : data[idx]));
+    }
+    return this;
+};
+
+list_core.get = function _get(idx) {
+    let len = this.count(),
+        normalizedIdx = 0 > idx ? len + idx : idx;
+    return this.toArray()[normalizedIdx];
 };
 
 /**

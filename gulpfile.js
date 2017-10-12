@@ -2,8 +2,7 @@
 //firebase
 var gulp = require('gulp'),
     _ = require('gulp-load-plugins')({ lazy: true }),
-    config = require('./gulp.config')(),
-    transpileDependencies = ['transpile-root'];
+    config = require('./gulp.config')();
 
 gulp.task('help', _.taskListing);
 gulp.task('default', ['help']);
@@ -23,15 +22,7 @@ gulp.task('strip-comments', function stipComments() {
         .pipe(gulp.dest('./tmpPlato'));
 });
 
-gulp.task('optimize', ['optimize-js'], function _optimize() {
-    log('Optimizing JavaScript!');
-});
-
-gulp.task('build', ['optimize'], function _build() {
-});
-
 gulp.task('optimize-js', ['clean-code'], function _optimize() {
-    log('Optimizing JavaScript');
     return gulp.src(config.gridJs)
         .pipe(_.plumber())
         .pipe(_.stripComments())
@@ -50,30 +41,3 @@ gulp.task('optimize-js', ['clean-code'], function _optimize() {
         }))
         .pipe(gulp.dest(config.src + 'scripts'));
 });
-
-gulp.task('transpile', transpileDependencies, function _transpile() {
-    log('Transpiling Dev code!');
-    return true;
-});
-
-gulp.task('transpile-root', function _transpileRoot() {
-    return gulp.src(config.devRootJs)
-        .pipe(_.babel())
-        .pipe(gulp.dest(config.srcRootJs));
-});
-
-gulp.task('transpile-testData', function _transpileTestData() {
-    return gulp.src('./test/testData.js')
-        .pipe(_.babel())
-        .pipe(_.rename('es5TestData.js'))
-        .pipe(gulp.dest('./test/'));
-});
-
-function log(msg) {
-    if ('object' === typeof msg) {
-        Object.keys(msg).forEach(function _printMsg(m) {
-            _.util.log(_.util.colors.blue(m));
-        });
-    }
-    else _.util.log(_.util.colors.blue(msg));
-}
