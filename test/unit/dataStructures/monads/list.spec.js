@@ -644,6 +644,15 @@ describe('List functor test', function _testListFunctor() {
                     .data.should.eql([5, 4, 3, 2, 1]);
             });
 
+            it('should set the value and return a new list', function _testSet() {
+                var list = List([1, 2, 3, 4, 5]);
+
+                list.set(3, 10).data.should.eql([1, 2, 3, 10, 5]);
+                list.set(6, 12).data.should.eql([1, 2, 3, 4, 5, undefined, 12]);
+                list.set(-3, 18).data.should.eql([1, 2, 18, 4, 5]);
+                list.set(-8, 2).data.should.eql(list.data);
+            });
+
             it('should skip the specified number of items', function _testSkip() {
                 List([1, 2, 3, 4, 5])
                     .skip(3)
@@ -791,6 +800,17 @@ describe('List functor test', function _testListFunctor() {
                 List([1, 2, 3, 4, 5])
                     .equals(List([1, 2, 3, 4, 5], (x, y) => x === y))
                     .should.be.true;
+            });
+
+            it('should return the value at the specified index', function _testGet() {
+                List([1, 2, 3, 4, 5])
+                    .get(3).should.eql(4);
+
+                List([1, 2, 3, 4, 5])
+                    .get(-3).should.eql(3);
+
+                expect(undefined).to.eql(List([1, 2, 3, 4, 5]).get(10));
+                expect(undefined).to.eql(List([1, 2, 3, 4, 5]).get(-10));
             });
 
             it('should return the index of the item', function _testFindIndex() {

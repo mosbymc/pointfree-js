@@ -650,6 +650,33 @@ function reverse(xs) {
 /**
  * @signature
  * @description d
+ * @param {dataStructures.list_core} xs - a
+ * @param {number} idx - b
+ * @param {*} val - c
+ * @return {generator} d
+ */
+function set(xs, idx, val) {
+    return function *_setIterator() {
+        let count = 0;
+        for (let item of xs) {
+            if (idx === count) yield val;
+            else yield item;
+            ++count;
+        }
+
+        if (count < idx) {
+            while (count <= idx) {
+                if (count !== idx) yield undefined;
+                else yield val;
+                ++count;
+            }
+        }
+    };
+}
+
+/**
+ * @signature
+ * @description d
  * @param {Array|generator|dataStructures.list_core} xs - a
  * @param {function} predicate - b
  * @return {generator} - c
@@ -761,4 +788,4 @@ function zip(xs, ys, selector) {
 
 export { all, any, binarySearch, chain, concat, concatAll, contains, copyWithin, count, distinct, equals, except, fill, filter,
         findIndex, findLastIndex, first, foldLeft, foldRight, groupBy, groupJoin, intersect, intersperse, join, last, map, ofType,
-        prepend, prependAll, reduceRight, repeat, reverse, skipWhile, slice, sortBy, takeWhile, unfold, union, zip };
+        prepend, prependAll, reduceRight, repeat, reverse, set, skipWhile, slice, sortBy, takeWhile, unfold, union, zip };

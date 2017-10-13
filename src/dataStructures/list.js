@@ -1,6 +1,6 @@
 import { all, any, binarySearch, chain, concat, concatAll, contains, copyWithin, count, distinct, equals, except, fill, filter,
         findIndex, findLastIndex, first, foldLeft, foldRight, groupBy, groupJoin, intersect, intersperse, join, last, map, ofType,
-        prepend, prependAll, reduceRight, repeat, reverse, skipWhile, slice, sortBy, takeWhile, unfold, union, zip } from './list_iterators';
+        prepend, prependAll, reduceRight, repeat, reverse, set, skipWhile, slice, sortBy, takeWhile, unfold, union, zip } from './list_iterators';
 import { sortDirection, generatorProto } from '../helpers';
 import { wrap, defaultPredicate, delegatesFrom, isArray, noop, invoke, delegatesTo, isString, both } from '../functionalHelpers';
 import { when, ifElse, identity, constant } from '../combinators';
@@ -16,18 +16,6 @@ var listProxyHandler = {
         }
         return undefined;
     }
-    //TODO: this won't work exactly as the setter must have a return value - which is likely not allowed.
-    //TODO: In addition, the return value must be assigned to a new variable or property, which would look
-    //TODO: something like this: var x = list[10] = 15.
-    //TODO: Which is obviously weird and syntactically incorrect. Most likely this cannot be supported.
-    /*,
-    set(target, prop, value) {
-        if (prop in target) target[prop] = value;
-        if ('symbol' !== typeof prop) {
-            let num = Number(prop);
-            if (Number.isInteger(num) && -1 < num) return this.of();//target.toArray();
-        }
-    }*/
 },
     bitMaskMaxListValue = 3;
 
@@ -1103,9 +1091,7 @@ list_core.set = function _set(idx, val) {
     let len = this.count();
     let normalizedIdx = 0 > idx ? len + idx : idx;
     if (0 <= normalizedIdx) {
-        let arr = new Array(normalizedIdx > len ? normalizedIdx : len);
-        let data = this.toArray();
-        return List(arr.map((val, idx) => idx === normalizedIdx ? val : data[idx]));
+        return this.of(this, _iteratorWrapper(set(this, normalizedIdx, val)));
     }
     return this;
 };
