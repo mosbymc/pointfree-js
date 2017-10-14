@@ -302,30 +302,6 @@ describe('Either functor tests', function _testEitherFunctor() {
             m8.equals(m9).should.be.false;
         });
 
-        it('should return a new constant functor regardless of data type', function _testEitherFactoryObjectCreation() {
-            var arr = [1, 2, 3],
-                obj = { a: 1, b: 2 },
-                e = Either(),
-                e1 = e.of(),
-                e2 = e.of(null),
-                e3 = e.of(arr),
-                e4 = e.of(obj);
-
-            right.isPrototypeOf(e1).should.be.true;
-            right.isPrototypeOf(e2).should.be.true;
-            right.isPrototypeOf(e3).should.be.true;
-            right.isPrototypeOf(e4).should.be.true;
-
-            e1.isLeft.should.be.false;
-            e1.isRight.should.be.true;
-            e2.isLeft.should.be.false;
-            e2.isRight.should.be.true;
-            e3.isLeft.should.not.be.true;
-            e3.isRight.should.be.true;
-            e4.isLeft.should.not.be.true;
-            e4.isRight.should.be.true;
-        });
-
         it('should have a functioning iterator', function _testEitherFunctorIterator() {
             var e1 = Either(10),
                 e2 = Either({ a: 1, b: 2 });

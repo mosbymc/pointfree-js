@@ -1,5 +1,4 @@
-import { monad_apply, chain, contramap, mjoin, equals, pointMaker, stringMaker,
-        valueOf, extendMaker } from './data_structure_util';
+import { monad_apply, chain, contramap, mjoin, equals, stringMaker, valueOf, extendMaker } from './data_structure_util';
 
 /**
  * @signature - :: * -> {@link dataStructures.identity}
@@ -66,6 +65,7 @@ Identity.empty = () => Identity();
 /**
  * @typedef {Object} identity
  * @property {function} value - returns the underlying value of the the monad
+ * @property {function} extract - returns the underlying value of the identity
  * @property {function} map - maps a single function over the underlying value of the monad
  * @property {function} chain - returns a new identity monad
  * @property {function} mjoin - returns a new identity monad
@@ -75,12 +75,7 @@ Identity.empty = () => Identity();
  * @property {function} fold - Applies a function to the identity's underlying value and returns the result
  * @property {function} sequence - returns a new identity monad
  * @property {function} traverse - returns a new identity monad
- * @property {function} empty - Creates a new, 'empty' identity monad
  * @property {function} isEmpty - Returns a boolean indicating if the identity monad is 'empty'
- * @property {function} get - returns the underlying value of the monad
- * @property {function} orElse - returns the underlying value of the monad
- * @property {function} getOrElse - returns the underlying value of the monad
- * @property {function} of - creates a new identity delegate with the value provided
  * @property {function} valueOf - returns the underlying value of the monad; used during concatenation and coercion
  * @property {function} toString - returns a string representation of the identity monad and its underlying value
  * @property {function} factory - a reference to the identity factory function
@@ -231,7 +226,7 @@ var identity = {
      * @return {Object} Returns a new identity monad that wraps the mapping function's returned monad type.
      */
     traverse: function _traverse(a, f) {
-        return f(this.value).map(this.of);
+        return f(this.value).map(this.factory.of);
     },
     /**
      * @signature (b -> a) -> dataStructures.Identity
@@ -271,21 +266,6 @@ var identity = {
      * function that was provided as an argument.
      */
     extend: extendMaker(Identity),
-    /**
-     * @signature * -> {@link dataStructures.identity}
-     * @description Factory function used to create a new object that delegates to
-     * the {@link dataStructures.identity} object. Any single value may be provided as an argument
-     * which will be used to set the underlying value of the new {@link dataStructures.identity}
-     * delegator. If no argument is provided, the underlying value will be 'undefined'.
-     * @memberOf dataStructures.identity
-     * @instance
-     * @function
-     * @param {*} item - The value that should be set as the underlying
-     * value of the {@link dataStructures.identity}.
-     * @return {dataStructures.identity} Returns a new {@link dataStructures.identity} delegator object
-     * via the {@link dataStructures.Identity#of} function.
-     */
-    of: pointMaker(Identity),
     /**
      * @signature * -> boolean
      * @description Determines if 'this' identity monad is equal to another monad. Equality

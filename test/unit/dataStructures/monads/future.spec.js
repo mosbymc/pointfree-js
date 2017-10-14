@@ -82,13 +82,9 @@ describe('Future functor test', function _testFutureFunctor() {
 
     describe('Test future', function _testFuture() {
         it('should create an empty future', function _testFutureDotEmpty() {
-            var f1 = Future.empty(),
-                f2 = f1.empty();
+            var f1 = Future.empty();
 
-            f1.value.should.eql(f2.value);
             f1.isEmpty().should.be.true;
-            f2.isEmpty().should.be.true;
-            f1.equals(f2).should.be.true;
         });
 
         it('should represent a future in string form', function _testFutureDotToString() {

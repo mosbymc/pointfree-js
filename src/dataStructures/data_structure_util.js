@@ -15,7 +15,7 @@ var map = m => fn => m.map(fn);
  * @return {*} Returns a data structure of the same type.
  */
 function contramap(fn) {
-    return this.of(compose(this.value, fn));
+    return this.factory.of(compose(this.value, fn));
 }
 
 function compose(f, g) {
@@ -216,7 +216,7 @@ function monad_apply(ma) {
  */
 function chain(fn) {
     var val = fn(this.value);
-    return Object.getPrototypeOf(this).isPrototypeOf(val) ? val : this.of(val);
+    return Object.getPrototypeOf(this).isPrototypeOf(val) ? val : this.factory.of(val);
 }
 
 /**
@@ -234,7 +234,7 @@ function chainRec(fn) {
     while (!state.done) {
         state = fn(next, done, state.value);
     }
-    return this.of(state.value);
+    return this.factory.of(state.value);
 }
 
 /**
@@ -326,7 +326,7 @@ function valueOf() {
 //==========================================================================================================//
 //==========================================================================================================//
 function justMap(fn) {
-    return this.of(fn(this.value));
+    return this.factory.of(fn(this.value));
 }
 
 function nothingMapMaker(factory) {
@@ -336,7 +336,7 @@ function nothingMapMaker(factory) {
 }
 
 function justBimap(f, g) {
-    return this.of(f(this.value));
+    return this.factory.of(f(this.value));
 }
 
 function nothingBimapMaker(factory) {
@@ -364,7 +364,7 @@ var sharedMaybeFns = {
  * @return {*} - b
  */
 function rightMap(fn) {
-    return this.of(fn(this.value));
+    return this.factory.of(fn(this.value));
 }
 
 /**
@@ -387,7 +387,7 @@ function leftMapMaker(factory) {
  * @return {*} - c
  */
 function rightBiMap(f, g) {
-    return this.of(f(this.value));
+    return this.factory.of(f(this.value));
 }
 
 /**

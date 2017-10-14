@@ -1,6 +1,6 @@
 import { identity } from '../combinators';
-import { monad_apply, chain, mjoin, disjunctionEqualMaker, maybeFactoryHelper, pointMaker, stringMaker,
-    get, emptyGet, orElse, emptyOrElse, getOrElse, emptyGetOrElse, valueOf, sharedMaybeFns } from './data_structure_util';
+import { monad_apply, chain, mjoin, disjunctionEqualMaker, maybeFactoryHelper, stringMaker,
+    get, valueOf, sharedMaybeFns } from './data_structure_util';
 
 /**
  * @signature
@@ -279,10 +279,7 @@ Nothing.is = n => nothing === n;
  * @property {function} value - returns the underlying value of the the monad
  * @property {function} map - maps a single function over the underlying value of the monad
  * @property {function} bimap
- * @property {function} get - returns the underlying value of the monad
- * @property {function} orElse - returns the underlying value of the monad
- * @property {function} getOrElse - returns the underlying value of the monad
- * @property {function} of - creates a new right delegate with the value provided
+ * @property {function} extract
  * @property {function} valueOf - returns the underlying value of the monad; used during concatenation and coercion
  * @property {function} toString - returns a string representation of the just monad and its underlying value
  * @property {function} factory - a reference to the just factory function
@@ -315,6 +312,9 @@ var just = {
      */
     get value() {
         return this._value;
+    },
+    get extract() {
+        return this.value;
     },
     /**
      * @signature () -> {@link dataStructures.just}
@@ -358,7 +358,7 @@ var just = {
         return this.traverse(identity, p);
     },
     traverse: function _traverse(a, f) {
-        return f(this.value).map(this.of);
+        return f(this.value).map(this.factory.of);
     },
     nothing: function _nothing() {
         return Nothing();
@@ -372,50 +372,6 @@ var just = {
      * @return {*} - Returns the underlying value of the current monad 'instance'.
      */
     get: get,
-    /**
-     * @signature * -> *
-     * @description Takes an optional parameter of any value as a default return value in
-     * cases where the current functor 'instance\'s' underlying value is not 'mappable'.
-     * Because the identity_functor does not support disjunctions, the parameter is entirely
-     * optional and will always be ignored. Whatever the actual underlying value is, it will
-     * always be returned.
-     * @memberOf dataStructures.just
-     * @instance
-     * @function
-     * @param {*} [x] - a
-     * @return {*} Returns the underlying value of the current monad 'instance'.
-     */
-    getOrElse: getOrElse,
-    /**
-     * @signature () -> *
-     * @description Takes an optional function parameter as a default to be invoked and
-     * returned in cases where the current functor 'instance\'s' underlying value is not
-     * 'mappable'. Because the identity_functor does not support disjunctions, the
-     * parameter is entirely optional and will always be ignored. Whatever the actual
-     * underlying value is, it will always be returned.
-     * @memberOf dataStructures.just
-     * @instance
-     * @function
-     * @param {function} [f] - An optional function argument which is invoked and the result
-     * returned in cases where the underlying value is not 'mappable'.
-     * @return {*} - b
-     */
-    orElse: orElse,
-    /**
-     * @signature * -> {@link dataStructures.just}
-     * @description Factory function used to create a new object that delegates to
-     * the {@link dataStructures.just} object. Any single value may be provided as an argument
-     * which will be used to set the underlying value of the new {@link dataStructures.just}
-     * delegator. If no argument is provided, the underlying value will be 'undefined'.
-     * @memberOf dataStructures.just
-     * @instance
-     * @function
-     * @param {*} item - The value that should be set as the underlying
-     * value of the {@link dataStructures.just}.
-     * @return {dataStructures.just} Returns a new {@link dataStructures.just} delegator object
-     * via the {@link dataStructures.Maybe#of} function.
-     */
-    of: pointMaker(Just),
     /**
      * @signature () -> *
      * @description Returns the underlying value of the current monad 'instance'. This
@@ -477,10 +433,7 @@ just.equals = disjunctionEqualMaker(just, 'isJust');
  * @property {function} value - returns the underlying value of the the monad
  * @property {function} map - maps a single function over the underlying value of the monad
  * @property {function} bimap
- * @property {function} get - returns the underlying value of the monad
- * @property {function} orElse - returns the underlying value of the monad
- * @property {function} getOrElse - returns the underlying value of the monad
- * @property {function} of - creates a new nothing delegate with the value provided
+ * @property {function} extract
  * @property {function} valueOf - returns the underlying value of the monad; used during concatenation and coercion
  * @property {function} toString - returns a string representation of the nothing monad and its underlying value
  * @property {function} factory - a reference to the nothing factory function
@@ -564,59 +517,6 @@ var nothing = {
         return a.of(Maybe.Nothing());
     },
     nothing: returnNothing,
-    /**
-     * @signature () -> *
-     * @description Returns the underlying value of the current monad 'instance'.
-     * @memberOf dataStructures.nothing
-     * @instance
-     * @function
-     * @return {*} - Returns the underlying value of the current monad 'instance'.
-     */
-    get: emptyGet,
-    /**
-     * @signature * -> *
-     * @description Takes an optional parameter of any value as a default return value in
-     * cases where the current monad 'instance\'s' underlying value is not 'mappable'.
-     * Because the left does not support disjunctions, the parameter is entirely
-     * optional and will always be ignored. Whatever the actual underlying value is, it will
-     * always be returned.
-     * @memberOf dataStructures.nothing
-     * @instance
-     * @function
-     * @param {*} [x] - a
-     * @return {*} Returns the underlying value of the current monad 'instance'.
-     */
-    getOrElse: emptyGetOrElse,
-    /**
-     * @signature () -> *
-     * @description Takes an optional function parameter as a default to be invoked and
-     * returned in cases where the current monad 'instance\'s' underlying value is not
-     * 'mappable'. Because the nothing monad does not support disjunctions, the
-     * parameter is entirely optional and will always be ignored. Whatever the actual
-     * underlying value is, it will always be returned.
-     * @memberOf dataStructures.nothing
-     * @instance
-     * @function
-     * @param {function} [f] - An optional function argument which is invoked and the result
-     * returned in cases where the underlying value is not 'mappable'.
-     * @return {*} - b
-     */
-    orElse: emptyOrElse,
-    /**
-     * @signature * -> {@link dataStructures.nothing}
-     * @description Factory function used to create a new object that delegates to
-     * the {@link dataStructures.nothing} object. Any single value may be provided as an argument
-     * which will be used to set the underlying value of the new {@link dataStructures.nothing}
-     * delegator. If no argument is provided, the underlying value will be 'undefined'.
-     * @memberOf dataStructures.nothing
-     * @instance
-     * @function
-     * @param {*} item - The value that should be set as the underlying
-     * value of the {@link dataStructures.nothing}.
-     * @return {dataStructures.nothing} Returns a new {@link dataStructures.nothing} delegator object
-     * via the {@link dataStructures.Maybe#of} function.
-     */
-    of: pointMaker(Just),
     /**
      * @signature * -> boolean
      * @description Determines if 'this' left functor is equal to another monad. Equality

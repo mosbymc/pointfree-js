@@ -4,6 +4,67 @@ import { all, any, except, intersect, union, map, chain, groupBy, sortBy, prepen
 import { list, ordered_list } from '../../../src/dataStructures/list';
 import { cacher, javaScriptTypes, sortDirection, typeNames } from '../../../src/helpers';
 import { testData } from '../../testData';
+import { generatorProto } from '../../../src/helpers';
+import { isString, isArray } from '../../../src/functionalHelpers';
+
+function createListDelegateInstance(source, iterator, sortObject, key) {
+    var bm = createBitMask(generatorProto.isPrototypeOf(iterator), isString(key), isArray(sortObject));
+    var proxiedList = 3 > bm ? Object.create(list) :
+        Object.create(
+            ordered_list, {
+                _value: { value: source, writable: false, configurable: false },
+                _appliedSorts: { value: sortObject, writable: false, configurable: false }
+            });
+
+    switch(bm) {
+        /**
+         * @description: case 1 = An iterator has been passed, but nothing else. Create a
+         * basic list type object instance and set the iterator as the version provided.
+         */
+        case 1:
+            proxiedList[Symbol.iterator] = iterator;
+            return proxiedList;
+        case 2:
+            /**
+             * @description: case 2 = A key was passed as the only argument. Create a list
+             * object and set the ._key field as the key string argument.
+             */
+            return Object.defineProperties(
+                proxiedList, {
+                    '_key': { value: key, writable: false, configurable: false },
+                    'key': { get: function _getKey() { return this._key; } }
+                });
+        /**
+         * @description: case 5 = Both an iterator and a sort object were passed in. The consumer
+         * invoked the sortBy/sortByDescending or thenBy/thenByDescending function properties. Create
+         * an ordered list type object instance, setting the iterator to the version provided (if any) and
+         * the _appliedSorts field as the sortObject param.
+         */
+        case 5:
+            proxiedList[Symbol.iterator] = iterator;
+            return proxiedList;
+        /**
+         * @description: default = Nothing beyond the 'source' param was passed to this
+         * function; results in a bitwise value of 00. Create a 'basic' list object type
+         * instance.
+         */
+        default:
+            return proxiedList;
+    }
+}
+
+/**
+ * @signature [...a] -> Number
+ * @description creates a bit mask value based on truthy/falsey arguments passed to the function
+ * @param {boolean} args - Zero or more arguments. All arguments are treated as booleans, so truthy,
+ * and falsey values will work.
+ * @return {number} Returns an integer that represents the bit mask value of the boolean arguments.
+ */
+function createBitMask(...args) {
+    return args.reduce(function _reduce(curr, next, idx) {
+        return curr |= next << idx;
+    }, args[0]);
+}
 
 describe('Test List Iterators', function _testListIterators() {
     describe('Test prepend...', function testAddFront() {

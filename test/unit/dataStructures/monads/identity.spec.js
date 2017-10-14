@@ -165,30 +165,6 @@ describe('Identity monad test', function _testIdentityMonad() {
             m4.equals(m5).should.be.false;
         });
 
-        it('should return a new identity functor regardless of data type', function _testIdentityFactoryObjectCreation() {
-            var arr = [1, 2, 3],
-                obj = { a: 1, b: 2 },
-                i = Identity();
-
-            var i1 = i.of(),
-                i2 = i.of(null),
-                i3 = i.of(1),
-                i4 = i.of(arr),
-                i5 = i.of(obj),
-                i6 = i.of(Symbol()),
-                i7 = i.of('testing constant'),
-                i8 = i.of(false);
-
-            expect(undefined).to.eql(i1.value);
-            expect(null).to.eql(i2.value);
-            expect(1).to.eql(i3.value);
-            expect(arr).to.eql(i4.value);
-            expect(obj).to.eql(i5.value);
-            expect('symbol').to.eql(typeof i6.value);
-            expect('testing constant').to.eql(i7.value);
-            expect(false).to.eql(i8.value);
-        });
-
         it('should map an identity functor to the other functor types', function _testIdentityFunctorMapTransform() {
             var i = Identity(1);
             var c = i.mapToConstant(),
@@ -226,6 +202,11 @@ describe('Identity monad test', function _testIdentityMonad() {
             Object.getPrototypeOf(left).should.eql(Object.getPrototypeOf(monads.Left()));
             Object.getPrototypeOf(m).should.eql(Object.getPrototypeOf(monads.Maybe(1)));
             Object.getPrototypeOf(r).should.eql(Object.getPrototypeOf(monads.Right()));
+        });
+
+        it('should extract the underlying value of an identity', function _testIdentityExtract() {
+            Identity(10).extract.should.eql(10);
+            Identity('10').extract.should.eql('10');
         });
 
         it('should represent the identity\'s \'type\' when \'Object.prototype.toString.call\' is invoked', function _testIdentityTypeString() {
@@ -368,7 +349,6 @@ describe('Identity monad test', function _testIdentityMonad() {
             i.reduce.should.eql(i['fantasy-land/reduce']);
             i.traverse.should.eql(i['fantasy-land/traverse']);
             i.equals.should.eql(i['fantasy-land/equals']);
-            i.of.should.eql(i['fantasy-land/of']);
         });
     });
 

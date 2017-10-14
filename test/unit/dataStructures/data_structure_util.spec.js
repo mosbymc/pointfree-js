@@ -38,6 +38,7 @@ var identity = {
     of: pointMaker(Identity),
     equals: equals,
     valueOf: valueOf,
+    factory: Identity,
     toString: stringMaker('Identity')
 };
 
@@ -77,6 +78,7 @@ var i = {
     of: pointMaker(I),
     equals: equals,
     valueOf: valueOf,
+    factory: I,
     toString: stringMaker('I')
 };
 

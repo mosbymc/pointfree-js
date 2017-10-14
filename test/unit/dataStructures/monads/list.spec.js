@@ -194,30 +194,6 @@ describe('List functor test', function _testListFunctor() {
             l.should.not.equal(d);
         });
 
-        it('should return a new List regardless of data type', function _testListFactoryObjectCreation() {
-            var arr = [1, 2, 3],
-                obj = { a: 1, b: 2 },
-                l = List();
-
-            var l1 = l.of(),
-                l2 = l.of(null),
-                l3 = l.of(1),
-                l4 = l.of(arr),
-                l5 = l.of(obj),
-                l6 = l.of(Symbol()),
-                l7 = l.of('testing constant'),
-                l8 = l.of(false);
-
-            expect(undefined).to.eql(l1.value);
-            expect(null).to.eql(l2.value);
-            expect(1).to.eql(l3.value);
-            expect(arr).to.eql(l4.value);
-            expect(obj).to.eql(l5.value);
-            expect('symbol').to.eql(typeof l6.value);
-            expect('testing constant').to.eql(l7.value);
-            expect(false).to.eql(l8.value);
-        });
-
         it('should transform a List to the other data structures', function _testListTransforms() {
             var l = List(1);
             var c = l.mapToConstant(),

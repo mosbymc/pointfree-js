@@ -1,6 +1,5 @@
 import { identity } from '../combinators';
-import { disjunctionEqualMaker, stringMaker, valueOf, monad_apply, chain, mjoin, pointMaker,
-    get, emptyGet, orElse, emptyOrElse, getOrElse, emptyGetOrElse, sharedEitherFns } from './data_structure_util';
+import { disjunctionEqualMaker, stringMaker, valueOf, monad_apply, chain, mjoin, sharedEitherFns } from './data_structure_util';
 
 /**
  * @signature
@@ -287,10 +286,7 @@ Right.of = x => Right(x);
  * @property {function} value - returns the underlying value of the the functor
  * @property {function} map - maps a single function over the underlying value of the functor
  * @property {function} bimap
- * @property {function} get - returns the underlying value of the functor
- * @property {function} orElse - returns the underlying value of the functor
- * @property {function} getOrElse - returns the underlying value of the functor
- * @property {function} of - creates a new right delegate with the value provided
+ * @property {function} extract
  * @property {function} valueOf - returns the underlying value of the functor; used during concatenation and coercion
  * @property {function} toString - returns a string representation of the identity functor and its underlying value
  * @property {function} factory - a reference to the right factory function
@@ -323,6 +319,9 @@ var right = {
      */
     get value() {
         return this._value;
+    },
+    get extract() {
+        return this.value;
     },
     /**
      * @signature () -> {@link dataStructures.right}
@@ -362,61 +361,8 @@ var right = {
         return this.traverse(identity, p);
     },
     traverse: function _traverse(a, f, g) {
-        return f(this.value).map(this.of);
+        return f(this.value).map(this.factory.of);
     },
-    /**
-     * @signature () -> *
-     * @description Returns the underlying value of the current functor 'instance'.
-     * @memberOf dataStructures.right
-     * @instance
-     * @function
-     * @return {*} - Returns the underlying value of the current functor 'instance'.
-     */
-    get: get,
-    /**
-     * @signature * -> *
-     * @description Takes an optional parameter of any value as a default return value in
-     * cases where the current functor 'instance\'s' underlying value is not 'mappable'.
-     * Because the identity_functor does not support disjunctions, the parameter is entirely
-     * optional and will always be ignored. Whatever the actual underlying value is, it will
-     * always be returned.
-     * @memberOf dataStructures.right
-     * @instance
-     * @function
-     * @param {*} [x] - a
-     * @return {*} Returns the underlying value of the current functor 'instance'.
-     */
-    getOrElse: getOrElse,
-    /**
-     * @signature () -> *
-     * @description Takes an optional function parameter as a default to be invoked and
-     * returned in cases where the current functor 'instance\'s' underlying value is not
-     * 'mappable'. Because the identity_functor does not support disjunctions, the
-     * parameter is entirely optional and will always be ignored. Whatever the actual
-     * underlying value is, it will always be returned.
-     * @memberOf dataStructures.right
-     * @instance
-     * @function
-     * @param {function} [f] - An optional function argument which is invoked and the result
-     * returned in cases where the underlying value is not 'mappable'.
-     * @return {*} - b
-     */
-    orElse: orElse,
-    /**
-     * @signature * -> {@link dataStructures.right}
-     * @description Factory function used to create a new object that delegates to
-     * the {@link dataStructures.right} object. Any single value may be provided as an argument
-     * which will be used to set the underlying value of the new {@link dataStructures.right}
-     * delegator. If no argument is provided, the underlying value will be 'undefined'.
-     * @memberOf dataStructures.right
-     * @instance
-     * @function
-     * @param {*} item - The value that should be set as the underlying
-     * value of the {@link dataStructures.right}.
-     * @return {dataStructures.right} Returns a new {@link dataStructures.right} delegator object
-     * via the {@link dataStructures.Either#of} function.
-     */
-    of: pointMaker(Right),
     /**
      * @signature () -> *
      * @description Returns the underlying value of the current functor 'instance'. This
@@ -515,6 +461,9 @@ var left = {
     get value() {
         return this._value;
     },
+    get extract() {
+        return this.value;
+    },
     /**
      * @signature () -> {@link dataStructures.left}
      * @description Takes a function that is applied to the underlying value of the
@@ -555,59 +504,6 @@ var left = {
     traverse: function _traverse(a, f) {
         return a.of(Left(this.value));
     },
-    /**
-     * @signature () -> *
-     * @description Returns the underlying value of the current functor 'instance'.
-     * @memberOf dataStructures.left
-     * @instance
-     * @function
-     * @return {*} - Returns the underlying value of the current functor 'instance'.
-     */
-    get: emptyGet,
-    /**
-     * @signature * -> *
-     * @description Takes an optional parameter of any value as a default return value in
-     * cases where the current functor 'instance\'s' underlying value is not 'mappable'.
-     * Because the left does not support disjunctions, the parameter is entirely
-     * optional and will always be ignored. Whatever the actual underlying value is, it will
-     * always be returned.
-     * @memberOf dataStructures.left
-     * @instance
-     * @function
-     * @param {*} [x] - a
-     * @return {*} Returns the underlying value of the current functor 'instance'.
-     */
-    getOrElse: emptyGetOrElse,
-    /**
-     * @signature () -> *
-     * @description Takes an optional function parameter as a default to be invoked and
-     * returned in cases where the current functor 'instance\'s' underlying value is not
-     * 'mappable'. Because the identity_functor does not support disjunctions, the
-     * parameter is entirely optional and will always be ignored. Whatever the actual
-     * underlying value is, it will always be returned.
-     * @memberOf dataStructures.left
-     * @instance
-     * @function
-     * @param {function} [f] - An optional function argument which is invoked and the result
-     * returned in cases where the underlying value is not 'mappable'.
-     * @return {*} - b
-     */
-    orElse: emptyOrElse,
-    /**
-     * @signature * -> {@link dataStructures.left}
-     * @description Factory function used to create a new object that delegates to
-     * the {@link dataStructures.left} object. Any single value may be provided as an argument
-     * which will be used to set the underlying value of the new {@link dataStructures.left}
-     * delegator. If no argument is provided, the underlying value will be 'undefined'.
-     * @memberOf dataStructures.left
-     * @instance
-     * @function
-     * @param {*} item - The value that should be set as the underlying
-     * value of the {@link dataStructures.left}.
-     * @return {dataStructures.left} Returns a new {@link dataStructures.left} delegator object
-     * via the {@link dataStructures.Either#of} function.
-     */
-    of: pointMaker(Right),
     /**
      * @signature () -> *
      * @description Returns the underlying value of the current functor 'instance'. This
