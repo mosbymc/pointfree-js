@@ -288,6 +288,19 @@ describe('Maybe functor tests', function _testMaybeFunctor() {
             expect(m2.value).to.eql(d2.value);
         });
 
+        it('should return a new maybe instance with the bi-mapped value', function _testMaybeBiMap() {
+            var f1 = x => x * x,
+                f2 = x => x;
+
+            var m1 = Maybe(1),
+                m2 = Maybe(),
+                d1 = m1.bimap(f1, f2),
+                d2 = m2.bimap(f1, f2);
+
+            d1.value.should.eql(1);
+            expect(null).to.eql(d2.value);
+        });
+
         it('should extract the underlying value of a just', function _testJustExtract() {
             Just(10).extract.should.eql(10);
             Just('10').extract.should.eql('10');

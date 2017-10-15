@@ -1,6 +1,5 @@
 import { identity } from '../combinators';
-import { monad_apply, chain, mjoin, disjunctionEqualMaker, maybeFactoryHelper, stringMaker,
-    get, valueOf, sharedMaybeFns } from './data_structure_util';
+import { monad_apply, chain, mjoin, disjunctionEqualMaker, maybeFactoryHelper, stringMaker, valueOf, sharedMaybeFns } from './data_structure_util';
 
 /**
  * @signature
@@ -363,15 +362,6 @@ var just = {
     nothing: function _nothing() {
         return Nothing();
     },
-    /**
-     * @signature () -> *
-     * @description Returns the underlying value of the current monad 'instance'.
-     * @memberOf dataStructures.just
-     * @instance
-     * @function
-     * @return {*} - Returns the underlying value of the current monad 'instance'.
-     */
-    get: get,
     /**
      * @signature () -> *
      * @description Returns the underlying value of the current monad 'instance'. This

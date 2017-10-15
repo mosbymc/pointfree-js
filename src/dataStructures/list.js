@@ -1054,10 +1054,6 @@ var list_core = {
         return this.foldl((ys, x) => g(x).map(x => y => y.concat([x])).apply(ys), f(List.empty));
     },
 
-    of: function _of(xs, iterator, sortObj, key) {
-        return createListDelegateInstance(xs, iterator, sortObj, key);
-    },
-
     /**
      * @description Base iterator to which all queryable_core delegator objects
      * delegate to for iteration if for some reason an iterator wasn't
@@ -1669,4 +1665,4 @@ list_core.reduce = list_core.foldl;
  */
 list_core.bimap = list_core.map;
 
-export { List, list_core, list, ordered_list };
+export { List, list_core, list, ordered_list, createListDelegateInstance };

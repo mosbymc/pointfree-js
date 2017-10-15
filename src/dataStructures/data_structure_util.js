@@ -120,24 +120,6 @@ function _toPrimitive(hint) {
 
 /**
  * @signature
- * @description d
- * @return {*} - a
- */
-function get() {
-    return this.value;
-}
-
-/**
- * @signature
- * @description d
- * @return {string} - b
- */
-function emptyGet() {
-    throw new Error('Cannot extract a null value.');
-}
-
-/**
- * @signature
  * @description A factory function that takes a monad factory of any type
  * and returns a function that acts as an extend for that monad.
  * @param {function} typeFactory - A reference to a specific monad's factory function.
@@ -147,55 +129,6 @@ function extendMaker(typeFactory) {
     return function _extend(fn) {
         return typeFactory(fn(this));
     };
-}
-
-/**
- * @signature extract :: () -> *
- * @description Returns the underlying value of the data structure
- * @return {*} Returns the underlying value of the data structure
- */
-function extract() {
-    return this.value;
-}
-
-/**
- * @signature
- * @description d
- * @param {function} f - a
- * @return {*} - b
- */
-function orElse(f) {
-    return this.value;
-}
-
-/**
- * @signature
- * @description d
- * @param {function} f - a
- * @return {*} - b
- */
-function emptyOrElse(f) {
-    return f();
-}
-
-/**
- * @signature
- * @description d
- * @param {*} x - a
- * @return {*} - b
- */
-function getOrElse(x) {
-    return this.value;
-}
-
-/**
- * @signature
- * @description d
- * @param {*} x - a
- * @return {*} - b
- */
-function emptyGetOrElse(x) {
-    return x;
 }
 
 /**
@@ -290,14 +223,6 @@ function mjoin() {
 /**
  * @signature
  * @description d
- * @param {Object} type - a
- * @return {function} - b
- */
-var pointMaker = type => val => type.of(val);
-
-/**
- * @signature
- * @description d
  * @param {string} factory - a
  * @return {function} - b
  */
@@ -339,17 +264,10 @@ function justBimap(f, g) {
     return this.factory.of(f(this.value));
 }
 
-function nothingBimapMaker(factory) {
-    return function nothingBimap(f, g) {
-        return factory(g(this.value));
-    };
-}
-
 var sharedMaybeFns = {
     justMap,
     nothingMapMaker,
-    justBimap,
-    nothingBimapMaker
+    justBimap
 };
 
 //==========================================================================================================//
@@ -475,5 +393,5 @@ var fl = {
 };
 
 export { monad_apply, applyTransforms, chain, contramap, monadIterator, disjunctionEqualMaker, equals, lifter, maybeFactoryHelper,
-        mjoin, pointMaker, stringMaker, valueOf, get, emptyGet, orElse, emptyOrElse, getOrElse, emptyGetOrElse, sharedMaybeFns,
-        sharedEitherFns, applyFantasyLandSynonyms, applyAliases, chainRec, extendMaker, extract, setIteratorAndLift };
+        mjoin, stringMaker, valueOf, sharedMaybeFns, sharedEitherFns, applyFantasyLandSynonyms, applyAliases, chainRec, extendMaker,
+        setIteratorAndLift };

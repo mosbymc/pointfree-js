@@ -1,6 +1,5 @@
 import { monad_apply, applyTransforms, chain, monadIterator, disjunctionEqualMaker, equals, lifter, maybeFactoryHelper,
-    mjoin, pointMaker, stringMaker, valueOf, get, emptyGet, orElse, emptyOrElse, getOrElse, emptyGetOrElse, sharedMaybeFns,
-    sharedEitherFns, applyFantasyLandSynonyms, chainRec } from '../../../src/dataStructures/data_structure_util';
+    mjoin, stringMaker, valueOf, sharedMaybeFns, sharedEitherFns, applyFantasyLandSynonyms, chainRec } from '../../../src/dataStructures/data_structure_util';
 
 function Identity(val) {
     return Object.create(identity, {
@@ -20,8 +19,7 @@ var identity = {
         return this._value;
     },
     map: function _map(fn) {
-        console.log(this.value);
-        return this.of(fn(this.value));
+        return this.factory.of(fn(this.value));
     },
     chain: chain,
     chainRec: chainRec,
@@ -32,10 +30,6 @@ var identity = {
     fold: function _fold(fn, acc) {
         return fn(acc, this.value);
     },
-    get: get,
-    orElse: orElse,
-    getOrElse: getOrElse,
-    of: pointMaker(Identity),
     equals: equals,
     valueOf: valueOf,
     factory: Identity,
@@ -60,8 +54,7 @@ var i = {
         return this._value;
     },
     map: function _map(fn) {
-        console.log(this.value);
-        return this.of(fn(this.value));
+        return this.factory.of(fn(this.value));
     },
     chain: chain,
     chainRec: chainRec,
@@ -72,10 +65,6 @@ var i = {
     fold: function _fold(fn, acc) {
         return fn(acc, this.value);
     },
-    get: get,
-    orElse: orElse,
-    getOrElse: getOrElse,
-    of: pointMaker(I),
     equals: equals,
     valueOf: valueOf,
     factory: I,
@@ -147,6 +136,43 @@ describe('Test data structure utils', function _testDataStructureUtils() {
         });
     });
 
+    describe('Test mjoin', function _testMjoin() {
+        it('should flatten a data structure by one level', function _testMjoinWithNestedDataStructures() {
+            function _identityReturningFunction(num) {
+                return Identity(num * num);
+            }
+
+            var i = Identity(2),
+                res = i.map(_identityReturningFunction).mjoin();
+
+            identity.should.eql(Object.getPrototypeOf(res));
+            res.toString().should.eql('Identity(4)');
+        });
+
+        it('should not flatten a data structure by more than one level', function _testMjoinWithMultipleLevelsOfNesting() {
+            function _multiLevel(x) {
+                return Identity(Identity(x * 3));
+            }
+
+            var i = Identity(1),
+                res = i.map(_multiLevel).mjoin();
+
+            res.toString().should.eql('Identity(Identity(3))');
+        });
+
+        it('should not attempt to flatten a data structure when it is already flat', function _testMjoinWithFlatIdentity() {
+            function _flat(x) { return x * x; }
+
+            var i = Identity(5),
+                res = i.map(_flat).mjoin();
+
+            res.should.be.an('object');
+            identity.should.eql(Object.getPrototypeOf(res));
+            res.value.should.eql(25);
+            res.toString().should.eql('Identity(25)');
+        });
+    });
+
     describe('Test lift', function _testList() {
         it('should lift a non-monad returning function into a monad returning function', function _testLift() {
             var lifted = (x, y) => x + y;
@@ -157,60 +183,6 @@ describe('Test data structure utils', function _testDataStructureUtils() {
             res.should.be.an('object');
             identity.should.eql(Object.getPrototypeOf(res));
             res.value.should.eql(25);
-        });
-    });
-
-    describe('Test get', function _testGet() {
-        it('should return the underlying value of a monad', function _testGet() {
-            Identity(1).get().should.eql(1);
-        });
-    });
-
-    describe('Test empty get', function _testEmptyGet() {
-        it('should throw an exception', function _testEmptyGet(done) {
-            try {
-                emptyGet();
-            }
-            catch (ex) {
-                done();
-            }
-        });
-    });
-
-    describe('Test orElse', function _testOrElse() {
-        it('should return the underlying value', function _testOrElse() {
-            var i = Identity(10),
-                res = i.orElse(x => x * x);
-
-            res.should.be.a('number');
-            res.should.eql(10);
-        });
-    });
-
-    describe('Test emptyOrElse', function _testEmptyOrElse() {
-        it('should execute the default function', function _testEmptyOrElse() {
-            function _x() { return 15; }
-
-            var res = emptyOrElse(_x);
-
-            res.should.be.a('number');
-            res.should.eql(15);
-        });
-    });
-
-    describe('Test getOrElse', function _testGetOrElse() {
-        it('should return the underlying value', function _testGetOrElse() {
-            var i = Identity(10),
-                res = i.getOrElse(1);
-
-            res.should.be.a('number');
-            res.should.eql(10);
-        });
-    });
-
-    describe('Test emptyGetOrElse', function _testEmptyGetOrElse() {
-        it('should return the default value', function _testEmptyGetOrElse() {
-            emptyGetOrElse(10).should.eql(10);
         });
     });
 

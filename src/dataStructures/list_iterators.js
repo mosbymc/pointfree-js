@@ -147,7 +147,7 @@ function concatAll(xs, yss) {
  * @description d
  * @param {Array|generator|dataStructures.list_core} xs - a
  * @param {*} val - b
- * @param {function} comparer - c
+ * @param {function} [comparer] - c
  * @return {*} - d
  */
 function contains(xs, val, comparer) {
