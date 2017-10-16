@@ -105,13 +105,14 @@ function _toPrimitive(hint) {
     if (Array.isArray(this.value) && 5 === this.value.length) {
         console.log(this.value);
         console.log(hint);
-        console.log(+this.value);
+        console.log(typeof this.value);
+        //console.log(+this.value);
     }
     //if the underlying is a function, an object, or we didn't receive a hint, let JS determine how
     //to turn the underlying value into a primitive if it is not already...
     if ('object' !== typeof this.value && 'function' !== typeof this.value && null != hint) {
         //..if the hint is a number or default, coerce the underlying to a number and return...
-        if ('number' === hint || 'default' === hint) return +this.value;
+        if ('number' === hint || 'number' === typeof this.value) return +this.value;
         //...else the hint was 'string', so coerce to a string a return
         return '' + this.value;
     }
@@ -177,7 +178,7 @@ function chainRec(fn) {
  * @param {string} prop - b
  * @return {function} - c
  */
-function disjunctionEqualMaker(type, prop) {
+function disjunctionEqualMaker(prop) {
     return function _disjunctionEquals(a) {
         return this.value && this.value.equals === _disjunctionEquals ? this.value.equals(a) :
             a.value && a.value.equals === _disjunctionEquals ? a.value.equals(this) : Object.getPrototypeOf(this).isPrototypeOf(a) && a[prop] && this.value === a.value;
@@ -228,9 +229,6 @@ function mjoin() {
  */
 function stringMaker(factory) {
     return function _toString() {
-        //String(this.value)
-        //this.value.toString()
-        //null == this.value ? this.value : this.value.toString()
         return `${factory}(${null == this.value ? this.value : this.value.toString()})`;
     };
 }

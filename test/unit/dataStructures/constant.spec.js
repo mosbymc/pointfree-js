@@ -1,6 +1,6 @@
-import * as monads from '../../../../src/dataStructures/dataStructures';
-import { constant } from '../../../../src/dataStructures/constant';
-import { identity } from '../../../../src/combinators';
+import * as monads from '../../../src/dataStructures/dataStructures';
+import { constant } from '../../../src/dataStructures/constant';
+import { identity } from '../../../src/combinators';
 
 var Constant = monads.Constant;
 

@@ -1,5 +1,5 @@
-import * as monads from '../../../../src/dataStructures/dataStructures';
-import { future } from '../../../../src/dataStructures/future';
+import * as monads from '../../../src/dataStructures/dataStructures';
+import { future } from '../../../src/dataStructures/future';
 
 var Future = monads.Future;
 

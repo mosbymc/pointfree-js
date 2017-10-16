@@ -1671,6 +1671,13 @@ describe('Test List Iterators', function _testListIterators() {
             ofTypeRes.should.have.lengthOf(1);
             ofTypeRes[0].should.eql(12345);
         });
+
+        it('should return all data that is an array', function _testTypeOfAgainstArrays() {
+            var ofTypeIterable = ofType([[], 1, 2, 3, [], {}, 4, {}, []], []),
+                ofTypeRes = Array.from(ofTypeIterable());
+
+            ofTypeRes.should.have.lengthOf(3);
+        });
     });
 
     describe('Test where...', function testWhere() {

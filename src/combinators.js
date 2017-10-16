@@ -104,7 +104,6 @@ var n = function _n(x, y, z) {
  * return the item passed to the constant function as an argument.
  */
 function constant(item) {
-
     return function _constant() {
         return item;
     };

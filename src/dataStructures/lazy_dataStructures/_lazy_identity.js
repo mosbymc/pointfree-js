@@ -21,7 +21,7 @@ import { equals, stringMaker, valueOf, extendMaker } from '../data_structure_uti
  * {@link dataStructures.lazy_identity}.
  */
 function LazyIdentity(val) {
-    let fn = when(not(strictEquals(javaScriptTypes.Function, type(val)), constant(val), val));
+    let fn = constant(val);
     return Object.create(lazy_identity, {
         _value: {
             value: fn,
@@ -72,6 +72,12 @@ LazyIdentity.is = f => lazy_identity.isPrototypeOf(f);
  * @return {dataStructures.lazy_identity} - Returns a new identity monad.
  */
 LazyIdentity.empty = () => LazyIdentity(Object.create(nil));
+
+LazyIdentity.lift = function lift(fn) {
+    return function _args(...args) {
+        return LazyIdentity.of(fn(...args));
+    };
+};
 
 var next = fn => Object.create(lazy_identity, {
     _value: {
@@ -134,7 +140,7 @@ var lazy_identity = {
      * @return {*} Returns the underlying value of the delegator. May be any value.
      */
     get value() {
-        return this.source();
+        return this._source();
     },
     get source() {
         return this._source;
@@ -254,7 +260,7 @@ var lazy_identity = {
      * @return {Object} Returns a new identity monad that wraps the mapping function's returned monad type.
      */
     traverse: function _traverse(a, f) {
-        return f(this.value).map(this.of);
+        return f(this.value).map(this.factory.of);
     },
     /**
      * @signature (b -> a) -> lazy_identity
@@ -282,9 +288,7 @@ var lazy_identity = {
      * @function isEmpty
      * @return {boolean} Returns a boolean indicating if the monad is 'empty'
      */
-    isEmpty: function _getIsEmpty() {
-        return nil.isPrototypeOf(this.value);
-    },
+    isEmpty: false,
     /**
      * @signature (identity<A> -> B) -> identity<B>
      * @description Takes a function that operates on the current identity monad and returns
@@ -294,24 +298,20 @@ var lazy_identity = {
      * @return {dataStructures.LazyIdentity<T>} Returns a new identity monad that wraps the return value of the
      * function that was provided as an argument.
      */
-    extend: extendMaker(Identity),
-    /**
-     * @signature * -> {@link dataStructures.lazy_identity}
-     * @description Factory function used to create a new object that delegates to
-     * the {@link dataStructures.lazy_identity} object. Any single value may be provided as an argument
-     * which will be used to set the underlying value of the new {@link dataStructures.lazy_identity}
-     * delegator. If no argument is provided, the underlying value will be 'undefined'.
-     * @memberOf dataStructures.lazy_identity
-     * @instance
-     * @function
-     * @param {*} fn - The value that should be set as the underlying
-     * value of the {@link dataStructures.lazy_identity}.
-     * @return {dataStructures.lazy_identity} Returns a new {@link dataStructures.lazy_identity} delegator object
-     * via the {@link dataStructures.LazyIdentity#of} function.
-     */
-    of: function _of(fn) {
-        return LazyIdentity.of(fn);
-    },
+    extend: extendMaker(LazyIdentity),
+     /**
+      * @signature * -> boolean
+      * @description Determines if 'this' identity object is equal to another data structure. Equality
+      * is defined as:
+      * 1) The other data structure shares the same delegate object as 'this' data structure
+      * 2) Both underlying values are strictly equal to each other
+      * @memberOf dataStructures.lazy_identity
+      * @instance
+      * @function
+      * @param {Object} ma - The other monad to check for equality with 'this' monad.
+      * @return {boolean} - Returns a boolean indicating equality
+      */
+     equals: equals,
     /**
      * @signature () -> *
      * @description Returns the underlying value of the current monad 'instance'. This
@@ -355,20 +355,6 @@ var lazy_identity = {
 };
 
 /**
- * @signature * -> boolean
- * @description Determines if 'this' identity object is equal to another data structure. Equality
- * is defined as:
- * 1) The other data structure shares the same delegate object as 'this' data structure
- * 2) Both underlying values are strictly equal to each other
- * @memberOf dataStructures.lazy_identity
- * @instance
- * @function
- * @param {Object} ma - The other monad to check for equality with 'this' monad.
- * @return {boolean} - Returns a boolean indicating equality
- */
-lazy_identity.equals = equals(lazy_identity);
-
-/**
  * @signature (* -> *) -> (* -> *) -> lazy_identity<T>
  * @description Since the constant monad does not represent a disjunction, the Identity's
  * bimap function property behaves just as its map function property. It is merely here as a
@@ -398,5 +384,7 @@ lazy_identity.bimap = lazy_identity.map;
  * @return {*} Returns the return value of the mapping function provided as an argument.
  */
 lazy_identity.reduce = lazy_identity.fold;
+
+lazy_identity.constructor = lazy_identity.factory;
 
 export { LazyIdentity, lazy_identity };

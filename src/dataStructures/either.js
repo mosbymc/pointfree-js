@@ -364,6 +364,19 @@ var right = {
         return f(this.value).map(this.factory.of);
     },
     /**
+     * @signature * -> boolean
+     * @description Determines if 'this' right functor is equal to another functor. Equality
+     * is defined as:
+     * 1) The other functor shares the same delegate object as 'this' identity functor
+     * 2) Both underlying values are strictly equal to each other
+     * @memberOf dataStructures.right
+     * @instance
+     * @function
+     * @param {Object} ma - The other functor to check for equality with 'this' functor.
+     * @return {boolean} - Returns a boolean indicating equality
+     */
+    equals: disjunctionEqualMaker('isRight'),
+    /**
      * @signature () -> *
      * @description Returns the underlying value of the current functor 'instance'. This
      * function property is not meant for explicit use. Rather, the JavaScript engine uses
@@ -404,20 +417,6 @@ var right = {
      */
     factory: Either
 };
-
-/**
- * @signature * -> boolean
- * @description Determines if 'this' right functor is equal to another functor. Equality
- * is defined as:
- * 1) The other functor shares the same delegate object as 'this' identity functor
- * 2) Both underlying values are strictly equal to each other
- * @memberOf dataStructures.right
- * @instance
- * @function
- * @param {Object} ma - The other functor to check for equality with 'this' functor.
- * @return {boolean} - Returns a boolean indicating equality
- */
-right.equals = disjunctionEqualMaker(right, 'isRight');
 
 /**
  * @typedef {Object} left
@@ -505,6 +504,19 @@ var left = {
         return a.of(Left(this.value));
     },
     /**
+     * @signature * -> boolean
+     * @description Determines if 'this' left functor is equal to another functor. Equality
+     * is defined as:
+     * 1) The other functor shares the same delegate object as 'this' identity functor
+     * 2) Both underlying values are strictly equal to each other
+     * @memberOf dataStructures.left
+     * @instance
+     * @function
+     * @param {Object} ma - The other functor to check for equality with 'this' functor.
+     * @return {boolean} - Returns a boolean indicating equality
+     */
+    equals: disjunctionEqualMaker('isLeft'),
+    /**
      * @signature () -> *
      * @description Returns the underlying value of the current functor 'instance'. This
      * function property is not meant for explicit use. Rather, the JavaScript engine uses
@@ -545,20 +557,6 @@ var left = {
      */
     factory: Either
 };
-
-/**
- * @signature * -> boolean
- * @description Determines if 'this' left functor is equal to another functor. Equality
- * is defined as:
- * 1) The other functor shares the same delegate object as 'this' identity functor
- * 2) Both underlying values are strictly equal to each other
- * @memberOf dataStructures.left
- * @instance
- * @function
- * @param {Object} ma - The other functor to check for equality with 'this' functor.
- * @return {boolean} - Returns a boolean indicating equality
- */
-left.equals = disjunctionEqualMaker(left, 'isLeft');
 
 right.chain = chain;
 right.mjoin = mjoin;

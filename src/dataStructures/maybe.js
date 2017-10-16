@@ -363,6 +363,19 @@ var just = {
         return Nothing();
     },
     /**
+     * @signature * -> boolean
+     * @description Determines if 'this' just monad is equal to another monad. Equality
+     * is defined as:
+     * 1) The other functor shares the same delegate object as 'this' just monad
+     * 2) Both underlying values are strictly equal to each other
+     * @memberOf dataStructures.just
+     * @instance
+     * @function
+     * @param {Object} ma - The other monad to check for equality with 'this' monad.
+     * @return {boolean} - Returns a boolean indicating equality
+     */
+    equals: disjunctionEqualMaker('isJust'),
+    /**
      * @signature () -> *
      * @description Returns the underlying value of the current monad 'instance'. This
      * function property is not meant for explicit use. Rather, the JavaScript engine uses
@@ -403,20 +416,6 @@ var just = {
      */
     factory: Maybe
 };
-
-/**
- * @signature * -> boolean
- * @description Determines if 'this' just monad is equal to another monad. Equality
- * is defined as:
- * 1) The other functor shares the same delegate object as 'this' just monad
- * 2) Both underlying values are strictly equal to each other
- * @memberOf dataStructures.just
- * @instance
- * @function
- * @param {Object} ma - The other monad to check for equality with 'this' monad.
- * @return {boolean} - Returns a boolean indicating equality
- */
-just.equals = disjunctionEqualMaker(just, 'isJust');
 
 /**
  * @typedef {Object} nothing

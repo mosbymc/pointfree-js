@@ -204,5 +204,14 @@ describe('Test combinators', function _testCombinators() {
 
             waiting.rightApply().should.eql(-120);
         });
+
+        it('should return the arguments provided to the function', function _testApplyWhenReadyArgs() {
+            var test = (...args) => args.reduce((acc, x) => acc - x, 0),
+                waiting = applyWhenReady(test);
+
+            waiting = waiting(1, 2, 3, 4, 5);
+            waiting = waiting(6, 7, 8, 9, 10);
+            waiting.args().should.eql([1, 2, 3, 4, 5, 6, 7, 8, 9, 10]);
+        });
     });
 });

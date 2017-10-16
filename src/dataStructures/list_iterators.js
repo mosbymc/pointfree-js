@@ -16,16 +16,11 @@ var asArray = when(not(isArray), Array.from);
 var arrayFromGenerator = val => Array.from(invoke(val));
 var toArray = ifElse(delegatesFrom(generatorProto), arrayFromGenerator, asArray);
 
-/**
- * @description d
- * @param {Array|dataStructures.list|dataStructures.ordered_list|generator} iterable - Any iterable item
- * @return {Array|dataStructures.list|dataStructures.ordered_list|generator} Returns an iterator
- */
-var getIterator = iterable => delegatesFrom(generatorProto, iterable) ? invoke(iterable) : iterable;
+//var getIterator = iterable => delegatesFrom(generatorProto, iterable) ? invoke(iterable) : iterable;
 
-function *_iterate(iterable, fn) {
+/*function *_iterate(iterable, fn) {
     for (let item of getIterator(iterable)) yield fn(item);
-}
+}*/
 
 /**
  * @signature
@@ -539,7 +534,7 @@ function map(xs, fn) {
  * @signature
  * @description d
  * @param {Array|generator|dataStructures.list_core} xs - a
- * @param {string} dataType - b
+ * @param {string|Object|function|null|Array} dataType - b
  * @return {generator} - c
  */
 function ofType(xs, dataType) {
@@ -577,10 +572,8 @@ function ofType(xs, dataType) {
                     }
                 }
             }
-            else {
-                for (let x of xs) {
-                    yield x;
-                }
+            else if (isArray(dataType)) {
+                for (var arr of xs) if (isArray(arr)) yield arr;
             }
         }
     };

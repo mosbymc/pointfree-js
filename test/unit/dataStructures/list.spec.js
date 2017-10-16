@@ -1,6 +1,6 @@
-import * as monads from '../../../../src/dataStructures/dataStructures';
-import { list, ordered_list } from '../../../../src/dataStructures/list';
-import { testData } from '../../../testData';
+import * as monads from '../../../src/dataStructures/dataStructures';
+import { list, ordered_list } from '../../../src/dataStructures/list';
+import { testData } from '../../testData';
 
 var List = monads.List;
 
@@ -918,6 +918,10 @@ describe('List functor test', function _testListFunctor() {
                 List([1, 2, 3, 4, 5])
                     .reduceRight((acc, x) => acc / x)
                     .should.eql(0.20833333333333334);
+
+                List([1, 2, 3, 4, 5])
+                    .reduceRight((acc, x) => acc / x, 2)
+                    .should.eql(0.016666666666666666);
             });
 
             it('should return the underlying data as an array', function _testToArray() {

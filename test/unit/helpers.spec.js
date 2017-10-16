@@ -1,4 +1,4 @@
-import { cacher, deepClone, deepCopy } from '../../src/helpers';
+import { cacher, deepClone, deepCopy, memoizer } from '../../src/helpers';
 import { testData } from '../testData';
 
 function checkClonedDataProps(orig, clone) {
@@ -39,6 +39,7 @@ describe('test helpers', function _testHelpers() {
                 mem1(item).should.not.be.true;
                 mem2(item).should.not.be.true;
                 mem1(item).should.be.true;
+                mem2.contains(item).should.be.true;
             });
 
             [1, 1, 2, 2, 3, 3, 4, 4, 5, 5].forEach(function findUniques(item, idx) {
@@ -168,6 +169,36 @@ describe('test helpers', function _testHelpers() {
 
             Object.keys(obj).every(key => key in clonedObj).should.be.true;
             Object.keys(clonedObj).every(key => key in obj).should.be.true;
+        });
+    });
+
+    describe('Test memoizer', function _testMemoizer() {
+        it('should memoize', function _memoize() {
+            var keyMaker = item => item.FirstName,
+                spyFn = sinon.spy(x => x),
+                m = memoizer(spyFn, keyMaker),
+                callCount = 0;
+
+            var comparer = (a, b) => a === b,
+                c = cacher(comparer);
+
+            testData.dataSource.data.forEach(function _iterateDate(item) {
+                m(item);
+                if (!c(item.FirstName)) {
+                    spyFn.callCount.should.eql(++callCount);
+                }
+                else spyFn.callCount.should.eql(callCount);
+            });
+        });
+
+        it('should memoize without a key maker function', function _memoize() {
+            var spyFn = sinon.spy(x => x),
+                m = memoizer(spyFn);
+
+            testData.dataSource.data.forEach(function _iterateDate(item) {
+                m(item);
+                spyFn.callCount.should.eql(1);
+            });
         });
     });
 });
