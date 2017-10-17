@@ -1,8 +1,8 @@
 import { all, any, except, intersect, union, map, chain, groupBy, sortBy, prepend, prependAll, concat, concatAll, groupJoin, join, zip, filter, intersperse,
         contains, first, last, count, foldLeft, reduceRight, distinct, ofType, binarySearch, equals, takeWhile, skipWhile, reverse,
         copyWithin, fill, findIndex, findLastIndex, repeat, foldRight, unfold } from '../../../src/dataStructures/list_iterators';
-import { list, ordered_list } from '../../../src/dataStructures/list';
-import { cacher, javaScriptTypes, sortDirection, typeNames } from '../../../src/helpers';
+import { list, ordered_list, createListDelegateInstance } from '../../../src/dataStructures/list';
+import { cacher, sortDirection, typeNames } from '../../../src/helpers';
 import { testData } from '../../testData';
 
 describe('Test List Iterators', function _testListIterators() {
@@ -317,7 +317,7 @@ describe('Test List Iterators', function _testListIterators() {
     });
 
     describe('Test groupJoin...', function testGroupJoin() {
-        var factoryFn = list.of;
+        var factoryFn = createListDelegateInstance;
         var preViewed = {};
         var uniqueCities = testData.dataSource.data.filter(function _gatherUniqueCities(item) {
             if (!(item.City in preViewed)) {
@@ -1671,6 +1671,13 @@ describe('Test List Iterators', function _testListIterators() {
             ofTypeRes.should.have.lengthOf(1);
             ofTypeRes[0].should.eql(12345);
         });
+
+        it('should return all data that is an array', function _testTypeOfAgainstArrays() {
+            var ofTypeIterable = ofType([[], 1, 2, 3, [], {}, 4, {}, []], []),
+                ofTypeRes = Array.from(ofTypeIterable());
+
+            ofTypeRes.should.have.lengthOf(3);
+        });
     });
 
     describe('Test where...', function testWhere() {
@@ -1797,7 +1804,7 @@ describe('Test List Iterators', function _testListIterators() {
                 uniqueLastNames.push(item.LastName);
         });
 
-        var factoryFn = list.of;
+        var factoryFn = createListDelegateInstance;
 
         describe('...using arrays', function testGroupByUsingArrays() {
             it('should group test data by state descending', function testGroupByOnStateDescending() {
@@ -1868,7 +1875,7 @@ describe('Test List Iterators', function _testListIterators() {
         });
     });
 
-    describe('Test mapWith...', function testMap() {
+    describe('Test map...', function testMap() {
         function _identity(item) {
             return item;
         }

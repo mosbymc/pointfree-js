@@ -1,5 +1,5 @@
-import * as monads from '../../../../src/dataStructures/dataStructures';
-import { just, nothing } from '../../../../src/dataStructures/maybe';
+import * as monads from '../../../src/dataStructures/dataStructures';
+import { just, nothing } from '../../../src/dataStructures/maybe';
 
 var Maybe = monads.Maybe,
     Just = monads.Just,
@@ -288,6 +288,24 @@ describe('Maybe functor tests', function _testMaybeFunctor() {
             expect(m2.value).to.eql(d2.value);
         });
 
+        it('should return a new maybe instance with the bi-mapped value', function _testMaybeBiMap() {
+            var f1 = x => x * x,
+                f2 = x => x;
+
+            var m1 = Maybe(1),
+                m2 = Maybe(),
+                d1 = m1.bimap(f1, f2),
+                d2 = m2.bimap(f1, f2);
+
+            d1.value.should.eql(1);
+            expect(null).to.eql(d2.value);
+        });
+
+        it('should extract the underlying value of a just', function _testJustExtract() {
+            Just(10).extract.should.eql(10);
+            Just('10').extract.should.eql('10');
+        });
+
         it('should properly indicate equality when constant monads are indeed equal', function _testMaybeFunctorEquality() {
             var m1 = Maybe(null),
                 m2 = Maybe(null),
@@ -342,31 +360,6 @@ describe('Maybe functor tests', function _testMaybeFunctor() {
             m7.equals(m9).should.be.false;
 
             m8.equals(m9).should.be.false;
-        });
-
-        it('should return a new maybe functor regardless of data type', function _testMaybeFactoryObjectCreation() {
-            var arr = [1, 2, 3],
-                obj = { a: 1, b: 2 },
-                m = Maybe(),
-                s = Symbol();
-
-            var m1 = m.of(),
-                m2 = m.of(null),
-                m3 = m.of(1),
-                m4 = m.of(arr),
-                m5 = m.of(obj),
-                m6 = m.of(s),
-                m7 = m.of('testing constant'),
-                m8 = m.of(false);
-
-            expect().to.eql(m1.value);
-            expect(null).to.eql(m2.value);
-            expect(1).to.eql(m3.value);
-            expect([1, 2, 3]).to.eql(m4.value);
-            expect({ a: 1, b: 2 }).to.eql(m5.value);
-            expect(s).to.eql(m6.value);
-            expect('testing constant').to.eql(m7.value);
-            expect(false).to.eql(m8.value);
         });
 
         it('should have a functioning iterator', function _testMaybeFunctorIterator() {

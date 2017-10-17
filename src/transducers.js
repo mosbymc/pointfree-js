@@ -1,4 +1,4 @@
-import { compose, curry } from './combinators';
+import { compose, curry, identity } from './combinators';
 
 /** @module transducers */
 

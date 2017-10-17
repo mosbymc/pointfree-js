@@ -60,10 +60,7 @@ Constant.is = f => constant.isPrototypeOf(f);
  * @property {function} value - returns the underlying value of the the functor
  * @property {function} map - maps a single function over the underlying value of the functor
  * @property {function} bimap
- * @property {function} get - returns the underlying value of the functor
- * @property {function} orElse - returns the underlying value of the functor
- * @property {function} getOrElse - returns the underlying value of the functor
- * @property {function} of - creates a new constant delegate with the value provided
+ * @property {function} extract
  * @property {function} valueOf - returns the underlying value of the functor; used during concatenation and coercion
  * @property {function} toString - returns a string representation of the identity functor and its underlying value
  * @property {function} factory - a reference to the constant factory function
@@ -97,6 +94,9 @@ var constant = {
     get value() {
         return this._value;
     },
+    get extract() {
+        return this.value;
+    },
     /**
      * @signature () -> {@link dataStructures.constant}
      * @description Takes a function that is applied to the underlying value of the
@@ -116,14 +116,23 @@ var constant = {
     chain: function _chain() {
         return this;
     },
+    /**
+     * @signature
+     * @description d
+     * @param {dataStructures.constant} con - Another constant data structure
+     * @return {dataStructures.constant} Returns itself
+     */
+    concat: function _concat(con) {
+        return this;
+    },
     fold: function _fold(f) {
         return f(this.value);
     },
     sequence: function _sequence(p) {
-        return this.of(this.value);
+        return this.factory.of(this.value);
     },
     traverse: function _traverse(a, f) {
-        return this.of(this.value);
+        return this.factory.of(this.value);
     },
     /**
      * @signature () -> *
@@ -134,50 +143,6 @@ var constant = {
      * @return {*} - Returns the underlying value of the current functor 'instance'.
      */
     get: get,
-    /**
-     * @signature () -> *
-     * @description Takes an optional function parameter as a default to be invoked and
-     * returned in cases where the current functor 'instance\'s' underlying value is not
-     * 'mappable'. Because the identity_functor does not support disjunctions, the
-     * parameter is entirely optional and will always be ignored. Whatever the actual
-     * underlying value is, it will always be returned.
-     * @memberOf dataStructures.constant
-     * @instance
-     * @function
-     * @param {function} [f] - An optional function argument which is invoked and the result
-     * returned in cases where the underlying value is not 'mappable'.
-     * @return {*} - b
-     */
-    orElse: orElse,
-    /**
-     * @signature * -> *
-     * @description Takes an optional parameter of any value as a default return value in
-     * cases where the current functor 'instance\'s' underlying value is not 'mappable'.
-     * Because the identity_functor does not support disjunctions, the parameter is entirely
-     * optional and will always be ignored. Whatever the actual underlying value is, it will
-     * always be returned.
-     * @memberOf dataStructures.constant
-     * @instance
-     * @function
-     * @param {*} [x] - a
-     * @return {*} Returns the underlying value of the current functor 'instance'.
-     */
-    getOrElse: getOrElse,
-    /**
-     * @signature * -> {@link dataStructures.constant}
-     * @description Factory function used to create a new object that delegates to
-     * the {@link dataStructures.constant} object. Any single value may be provided as an argument
-     * which will be used to set the underlying value of the new {@link dataStructures.constant}
-     * delegator. If no argument is provided, the underlying value will be 'undefined'.
-     * @memberOf dataStructures.constant
-     * @instance
-     * @function
-     * @param {*} item - The value that should be set as the underlying
-     * value of the {@link dataStructures.constant}.
-     * @return {dataStructures.constant} Returns a new {@link dataStructures.constant} delegator object
-     * via the {@link dataStructures.Constant#of} function.
-     */
-    of: pointMaker(Constant),
     /**
      * @signature * -> boolean
      * @description Determines if 'this' identity functor is equal to another functor. Equality

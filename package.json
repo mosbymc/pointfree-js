@@ -30,8 +30,10 @@
     "lint:test": "npm run lint && npm test",
     "lint:test:coverage": "npm run lint && npm run coverage",
     "minify": "uglifyjs dist/pointfree.js -o dist/pointfree.min.js -c -m --source-map",
-    "preplato": "del-cli plato",
-    "plato": "plato -r -d plato -l .jshintrc -e .eslintrc.json -t 'pointfree-js' -n src",
+    "preplato": "del-cli plato && gulp strip-comments",
+    "plato": "plato -r -d plato -l .jshintrc -e .eslintrc.json -t 'pointfree-js' -n tmpPlato && del-cli tmpPlato",
+    "postPlato": "del-cli tmpPlato",
+    "serve:dev": "npm run build:dev && nodemon ./app.js localhost 3030",
     "snyk": "./node_modules/.bin/snyk test",
     "start": "node app.js 3000",
     "test": "cross-env NODE_ENV=test mocha --recursive test/unit --require babel-polyfill --require test/test_helper --compilers js:babel-register"
@@ -53,6 +55,27 @@
       "test",
       "src/dataStructures/_lazy_identity.js"
     ]
+  },
+  "nodemonConfig": {
+    "restartable": "rs",
+    "ignore": [
+      ".git",
+      "node_modules/**/node_modules"
+    ],
+    "verbose": true,
+    "execMap": {
+      "js": "node --harmony"
+    },
+    "events": {
+      "restart": "npm run build:dev"
+    },
+    "watch": [
+      "src/"
+    ],
+    "env": {
+      "NODE_ENV": "dev"
+    },
+    "ext": "js json"
   },
   "repository": {
     "type": "git",
@@ -87,12 +110,9 @@
     "babelify": "^7.3.0",
     "body-parser": "^1.18.2",
     "brfs": "^1.4.3",
-    "browser-sync": "^2.11.1",
     "browserify": "^14.4.0",
     "chai": "^3.5.0",
-    "codeclimate-test-reporter": "^0.5.0",
     "cross-env": "^5.0.5",
-    "del": "^3.0.0",
     "del-cli": "^1.1.0",
     "docdash": "^0.4.0",
     "eslint": "^4.8.0",
@@ -100,22 +120,16 @@
     "google-closure-compiler-js": "^20170806.0.0",
     "gulp": "^3.9.1",
     "gulp-babel": "^7.0.0",
-    "gulp-browserify": "^0.5.1",
     "gulp-closure-compiler": "^0.4.0",
-    "gulp-filter": "^5.0.1",
     "gulp-load-plugins": "^1.2.0",
-    "gulp-nodemon": "^2.0.6",
     "gulp-plumber": "^1.1.0",
-    "gulp-print": "^2.0.1",
-    "gulp-rename": "^1.2.2",
-    "gulp-sourcemaps": "^2.4.1",
     "gulp-strip-comments": "^2.5.1",
     "gulp-task-listing": "^1.0.1",
-    "gulp-util": "^3.0.7",
     "jsdoc": "^3.5.5",
     "jshint": "^2.9.1",
     "mocha": "^3.5.3",
     "mocha-sinon": "^2.0.0",
+    "nodemon": "^1.12.1",
     "nyc": "^11.2.1",
     "plato": "^1.5.0",
     "proxyquire": "^1.7.4",
@@ -126,7 +140,6 @@
     "snyk": "^1.41.1",
     "source-map-support": "^0.4.18",
     "uglify-js": "^3.1.2",
-    "wallabify": "0.0.15",
-    "yargs": "^8.0.2"
+    "wallabify": "0.0.15"
   }
 }

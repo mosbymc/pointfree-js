@@ -163,88 +163,8 @@ function cacher(comparer) {
 /**
  * @signature
  * @description d
- * @param {Generator|Array|Map|Set} collection - a
- * @param {function} comparer - b
- * @return {{contains, getValue}} - c
- */
-function genericCacher(collection, comparer) {
-    function createCacheChequer() {
-        switch (createBitMask(...buildTypeBits(collection))) {
-            case 1: collection = Array.from(collection);
-            case 2:
-                //The collection's type is some kind of an array (@see collectionTypes). We
-                //can use the .some and .find to determine if the cache already holds the
-                //value we're looking for or return the value respectively.
-                return {
-                    contains: function _contains(item) {
-                        return collection.some(function _checkEquality(it) {
-                            return comparer(it, item);
-                        });
-                    },
-                    getValue: function _getValue(value) {
-                        return collection.find(function _findKey(key) {
-                            return comparer(key, value);
-                        });
-                    }
-                };
-                break;
-            case 4:
-                //TODO: find out if an ArrayBuffer can be interacted with directly at all, and
-                //TODO: remove this case if it cannot, or implement this case if it can.
-                break;
-            case 8: //Map
-            case 16: //WeakMap
-            case 32: //Set
-            case 64: //WeakSet
-                //Here, the type of the collection is a Map, WeakMap, Set, or WeakSet; we can use
-                //the native functionality to find the result of the cache contains the item we
-                //are looking for.
-                return {
-                    contains: function _contains(item) {
-                        return collection.values().some(function _checkEquality(it) {
-                            return comparer(it, item);
-                        });
-                    },
-                    getValue: function _getValue(value) {
-                        return collection.values().find(function _findKey(key) {
-                            return comparer(key, value);
-                        });
-                    }
-                };
-                break;
-            case 128:
-                //The collection's type is a generator. We need to turn it into an array
-                //and recursively call the 'createCacheChequer' function with the array
-                //that was created from the generator.
-                collection = Array.from(collection);
-                //return createCacheChequer(Array.from(collection));
-                break;
-            default:
-        }
-    }
-
-    function buildTypeBits(arrayType) {
-        return Object.keys(collectionTypes).map(function _buildBits(key) {
-            return collectionTypes[key].some(function _findDelegate(delegate) {
-                return delegate.isPrototypeOf(arrayType);
-            });
-        });
-    }
-
-    function createBitMask(...args) {
-        return args.reduce(function _reduce(curr, next, idx) {
-            return curr |= next << idx;
-        }, args[0]);
-    }
-
-    return createCacheChequer();
-}
-
-/**
- * @signature
- * @description d
  * @param {function} fn - a
- * @param {function} keyMaker - b
+ * @param {function} [keyMaker] - b
  * @return {function} - c
  */
 function memoizer(fn, keyMaker) {
@@ -360,8 +280,8 @@ function deepCopy(arr) {
  */
 function shallowClone(obj) {
     var clone = {};
-    for (var p in obj) {
-        clone[p] = obj[p];
+    for (var item in obj) {
+        clone[item] = obj[item];
     }
     return clone;
 }

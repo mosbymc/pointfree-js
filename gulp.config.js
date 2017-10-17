@@ -7,9 +7,7 @@ module.exports = function _gulpConfig() {
         report = test + 'report/',
         tmpPlato = './tmpPlato/',
         platoScripts = [
-            tmpPlato + './containers/**/*.js',
-            tmpPlato + './containers/functors/*.js',
-            tmpPlato + './containers/monads/*.js',
+            tmpPlato + './dataStructures/*.js',
             tmpPlato + './groups/*.js',
             tmpPlato + './streams/**/*.js',
         ];

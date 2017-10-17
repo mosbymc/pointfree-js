@@ -1,6 +1,6 @@
-import * as monads from '../../../../src/dataStructures/dataStructures';
-import { list, ordered_list } from '../../../../src/dataStructures/list';
-import { testData } from '../../../testData';
+import * as monads from '../../../src/dataStructures/dataStructures';
+import { list, ordered_list } from '../../../src/dataStructures/list';
+import { testData } from '../../testData';
 
 var List = monads.List;
 
@@ -192,30 +192,6 @@ describe('List functor test', function _testListFunctor() {
 
             l.value.should.not.eql(d.data);
             l.should.not.equal(d);
-        });
-
-        it('should return a new List regardless of data type', function _testListFactoryObjectCreation() {
-            var arr = [1, 2, 3],
-                obj = { a: 1, b: 2 },
-                l = List();
-
-            var l1 = l.of(),
-                l2 = l.of(null),
-                l3 = l.of(1),
-                l4 = l.of(arr),
-                l5 = l.of(obj),
-                l6 = l.of(Symbol()),
-                l7 = l.of('testing constant'),
-                l8 = l.of(false);
-
-            expect(undefined).to.eql(l1.value);
-            expect(null).to.eql(l2.value);
-            expect(1).to.eql(l3.value);
-            expect(arr).to.eql(l4.value);
-            expect(obj).to.eql(l5.value);
-            expect('symbol').to.eql(typeof l6.value);
-            expect('testing constant').to.eql(l7.value);
-            expect(false).to.eql(l8.value);
         });
 
         it('should transform a List to the other data structures', function _testListTransforms() {
@@ -644,6 +620,15 @@ describe('List functor test', function _testListFunctor() {
                     .data.should.eql([5, 4, 3, 2, 1]);
             });
 
+            it('should set the value and return a new list', function _testSet() {
+                var list = List([1, 2, 3, 4, 5]);
+
+                list.set(3, 10).data.should.eql([1, 2, 3, 10, 5]);
+                list.set(6, 12).data.should.eql([1, 2, 3, 4, 5, undefined, 12]);
+                list.set(-3, 18).data.should.eql([1, 2, 18, 4, 5]);
+                list.set(-8, 2).data.should.eql(list.data);
+            });
+
             it('should skip the specified number of items', function _testSkip() {
                 List([1, 2, 3, 4, 5])
                     .skip(3)
@@ -793,6 +778,17 @@ describe('List functor test', function _testListFunctor() {
                     .should.be.true;
             });
 
+            it('should return the value at the specified index', function _testGet() {
+                List([1, 2, 3, 4, 5])
+                    .get(3).should.eql(4);
+
+                List([1, 2, 3, 4, 5])
+                    .get(-3).should.eql(3);
+
+                expect(undefined).to.eql(List([1, 2, 3, 4, 5]).get(10));
+                expect(undefined).to.eql(List([1, 2, 3, 4, 5]).get(-10));
+            });
+
             it('should return the index of the item', function _testFindIndex() {
                 List([1, 2, 3, 4, 5])
                     .findIndex(x => 3 === x)
@@ -922,6 +918,10 @@ describe('List functor test', function _testListFunctor() {
                 List([1, 2, 3, 4, 5])
                     .reduceRight((acc, x) => acc / x)
                     .should.eql(0.20833333333333334);
+
+                List([1, 2, 3, 4, 5])
+                    .reduceRight((acc, x) => acc / x, 2)
+                    .should.eql(0.016666666666666666);
             });
 
             it('should return the underlying data as an array', function _testToArray() {
@@ -951,7 +951,7 @@ describe('List functor test', function _testListFunctor() {
             it('should return the underlying data as a map', function _testToMap() {
                 List([1, 2, 3, 4, 5])
                     .toMap()
-                    .should.eql(new Map())
+                    .should.eql(new Map());
             });
 
             it('should return the underlying data as a set', function _testToSet() {
@@ -1004,6 +1004,21 @@ describe('List functor test', function _testListFunctor() {
 
                     spyComparer.should.have.been.callCount(16);
                 });
+            });
+
+            it('should only evaluate the pipeline a single time', function _testPipelineEvaluation() {
+                var predSpy = sinon.spy(item => 'Mark' === item.FirstName);
+                var list = List(testData.dataSource.data).filter(predSpy).toEvaluatedList().map(x => x);
+                list.data;
+
+                predSpy.callCount.should.eql(54);
+
+                var list2 = List.empty;
+                for (let item of list) {
+                    list2 = list2.concat(item);
+                }
+
+                predSpy.callCount.should.eql(54);
             });
         });
     });

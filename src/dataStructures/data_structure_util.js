@@ -15,7 +15,7 @@ var map = m => fn => m.map(fn);
  * @return {*} Returns a data structure of the same type.
  */
 function contramap(fn) {
-    return this.of(compose(this.value, fn));
+    return this.factory.of(compose(this.value, fn));
 }
 
 function compose(f, g) {
@@ -105,35 +105,18 @@ function _toPrimitive(hint) {
     if (Array.isArray(this.value) && 5 === this.value.length) {
         console.log(this.value);
         console.log(hint);
-        console.log(+this.value);
+        console.log(typeof this.value);
+        //console.log(+this.value);
     }
     //if the underlying is a function, an object, or we didn't receive a hint, let JS determine how
     //to turn the underlying value into a primitive if it is not already...
     if ('object' !== typeof this.value && 'function' !== typeof this.value && null != hint) {
         //..if the hint is a number or default, coerce the underlying to a number and return...
-        if ('number' === hint || 'default' === hint) return +this.value;
+        if ('number' === hint || 'number' === typeof this.value) return +this.value;
         //...else the hint was 'string', so coerce to a string a return
         return '' + this.value;
     }
     return this.value;
-}
-
-/**
- * @signature
- * @description d
- * @return {*} - a
- */
-function get() {
-    return this.value;
-}
-
-/**
- * @signature
- * @description d
- * @return {string} - b
- */
-function emptyGet() {
-    throw new Error('Cannot extract a null value.');
 }
 
 /**
@@ -147,55 +130,6 @@ function extendMaker(typeFactory) {
     return function _extend(fn) {
         return typeFactory(fn(this));
     };
-}
-
-/**
- * @signature extract :: () -> *
- * @description Returns the underlying value of the data structure
- * @return {*} Returns the underlying value of the data structure
- */
-function extract() {
-    return this.value;
-}
-
-/**
- * @signature
- * @description d
- * @param {function} f - a
- * @return {*} - b
- */
-function orElse(f) {
-    return this.value;
-}
-
-/**
- * @signature
- * @description d
- * @param {function} f - a
- * @return {*} - b
- */
-function emptyOrElse(f) {
-    return f();
-}
-
-/**
- * @signature
- * @description d
- * @param {*} x - a
- * @return {*} - b
- */
-function getOrElse(x) {
-    return this.value;
-}
-
-/**
- * @signature
- * @description d
- * @param {*} x - a
- * @return {*} - b
- */
-function emptyGetOrElse(x) {
-    return x;
 }
 
 /**
@@ -216,7 +150,7 @@ function monad_apply(ma) {
  */
 function chain(fn) {
     var val = fn(this.value);
-    return Object.getPrototypeOf(this).isPrototypeOf(val) ? val : this.of(val);
+    return Object.getPrototypeOf(this).isPrototypeOf(val) ? val : this.factory.of(val);
 }
 
 /**
@@ -234,17 +168,16 @@ function chainRec(fn) {
     while (!state.done) {
         state = fn(next, done, state.value);
     }
-    return this.of(state.value);
+    return this.factory.of(state.value);
 }
 
 /**
  * @signature
  * @description d
- * @param {Object} type - a
  * @param {string} prop - b
  * @return {function} - c
  */
-function disjunctionEqualMaker(type, prop) {
+function disjunctionEqualMaker(prop) {
     return function _disjunctionEquals(a) {
         return this.value && this.value.equals === _disjunctionEquals ? this.value.equals(a) :
             a.value && a.value.equals === _disjunctionEquals ? a.value.equals(this) : Object.getPrototypeOf(this).isPrototypeOf(a) && a[prop] && this.value === a.value;
@@ -290,22 +223,11 @@ function mjoin() {
 /**
  * @signature
  * @description d
- * @param {Object} type - a
- * @return {function} - b
- */
-var pointMaker = type => val => type.of(val);
-
-/**
- * @signature
- * @description d
  * @param {string} factory - a
  * @return {function} - b
  */
 function stringMaker(factory) {
     return function _toString() {
-        //String(this.value)
-        //this.value.toString()
-        //null == this.value ? this.value : this.value.toString()
         return `${factory}(${null == this.value ? this.value : this.value.toString()})`;
     };
 }
@@ -326,7 +248,7 @@ function valueOf() {
 //==========================================================================================================//
 //==========================================================================================================//
 function justMap(fn) {
-    return this.of(fn(this.value));
+    return this.factory.of(fn(this.value));
 }
 
 function nothingMapMaker(factory) {
@@ -336,20 +258,13 @@ function nothingMapMaker(factory) {
 }
 
 function justBimap(f, g) {
-    return this.of(f(this.value));
-}
-
-function nothingBimapMaker(factory) {
-    return function nothingBimap(f, g) {
-        return factory(g(this.value));
-    };
+    return this.factory.of(f(this.value));
 }
 
 var sharedMaybeFns = {
     justMap,
     nothingMapMaker,
-    justBimap,
-    nothingBimapMaker
+    justBimap
 };
 
 //==========================================================================================================//
@@ -364,7 +279,7 @@ var sharedMaybeFns = {
  * @return {*} - b
  */
 function rightMap(fn) {
-    return this.of(fn(this.value));
+    return this.factory.of(fn(this.value));
 }
 
 /**
@@ -387,7 +302,7 @@ function leftMapMaker(factory) {
  * @return {*} - c
  */
 function rightBiMap(f, g) {
-    return this.of(f(this.value));
+    return this.factory.of(f(this.value));
 }
 
 /**
@@ -475,5 +390,5 @@ var fl = {
 };
 
 export { monad_apply, applyTransforms, chain, contramap, monadIterator, disjunctionEqualMaker, equals, lifter, maybeFactoryHelper,
-        mjoin, pointMaker, stringMaker, valueOf, get, emptyGet, orElse, emptyOrElse, getOrElse, emptyGetOrElse, sharedMaybeFns,
-        sharedEitherFns, applyFantasyLandSynonyms, applyAliases, chainRec, extendMaker, extract, setIteratorAndLift };
+        mjoin, stringMaker, valueOf, sharedMaybeFns, sharedEitherFns, applyFantasyLandSynonyms, applyAliases, chainRec, extendMaker,
+        setIteratorAndLift };

@@ -16,16 +16,11 @@ var asArray = when(not(isArray), Array.from);
 var arrayFromGenerator = val => Array.from(invoke(val));
 var toArray = ifElse(delegatesFrom(generatorProto), arrayFromGenerator, asArray);
 
-/**
- * @description d
- * @param {Array|dataStructures.list|dataStructures.ordered_list|generator} iterable - Any iterable item
- * @return {Array|dataStructures.list|dataStructures.ordered_list|generator} Returns an iterator
- */
-var getIterator = iterable => delegatesFrom(generatorProto, iterable) ? invoke(iterable) : iterable;
+//var getIterator = iterable => delegatesFrom(generatorProto, iterable) ? invoke(iterable) : iterable;
 
-function *_iterate(iterable, fn) {
+/*function *_iterate(iterable, fn) {
     for (let item of getIterator(iterable)) yield fn(item);
-}
+}*/
 
 /**
  * @signature
@@ -147,7 +142,7 @@ function concatAll(xs, yss) {
  * @description d
  * @param {Array|generator|dataStructures.list_core} xs - a
  * @param {*} val - b
- * @param {function} comparer - c
+ * @param {function} [comparer] - c
  * @return {*} - d
  */
 function contains(xs, val, comparer) {
@@ -539,7 +534,7 @@ function map(xs, fn) {
  * @signature
  * @description d
  * @param {Array|generator|dataStructures.list_core} xs - a
- * @param {string} dataType - b
+ * @param {string|Object|function|null|Array} dataType - b
  * @return {generator} - c
  */
 function ofType(xs, dataType) {
@@ -577,10 +572,8 @@ function ofType(xs, dataType) {
                     }
                 }
             }
-            else {
-                for (let x of xs) {
-                    yield x;
-                }
+            else if (isArray(dataType)) {
+                for (var arr of xs) if (isArray(arr)) yield arr;
             }
         }
     };
@@ -644,6 +637,33 @@ function repeat(item, count) {
 function reverse(xs) {
     return function *reverseIterator() {
         for (let x of asArray(xs).reverse()) yield x;
+    };
+}
+
+/**
+ * @signature
+ * @description d
+ * @param {dataStructures.list_core} xs - a
+ * @param {number} idx - b
+ * @param {*} val - c
+ * @return {generator} d
+ */
+function set(xs, idx, val) {
+    return function *_setIterator() {
+        let count = 0;
+        for (let item of xs) {
+            if (idx === count) yield val;
+            else yield item;
+            ++count;
+        }
+
+        if (count < idx) {
+            while (count <= idx) {
+                if (count !== idx) yield undefined;
+                else yield val;
+                ++count;
+            }
+        }
     };
 }
 
@@ -761,4 +781,4 @@ function zip(xs, ys, selector) {
 
 export { all, any, binarySearch, chain, concat, concatAll, contains, copyWithin, count, distinct, equals, except, fill, filter,
         findIndex, findLastIndex, first, foldLeft, foldRight, groupBy, groupJoin, intersect, intersperse, join, last, map, ofType,
-        prepend, prependAll, reduceRight, repeat, reverse, skipWhile, slice, sortBy, takeWhile, unfold, union, zip };
+        prepend, prependAll, reduceRight, repeat, reverse, set, skipWhile, slice, sortBy, takeWhile, unfold, union, zip };

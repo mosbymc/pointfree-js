@@ -1,4 +1,4 @@
-import { monad_apply, chain, mjoin, pointMaker, equals, stringMaker, valueOf } from './data_structure_util';
+import { monad_apply, chain, mjoin, equals, stringMaker, valueOf } from './data_structure_util';
 
 /**
  * @description d
@@ -45,7 +45,6 @@ var validation = {
     map: function _map(fn) {
         return this.of(fn(this.value));
     },
-    of: pointMaker(Validation),
     valueOf: valueOf,
     equals: equals,
     toString: stringMaker('Validation'),

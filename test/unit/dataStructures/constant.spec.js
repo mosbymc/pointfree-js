@@ -1,6 +1,6 @@
-import * as monads from '../../../../src/dataStructures/dataStructures';
-import { constant } from '../../../../src/dataStructures/constant';
-import { identity } from '../../../../src/combinators';
+import * as monads from '../../../src/dataStructures/dataStructures';
+import { constant } from '../../../src/dataStructures/constant';
+import { identity } from '../../../src/combinators';
 
 var Constant = monads.Constant;
 
@@ -142,28 +142,9 @@ describe('Constant monad tests', function _testConstantMonad() {
             m4.equals(m5).should.be.false;
         });
 
-        it('should return a new constant functor regardless of data type', function testConstantFactoryObjectCreation() {
-            var arr = [1, 2, 3],
-                obj = { a: 1, b: 2 },
-                c = Constant();
-
-            var c1 = c.of(),
-                c2 = c.of(null),
-                c3 = c.of(1),
-                c4 = c.of(arr),
-                c5 = c.of(obj),
-                c6 = c.of(Symbol()),
-                c7 = c.of('testing constant'),
-                c8 = c.of(false);
-
-            expect(undefined).to.eql(c1.value);
-            expect(null).to.eql(c2.value);
-            expect(1).to.eql(c3.value);
-            expect(arr).to.eql(c4.value);
-            expect(obj).to.eql(c5.value);
-            expect('symbol').to.eql(typeof c6.value);
-            expect('testing constant').to.eql(c7.value);
-            expect(false).to.eql(c8.value);
+        it('should extract the underlying value of a constant', function _testConstantExtract() {
+            Constant(10).extract.should.eql(10);
+            Constant('10').extract.should.eql('10');
         });
 
         it('should transform a constant functor to the other functor types', function _testConstantFunctorTransforms() {

@@ -148,10 +148,7 @@ Future.empty = () => Future(identity);
  * @property {function} value - returns the underlying value of the the monad
  * @property {function} map - maps a single function over the underlying value of the monad
  * @property {function} bimap
- * @property {function} get - returns the underlying value of the monad
- * @property {function} orElse - returns the underlying value of the monad
- * @property {function} getOrElse - returns the underlying value of the monad
- * @property {function} of - creates a new future delegate with the value provided
+ * @property {function} extract
  * @property {function} valueOf - returns the underlying value of the monad; used during concatenation and coercion
  * @property {function} toString - returns a string representation of the future monad and its underlying value
  * @property {function} factory - a reference to the future factory function
@@ -199,12 +196,12 @@ var future = {
      * just performed.
      */
     map: function _map(fn) {
-        return this.of((reject, resolve) => this.fork(err => reject(err), res => resolve(fn(res))));
+        return this.factory.of((reject, resolve) => this.fork(err => reject(err), res => resolve(fn(res))));
     },
     //TODO: probably need to compose here, not actually map over the value; this is a temporary fill-in until
     //TODO: I have time to finish working on the Future
     chain: function _chain(fn) {
-        return this.of((resolve, reject) => this.fork(err => reject(err), res => fn(res).fork(reject, resolve)));
+        return this.factory.of((resolve, reject) => this.fork(err => reject(err), res => fn(res).fork(reject, resolve)));
         /*
         return this.of((reject, resolve) =>
         {
@@ -220,7 +217,7 @@ var future = {
         return this.chain(x => x);
     },
     apply: function _apply(ma) {
-        return this.of((reject, resolve) => {
+        return this.factory.of((reject, resolve) => {
             let rej = once(reject),
                 val, mapper,
                 rejected = false;
@@ -249,7 +246,7 @@ var future = {
         });
     },
     fold: function _fold(f, g) {
-        return this.of((reject, resolve) =>
+        return this.factory.of((reject, resolve) =>
             this.fork(err => resolve(f(err)), res => resolve(g(res))));
     },
     traverse: function _traverse(fa, fn) {
@@ -263,10 +260,7 @@ var future = {
         });
     },
     bimap: function _bimap(f, g) {
-        return this.of((reject, resolve) => this._fork(safeFork(reject, err => reject(f(err))), safeFork(reject, res => resolve(g(res)))));
-    },
-    empty: function _empty() {
-        return this.of(identity);
+        return this.factory.of((reject, resolve) => this._fork(safeFork(reject, err => reject(f(err))), safeFork(reject, res => resolve(g(res)))));
     },
     isEmpty: function _isEmpty() {
         return this._fork === identity;
@@ -301,21 +295,6 @@ var future = {
         //return this.value();
         return this.value;
     },
-    /**
-     * @signature * -> {@link dataStructures.future}
-     * @description Factory function used to create a new object that delegates to
-     * the {@link dataStructures.future} object. Any single value may be provided as an argument
-     * which will be used to set the underlying value of the new {@link dataStructures.future}
-     * delegator. If no argument is provided, the underlying value will be 'undefined'.
-     * @memberOf dataStructures.future
-     * @instance
-     * @function
-     * @param {*} item - The value that should be set as the underlying
-     * value of the {@link dataStructures.future}.
-     * @return {dataStructures.future} Returns a new {@link dataStructures.future} delegator object
-     * via the {@link dataStructures.Future#of} function.
-     */
-    of: pointMaker(Future),
     /**
      * @signature () -> *
      * @description Returns the underlying value of the current monad 'instance'. This
