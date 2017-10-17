@@ -1,7 +1,4 @@
-import {
-    LazyMaybe, lazy_just, lazy_nothing,
-    LazyJust
-} from '../../../../src/dataStructures/lazy_dataStructures/_lazy_maybe';
+import { LazyMaybe, lazy_just, lazy_nothing, LazyJust } from '../../../../src/dataStructures/lazy_dataStructures/_lazy_maybe';
 import * as monads from '../../../../src/dataStructures/dataStructures';
 
 describe('Test lazy maybe', function _testLazyMaybe() {

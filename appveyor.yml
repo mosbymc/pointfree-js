@@ -30,7 +30,7 @@ after_test:
   #- if [[ "$APPVEYOR_JOB_NUMBER" =~ [.]1$ ]]; then ./cc-test-reporter after-build --exit-code $TRAVIS_TEST_RESULT; fi
 
 on_success:
-  - "npm run codeclimate:coverage"
+  #- "npm run codeclimate:coverage"
 
 # Don't actually build.
 build: off

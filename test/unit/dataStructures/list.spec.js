@@ -1008,7 +1008,15 @@ describe('List functor test', function _testListFunctor() {
 
             it('should only evaluate the pipeline a single time', function _testPipelineEvaluation() {
                 var predSpy = sinon.spy(item => 'Mark' === item.FirstName);
-                List(testData.dataSource.data).filter(predSpy).toEvaluatedList().map(x => x).data;
+                var list = List(testData.dataSource.data).filter(predSpy).toEvaluatedList().map(x => x);
+                list.data;
+
+                predSpy.callCount.should.eql(54);
+
+                var list2 = List.empty;
+                for (let item of list) {
+                    list2 = list2.concat(item);
+                }
 
                 predSpy.callCount.should.eql(54);
             });
