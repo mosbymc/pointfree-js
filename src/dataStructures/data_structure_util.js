@@ -174,7 +174,6 @@ function chainRec(fn) {
 /**
  * @signature
  * @description d
- * @param {Object} type - a
  * @param {string} prop - b
  * @return {function} - c
  */

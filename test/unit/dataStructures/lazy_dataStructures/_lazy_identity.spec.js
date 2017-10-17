@@ -140,6 +140,13 @@ describe('Test lazy identity', function _testLazyIdentity() {
             i.should.not.equal(d);
         });
 
+        it('should map over the input', function _testIdentityContramap() {
+            LazyIdentity(x => x * x)
+                .contramap(x => x + 10)
+                .apply(LazyIdentity(5))
+                .extract.should.eql(225);
+        });
+
         it('should properly indicate equality when constant monads are indeed equal', function _testIdentityFunctorEquality() {
             var m1 = LazyIdentity(null),
                 m2 = LazyIdentity(null),

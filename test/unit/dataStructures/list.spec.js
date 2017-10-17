@@ -951,7 +951,7 @@ describe('List functor test', function _testListFunctor() {
             it('should return the underlying data as a map', function _testToMap() {
                 List([1, 2, 3, 4, 5])
                     .toMap()
-                    .should.eql(new Map())
+                    .should.eql(new Map());
             });
 
             it('should return the underlying data as a set', function _testToSet() {
@@ -1004,6 +1004,13 @@ describe('List functor test', function _testListFunctor() {
 
                     spyComparer.should.have.been.callCount(16);
                 });
+            });
+
+            it('should only evaluate the pipeline a single time', function _testPipelineEvaluation() {
+                var predSpy = sinon.spy(item => 'Mark' === item.FirstName);
+                List(testData.dataSource.data).filter(predSpy).toEvaluatedList().map(x => x).data;
+
+                predSpy.callCount.should.eql(54);
             });
         });
     });

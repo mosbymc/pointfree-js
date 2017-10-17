@@ -143,6 +143,13 @@ describe('Identity monad test', function _testIdentityMonad() {
             i.should.not.equal(d);
         });
 
+        it('should map over the input', function _testIdentityContramap() {
+            Identity(x => x * x)
+                .contramap(x => x + 10)
+                .apply(Identity(5))
+                .extract.should.eql(225);
+        });
+
         it('should properly indicate equality when constant monads are indeed equal', function _testIdentityFunctorEquality() {
             var m1 = Identity(null),
                 m2 = Identity(null),
@@ -212,7 +219,7 @@ describe('Identity monad test', function _testIdentityMonad() {
         it('should represent the identity\'s \'type\' when \'Object.prototype.toString.call\' is invoked', function _testIdentityTypeString() {
             var i = Identity();
 
-            console.log(Object.prototype.toString.call(i));
+            //console.log(Object.prototype.toString.call(i));
 
             //Object.prototype.toString.call(i).should.eql('[object Identity]');
         });

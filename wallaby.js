@@ -31,8 +31,7 @@ module.exports = function _wallaby(wallaby) {
             '!test/**/*.spec.js',
             '!playground.js',
             '!test/test_helper.js',
-            '!./observations.js',
-            '!./src/dataStructures/_lazy_identity.js',
+            '!./observations.js'
         ],
 
         /*
