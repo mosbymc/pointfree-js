@@ -18,7 +18,7 @@ describe('Test streams', function _testStreams() {
             }, function complete() {
                 count.should.eql(40);
                 done();
-            })
+            });
     });
 
     it('should group the results', function _testGroupBy(done) {
@@ -70,4 +70,58 @@ describe('Test streams', function _testStreams() {
             done();
         });
     });
+
+    it('should take the alternate path when mapping twice', function _testObservableMap(done) {
+        var count = 0,
+            o = observable.fromList([1, 2, 3, 4, 5, 6, 7, 8, 9, 10]);
+
+        o.map(x => x * 2)
+            .map(x => x)
+            .map(x => x)
+            .subscribe(function _next(x) {
+                count += x;
+            }, function _error(x) {
+                console.log(x);
+            }, function complete() {
+                count.should.eql(110);
+                done();
+            });
+    });
+
+    it('should take the alternate path when filtering twice', function _testObservableFilter(done) {
+        var count = 0,
+            o = observable.fromList([1, 2, 3, 4, 5, 6, 7, 8, 9, 10]);
+
+        o.map(x => x * 2)
+            .filter(x => 0 < x)
+            .filter(x => 0 < x)
+            .subscribe(function _next(x) {
+                count += x;
+            }, function _error(x) {
+                console.log(x);
+            }, function complete() {
+                count.should.eql(110);
+                done();
+            });
+    });
+
+    /*
+    it('should invoke the error handler when an exception is thrown on the chain operation', function _testObservableChainError(done) {
+        var count = 0,
+            o = observable.fromList([1, 2, 3, 4, 5, 6, 7, 8, 9, 10]);
+
+        o.map(x => x * 2)
+            .chain(function _chainThrow() {
+                throw Error("Chain test exception!");
+            })
+            .subscribe(function _next(x) {
+                count += x;
+            }, function _error(x) {
+                count.should.eql(0);
+                done();
+            }, function complete() {
+                count.should.eql(40);
+            });
+    });
+    */
 });

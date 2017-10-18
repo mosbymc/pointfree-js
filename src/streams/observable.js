@@ -80,6 +80,7 @@ var observable = {
      * @return {observable} - b
      */
     merge: function _merge(...observables) {
+        //TODO: fix merge operator - it doesn't appear to be working as intended
         return this.mergeMap(null, ...observables);
     },
     /**
@@ -90,10 +91,11 @@ var observable = {
      * @return {observable} - c
      */
     mergeMap: function _mergeMap(fn, ...observables) {
+        //TODO: fix merge operator - it doesn't appear to be working as intended
         fn = fn || identity;
         if (mergeOperator.isPrototypeOf(this.operator))
             return this.lift.call(this.source, Object.create(mergeOperator).init([this].concat(observables, this.operator.observables)));
-        return this.lift(Object.create(mergeOperator).init([this].concat(observables)), fn);
+        return this.lift(Object.create(mergeOperator).init([this].concat(observables), fn));
 
         /*
         if (delegatesTo(this.operator, mergeOperator))

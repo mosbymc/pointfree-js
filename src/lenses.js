@@ -223,4 +223,4 @@ var split = curry(function _split(delimiter, string) {
     return string.split(delimiter);
 });
 
-export { arrayLens, objectLens, view, over, put, set, lens, prismPath, makeLenses, lensPath, unifiedLens };
+export { arrayLens, objectLens, view, over, put, set, lens, prism, prismPath, makeLenses, lensPath, unifiedLens };

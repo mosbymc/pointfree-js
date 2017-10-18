@@ -10,6 +10,7 @@ var mergeOperator = {
         this._observables = arr;
     },
     init: function _init(observables, transform) {
+        //TODO: fix merge operator - it doesn't appear to be working as intended
         this.observables = observables;
         this.transform = transform;
         return this;
