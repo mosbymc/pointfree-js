@@ -1,7 +1,7 @@
 import { all, any, except, intersect, union, map, chain, groupBy, sortBy, prepend, prependAll, concat, concatAll, groupJoin, join, zip, filter, intersperse,
         contains, first, last, count, foldLeft, reduceRight, distinct, ofType, binarySearch, equals, takeWhile, skipWhile, reverse,
         copyWithin, fill, findIndex, findLastIndex, repeat, foldRight, unfold } from '../../../src/dataStructures/list_iterators';
-import { list, ordered_list, createListDelegateInstance } from '../../../src/dataStructures/list';
+import { list, ordered_list, createList } from '../../../src/dataStructures/list';
 import { cacher, sortDirection, typeNames } from '../../../src/helpers';
 import { testData } from '../../testData';
 
@@ -317,7 +317,7 @@ describe('Test List Iterators', function _testListIterators() {
     });
 
     describe('Test groupJoin...', function testGroupJoin() {
-        var factoryFn = createListDelegateInstance;
+        var factoryFn = createList;
         var preViewed = {};
         var uniqueCities = testData.dataSource.data.filter(function _gatherUniqueCities(item) {
             if (!(item.City in preViewed)) {
@@ -1804,7 +1804,7 @@ describe('Test List Iterators', function _testListIterators() {
                 uniqueLastNames.push(item.LastName);
         });
 
-        var factoryFn = createListDelegateInstance;
+        var factoryFn = createList;
 
         describe('...using arrays', function testGroupByUsingArrays() {
             it('should group test data by state descending', function testGroupByOnStateDescending() {

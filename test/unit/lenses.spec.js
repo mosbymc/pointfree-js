@@ -37,6 +37,18 @@ describe('Test lenses', function _testLenses() {
                 .should.eql({ id: 3, name: 'CHARLES BRONSON', addresses: [{ street: '99 Walnut Dr.', zip: '04821' }, { street: '2321 Crane Way', zip: '08082' }]});
         });
 
+        it('should create a lens path and view/update object', function _createPathForViewingAndUpdating() {
+            var name = prismPath('name');
+
+            //view(name, user).should.eql('Charles Bronson');
+            /*
+            set(name, 'Richard Branson', user)
+                .should.eql({ id: 3, name: 'Richard Branson', addresses: [{ street: '99 Walnut Dr.', zip: '04821' }, { street: '2321 Crane Way', zip: '08082' }]});
+            over(name, toUpper, user)
+                .should.eql({ id: 3, name: 'CHARLES BRONSON', addresses: [{ street: '99 Walnut Dr.', zip: '04821' }, { street: '2321 Crane Way', zip: '08082' }]});
+                */
+        });
+
         it('should work', function _createPathOnList() {
             var list = monads.List(testData.dataSource.data),
                 drillDown = lensPath('drillDownData'),

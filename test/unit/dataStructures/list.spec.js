@@ -229,6 +229,29 @@ describe('List functor test', function _testListFunctor() {
             c4.toString().should.eql('List(5)');
         });
 
+        it('should print a locale specific version of the underlying data when .toLocaleString() is invoked', function _testListToLocaleString() {
+            var c1 = List(1),
+                c2 = List(null),
+                c3 = List([1, 2, 3]),
+                c4 = List(List(List(5)));
+
+            c1.toLocaleString().should.eql('1');
+            c2.toLocaleString().should.eql('');
+            c3.toLocaleString().should.eql('1,2,3');
+            c4.toLocaleString().should.eql('5');
+        });
+
+        it('should print the List\'s \'class\' when Object.toString is invoked on the list', function _testObjectToString() {
+            Object.prototype.toString.call(List([1, 2, 3, 4, 5]))
+                .should.eql('[object List]');
+        });
+
+        it('should return a json stringified version of the underlying data', function _testToJSON() {
+            List([1, 2, 3, 4, 5])
+                .toJSON()
+                .should.eql([1, 2, 3, 4, 5]);
+        });
+
         it('should have a .constructor property that points to the factory function', function _testListFunctorIsStupidViaFantasyLandSpecCompliance() {
             List(null).constructor.should.eql(List);
         });
@@ -515,6 +538,12 @@ describe('List functor test', function _testListFunctor() {
                 */
             });
 
+            it('should return the first item in the list', function _testHead() {
+                List([1, 2, 3, 4, 5])
+                    .head()
+                    .data.should.eql([1]);
+            });
+
             it('should intersperse a value within the list', function _testIntersperse() {
                 List([1, 2, 3, 4, 5])
                     .intersperse(1)
@@ -614,6 +643,22 @@ describe('List functor test', function _testListFunctor() {
                     .data.should.eql([1, 2]);
             });
 
+            it('should remove the first item and return a new list containing the rest', function _testPop() {
+                List([1, 2, 3, 4, 5])
+                    .pop()
+                    .data.should.eql([1, 2, 3, 4]);
+            });
+
+            it('should add one or more items to the end of the list', function _testPush() {
+                List([1, 2, 3, 4, 5])
+                    .push(6)
+                    .data.should.eql([1, 2, 3, 4, 5, 6]);
+
+                List([1, 2, 3, 4, 5])
+                    .push(6, 7, 8)
+                    .data.should.eql([1, 2, 3, 4, 5, 6, 7, 8]);
+            });
+
             it('should reverse the underlying data', function _testReverse() {
                 List([1, 2, 3, 4, 5])
                     .reverse()
@@ -627,6 +672,12 @@ describe('List functor test', function _testListFunctor() {
                 list.set(6, 12).data.should.eql([1, 2, 3, 4, 5, undefined, 12]);
                 list.set(-3, 18).data.should.eql([1, 2, 18, 4, 5]);
                 list.set(-8, 2).data.should.eql(list.data);
+            });
+
+            it('should shift an item from the front of the list', function _testShift() {
+                List([1, 2, 3, 4, 5])
+                    .shift()
+                    .data.should.eql([2, 3, 4, 5]);
             });
 
             it('should skip the specified number of items', function _testSkip() {
@@ -651,6 +702,12 @@ describe('List functor test', function _testListFunctor() {
                     .data.should.eql([2, 3, 4, 5]);
             });
 
+            it('should return a subset of the list', function _testSplice() {
+                List([1, 2, 3, 4, 5])
+                    .splice(2)
+                    .data.should.eql([3, 4, 5]);
+            });
+
             it('should take the specified number of items', function _testTake() {
                 List(testData.dataSource.data)
                     .take(15)
@@ -673,10 +730,26 @@ describe('List functor test', function _testListFunctor() {
                     .data.should.eql([1]);
             });
 
+            it('should skip the first item and return the rest', function _testTail() {
+                List([1, 2, 3, 4, 5])
+                    .tail()
+                    .data.should.eql([2, 3, 4, 5]);
+            });
+
             it('should produce a set of unique items from both collections', function _testUnion() {
                 List([1, 2, 3, 4, 5, 6])
                     .union([5, 6, 7, 8, 9, 10])
                     .data.should.eql([1, 2, 3, 4, 5, 6, 7, 8, 9, 10]);
+            });
+
+            it('should prepend one or more items to the list', function _testUnshift() {
+                List([5, 6, 7, 8, 9])
+                    .unshift(4)
+                    .data.should.eql([4, 5, 6, 7, 8, 9]);
+
+                List([5, 6, 7, 8, 9])
+                    .unshift(2, 3, 4)
+                    .data.should.eql([2, 3, 4, 5, 6, 7, 8, 9]);
             });
 
             it('should zip two lists together', function _testZip() {
@@ -1019,6 +1092,27 @@ describe('List functor test', function _testListFunctor() {
                 }
 
                 predSpy.callCount.should.eql(54);
+            });
+
+            it('should return the value contained at the specified index', function _testListGetByIndex() {
+                List([1, 2, 3, 4, 5])[2].should.eql(3);
+            });
+        });
+
+        describe('List iterator', function _testListBuiltInIterator() {
+            it('should only evaluate the data in the pipeline once', function _testIterator() {
+                var mapFn = sinon.spy(x => x * x);
+                var list = List([1, 2, 3, 4, 5])
+                    .map(mapFn),
+                    count = 0,
+                    it = list[Symbol.iterator]();
+
+                while (!it.next().done) ++count;
+                it = list[Symbol.iterator]();
+                while (!it.next().done) ++count;
+
+                count.should.eql(10);
+                mapFn.callCount.should.eql(5);
             });
         });
     });

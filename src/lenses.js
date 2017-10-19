@@ -1,4 +1,5 @@
 import { arraySet, mapSet, objectSet, setSet, isArray } from './functionalHelpers';
+import { not } from './decorators';
 import { curry, compose, kestrel, when } from './combinators';
 import { deepClone } from './helpers';
 import { Maybe } from './dataStructures/maybe';
@@ -167,10 +168,12 @@ function lensPath(...path) {
  */
 var prismPath = curry(function _prismPath(path, obj) {
     path = when(not(isArray), split('.'), path);
+    console.log(path, obj);
     var val = obj,
         idx = 0;
     while (idx < path.length) {
         if (null == val) return Maybe.Nothing();
+        console.log(val[path[idx]]);
         val = val[path[idx]];
         ++idx;
     }
