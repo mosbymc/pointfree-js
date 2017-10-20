@@ -243,6 +243,25 @@ describe('Either functor tests', function _testEitherFunctor() {
             e2_1.value.should.eql(e2.value);
         });
 
+        it('should return underlying value when constant_functor#fold is invoked', function _testConstantDotFold() {
+            Right(10).fold((x, y) => x + y * 15, 0).should.eql(150);
+            Left(10).fold((x, y) => x + y * 15, 0).should.eql(150);
+        });
+
+        it('should return a Just of an Identity of 10 when #sequence is invoked', function _testConstantDotSequence() {
+            Right(10).sequence(monads.Maybe).toString().should.eql('Just(Right(10))');
+            Left(10).sequence(monads.Maybe).toString().should.eql('Just(Left(10))');
+        });
+
+        it('should return a Just of an Identity of 3 when #traverse is invoked', function _testConstantDotTraverse() {
+            function test(val) {
+                return monads.Maybe(val + 2);
+            }
+
+            Right(1).traverse(monads.Maybe, test).toString().should.eql('Just(Right(3))');
+            Left(1).traverse(monads.Maybe, test).toString().should.eql('Just(Left(3))');
+        });
+
         it('should properly indicate equality when constant monads are indeed equal', function _testEitherFunctorEquality() {
             var m1 = Either(null),
                 m2 = Either(null),
@@ -340,6 +359,14 @@ describe('Either functor tests', function _testEitherFunctor() {
             c2.toString().should.eql('Left(null)');
             c3.toString().should.eql('Left(1,2,3)');
             c4.toString().should.eql('Right(Left(Right(5)))');
+        });
+
+        it('should represent the either\'s \'type\' when \'Object.prototype.toString.call\' is invoked', function _testEitherTypeString() {
+            var r = Right();
+            var l = Left();
+
+            Object.prototype.toString.call(r).should.eql('[object Right]');
+            Object.prototype.toString.call(l).should.eql('[object Left]');
         });
 
         it('should have a .constructor property that points to the factory function', function _testEitherFunctorIsStupidViaFantasyLandSpecCompliance() {

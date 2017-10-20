@@ -354,13 +354,52 @@ var right = {
      * the mapping function to the underlying data.
      */
     bimap: sharedEitherFns.rightBiMap,
-    fold: function _fold(fn) {
-        return fn(this.value);
+    /**
+     * @signature () -> *
+     * @description Accepts a function that is used to map over the identity's underlying value
+     * and returns the returns value of the function without 're-wrapping' it in a new identity
+     * monad instance.
+     * @memberOf dataStructures.right
+     * @instance
+     * @function fold
+     * @param {function} fn - Any mapping function that should be applied to the underlying value
+     * of the identity monad.
+     * @param {*} acc - An JavaScript value that should be used as an accumulator.
+     * @return {*} Returns the return value of the mapping function provided as an argument.
+     */
+    fold: function _fold(fn, acc) {
+        return fn(acc, this.value);
     },
+    /**
+     * @signature monad -> monad<monad<T>>
+     * @description Returns a monad of the type passed as an argument that 'wraps'
+     * and identity monad that 'wraps' the current identity monad's underlying value.
+     * @memberOf dataStructures.right
+     * @instance
+     * @function sequence
+     * @param {Object} p - Any pointed monad with a '#of' function property
+     * @return {Object} Returns a monad of the type passed as an argument that 'wraps'
+     * and identity monad that 'wraps' the current identity monad's underlying value.
+     */
     sequence: function _sequence(p) {
-        return this.traverse(identity, p);
+        return this.traverse(p, p.of);
     },
-    traverse: function _traverse(a, f, g) {
+    /**
+     * @signature Object -> () -> Object
+     * @description Accepts a pointed monad with a '#of' function property and a mapping function. The mapping
+     * function is applied to the identity monad's underlying value. The mapping function should return a monad
+     * of any type. Then the {@link dataStructures.Identity.of} function is used to map over the returned monad. Essentially
+     * creating a new object of type: monad<Identity<T>>, where 'monad' is the type of monad the mapping
+     * function returns.
+     * @memberOf dataStructures.right
+     * @instance
+     * @function traverse
+     * @param {Object} a - A pointed monad with a '#of' function property. Used only in cases
+     * where the mapping function cannot be run.
+     * @param {function} f - A mapping function that should be applied to the identity's underlying value.
+     * @return {Object} Returns a new identity monad that wraps the mapping function's returned monad type.
+     */
+    traverse: function _traverse(a, f) {
         return f(this.value).map(this.factory.of);
     },
     /**
@@ -494,14 +533,53 @@ var left = {
      * the mapping function to the underlying data.
      */
     bimap: sharedEitherFns.leftBimapMaker(Left),
-    fold: function _fold(fn) {
-        return fn(this.value);
+    /**
+     * @signature () -> *
+     * @description Accepts a function that is used to map over the identity's underlying value
+     * and returns the returns value of the function without 're-wrapping' it in a new identity
+     * monad instance.
+     * @memberOf dataStructures.left
+     * @instance
+     * @function fold
+     * @param {function} fn - Any mapping function that should be applied to the underlying value
+     * of the identity monad.
+     * @param {*} acc - An JavaScript value that should be used as an accumulator.
+     * @return {*} Returns the return value of the mapping function provided as an argument.
+     */
+    fold: function _fold(fn, acc) {
+        return fn(acc, this.value);
     },
+    /**
+     * @signature monad -> monad<monad<T>>
+     * @description Returns a monad of the type passed as an argument that 'wraps'
+     * and identity monad that 'wraps' the current identity monad's underlying value.
+     * @memberOf dataStructures.left
+     * @instance
+     * @function sequence
+     * @param {Object} p - Any pointed monad with a '#of' function property
+     * @return {Object} Returns a monad of the type passed as an argument that 'wraps'
+     * and identity monad that 'wraps' the current identity monad's underlying value.
+     */
     sequence: function _sequence(p) {
-        return this.traverse(identity, p);
+        return this.traverse(p, p.of);
     },
+    /**
+     * @signature Object -> () -> Object
+     * @description Accepts a pointed monad with a '#of' function property and a mapping function. The mapping
+     * function is applied to the identity monad's underlying value. The mapping function should return a monad
+     * of any type. Then the {@link dataStructures.Identity.of} function is used to map over the returned monad. Essentially
+     * creating a new object of type: monad<Identity<T>>, where 'monad' is the type of monad the mapping
+     * function returns.
+     * @memberOf dataStructures.left
+     * @instance
+     * @function traverse
+     * @param {Object} a - A pointed monad with a '#of' function property. Used only in cases
+     * where the mapping function cannot be run.
+     * @param {function} f - A mapping function that should be applied to the identity's underlying value.
+     * @return {Object} Returns a new identity monad that wraps the mapping function's returned monad type.
+     */
     traverse: function _traverse(a, f) {
-        return a.of(Left(this.value));
+        return f(this.value).map(Left);
     },
     /**
      * @signature * -> boolean

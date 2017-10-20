@@ -359,9 +359,6 @@ var just = {
     traverse: function _traverse(a, f) {
         return f(this.value).map(this.factory.of);
     },
-    nothing: function _nothing() {
-        return Nothing();
-    },
     /**
      * @signature * -> boolean
      * @description Determines if 'this' just monad is equal to another monad. Equality

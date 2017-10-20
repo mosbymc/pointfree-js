@@ -390,6 +390,14 @@ describe('Maybe functor tests', function _testMaybeFunctor() {
             num4.should.eql(2);
         });
 
+        it('should represent the maybe\'s \'type\' when \'Object.prototype.toString.call\' is invoked', function _testIdentityTypeString() {
+            var j = Just(),
+                n = Nothing();
+
+            Object.prototype.toString.call(j).should.eql('[object Just]');
+            Object.prototype.toString.call(n).should.eql('[object Nothing]');
+        });
+
         it('should print the correct container type + value when .toString() is invoked', function _testMaybeFunctorToString() {
             var c1 = Maybe(1),
                 c2 = Maybe(null),
