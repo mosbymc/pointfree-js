@@ -439,12 +439,6 @@ function groupJoin(xs, ys, xSelector, ySelector, projector, listFactory, compare
     };
 }
 
-function head(xs) {
-    return function *_headIterator() {
-        yield toArray(xs)[0];
-    };
-}
-
 /**
  * @signature
  * @description d
@@ -620,13 +614,6 @@ function prependAll(xs, yss) {
     return concatAll(toArray(yss[0]), yss.slice(1).concat([xs]));
 }
 
-function push(xs, item) {
-    return function *_pushIterator() {
-        for (let it of xs) yield it;
-        yield item;
-    };
-}
-
 /**
  * @signature
  * @description s
@@ -745,13 +732,6 @@ function sortBy(xs, orderObject) {
     };
 }
 
-function tail(xs) {
-    return function *_tailIterator() {
-        var idx = 0;
-        while (++idx < xs.length) yield xs[idx];
-    };
-}
-
 /**
  * @signature
  * @description d
@@ -813,5 +793,5 @@ function zip(xs, ys, selector) {
 }
 
 export { all, any, binarySearch, chain, concat, concatAll, contains, copyWithin, count, distinct, equals, except, fill, filter,
-        findIndex, findLastIndex, first, foldLeft, foldRight, groupBy, groupJoin, head, intersect, intersperse, join, last, map, ofType,
-        pop, prepend, prependAll, reduceRight, repeat, reverse, set, skipWhile, slice, sortBy, tail, takeWhile, unfold, union, zip };
+        findIndex, findLastIndex, first, foldLeft, foldRight, groupBy, groupJoin, intersect, intersperse, join, last, map, ofType,
+        pop, prepend, prependAll, reduceRight, repeat, reverse, set, skipWhile, slice, sortBy, takeWhile, unfold, union, zip };

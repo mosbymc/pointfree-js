@@ -120,6 +120,12 @@ describe('Constant monad tests', function _testConstantMonad() {
             c.should.equal(d);
         });
 
+        it('should return itself during a concat operation', function _testConcat() {
+            Constant(1)
+                .concat(Constant(2))
+                .extract.should.eql(1);
+        });
+
         it('should properly indicate equality when constant monads are indeed equal', function _testConstantFunctorEquality() {
             var m1 = Constant(null),
                 m2 = Constant(null),

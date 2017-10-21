@@ -1,6 +1,6 @@
 import { all, any, binarySearch, chain, concat, concatAll, contains, copyWithin, count, distinct, equals, except, fill, filter,
-        findIndex, findLastIndex, first, foldLeft, foldRight, groupBy, groupJoin, head, intersect, intersperse, join, last, map, ofType,
-        pop, prepend, prependAll, reduceRight, repeat, reverse, set, skipWhile, slice, sortBy, tail, takeWhile, unfold, union, zip } from './list_iterators';
+        findIndex, findLastIndex, first, foldLeft, foldRight, groupBy, groupJoin, intersect, intersperse, join, last, map, ofType,
+        pop, prepend, prependAll, reduceRight, repeat, reverse, set, skipWhile, slice, sortBy, takeWhile, unfold, union, zip } from './list_iterators';
 import { sortDirection, generatorProto } from '../helpers';
 import { wrap, defaultPredicate, delegatesFrom, isArray, noop, invoke, delegatesTo, isString, both } from '../functionalHelpers';
 import { when, ifElse, identity, constant } from '../combinators';
@@ -405,7 +405,7 @@ var list_core = {
      * @return {list} - a
      */
     mjoin: function _mjoin() {
-        return this.value;
+        return this.chain(x => x);
     },
 
     /**
@@ -1049,11 +1049,11 @@ var list_core = {
      * @memberOf dataStructures.list_core
      * @instance
      * @function sequence
-     * @param {function} p - a
+     * @param {Object} p - Any pointed monad with a '#of' function property
      * @return {list} - b
      */
     sequence: function _sequence(p) {
-        return this.traverse(p, identity);
+        return this.traverse(p, p.of);
         /*
         return this.foldr((m, ma) => {
             return m.chain(x => {
@@ -1069,7 +1069,8 @@ var list_core = {
      * @memberOf dataStructures.list_core
      * @instance
      * @function traverse
-     * @param {function} f - a
+     * @param {Object} f - A pointed monad with a '#of' function property. Used only in cases
+     * where the mapping function cannot be run.
      * @param {function} g - b
      * @return {list} - c
      */

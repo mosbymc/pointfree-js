@@ -274,6 +274,18 @@ describe('List functor test', function _testListFunctor() {
             }).data.should.eql([3, 7, 11, 15]);
         });
 
+        it('should return a flattened list when mjoin is called', function _testListMjoin() {
+            var l1 = List([1, 2, 3, 4, 5]),
+                l2 = List.from([false, false, true, false, true]),
+                l3 = List(List([{ a: 1, b: 2 }, { a: 3, b: 4 }, { a: 5, b: 6 }, { a: 7, b: 8 }]));
+
+            l1.mjoin().data.should.eql([1, 2, 3, 4, 5]);
+
+            l2.mjoin().data.should.eql([false, false, true, false, true]);
+
+            l3.mjoin().data.should.eql([{ a: 1, b: 2 }, { a: 3, b: 4 }, { a: 5, b: 6 }, { a: 7, b: 8 }]);
+        });
+
         it('should apply each function contained within to the provided data structure', function _testListApply() {
             var fn1 = x => x * 1,
                 fn2 = x => x * 2,
@@ -931,6 +943,10 @@ describe('List functor test', function _testListFunctor() {
                 List([1, 2, 3, 4, 5])
                     .foldr((x, acc) => x / acc, 1)
                     .should.eql(1.875);
+
+                List([1, 2, 3, 4, 5])
+                    .foldr((x, acc) => x / acc)
+                    .should.eql(1.875);
             });
 
             it('should return a boolean indicating if the list has no items', function _testIsEmpty() {
@@ -1223,8 +1239,12 @@ describe('List functor test', function _testListFunctor() {
         });
 
         it('should run sequence', function _testSequence() {
-            //var list = List([1, 2, 3, 4, 5]),
-              //  res = list.sequence(monads.Identity);
+            var list = List([1, 2, 3, 4, 5]),
+                res = list.sequence(monads.Identity);
+
+            Object.getPrototypeOf(monads.Identity()).isPrototypeOf(res).should.be.true;
+            Object.getPrototypeOf(List()).isPrototypeOf(res.value).should.be.true;
+            res.extract.data.should.eql([1, 2, 3, 4, 5]);
         });
     });
 });
