@@ -2,8 +2,6 @@ import { identity } from '../combinators';
 
 /** @module data_structure_util */
 
-var map = m => fn => m.map(fn);
-
 /**
  * @signature contramap :: (b -> a) -> Ma
  * @description Contramap accepts a single function as an argument and returns a
@@ -15,13 +13,7 @@ var map = m => fn => m.map(fn);
  * @return {*} Returns a data structure of the same type.
  */
 function contramap(fn) {
-    return this.factory.of(compose(this.value, fn));
-}
-
-function compose(f, g) {
-    return function _compose(...args) {
-        return f(g(...args));
-    };
+    return this.factory.of((...args) => this.value(fn(...args)));
 }
 
 /**
@@ -30,7 +22,7 @@ function compose(f, g) {
  * @param {Object} type - a
  * @return {function} - b
  */
-function monadTransformer(type) {
+function transformer(type) {
     return function toType(fn = identity) {
         return type.of(fn(this.value));
     };
@@ -43,22 +35,15 @@ function monadTransformer(type) {
  * @return {*} Returns the array of monad 'types' that it received as an argument.
  */
 function applyTransforms(types) {
-    var fns = types
-        .map(type => [
-            { name: `mapTo${type.factory.name}`, fn: monadTransformer(type.factory) },
-            { name: `to${type.factory.name}`, fn: function _toType() { return type.factory(this.value); } }
-        ]);
-
-    return types.map(function _applyTransforms(type) {
-        if (type.delegate) {
-            let regex = new RegExp(type.factory.name, 'i');
-
-            fns.forEach(function _addTransformFunctionality(transforms) {
-                transforms.forEach(transform => type.delegate[transform.name] = regex.test(transform.name) ? map(type.delegate) : transform.fn);
-            });
-        }
-        return type;
-    });
+    var fns = types.map(type => { return { name: `mapTo${type.factory.name}`, fn: transformer(type.factory) }; });
+    return types
+        .map(function _applyTransforms(type) {
+            if (type.delegate) {
+                let regex = new RegExp(type.factory.name, 'i');
+                fns.filter(fn => !regex.test(fn.name)).forEach(fn => type.delegate[fn.name] = fn.fn);
+            }
+            return type;
+        });
 }
 
 /**

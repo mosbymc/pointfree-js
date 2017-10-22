@@ -360,6 +360,8 @@ describe('Maybe functor tests', function _testMaybeFunctor() {
             m7.equals(m9).should.be.false;
 
             m8.equals(m9).should.be.false;
+
+            Maybe(Maybe(1)).equals(Maybe(1)).should.be.true;
         });
 
         it('should have a functioning iterator', function _testMaybeFunctorIterator() {

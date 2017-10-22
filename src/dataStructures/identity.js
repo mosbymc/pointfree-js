@@ -76,6 +76,17 @@ Identity.empty = () => Identity();
  * @property {function} sequence - returns a new identity monad
  * @property {function} traverse - returns a new identity monad
  * @property {function} isEmpty - Returns a boolean indicating if the identity monad is 'empty'
+ * @property {function} mapToConstant
+ * @property {function} mapToEither
+ * @property {function} mapToLeft
+ * @property {function} mapToRight
+ * @property {function} mapToFuture
+ * @property {function} mapToIo
+ * @property {function} mapToList
+ * @property {function} mapToMaybe
+ * @property {function} mapToJust
+ * @property {function} mapToNothing
+ * @property {function} mapToValidations
  * @property {function} valueOf - returns the underlying value of the monad; used during concatenation and coercion
  * @property {function} toString - returns a string representation of the identity monad and its underlying value
  * @property {function} factory - a reference to the identity factory function

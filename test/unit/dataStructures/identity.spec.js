@@ -182,26 +182,7 @@ describe('Identity monad test', function _testIdentityMonad() {
                 m = i.mapToMaybe(),
                 r = i.mapToRight();
 
-            Object.getPrototypeOf(c).should.eql(Object.getPrototypeOf(monads.Constant()));
-            Object.getPrototypeOf(f).should.eql(Object.getPrototypeOf(monads.Future()));
-            Object.getPrototypeOf(io).should.eql(Object.getPrototypeOf(monads.Io()));
-            Object.getPrototypeOf(l).should.eql(Object.getPrototypeOf(monads.List()));
-            Object.getPrototypeOf(left).should.eql(Object.getPrototypeOf(monads.Left()));
-            Object.getPrototypeOf(m).should.eql(Object.getPrototypeOf(monads.Maybe(1)));
-            Object.getPrototypeOf(r).should.eql(Object.getPrototypeOf(monads.Right()));
-        });
-
-        it('should transform an identity functor to the other functor types', function _testIdentityFunctorTransform() {
-            var i = Identity(1);
-
-            var c = i.toConstant(),
-                f = i.toFuture(),
-                io = i.toIo(),
-                l = i.toList(),
-                left = i.toLeft(),
-                m = i.toMaybe(),
-                r = i.toRight();
-
+            expect(i.mapToIdentity).to.be.undefined;
             Object.getPrototypeOf(c).should.eql(Object.getPrototypeOf(monads.Constant()));
             Object.getPrototypeOf(f).should.eql(Object.getPrototypeOf(monads.Future()));
             Object.getPrototypeOf(io).should.eql(Object.getPrototypeOf(monads.Io()));

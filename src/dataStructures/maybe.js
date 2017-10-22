@@ -236,7 +236,9 @@ Just.is = f => just.isPrototypeOf(f);
  * @return {dataStructures.nothing} - Returns a new object that delegates to the
  * {@link dataStructures.nothing}.
  */
-var Nothing = returnNothing;
+function Nothing() {
+    return nothing;
+}
 
 /**
  * @signature * -> {@link dataStructures.nothing}
