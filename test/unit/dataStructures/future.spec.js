@@ -87,10 +87,86 @@ describe('Future functor test', function _testFutureFunctor() {
             f1.isEmpty().should.be.true;
         });
 
+        it('should map a function over a future', function _testFutureMap(done) {
+            Future(function _to(rej, res) {
+                setTimeout(function _timeout() {
+                    res(5);
+                }, 500);
+            })
+                .map(x => x * x)
+                .fork(console.error, function _res(res) {
+                    res.should.eql(25);
+                    done();
+                });
+        });
+
+        it('should fail to map a function over a future', function _testFutureMap(done) {
+            Future(function _to(rej, res) {
+                setTimeout(function _timeout() {
+                    rej(5);
+                }, 500);
+            })
+                .map(x => x * x)
+                .fork(function _err(err) {
+                    err.should.eql(5);
+                    done();
+                }, console.log);
+        });
+
+        it('should chain a function over a future', function _testFutureChain(done) {
+            Future(function _to(rej, res) {
+                setTimeout(function _timeout() {
+                    res(5);
+                }, 500);
+            })
+                .chain(function _chain(val) {
+                    return Future.of(val * val);
+                })
+                .fork(console.error, function _res(res) {
+                    res.should.eql(25);
+                    done();
+                });
+        });
+
+        it('should fail to chain a function over a future', function _testFutureChain(done) {
+            Future(function _to(rej, res) {
+                setTimeout(function _timeout() {
+                    rej(5);
+                }, 500);
+            })
+                .chain(function _chain(val) {
+                    return Future.of(val * val);
+                })
+                .fork(function _err(err) {
+                    err.should.eql(5);
+                    done();
+                }, console.log);
+        });
+
+        it('should return a boolean indicating future equality', function _testFutureEquals() {
+            function fn1() {}
+            function fn2() {}
+            var f1 = Future(fn1),
+                f2 = Future(fn1),
+                f3 = Future(fn2);
+
+            f1.equals(f2).should.be.true;
+            f2.equals(f1).should.be.true;
+            f1.equals(f3).should.be.false;
+            f3.equals(f1).should.be.false;
+            f2.equals(f3).should.be.false;
+            f3.equals(f2).should.be.false;
+        });
+
         it('should represent a future in string form', function _testFutureDotToString() {
             var f = Future.of(1);
 
             f.toString().should.eql('Future()');
+        });
+
+        it('should represent the future\'s \'type\' when \'Object.prototype.toString.call\' is invoked', function _testFutureTypeString() {
+            var i = Future();
+            Object.prototype.toString.call(i).should.eql('[object Future]');
         });
     });
 });

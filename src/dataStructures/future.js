@@ -201,7 +201,7 @@ var future = {
     //TODO: probably need to compose here, not actually map over the value; this is a temporary fill-in until
     //TODO: I have time to finish working on the Future
     chain: function _chain(fn) {
-        return this.factory.of((resolve, reject) => this.fork(err => reject(err), res => fn(res).fork(reject, resolve)));
+        return this.factory.of((reject, resolve) => this.fork(err => reject(err), res => fn(res).fork(reject, resolve)));
         /*
         return this.of((reject, resolve) =>
         {
