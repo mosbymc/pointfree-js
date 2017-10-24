@@ -1191,8 +1191,12 @@ describe('List functor test', function _testListFunctor() {
 
         it('should return the value of the list', function _testValueOf() {
             var list = List([1, 2, 3, 4, 5]),
-                res = list + list;
-            res.should.eql(NaN);
+                res = +list;
+            res.should.eql(15);
+
+            (list + list).should.eql(30);
+            (`${list}`).should.eql('12345');
+            ('' + list).should.eql('15');
         });
     });
 

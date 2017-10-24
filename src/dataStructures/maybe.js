@@ -1,5 +1,5 @@
 import { identity } from '../combinators';
-import { monad_apply, chain, mjoin, disjunctionEqualMaker, maybeFactoryHelper, stringMaker, valueOf, sharedMaybeFns } from './data_structure_util';
+import { monad_apply, chain, mjoin, disjunctionEqualMaker, stringMaker, valueOf, sharedMaybeFns } from './data_structure_util';
 
 /**
  * @signature

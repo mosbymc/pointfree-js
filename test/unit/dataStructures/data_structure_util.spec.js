@@ -1,4 +1,4 @@
-import { monad_apply, applyTransforms, chain, monadIterator, disjunctionEqualMaker, equals, lifter, maybeFactoryHelper,
+import { monad_apply, applyTransforms, chain, monadIterator, disjunctionEqualMaker, equals, lifter,
     mjoin, stringMaker, valueOf, sharedMaybeFns, sharedEitherFns, applyFantasyLandSynonyms, chainRec } from '../../../src/dataStructures/data_structure_util';
 
 function Identity(val) {

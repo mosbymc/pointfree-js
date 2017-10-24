@@ -84,24 +84,17 @@ function monadIterator() {
 }
 
 function _toPrimitive(hint) {
-    console.log(hint);
-    console.log(this.value);
-
-    if (Array.isArray(this.value) && 5 === this.value.length) {
-        console.log(this.value);
-        console.log(hint);
-        console.log(typeof this.value);
-        //console.log(+this.value);
-    }
     //if the underlying is a function, an object, or we didn't receive a hint, let JS determine how
     //to turn the underlying value into a primitive if it is not already...
-    if ('object' !== typeof this.value && 'function' !== typeof this.value && null != hint) {
+    if (!Array.isArray(this.value) && null != hint) {
         //..if the hint is a number or default, coerce the underlying to a number and return...
         if ('number' === hint || 'number' === typeof this.value) return +this.value;
         //...else the hint was 'string', so coerce to a string a return
         return '' + this.value;
     }
-    return this.value;
+
+    if ('string' === hint) return this.value.join('');
+    if ('number' === hint || 'default' === hint) return this.value.reduce((curr, acc) => curr + acc, 0);
 }
 
 /**
@@ -191,14 +184,6 @@ var lifter = (type) => (fn) => (...args) => type.of(fn(...args));
 /**
  * @signature
  * @description d
- * @param {function} type - a
- * @return {function} val - b
- */
-var maybeFactoryHelper = type => val => type(val);
-
-/**
- * @signature
- * @description d
  * @return {Object} Returns a monad flattened by one level if capable.
  */
 function mjoin() {
@@ -236,19 +221,12 @@ function justMap(fn) {
     return this.factory.of(fn(this.value));
 }
 
-function nothingMapMaker(factory) {
-    return function nothingMap(fn) {
-        return factory(this.value);
-    };
-}
-
 function justBimap(f, g) {
     return this.factory.of(f(this.value));
 }
 
 var sharedMaybeFns = {
     justMap,
-    nothingMapMaker,
     justBimap
 };
 
@@ -325,7 +303,7 @@ function setIteratorAndLift(dataStructures) {
         if (dataStructure.delegate) {
             //TODO: for now, don't apply the toPrimitive symbol function - it's messing with operations I
             //TODO: would not expect it to mess with.
-            //dataStructure.delegate[Symbol.toPrimitive] = _toPrimitive;
+            dataStructure.delegate[Symbol.toPrimitive] = _toPrimitive;
             if (!dataStructure.delegate[Symbol.iterator]) dataStructure.delegate[Symbol.iterator] = monadIterator;
         }
         return dataStructure;
@@ -374,6 +352,6 @@ var fl = {
     promap: 'fantasy-land/promap'
 };
 
-export { monad_apply, applyTransforms, chain, contramap, monadIterator, disjunctionEqualMaker, equals, lifter, maybeFactoryHelper,
+export { monad_apply, applyTransforms, chain, contramap, monadIterator, disjunctionEqualMaker, equals, lifter,
         mjoin, stringMaker, valueOf, sharedMaybeFns, sharedEitherFns, applyFantasyLandSynonyms, applyAliases, chainRec, extendMaker,
         setIteratorAndLift };
