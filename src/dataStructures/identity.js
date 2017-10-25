@@ -30,7 +30,7 @@ function Identity(val) {
  * @signature * -> {@link dataStructures.identity}
  * @description Takes any value and places it in the correct context if it is
  * not already and creates a new {@link dataStructures.identity} object delegator instance.
- * Because the identity monad does not require any specific context for
+ * Because the identity data structure does not require any specific context for
  * its value, this can be viewed as an alias for {@link Identity}
  * @memberOf dataStructures.Identity
  * @static
@@ -57,25 +57,25 @@ Identity.is = f => identity.isPrototypeOf(f);
 
 /**
  * @signature () -> {@link dataStructures.identity}
- * @description Creates and returns an 'empty' identity monad.
- * @return {dataStructures.identity} - Returns a new identity monad.
+ * @description Creates and returns an 'empty' identity data structure.
+ * @return {dataStructures.identity} - Returns a new identity.
  */
 Identity.empty = () => Identity();
 
 /**
  * @typedef {Object} identity
- * @property {function} value - returns the underlying value of the the monad
+ * @property {function} value - returns the underlying value of the the identity
  * @property {function} extract - returns the underlying value of the identity
- * @property {function} map - maps a single function over the underlying value of the monad
- * @property {function} chain - returns a new identity monad
- * @property {function} mjoin - returns a new identity monad
- * @property {function} apply - returns a new instance of whatever monad type's underlying value this
+ * @property {function} map - maps a single function over the underlying value of the identity
+ * @property {function} chain - returns a new identity data structure
+ * @property {function} mjoin - returns a new identity data structure
+ * @property {function} apply - returns a new instance of whatever data structure type's underlying value this
  * identity's underlying function value should be mapped over.
- * @property {function} bimap - returns a new identity monad
+ * @property {function} bimap - returns a new identity data structure
  * @property {function} fold - Applies a function to the identity's underlying value and returns the result
- * @property {function} sequence - returns a new identity monad
- * @property {function} traverse - returns a new identity monad
- * @property {function} isEmpty - Returns a boolean indicating if the identity monad is 'empty'
+ * @property {function} sequence - returns a new identity data structure
+ * @property {function} traverse - returns a new identity data structure
+ * @property {function} isEmpty - Returns a boolean indicating if the identity is 'empty'
  * @property {function} mapToConstant
  * @property {function} mapToEither
  * @property {function} mapToLeft
@@ -87,18 +87,18 @@ Identity.empty = () => Identity();
  * @property {function} mapToJust
  * @property {function} mapToNothing
  * @property {function} mapToValidations
- * @property {function} valueOf - returns the underlying value of the monad; used during concatenation and coercion
- * @property {function} toString - returns a string representation of the identity monad and its underlying value
+ * @property {function} valueOf - returns the underlying value of the identity; used during concatenation and coercion
+ * @property {function} toString - returns a string representation of the identity data structure and its underlying value
  * @property {function} factory - a reference to the identity factory function
  * @property {function} [Symbol.Iterator] - Iterator for the identity
  * @kind {Object}
  * @memberOf dataStructures
  * @namespace identity
- * @description This is the delegate object that specifies the behavior of the identity monad. All
- * operations that may be performed on an identity monad 'instance' delegate to this object. Identity
+ * @description This is the delegate object that specifies the behavior of the identity data structure. All
+ * operations that may be performed on an identity 'instance' delegate to this object. Identity
  * monad 'instances' are created by the {@link dataStructures.Identity} factory function via Object.create,
  * during which the underlying value is placed directly on the newly created object. No other
- * properties exist directly on an identity monad delegator object beyond the ._value property.
+ * properties exist directly on an identity delegator object beyond the ._value property.
  * All behavior delegates to this object, or higher up the prototype chain.
  */
 var identity = {
@@ -124,7 +124,8 @@ var identity = {
      * @description Returns the underlying value of an identity delegator. This is a getter function
      * and thus works differently than the fantasy-land specification; rather than invoking identity#extract
      * as a function, you merely need to reference as a non-function property. This makes infinitely more
-     * sense to me, especially if the underlying is a function... who wants to: identity.extract()(x, y, z)?
+     * sense to me, especially if the underlying is a function... who wants to do this: identity.extract()(x, y, z)
+     * when they could do this: identity.extract(x, y, z)?
      * @memberOf dataStructures.identity
      * @instance
      * @private
@@ -153,34 +154,34 @@ var identity = {
     /**
      * @signature () -> {@link dataStructures.identity}
      * @description Accepts a mapping function as an argument, applies the function to the
-     * underlying value. If the mapping function returns an identity monad, chain will 'flatten'
-     * the nested identities by one level. If the mapping function does not return an identity
-     * monad, chain will just return an identity monad that 'wraps' whatever the return value
+     * underlying value. If the mapping function returns an identity data structure, chain will 'flatten'
+     * the nested identities by one level. If the mapping function does not return an identity,
+     * chain will just return an identity data structure that 'wraps' whatever the return value
      * of the mapping function is. However, if the mapping function does not return a monad of
      * the same type, then chain is probably not the functionality you should use. See
      * {@link dataStructures.identity#map} instead.
      * @memberOf dataStructures.identity
      * @instance
      * @function chain
-     * @param {function} fn - A mapping function that returns a monad of the same type
-     * @return {Object} Returns a new identity monad that 'wraps' the return value of the
+     * @param {function} fn - A mapping function that returns a data structure of the same type
+     * @return {Object} Returns a new identity data structure that 'wraps' the return value of the
      * mapping function after flattening it by one level.
      */
     chain: chain,
     /**
      * @signature () -> {@link dataStructures.identity}
-     * @description Returns a new identity monad. If the current identity monad is nested, mjoin
+     * @description Returns a new identity data structure. If the current identity is nested, mjoin
      * will flatten it by one level. Very similar to {@link dataStructures.identity#chain} except no
      * mapping function is accepted or run.
      * @memberOf dataStructures.identity
      * @instance
      * @function mjoin
-     * @return {Object} Returns a new identity monad after flattening the nested monads by one level.
+     * @return {Object} Returns a new identity after flattening the nested data structures by one level.
      */
     mjoin: mjoin,
     /**
      * @signature Object -> Object
-     * @description Accepts any monad object with a mapping function and invokes that object's mapping
+     * @description Accepts any applicative object with a mapping function and invokes that object's mapping
      * function on the identity's underlying value. In order for this function to execute properly and
      * not throw, the identity's underlying value must be a function that can be used as a mapping function
      * on the monad object supplied as the argument.
@@ -188,19 +189,19 @@ var identity = {
      * @instance
      * @function apply
      * @param {Object} ma - Any object with a map function - i.e. a monad.
-     * @return {Object} Returns an instance of the monad object provide as an argument.
+     * @return {Object} Returns an instance of the data structure object provide as an argument.
      */
     apply: monad_apply,
     /**
      * @signature () -> *
      * @description Accepts a function that is used to map over the identity's underlying value
      * and returns the returns value of the function without 're-wrapping' it in a new identity
-     * monad instance.
+     * instance.
      * @memberOf dataStructures.identity
      * @instance
      * @function fold
      * @param {function} fn - Any mapping function that should be applied to the underlying value
-     * of the identity monad.
+     * of the identity.
      * @param {*} acc - An JavaScript value that should be used as an accumulator.
      * @return {*} Returns the return value of the mapping function provided as an argument.
      */
@@ -208,33 +209,33 @@ var identity = {
         return fn(acc, this.value);
     },
     /**
-     * @signature monad -> monad<monad<T>>
-     * @description Returns a monad of the type passed as an argument that 'wraps'
-     * and identity monad that 'wraps' the current identity monad's underlying value.
+     * @signature identity -> M<identity<T>>
+     * @description Returns a data structure of the type passed as an argument that 'wraps'
+     * and identity object that 'wraps' the current identity's underlying value.
      * @memberOf dataStructures.identity
      * @instance
      * @function sequence
-     * @param {Object} p - Any pointed monad with a '#of' function property
-     * @return {Object} Returns a monad of the type passed as an argument that 'wraps'
-     * and identity monad that 'wraps' the current identity monad's underlying value.
+     * @param {Object} p - Any pointed data structure with a '#of' function property
+     * @return {Object} Returns a data structure of the type passed as an argument that 'wraps'
+     * and identity that 'wraps' the current identity's underlying value.
      */
     sequence: function _sequence(p) {
         return this.traverse(p, p.of);
     },
     /**
      * @signature Object -> () -> Object
-     * @description Accepts a pointed monad with a '#of' function property and a mapping function. The mapping
-     * function is applied to the identity monad's underlying value. The mapping function should return a monad
-     * of any type. Then the {@link dataStructures.Identity.of} function is used to map over the returned monad. Essentially
-     * creating a new object of type: monad<Identity<T>>, where 'monad' is the type of monad the mapping
+     * @description Accepts a pointed data structure with a '#of' function property and a mapping function. The mapping
+     * function is applied to the identity's underlying value. The mapping function should return a data structure
+     * of any type. Then the {@link dataStructures.Identity.of} function is used to map over the returned data structure. Essentially
+     * creating a new object of type: M<Identity<T>>, where 'M' is the type of data structure the mapping
      * function returns.
      * @memberOf dataStructures.identity
      * @instance
      * @function traverse
-     * @param {Object} a - A pointed monad with a '#of' function property. Used only in cases
+     * @param {Object} a - A pointed data structure with a '#of' function property. Used only in cases
      * where the mapping function cannot be run.
      * @param {function} f - A mapping function that should be applied to the identity's underlying value.
-     * @return {Object} Returns a new identity monad that wraps the mapping function's returned monad type.
+     * @return {Object} Returns a new identity that wraps the mapping function's returned data structure type.
      */
     traverse: function _traverse(a, f) {
         return f(this.value).map(this.factory.of);
