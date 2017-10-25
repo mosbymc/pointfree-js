@@ -16,7 +16,7 @@ A JavaScript library that brings together algebraic data structures, combinators
 This is a work in progress and is not yet ready for production use.
 
 Currently in progress:
-- Find out what is causing less than half the tests to run on travis and either fix it, or more to a different CI builder
+- lazify existing data structures
 - monoids and groups
 - semi-group/monoid/group factory for defining your own semi-groups/monoids/groups
 - tests and refactoring of existing code base
