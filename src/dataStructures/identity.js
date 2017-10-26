@@ -270,30 +270,30 @@ var identity = {
     },
     /**
      * @signature (identity<A> -> B) -> identity<B>
-     * @description Takes a function that operates on the current identity monad and returns
-     * any value, invokes that function, passing the current identity monad as the only argument,
-     * and then returns a new identity monad that wraps the return value of the provided function.
-     * @param {function} fn - A function that can operate on an identity monad
-     * @return {Identity<T>} Returns a new identity monad that wraps the return value of the
+     * @description Takes a function that operates on the current identity and returns
+     * any value, invokes that function, passing the current identity as the only argument,
+     * and then returns a new identity that wraps the return value of the provided function.
+     * @param {function} fn - A function that can operate on an identity data structure
+     * @return {Identity<T>} Returns a new identity that wraps the return value of the
      * function that was provided as an argument.
      */
     extend: extendMaker(Identity),
     /**
      * @signature * -> boolean
-     * @description Determines if 'this' identity monad is equal to another monad. Equality
+     * @description Determines if 'this' identity is equal to another data structure. Equality
      * is defined as:
-     * 1) The other monad shares the same delegate object as 'this' identity monad
+     * 1) The other data structure shares the same delegate object as 'this' identity
      * 2) Both underlying values are strictly equal to each other
      * @memberOf dataStructures.identity
      * @instance
      * @function
-     * @param {Object} ma - The other monad to check for equality with 'this' monad.
+     * @param {Object} ma - The other data structure to check for equality with 'this' identity.
      * @return {boolean} - Returns a boolean indicating equality
      */
     equals: equals,
     /**
      * @signature () -> *
-     * @description Returns the underlying value of the current monad 'instance'. This
+     * @description Returns the underlying value of the current identity 'instance'. This
      * function property is not meant for explicit use. Rather, the JavaScript engine uses
      * this property during implicit coercion like addition and concatenation.
      * @memberOf dataStructures.identity
@@ -304,7 +304,7 @@ var identity = {
     valueOf: valueOf,
     /**
      * @signature () -> string
-     * @description Returns a string representation of the monad and its
+     * @description Returns a string representation of the identity and its
      * underlying value
      * @memberOf dataStructures.identity
      * @instance
@@ -328,7 +328,7 @@ var identity = {
      * @see dataStructures.Identity
      * @param {*} val - The value that should be set as the underlying
      * value of the {@link dataStructures.identity}.
-     * @return {dataStructures.identity} - Returns a new identity monad delegator
+     * @return {dataStructures.identity} - Returns a new identity object
      */
     factory: Identity
 };
@@ -337,7 +337,7 @@ var identity = {
  * @signature (* -> *) -> (* -> *) -> dataStructures.identity<T>
  * @description Since the constant monad does not represent a disjunction, the Identity's
  * bimap function property behaves just as its map function property. It is merely here as a
- * convenience so that swapping out monads/monads does not break an application that is
+ * convenience so that swapping out data structure does not break an application that is
  * relying on its existence.
  * @memberOf dataStructures.identity
  * @instance
@@ -359,7 +359,7 @@ identity.bimap = identity.map;
  * @function ap
  * @see dataStructures.identity#apply
  * @param {Object} ma - Any object with a map function - i.e. a monad.
- * @return {Object} Returns an instance of the monad object provide as an argument.
+ * @return {Object} Returns an instance of the data structure object provide as an argument.
  */
 identity.ap = identity.apply;
 
@@ -370,8 +370,8 @@ identity.ap = identity.apply;
  * @instance
  * @function fmap
  * @see dataStructures.identity#chain
- * @param {function} fn - A mapping function that returns a monad of the same type
- * @return {Object} Returns a new identity monad that 'wraps' the return value of the
+ * @param {function} fn - A mapping function that returns a data structure of the same type
+ * @return {Object} Returns a new identity that 'wraps' the return value of the
  * mapping function after flattening it by one level.
  */
 identity.fmap = identity.chain;
@@ -383,8 +383,8 @@ identity.fmap = identity.chain;
  * @instance
  * @function flatMap
  * @see dataStructures.identity#chain
- * @param {function} fn - A mapping function that returns a monad of the same type
- * @return {Object} Returns a new identity monad that 'wraps' the return value of the
+ * @param {function} fn - A mapping function that returns a data structure of the same type
+ * @return {Object} Returns a new identity that 'wraps' the return value of the
  * mapping function after flattening it by one level.
  */
 identity.flapMap = identity.chain;
@@ -396,8 +396,8 @@ identity.flapMap = identity.chain;
  * @instance
  * @function bind
  * @see dataStructures.identity#chain
- * @param {function} fn - A mapping function that returns a monad of the same type
- * @return {Object} Returns a new identity monad that 'wraps' the return value of the
+ * @param {function} fn - A mapping function that returns a data structure of the same type
+ * @return {Object} Returns a new identity that 'wraps' the return value of the
  * mapping function after flattening it by one level.
  */
 identity.bind = identity.chain;
@@ -410,7 +410,7 @@ identity.bind = identity.chain;
  * @function reduce
  * @see dataStructures.identity#fold
  * @param {function} fn - Any mapping function that should be applied to the underlying value
- * of the identity monad.
+ * of the identity data structure.
  * @return {*} Returns the return value of the mapping function provided as an argument.
  */
 identity.reduce = identity.fold;
