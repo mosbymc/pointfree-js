@@ -3,12 +3,12 @@ import { monad_apply, chain, mjoin, disjunctionEqualMaker, stringMaker, valueOf,
 
 /**
  * @signature
- * @description Returns an either functor based on a loose equals null comparison. If
- * the argument passed to the function loose equals null, a left is returned; other wise,
- * a right.
+ * @description Returns a just or nothing data structure based on a loose equals null comparison. If
+ * the argument passed to the function loose equals null, a nothing is returned; other wise,
+ * a just.
  * @private
- * @param {*} x - Any value that should be placed inside an either functor.
- * @return {dataStructures.just|dataStructures.nothing} - Either a left or a right functor
+ * @param {*} x - Any value that should be placed inside a maybe type.
+ * @return {dataStructures.just|dataStructures.nothing} - Either a just or a nothing
  */
 function fromNullable(x) {
     return null != x ? Just(x) : Nothing();
@@ -19,10 +19,11 @@ var returnNothing = () => nothing;
 
 /**
  * @signature - :: * -> dataStructures.just|dataStructures.nothing
- * @description Factory function used to create a new object that delegates to
- * the {@link dataStructures.just|dataStructures.nothing} object. Any single value may be provided as an argument
- * which will be used to set the underlying value of the new {@link dataStructures.just|dataStructures.nothing}
- * delegator. If no argument is provided, the underlying value will be 'undefined'.
+ * @description Factory function used to create a new object that delegates to either
+ * the {@link dataStructures.just} object or the {@link dataStructures.nothing}. Any 
+ * single value may be provided as an argument which will be used to set the underlying 
+ * value of the new {@link dataStructures.just|dataStructures.nothing} delegator. If no 
+ * argument is provided, the underlying value will be 'undefined'.
  * @namespace Maybe
  * @memberOf dataStructures
  * @property {function} of
@@ -52,8 +53,9 @@ function Maybe(val) {
  * @signature * -> {@link dataStructures.just}
  * @description Takes any value and places it in the correct context if it is
  * not already and creates a new {@link dataStructures.just} object delegator instance.
- * Because the either functor does not require any specific context for
- * its value, this can be viewed as an alias for {@link dataStructures.just}
+ * In the case of a Maybe, the 'correct' context simply means that a {@link dataStructures.just}
+ * will be returned, even if null or undefined are given as the argument. This function can
+ * be viewed as an alias for {@link dataStructures.Just}
  * @memberOf dataStructures.Maybe
  * @static
  * @function of
@@ -103,7 +105,7 @@ Maybe.Just = Maybe.of;
 
 /**
  * @signature
- * @description Creates and returns a new {@link dataStructures.nothing} monad
+ * @description Creates and returns a new {@link dataStructures.nothing} data structure
  * @memberOf dataStructures.Maybe
  * @function Nothing
  * @return {dataStructures.nothing} A new {@link dataStructures.nothing}
@@ -113,7 +115,7 @@ Maybe.Nothing = () => Maybe();
 /**
  * @signature Object -> boolean
  * @description Takes any object and returns a boolean indicating if the object is
- * a 'just' monad.
+ * a 'just' data structure
  * @memberOf dataStructures.Maybe
  * @function is
  * @param {Object} [m] - a
@@ -124,7 +126,7 @@ Maybe.isJust = m => just.isPrototypeOf(m);
 /**
  * @signature Object -> boolean
  * @description Takes any object and returns a boolean indicating if the object is
- * a 'nothing' monad.
+ * a 'nothing' data structure
  * @memberOf dataStructures.Maybe
  * @function is
  * @param {Object} [m] - a
@@ -134,8 +136,8 @@ Maybe.isNothing = m => nothing === m;
 
 /**
  * @signature * -> dataStructures.left|dataStructures.right
- * @description Takes any value and returns a 'nothing' monad is the value
- * loose equals null; other wise returns a 'just' monad.
+ * @description Takes any value and returns a 'nothing' if the value
+ * loose equals null; other wise returns a 'just'
  * @memberOf dataStructures.Maybe
  * @function is
  * @param {*} [x] - a
@@ -143,10 +145,6 @@ Maybe.isNothing = m => nothing === m;
  */
 Maybe.fromNullable = fromNullable;
 
-//TODO: determine if there is any purpose in splitting a maybe into two types... if those sub-types
-//TODO: are not exposed, what benefit is derived from them? And if they are exposed (Just being Identity,
-//TODO: and Nothing being Constant(null)), then the maybe container has a direct dependency on the Identity
-//TODO: and Constant containers. This becomes an issue due to circular dependencies.
 /**
  * @signature - :: * -> dataStructures.just
  * @description Factory function used to create a new object that delegates to
@@ -183,7 +181,7 @@ function Just(val) {
  * @signature * -> {@link dataStructures.just}
  * @description Takes any value and places it in the correct context if it is
  * not already and creates a new {@link dataStructures.just} object delegator instance.
- * Because the either functor does not require any specific context for
+ * Because the just data structure does not require any specific context for
  * its value, this can be viewed as an alias for {@link dataStructures.Just}
  * @memberOf dataStructures.Just
  * @static
@@ -244,7 +242,7 @@ function Nothing() {
  * @signature * -> {@link dataStructures.nothing}
  * @description Takes any value and places it in the correct context if it is
  * not already and creates a new {@link dataStructures.nothing} object delegator instance.
- * Because the either functor does not require any specific context for
+ * Because the nothing data structure does not require any specific context for
  * its value, this can be viewed as an alias for {@link dataStructures.Nothing}
  * @memberOf dataStructures.Nothing
  * @static
@@ -256,9 +254,8 @@ Nothing.of = Nothing;
 
 /**
  * @signature * -> boolean
- * @description Convenience function for determining if a value is an
- * {@link dataStructures.nothing} delegate or not. Available on the
- * {@link left}'s factory function as dataStructures.Nothing#is
+ * @description Convenience function for determining if a value is a {@link dataStructures.nothing}.
+ * Available on the {@link left}'s factory function as dataStructures.Nothing#is
  * @memberOf dataStructures.Nothing
  * @function is
  * @param {*} [n] - Any value may be used as an argument to this function.
@@ -267,42 +264,34 @@ Nothing.of = Nothing;
  */
 Nothing.is = n => nothing === n;
 
-//TODO: Using this.of in order to create a new instance of a Maybe container (functor/monad) will
-//TODO: not work as it is implemented here in terms of creating a new maybe container with the
-//TODO: proper values for the '.isJust' and '.isNothing' fields. The problem is that the '.of'
-//TODO: function property will create a new maybe instance with whatever value it receives as
-//TODO: as argument and treat the new maybe container instance as a 'Just', regardless of the
-//TODO: actual underlying value. As 'null' and 'undefined' underlying values are traditionally
-//TODO: treated as 'Nothing' maybe values, this will cause a problem during mapping/flat-mapping/etc.
-
 /**
  * @typedef {Object} just
- * @property {function} value - returns the underlying value of the the monad
- * @property {function} map - maps a single function over the underlying value of the monad
+ * @property {function} value - returns the underlying value of the just
+ * @property {function} map - maps a single function over the underlying value of the just
  * @property {function} bimap
  * @property {function} extract
- * @property {function} valueOf - returns the underlying value of the monad; used during concatenation and coercion
- * @property {function} toString - returns a string representation of the just monad and its underlying value
+ * @property {function} valueOf - returns the underlying value of the just; used during concatenation and coercion
+ * @property {function} toString - returns a string representation of the just and its underlying value
  * @property {function} factory - a reference to the just factory function
- * @property {function} [Symbol.Iterator] - Iterator for the just monad
+ * @property {function} [Symbol.Iterator] - Iterator for the just
  * @kind {Object}
  * @memberOf dataStructures
  * @namespace just
- * @description This is the delegate object that specifies the behavior of the just monad. All
- * operations that may be performed on an just monad 'instance' delegate to this object. Just
- * monad 'instances' are created by the {@link dataStructures.Just|dataStructures.Nothing} factory function via Object.create,
+ * @description This is the delegate object that specifies the behavior of the just data structure. All
+ * operations that may be performed on a just 'instance' delegate to this object. Just
+ * 'instances' are created by the {@link dataStructures.Just|dataStructures.Nothing} factory function via Object.create,
  * during which the underlying value is placed directly on the newly created object. No other
- * properties exist directly on an right monad delegator object beyond the ._value property.
+ * properties exist directly on an just instance beyond the ._value property.
  * All behavior delegates to this object, or higher up the prototype chain.
  */
 var just = {
     /**
      * @signature () -> *
-     * @description Returns the underlying value of an right delegator. This
+     * @description Returns the underlying value of a just instance. This
      * getter is not expected to be used directly by consumers - it is meant as an internal
-     * access only. To manipulate the underlying value of a right delegator,
+     * access only. To manipulate the underlying value of a just,
      * see {@link dataStructures.just#map} and {@link dataStructures.just#bimap}. To
-     * retrieve the underlying value of a right delegator, see {@link dataStructures.just#get},
+     * retrieve the underlying value of a 'just', see {@link dataStructures.just#get},
      * {@link dataStructures.just#orElse}, {@link dataStructures.just#getOrElse},
      * and {@link dataStructures.just#valueOf}.
      * @memberOf dataStructures.just
@@ -320,8 +309,8 @@ var just = {
     /**
      * @signature () -> {@link dataStructures.just}
      * @description Takes a function that is applied to the underlying value of the
-     * functor, the result of which is used to create a new {@link dataStructures.just}
-     * delegator instance.
+     * 'just' instance, the result of which is used to create a new {@link dataStructures.just}
+     * instance.
      * @memberOf dataStructures.just
      * @instance
      * @param {function} fn - A mapping function that can operate on the underlying
@@ -336,18 +325,18 @@ var just = {
     apply: monad_apply,
     /**
      * @signature (* -> *) -> (* -> *) -> dataStructures.just<T>
-     * @description Acts as a map for the disjunction between a just and a nothing monad. If the
-     * monad is a just, the first mapping function parameter is used to map over the underlying value
-     * and a new just is returned, 'wrapping' the return value of the function. If the monad is a nothing,
-     * the second mapping function is invoked with a 'null' valued argument and a new nothing monad is
-     * returned.
+     * @description Acts as a map for the disjunction between just and nothing data structures. If the
+     * data structure that bimap was invoked on is a just, the first mapping function parameter is used 
+     * to map over the underlying value and a new just is returned, 'wrapping' the return value of the 
+     * function. If the data structure is a nothing, the second mapping function is invoked with a 'null' 
+     * valued argument and 'nothing' is returned.
      * @memberOf dataStructures.just
      * @instance
      * @function
      * @param {function} f - A function that will be used to map over the underlying data of the
      * {@link dataStructures.just} delegator.
      * @param {function} g - A function that will be used to map over a null value if this is a
-     * nothing monad.
+     * 'nothing' instance.
      * @return {dataStructures.just} - Returns a new {@link dataStructures.just} delegator after applying
      * the mapping function to the underlying data.
      */
@@ -363,37 +352,35 @@ var just = {
     },
     /**
      * @signature * -> boolean
-     * @description Determines if 'this' just monad is equal to another monad. Equality
+     * @description Determines if the current 'just' is equal to another data structure. Equality
      * is defined as:
-     * 1) The other functor shares the same delegate object as 'this' just monad
+     * 1) The other data structure shares the same delegate object as 'this'
      * 2) Both underlying values are strictly equal to each other
      * @memberOf dataStructures.just
      * @instance
      * @function
-     * @param {Object} ma - The other monad to check for equality with 'this' monad.
+     * @param {Object} ma - The other data structure to check for equality with
      * @return {boolean} - Returns a boolean indicating equality
      */
     equals: disjunctionEqualMaker('isJust'),
     /**
      * @signature () -> *
-     * @description Returns the underlying value of the current monad 'instance'. This
+     * @description Returns the underlying value of the current just 'instance'. This
      * function property is not meant for explicit use. Rather, the JavaScript engine uses
      * this property during implicit coercion like addition and concatenation.
      * @memberOf dataStructures.just
      * @instance
      * @function
-     * @return {*} Returns the underlying value of the current monad 'instance'.
+     * @return {*} Returns the underlying value of the current 'just' 'instance'.
      */
     valueOf: valueOf,
     /**
      * @signature () -> string
-     * @description Returns a string representation of the monad and its
-     * underlying value
+     * @description Returns a string representation of the 'just' and its underlying value
      * @memberOf dataStructures.just
      * @instance
      * @function
-     * @return {string} Returns a string representation of the just
-     * and its underlying value.
+     * @return {string} Returns a string representation of the just and its underlying value.
      */
     toString: stringMaker('Just'),
     get [Symbol.toStringTag]() {
@@ -411,41 +398,40 @@ var just = {
      * @see dataStructures.Maybe
      * @param {*} val - The value that should be set as the underlying
      * value of the {@link dataStructures.just}.
-     * @return {dataStructures.just} - Returns a new identity functor delegator
+     * @return {dataStructures.just|dataStructures.nothing} - Returns a new just or nothing data structure
      */
     factory: Maybe
 };
 
 /**
  * @typedef {Object} nothing
- * @property {function} value - returns the underlying value of the the monad
- * @property {function} map - maps a single function over the underlying value of the monad
+ * @property {function} value - returns the underlying value of the 'nothing' data structure (always null)
+ * @property {function} map - maps a single function over the underlying value of the 'nothing'
  * @property {function} bimap
  * @property {function} extract
- * @property {function} valueOf - returns the underlying value of the monad; used during concatenation and coercion
- * @property {function} toString - returns a string representation of the nothing monad and its underlying value
- * @property {function} factory - a reference to the nothing factory function
- * @property {function} [Symbol.Iterator] - Iterator for the nothing
+ * @property {function} valueOf - returns the underlying value of the 'nothing'; used during concatenation and coercion
+ * @property {function} toString - returns a string representation of the 'nothing' and its underlying value
+ * @property {function} factory - a reference to the 'nothing' factory function
+ * @property {function} [Symbol.Iterator] - Iterator for the 'nothing'
  * @kind {Object}
  * @memberOf dataStructures
  * @namespace nothing
- * @description This is the delegate object that specifies the behavior of the nothing monad. All
- * operations that may be performed on an nothing monad 'instance' delegate to this object. Nothing
- * monad 'instances' are created by the {@link dataStructures.Nothing|dataStructures.Maybe} factory function via Object.create,
- * during which the underlying value is placed directly on the newly created object. No other
- * properties exist directly on an nothing monad delegator object beyond the ._value property.
+ * @description This is the delegate object that specifies the behavior of the 'nothing' data structure. All
+ * operations that may be performed on a 'nothing' delegate to this object. Nothing 'instances' are created by 
+ * the {@link dataStructures.Nothing|dataStructures.Maybe} factory function via Object.create, during which 
+ * the underlying value is placed directly on the newly created object. No other properties exist directly on 
+ * the 'nothing' data structure beyond the ._value property.
  * All behavior delegates to this object, or higher up the prototype chain.
  */
 var nothing = {
     /**
      * @signature () -> *
-     * @description Returns the underlying value of a nothing monad delegator. This
+     * @description Returns the underlying value of a 'nothing' data structure. This
      * getter is not expected to be used directly by consumers - it is meant as an internal
-     * access only. To manipulate the underlying value of an identity_functor delegator,
-     * see {@link dataStructures.nothing#map} and {@link dataStructures.nothing#bimap}.
-     * To retrieve the underlying value of an nothing monad delegator, see {@link dataStructures.nothing#get},
-     * {@link dataStructures.nothing#orElse}, {@link dataStructures.nothing#getOrElse},
-     * and {@link dataStructures.nothing#valueOf}.
+     * access only. To manipulate the underlying value of a 'nothing', see {@link dataStructures.nothing#map} 
+     * and {@link dataStructures.nothing#bimap}. To retrieve the underlying value of a
+     * 'nothing', see {@link dataStructures.nothing#get}, {@link dataStructures.nothing#orElse}, 
+     * {@link dataStructures.nothing#getOrElse}, and {@link dataStructures.nothing#valueOf}.
      * @memberOf dataStructures.nothing
      * @instance
      * @protected
@@ -463,9 +449,9 @@ var nothing = {
     isNothing: true,
     /**
      * @signature () -> {@link dataStructures.nothing}
-     * @description Takes a function that is applied to the underlying value of the
-     * monad, the result of which is used to create a new {@link dataStructures.nothing}
-     * delegator instance.
+     * @description Takes a single function as an argument and returns 'nothing'. A 'nothing' cannot
+     * be mapped over, so the result of the mapping operation is to return 'nothing' while ignoring
+     * the provided function argument.
      * @memberOf dataStructures.nothing
      * @instance
      * @param {function} fn - A mapping function that can operate on the underlying
@@ -477,18 +463,19 @@ var nothing = {
     map: returnNothing,
     /**
      * @signature (* -> *) -> (* -> *) -> dataStructures.nothing<T>
-     * @description Since the nothing monad does not represent a disjunction, the Maybe's
-     * bimap function property behaves just as its map function property. It is merely here as a
-     * convenience so that swapping out monads does not break an application that is
-     * relying on its existence.
+     * @description Acts as a map for the disjunction between just and nothing data structures. If the
+     * data structure that bimap was invoked on is a just, the first mapping function parameter is used 
+     * to map over the underlying value and a new just is returned, 'wrapping' the return value of the 
+     * function. If the data structure is a nothing, the second mapping function is invoked with a 'null' 
+     * valued argument and 'nothing' is returned.
      * @memberOf dataStructures.nothing
      * @instance
      * @function
      * @param {function} f - A function that will be used to map over the underlying data of the
-     * {@link dataStructures.nothing} delegator.
-     * @param {function} [g] - An optional function that is simply ignored on the {@link dataStructures.nothing}
-     * since there is no disjunction present.
-     * @return {dataStructures.nothing} - Returns a new {@link dataStructures.nothing} delegator after applying
+     * {@link dataStructures.just} delegator.
+     * @param {function} g - A function that will be used to map over a null value if this is a
+     * 'nothing' instance.
+     * @return {dataStructures.just} - Returns a new {@link dataStructures.just} delegator after applying
      * the mapping function to the underlying data.
      */
     bimap: returnNothing,
@@ -507,37 +494,38 @@ var nothing = {
     nothing: returnNothing,
     /**
      * @signature * -> boolean
-     * @description Determines if 'this' left functor is equal to another monad. Equality
+     * @description Determines if 'this' nothing is equal to another data structure. Equality
      * is defined as:
      * 1) The other monad shares the same delegate object as 'this' nothing monad
      * 2) Both underlying values are strictly equal to each other
+     * Since 'nothing' is a singleton, the actual operation is a strict equality comparison
+     * between the both data structures; if they both point to the same place in memory, they
+     * are equal.
      * @memberOf dataStructures.nothing
      * @instance
      * @function
-     * @param {Object} ma - The other monad to check for equality with 'this' monad.
+     * @param {Object} ma - The other data structure to check for equality.
      * @return {boolean} - Returns a boolean indicating equality
      */
     equals: Nothing.is,
     /**
      * @signature () -> *
-     * @description Returns the underlying value of the current monad 'instance'. This
+     * @description Returns the underlying value of the current 'nothing' 'instance'. This
      * function property is not meant for explicit use. Rather, the JavaScript engine uses
      * this property during implicit coercion like addition and concatenation.
      * @memberOf dataStructures.nothing
      * @instance
      * @function
-     * @return {*} Returns the underlying value of the current monad 'instance'.
+     * @return {*} Returns the underlying value of the 'nothing'
      */
     valueOf: valueOf,
     /**
      * @signature () -> string
-     * @description Returns a string representation of the monad and its
-     * underlying value
+     * @description Returns a string representation of the 'nothing' and its underlying value
      * @memberOf dataStructures.nothing
      * @instance
      * @function
-     * @return {string} Returns a string representation of the nothing
-     * and its underlying value.
+     * @return {string} Returns a string representation of the 'nothing' and its underlying value.
      */
     toString: function _toString() {
         return 'Nothing()';
@@ -557,7 +545,7 @@ var nothing = {
      * @see dataStructures.Maybe
      * @param {*} val - The value that should be set as the underlying
      * value of the {@link dataStructures.nothing}.
-     * @return {dataStructures.nothing} - Returns a new nothing monad delegator
+     * @return {dataStructures.nothing} - Returns 'nothing'
      */
     factory: Maybe
 };
