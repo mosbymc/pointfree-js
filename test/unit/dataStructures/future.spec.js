@@ -91,7 +91,7 @@ describe('Future functor test', function _testFutureFunctor() {
             Future(function _to(rej, res) {
                 setTimeout(function _timeout() {
                     res(5);
-                }, 500);
+                }, 25);
             })
                 .map(x => x * x)
                 .fork(console.error, function _res(res) {
@@ -104,7 +104,7 @@ describe('Future functor test', function _testFutureFunctor() {
             Future(function _to(rej, res) {
                 setTimeout(function _timeout() {
                     rej(5);
-                }, 500);
+                }, 25);
             })
                 .map(x => x * x)
                 .fork(function _err(err) {
@@ -117,7 +117,7 @@ describe('Future functor test', function _testFutureFunctor() {
             Future(function _to(rej, res) {
                 setTimeout(function _timeout() {
                     res(5);
-                }, 500);
+                }, 25);
             })
                 .chain(function _chain(val) {
                     return Future.of(val * val);
@@ -132,7 +132,7 @@ describe('Future functor test', function _testFutureFunctor() {
             Future(function _to(rej, res) {
                 setTimeout(function _timeout() {
                     rej(5);
-                }, 500);
+                }, 25);
             })
                 .chain(function _chain(val) {
                     return Future.of(val * val);
@@ -165,7 +165,7 @@ describe('Future functor test', function _testFutureFunctor() {
         });
 
         it('should represent the future\'s \'type\' when \'Object.prototype.toString.call\' is invoked', function _testFutureTypeString() {
-            var i = Future();
+            var i = Future(x => x);
             Object.prototype.toString.call(i).should.eql('[object Future]');
         });
     });

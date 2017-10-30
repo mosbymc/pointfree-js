@@ -773,7 +773,7 @@ describe('Test List Iterators', function _testListIterators() {
         }
 
         function comparer3(a, b) {
-            return a.City === b.City && a.State == b.State;
+            return a.City === b.City && a.State === b.State;
         }
 
         function comparer4(a, b) {
