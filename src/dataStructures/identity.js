@@ -64,7 +64,6 @@ Identity.empty = () => Identity();
 
 /**
  * @typedef {Object} identity
- * @property {function} value - returns the underlying value of the the identity
  * @property {function} extract - returns the underlying value of the identity
  * @property {function} map - maps a single function over the underlying value of the identity
  * @property {function} chain - returns a new identity data structure
@@ -76,7 +75,7 @@ Identity.empty = () => Identity();
  * @property {function} sequence - returns a new identity data structure
  * @property {function} traverse - returns a new identity data structure
  * @property {function} isEmpty - Returns a boolean indicating if the identity is 'empty'
- * @property {function} mapToConstant
+ * @property {function} mapToConstant - Accepts an optional function to run over the underlying data and convert the data structure into a {@link dataStructures.constant}
  * @property {function} mapToEither
  * @property {function} mapToLeft
  * @property {function} mapToRight
