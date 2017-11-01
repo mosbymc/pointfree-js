@@ -173,7 +173,10 @@ var identity = {
      * @return {Object} Returns a new identity data structure that 'wraps' the return value of the
      * mapping function after flattening it by one level.
      *
-     * @example Identity(10).chain(x => Identity(x * x))    // => Identity(100)
+     * @example
+     * Identity(10).chain(x => Identity(x * x))    // => Identity(100)
+     * Identity(10).chain(x => x * x)              // => Identity(100)
+     * Identity(10).chain(x => Just(x * x))        // => Identity(Just(100))
      */
     chain: chain,
     /**

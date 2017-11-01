@@ -1,5 +1,9 @@
 import { compose } from '../combinators';
 
+/**
+ * @namespace group
+ */
+
 //TODO: Abelian Groups:
 //TODO: - addition
 //TODO: - multiplication
@@ -22,7 +26,7 @@ import { compose } from '../combinators';
 /**
  * @description d
  * @namespace baseGroupObject
- * @memberOf dataStructures
+ * @memberOf group
  * @typedef {Object}
  * @property {function} extract
  * @property {function} valueOf
@@ -70,6 +74,7 @@ var baseGroupObject = {
 /**
  * @signature
  * @description d
+ * @memberOf group
  * @param {function} concatFn - A
  * @param {*} [identity] - B
  * @param {function} [inverseFn] - C
@@ -127,6 +132,7 @@ function semigroupFactory(concatFn, type) {
              * underlying value. If the 'type' param was set upon creation of this specific
              * monoid factory, the type name will be included in the returned string. Otherwise,
              * simply 'Monoid' will be used.
+             * @memberOf group
              * @return {string} Returns a string
              */
             toString: {

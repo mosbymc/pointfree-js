@@ -46,7 +46,7 @@ var listProxyHandler = {
  * @property {function} intersperse
  * @property {function} listJoin
  * @property {function} map
- * @property {function} mjoin
+ * @property {function} join
  * @property {function} ofType
  * @property {function} prepend
  * @property {function} prependAll
@@ -1647,6 +1647,7 @@ function createList(source, iterator, sortObject, key) {
 /**
  * @signature [...a] -> Number
  * @description creates a bit mask value based on truthy/falsey arguments passed to the function
+ * @private
  * @param {boolean} args - Zero or more arguments. All arguments are treated as booleans, so truthy,
  * and falsey values will work.
  * @return {number} Returns an integer that represents the bit mask value of the boolean arguments.

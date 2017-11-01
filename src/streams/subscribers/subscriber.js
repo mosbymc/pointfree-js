@@ -1,6 +1,10 @@
 import { observableStatus } from '../../helpers';
 
 /**
+ * @namespace stream
+ */
+
+/**
  * @typedef {Object}
  * @property {function} status
  * @property {function} count
@@ -14,6 +18,7 @@ import { observableStatus } from '../../helpers';
  * @property {function} onNext
  * @property {function} onError
  * @property {function} onComplete
+ * @memberOf stream
  * @description:
  */
 var subscriber = {
