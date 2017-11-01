@@ -1,4 +1,4 @@
-import { monad_apply, mjoin, pointMaker, equals, stringMaker, valueOf, get, orElse, getOrElse } from './data_structure_util';
+import { monad_apply, join, pointMaker, equals, stringMaker, valueOf, get, orElse, getOrElse } from './data_structure_util';
 
 /**
  * @signature - :: * -> {@link dataStructures.constant}
@@ -216,7 +216,7 @@ var constant = {
  */
 constant.bimap = constant.map;
 
-constant.mjoin = mjoin;
+constant.mjoin = join;
 constant.apply = monad_apply;
 
 constant.ap = constant.apply;

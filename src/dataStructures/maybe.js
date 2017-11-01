@@ -1,5 +1,5 @@
 import { identity } from '../combinators';
-import { monad_apply, chain, mjoin, disjunctionEqualMaker, stringMaker, valueOf, sharedMaybeFns } from './data_structure_util';
+import { monad_apply, chain, join, disjunctionEqualMaker, stringMaker, valueOf, sharedMaybeFns } from './data_structure_util';
 
 /**
  * @signature
@@ -321,7 +321,7 @@ var just = {
      */
     map: sharedMaybeFns.justMap,
     chain: chain,
-    mjoin: mjoin,
+    mjoin: join,
     apply: monad_apply,
     /**
      * @signature (* -> *) -> (* -> *) -> dataStructures.just<T>

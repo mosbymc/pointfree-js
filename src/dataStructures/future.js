@@ -1,6 +1,6 @@
 import { once, type, strictEquals } from '../functionalHelpers';
 import { ifElse, constant, identity } from '../combinators';
-import { mjoin, pointMaker, valueOf } from './data_structure_util';
+import { join, pointMaker, valueOf } from './data_structure_util';
 import { javaScriptTypes } from '../helpers';
 
 /**
@@ -339,7 +339,7 @@ var future = {
     factory: Future
 };
 
-future.mjoin = mjoin;
+future.mjoin = join;
 future.ap = future.apply;
 future.fmap = future.chain;
 future.flapMap = future.chain;

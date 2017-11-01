@@ -1,5 +1,5 @@
 import { monad_apply, applyTransforms, chain, monadIterator, disjunctionEqualMaker, equals, lifter,
-    mjoin, stringMaker, valueOf, sharedMaybeFns, sharedEitherFns, applyFantasyLandSynonyms, chainRec } from '../../../src/dataStructures/data_structure_util';
+    join, stringMaker, valueOf, sharedMaybeFns, sharedEitherFns, applyFantasyLandSynonyms, chainRec } from '../../../src/dataStructures/data_structure_util';
 
 function Identity(val) {
     return Object.create(identity, {
@@ -23,7 +23,7 @@ var identity = {
     },
     chain: chain,
     chainRec: chainRec,
-    mjoin: mjoin,
+    mjoin: join,
     apply: function _apply(ma) {
         return ma.map(this.value);
     },
@@ -58,7 +58,7 @@ var i = {
     },
     chain: chain,
     chainRec: chainRec,
-    mjoin: mjoin,
+    mjoin: join,
     apply: function _apply(ma) {
         return ma.map(this.value);
     },

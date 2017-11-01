@@ -1,6 +1,6 @@
 import { constant } from '../combinators';
 import { type, strictEquals } from '../functionalHelpers';
-import { monad_apply, chain, mjoin, equals, stringMaker, valueOf } from './data_structure_util';
+import { monad_apply, chain, join, equals, stringMaker, valueOf } from './data_structure_util';
 import { javaScriptTypes } from '../helpers';
 
 /**
@@ -100,7 +100,7 @@ var io = {
 io.bimap = io.map;
 
 io.chain = chain;
-io.mjoin = mjoin;
+io.mjoin = join;
 io.apply = monad_apply;
 
 io.ap =io.apply;

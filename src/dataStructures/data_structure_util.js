@@ -16,6 +16,10 @@ function contramap(fn) {
     return this.factory.of((...args) => this.value(fn(...args)));
 }
 
+function dimap(f, g) {
+    return this.factory.of((...args) => g(this.value(f(...args))));
+}
+
 /**
  * @signature
  * @description d
@@ -184,9 +188,9 @@ var lifter = (type) => (fn) => (...args) => type.of(fn(...args));
 /**
  * @signature
  * @description d
- * @return {Object} Returns a monad flattened by one level if capable.
+ * @return {Object} Returns a data structure flattened by one level if capable.
  */
-function mjoin() {
+function join() {
     return Object.getPrototypeOf(this).isPrototypeOf(this.value) ? this.value : this;
 }
 
@@ -352,6 +356,6 @@ var fl = {
     promap: 'fantasy-land/promap'
 };
 
-export { monad_apply, applyTransforms, chain, contramap, monadIterator, disjunctionEqualMaker, equals, lifter,
-        mjoin, stringMaker, valueOf, sharedMaybeFns, sharedEitherFns, applyFantasyLandSynonyms, applyAliases, chainRec, extendMaker,
+export { monad_apply, applyTransforms, chain, contramap, monadIterator, dimap, disjunctionEqualMaker, equals, lifter,
+        join, stringMaker, valueOf, sharedMaybeFns, sharedEitherFns, applyFantasyLandSynonyms, applyAliases, chainRec, extendMaker,
         setIteratorAndLift };

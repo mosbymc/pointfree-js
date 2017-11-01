@@ -150,7 +150,14 @@ describe('Identity monad test', function _testIdentityMonad() {
                 .extract.should.eql(225);
         });
 
-        it('should properly indicate equality when constant monads are indeed equal', function _testIdentityFunctorEquality() {
+        it('should dimap over the identity', function _testIdentityDimap() {
+            Identity(x => x * x)
+                .dimap(x => x + 10, x => x / 5)
+                .apply(Identity(5))
+                .extract.should.eql(45);
+        });
+
+        it('should properly indicate equality when identities are indeed equal', function _testIdentityEquality() {
             var m1 = Identity(null),
                 m2 = Identity(null),
                 m3 = Identity(1),
@@ -172,7 +179,7 @@ describe('Identity monad test', function _testIdentityMonad() {
             m4.equals(m5).should.be.false;
         });
 
-        it('should map an identity functor to the other functor types', function _testIdentityFunctorMapTransform() {
+        it('should map an identity to the other functor types', function _testIdentityMapTransform() {
             var i = Identity(1);
             var c = i.mapToConstant(),
                 f = i.mapToFuture(),
@@ -205,7 +212,7 @@ describe('Identity monad test', function _testIdentityMonad() {
             //Object.prototype.toString.call(i).should.eql('[object Identity]');
         });
 
-        it('should have a functioning iterator', function _testIdentityFunctorIterator() {
+        it('should have a functioning iterator', function _testIdentityIterator() {
             var i1 = Identity(10),
                 i2 = Identity({ a: 1, b: 2 });
 
@@ -216,7 +223,7 @@ describe('Identity monad test', function _testIdentityMonad() {
             i2Res.should.eql([i2.value]);
         });
 
-        it('should allow "expected" functionality of concatenation for strings and mathematical operators for numbers', function _testIdentityFunctorValueOf() {
+        it('should allow "expected" functionality of concatenation for strings and mathematical operators for numbers', function _testIdentityValueOf() {
             var i1 = Identity('Mark'),
                 i2 = Identity(10);
 
@@ -233,7 +240,7 @@ describe('Identity monad test', function _testIdentityMonad() {
             num4.should.eql(2);
         });
 
-        it('should print the correct container type + value when .toString() is invoked', function _testIdentityFunctorToString() {
+        it('should print the correct data structure type + value when .toString() is invoked', function _testIdentityToString() {
             var c1 = Identity(1),
                 c2 = Identity(null),
                 c3 = Identity([1, 2, 3]),
@@ -245,17 +252,17 @@ describe('Identity monad test', function _testIdentityMonad() {
             c4.toString().should.eql('Identity(Identity(Identity(5)))');
         });
 
-        it('should return the underlying value when the mjoin function property is called', function _testIdentityMonadMjoin() {
+        it('should return the underlying value when the join function property is called', function _testIdentityJoin() {
             var i1 = Identity(10),
                 i2 = Identity(null),
                 i3 = Identity(Identity(1));
 
-            i1.mjoin().should.eql(Identity(10));
-            expect(i2.mjoin()).to.eql(Identity(null));
-            i3.mjoin().should.eql(Identity(1));
+            i1.join().should.eql(Identity(10));
+            expect(i2.join()).to.eql(Identity(null));
+            i3.join().should.eql(Identity(1));
         });
 
-        it('should apply a mutating function to the underlying value and return the new value unwrapped in an Identity when chain is called', function _testIdentityMonadChain() {
+        it('should apply a mutating function to the underlying value and return the new value unwrapped in an identity when chain is called', function _testIdentityChain() {
             var i1 = Identity(10),
                 i2 = Identity(Identity({ a: 1, b: 2 })),
                 i3 = Identity(25);
@@ -275,7 +282,7 @@ describe('Identity monad test', function _testIdentityMonad() {
             }).value.should.eql(27);
         });
 
-        it('should return the applied monad type after mapping the identity monad\'s underlying value', function _testIdentityMonadApply() {
+        it('should return the applied data structure\'s type after mapping the identity\'s underlying value', function _testIdentityApply() {
             var i = Identity(function _identityMap(val) {
                 return val ? val + 50 : 0;
             });
@@ -306,15 +313,15 @@ describe('Identity monad test', function _testIdentityMonad() {
             //Object.getPrototypeOf(m3Res).should.eql(monads.Maybe(false));
         });
 
-        it('should return underlying value when constant_functor#fold is invoked', function _testConstantDotFold() {
+        it('should return underlying value when identity#fold is invoked', function _testIdentityFold() {
             Identity(10).fold((x, y) => x + y * 15, 0).should.eql(150);
         });
 
-        it('should return a Just of an Identity of 10 when #sequence is invoked', function _testConstantDotSequence() {
+        it('should return a Just of an Identity of 10 when #sequence is invoked', function _testIdentitySequence() {
             Identity(10).sequence(monads.Maybe).toString().should.eql('Just(Identity(10))');
         });
 
-        it('should return a Just of an Identity of 3 when #traverse is invoked', function _testConstantDotTraverse() {
+        it('should return a Just of an Identity of 3 when #traverse is invoked', function _testIdentityTraverse() {
             function test(val) {
                 return monads.Maybe(val + 2);
             }
@@ -322,7 +329,7 @@ describe('Identity monad test', function _testIdentityMonad() {
             Identity(1).traverse(monads.Maybe, test).toString().should.eql('Just(Identity(3))');
         });
 
-        it('should have a .factory property that points to the factory function', function _testIdentityFunctorIsStupidViaFantasyLandSpecCompliance() {
+        it('should have a .factory property that points to the factory function', function _testIdentityIsStupidViaFantasyLandSpecCompliance() {
             Identity(null).factory.should.eql(Identity);
             Identity(null).constructor.should.eql(Identity);
         });

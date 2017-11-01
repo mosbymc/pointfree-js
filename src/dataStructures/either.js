@@ -1,5 +1,5 @@
 import { identity } from '../combinators';
-import { disjunctionEqualMaker, stringMaker, valueOf, monad_apply, chain, mjoin, sharedEitherFns } from './data_structure_util';
+import { disjunctionEqualMaker, stringMaker, valueOf, monad_apply, chain, join, sharedEitherFns } from './data_structure_util';
 
 /**
  * @signature
@@ -637,11 +637,11 @@ var left = {
 };
 
 right.chain = chain;
-right.mjoin = mjoin;
+right.mjoin = join;
 right.apply = monad_apply;
 
 left.chain = chain;
-left.mjoin = mjoin;
+left.mjoin = join;
 left.apply = monad_apply;
 
 right.ap = right.apply;

@@ -1,4 +1,4 @@
-import { monad_apply, chain, mjoin, equals, stringMaker, valueOf } from './data_structure_util';
+import { monad_apply, chain, join, equals, stringMaker, valueOf } from './data_structure_util';
 
 /**
  * @description d
@@ -69,7 +69,7 @@ var validation = {
 validation.bimap = validation.map;
 
 validation.chain = chain;
-validation.mjoin = mjoin;
+validation.mjoin = join;
 validation.apply = monad_apply;
 validation.constructor = validation.factory;
 

@@ -1,4 +1,4 @@
-import { monad_apply, chain, contramap, mjoin, equals, stringMaker, valueOf, extendMaker } from './data_structure_util';
+import { monad_apply, chain, contramap, dimap, join, equals, stringMaker, valueOf, extendMaker } from './data_structure_util';
 
 /**
  * @signature - :: * -> {@link dataStructures.identity}
@@ -67,25 +67,27 @@ Identity.empty = () => Identity();
  * @property {function} extract - returns the underlying value of the identity
  * @property {function} map - maps a single function over the underlying value of the identity
  * @property {function} chain - returns a new identity data structure
- * @property {function} mjoin - returns a new identity data structure
+ * @property {function} join - returns a new identity data structure
  * @property {function} apply - returns a new instance of whatever data structure type's underlying value this
  * identity's underlying function value should be mapped over.
  * @property {function} bimap - returns a new identity data structure
+ * @property {function} contramap - maps over the input of a contravariant identity
+ * @property {function} dimap - maps over the input and output of a contravariant identity
  * @property {function} fold - Applies a function to the identity's underlying value and returns the result
  * @property {function} sequence - returns a new identity data structure
  * @property {function} traverse - returns a new identity data structure
  * @property {function} isEmpty - Returns a boolean indicating if the identity is 'empty'
- * @property {function} mapToConstant - Accepts an optional function to run over the underlying data and convert the data structure into a {@link dataStructures.constant}
- * @property {function} mapToEither
- * @property {function} mapToLeft
- * @property {function} mapToRight
- * @property {function} mapToFuture
- * @property {function} mapToIo
- * @property {function} mapToList
- * @property {function} mapToMaybe
- * @property {function} mapToJust
- * @property {function} mapToNothing
- * @property {function} mapToValidations
+ * @property {function} mapToConstant - Accepts an optional function to map over the underlying data and converts the output into a {@link dataStructures.constant}
+ * @property {function} mapToEither - Accepts an optional function to map over the underlying data and converts the output into a {@link dataStructures.Either}
+ * @property {function} mapToLeft - Accepts an optional function to map over the underlying data and converts the output into a {@link dataStructures.left}
+ * @property {function} mapToRight - Accepts an optional function to map over the underlying data and converts the output into a {@link dataStructures.right}
+ * @property {function} mapToFuture - Accepts an optional function to map over the underlying data and converts the output into a {@link dataStructures.future}
+ * @property {function} mapToIo - Accepts an optional function to map over the underlying data and converts the output into a {@link dataStructures.io}
+ * @property {function} mapToList - Accepts an optional function to map over the underlying data and converts the output into a {@link dataStructures.list}
+ * @property {function} mapToMaybe - Accepts an optional function to map over the underlying data and converts the output into a {@link dataStructures.Maybe}
+ * @property {function} mapToJust - Accepts an optional function to map over the underlying data and converts the output into a {@link dataStructures.just}
+ * @property {function} mapToNothing - Accepts an optional function to map over the underlying data and converts the output into a {@link dataStructures.nothing}
+ * @property {function} mapToValidation - Accepts an optional function to map over the underlying data and converts the output into a {@link dataStructures.validation}
  * @property {function} valueOf - returns the underlying value of the identity; used during concatenation and coercion
  * @property {function} toString - returns a string representation of the identity data structure and its underlying value
  * @property {function} factory - a reference to the identity factory function
@@ -125,6 +127,7 @@ var identity = {
      * as a function, you merely need to reference as a non-function property. This makes infinitely more
      * sense to me, especially if the underlying is a function... who wants to do this: identity.extract()(x, y, z)
      * when they could do this: identity.extract(x, y, z)?
+     * @example Identity(10).extract // => 10
      * @memberOf dataStructures.identity
      * @instance
      * @private
@@ -136,9 +139,9 @@ var identity = {
     },
     /**
      * @signature () -> {@link dataStructures.identity}
-     * @description Takes a function that is applied to the underlying value of the
-     * monad, the result of which is used to create a new {@link dataStructures.identity}
-     * delegator instance.
+     * @description Takes a function as an argument and applies that function to the underlying value
+     * of the identity. A new identity instance that holds the result of the application as its underlying
+     * value is created and returned.
      * @memberOf dataStructures.identity
      * @instance
      * @param {function} fn - A mapping function that can operate on the underlying
@@ -146,6 +149,8 @@ var identity = {
      * @return {dataStructures.identity} Returns a new {@link dataStructures.identity}
      * delegator whose underlying value is the result of the mapping operation
      * just performed.
+     *
+     * @example Identity(10).map(x => x * x)    // => Identity(100)
      */
     map: function _map(fn) {
         return Identity.of(fn(this.value));
@@ -156,39 +161,52 @@ var identity = {
      * underlying value. If the mapping function returns an identity data structure, chain will 'flatten'
      * the nested identities by one level. If the mapping function does not return an identity,
      * chain will just return an identity data structure that 'wraps' whatever the return value
-     * of the mapping function is. However, if the mapping function does not return a monad of
+     * of the mapping function is. However, if the mapping function does not return a data structure  of
      * the same type, then chain is probably not the functionality you should use. See
      * {@link dataStructures.identity#map} instead.
+     *
+     * Alias: bind, flatMap
      * @memberOf dataStructures.identity
      * @instance
      * @function chain
      * @param {function} fn - A mapping function that returns a data structure of the same type
      * @return {Object} Returns a new identity data structure that 'wraps' the return value of the
      * mapping function after flattening it by one level.
+     *
+     * @example Identity(10).chain(x => Identity(x * x))    // => Identity(100)
      */
     chain: chain,
     /**
      * @signature () -> {@link dataStructures.identity}
-     * @description Returns a new identity data structure. If the current identity is nested, mjoin
+     * @description Returns a new identity data structure. If the current identity is nested, join
      * will flatten it by one level. Very similar to {@link dataStructures.identity#chain} except no
      * mapping function is accepted or run.
      * @memberOf dataStructures.identity
      * @instance
      * @function mjoin
      * @return {Object} Returns a new identity after flattening the nested data structures by one level.
+     *
+     * @example
+     * Identity(Identity(10)).join()   // => Identity(10)
+     * Identity(Just(10)).join()       // => Identity(Just(10))
+     * Identity(10).join()             // => Identity(10)
      */
-    mjoin: mjoin,
+    join: join,
     /**
      * @signature Object -> Object
      * @description Accepts any applicative object with a mapping function and invokes that object's mapping
      * function on the identity's underlying value. In order for this function to execute properly and
      * not throw, the identity's underlying value must be a function that can be used as a mapping function
      * on the monad object supplied as the argument.
+     *
+     * Alias: ap
      * @memberOf dataStructures.identity
      * @instance
      * @function apply
      * @param {Object} ma - Any object with a map function - i.e. a monad.
      * @return {Object} Returns an instance of the data structure object provide as an argument.
+     *
+     * @example Identity(x => x + 10).apply(Just(10))  // => Just(20)
      */
     apply: monad_apply,
     /**
@@ -196,6 +214,8 @@ var identity = {
      * @description Accepts a function that is used to map over the identity's underlying value
      * and returns the returns value of the function without 're-wrapping' it in a new identity
      * instance.
+     *
+     * Alias: reduce
      * @memberOf dataStructures.identity
      * @instance
      * @function fold
@@ -203,6 +223,8 @@ var identity = {
      * of the identity.
      * @param {*} acc - An JavaScript value that should be used as an accumulator.
      * @return {*} Returns the return value of the mapping function provided as an argument.
+     *
+     * @example Identity(10).fold((acc, x) => x + acc, 5)   // => 15
      */
     fold: function _fold(fn, acc) {
         return fn(acc, this.value);
@@ -235,26 +257,49 @@ var identity = {
      * where the mapping function cannot be run.
      * @param {function} f - A mapping function that should be applied to the identity's underlying value.
      * @return {Object} Returns a new identity that wraps the mapping function's returned data structure type.
+     *
+     * @example Identity(10).traverse(Just, x => Just(x * x))   // => Just(Identity(100))
      */
     traverse: function _traverse(a, f) {
         return f(this.value).map(this.factory.of);
     },
     /**
      * @signature (b -> a) -> dataStructures.Identity
-     * @description This property will only function correctly if the underlying value of the
-     * current identity is a function. Contramap accepts a function argument and returns a new
-     * identity with the composition of the function argument and the underlying function
-     * value as the new underlying. The supplied function argument is executed first in the
-     * composition, so its signature must be (b -> a) so that the value it passes as an argument
-     * to the previous underlying function will be of the expected type.
+     * @description This property is for contravariant identity data structures and will not function
+     * correctly if the underlying value is anything other than a function. Contramap accepts a
+     * function argument and returns a new identity with the composition of the function argument and
+     * the underlying function value as the new underlying. The supplied function argument is executed
+     * first in the composition, so its signature must be (b -> a) so that the value it passes as an
+     * argument to the previous underlying function will be of the expected type.
      * @memberOf dataStructures.identity
      * @instance
      * @function contramap
      * @param {function} fn - A function that should be composed with the current identity's
      * underlying function.
      * @return {dataStructures.identity} Returns a new identity data structure.
+     *
+     * @example Identity(x => x * x).contramap(x => x + 10).apply(Identity(5))  // => Identity(225)
      */
     contramap: contramap,
+
+    /**
+     * @signature dimap :: (b -> a) -> (d -> c) -> identity<c>
+     * @description Like {@link dataStructures.identity#contramap}, dimap is for use on contravariant
+     * identity instances, and thus, requires that the identity instance dimap is invoked on has an
+     * underlying function value. Dimap accepts two arguments, both of them functions. The first argument
+     * is used to map over the input the current contravariant identity, while the second argument maps
+     * over the output. Dimap is like contramap, but with an additional mapping thrown in after it has run.
+     * Thus, dimap can be derived from contramap and map: i.dimap(f, g) === i.contramap(f).map(g)
+     * @memberOf dataStructures.identity
+     * @instance
+     * @function dimap
+     * @param {function} f - f
+     * @param {function} g - g
+     * @return {dataStructures.identity} l
+     *
+     * @example Identity(x => x * x).dimap(x => x + 10, x => x / 5).apply(Identity(5))  // => Identity(45)
+     */
+    dimap: dimap,
     /**
      * @signature () -> boolean
      * @description Returns a boolean indicating if the identity is 'empty'. Because there is
@@ -263,6 +308,10 @@ var identity = {
      * @instance
      * @function isEmpty
      * @return {boolean} Returns a boolean indicating if the identity instance is 'empty'.
+     *
+     * @example
+     * Identity(10).isEmpty()  // => false
+     * Identity().isEmpty()    // => false
      */
     isEmpty: function _isEmpty() {
         return false;
@@ -288,6 +337,11 @@ var identity = {
      * @function
      * @param {Object} ma - The other data structure to check for equality with 'this' identity.
      * @return {boolean} - Returns a boolean indicating equality
+     *
+     * @example
+     * Identity(10).equals(Identity(10))    // => true
+     * Identity(10).equals(Identity(1))     // => false
+     * Identity(10).equals(Just(10))        // => false
      */
     equals: equals,
     /**
@@ -299,6 +353,10 @@ var identity = {
      * @instance
      * @function
      * @return {*} Returns the underlying value of the current monad 'instance'.
+     *
+     * @example
+     * 5 + Identity(10)     // => 15
+     * 'Hello my name is: ' + Identity('Identity')  // => 'Hello my name is : Identity'
      */
     valueOf: valueOf,
     /**
@@ -310,8 +368,23 @@ var identity = {
      * @function
      * @return {string} Returns a string representation of the identity
      * and its underlying value.
+     *
+     * @example
+     * Identity(10).toString()      // => 'Identity(10)'
+     * Identity(Identity(true))     // => 'Identity(Identity(true))'
      */
     toString: stringMaker('Identity'),
+    /**
+     * @description Used only when Object's .toString function property is invoked on an instance
+     * of the identity data structure, this will affect the returned 'class' value. Rather than
+     * receiving '[object Object]' (which would normally be the case), this will cause the same
+     * invocation to return '[object Identity]'.
+     * @memberOf dataStructures.identity
+     * @instance
+     * @returns {string} Returns a string representation of the identity's 'class'.
+     *
+     * @example Object.prototype.toString.call(Identity(10))    // => '[object Identity]'
+     */
     get [Symbol.toStringTag]() {
         return 'Identity';
     },
@@ -334,7 +407,7 @@ var identity = {
 
 /**
  * @signature (* -> *) -> (* -> *) -> dataStructures.identity<T>
- * @description Since the constant monad does not represent a disjunction, the Identity's
+ * @description Since the identity data structure does not represent a disjunction, the identity's
  * bimap function property behaves just as its map function property. It is merely here as a
  * convenience so that swapping out data structure does not break an application that is
  * relying on its existence.
@@ -347,6 +420,8 @@ var identity = {
  * since there is no disjunction present.
  * @return {dataStructures.identity<T>} - Returns a new {@link dataStructures.identity} delegator after applying
  * the mapping function to the underlying data.
+ *
+ * @example Identity(10).bimap(x => x + 10, x => x - 10)    // => Identity(20)
  */
 identity.bimap = identity.map;
 
@@ -356,6 +431,7 @@ identity.bimap = identity.map;
  * @memberOf dataStructures.identity
  * @instance
  * @function ap
+ * @ignore
  * @see dataStructures.identity#apply
  * @param {Object} ma - Any object with a map function - i.e. a monad.
  * @return {Object} Returns an instance of the data structure object provide as an argument.
@@ -368,6 +444,7 @@ identity.ap = identity.apply;
  * @memberOf dataStructures.identity
  * @instance
  * @function fmap
+ * @ignore
  * @see dataStructures.identity#chain
  * @param {function} fn - A mapping function that returns a data structure of the same type
  * @return {Object} Returns a new identity that 'wraps' the return value of the
@@ -381,6 +458,7 @@ identity.fmap = identity.chain;
  * @memberOf dataStructures.identity
  * @instance
  * @function flatMap
+ * @ignore
  * @see dataStructures.identity#chain
  * @param {function} fn - A mapping function that returns a data structure of the same type
  * @return {Object} Returns a new identity that 'wraps' the return value of the
@@ -394,6 +472,7 @@ identity.flapMap = identity.chain;
  * @memberOf dataStructures.identity
  * @instance
  * @function bind
+ * @ignore
  * @see dataStructures.identity#chain
  * @param {function} fn - A mapping function that returns a data structure of the same type
  * @return {Object} Returns a new identity that 'wraps' the return value of the
@@ -407,6 +486,7 @@ identity.bind = identity.chain;
  * @memberOf dataStructures.identity
  * @instance
  * @function reduce
+ * @ignore
  * @see dataStructures.identity#fold
  * @param {function} fn - Any mapping function that should be applied to the underlying value
  * of the identity data structure.
