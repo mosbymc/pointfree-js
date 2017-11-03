@@ -14,7 +14,9 @@ import { javaScriptTypes } from '../helpers';
 function safeFork(reject, resolve) {
     return function _safeFork(val) {
         try {
-            return resolve(val);
+            var res = resolve(val);
+            //this._value = res;
+            return res;
         }
         catch(ex) {
             reject(ex);
@@ -40,7 +42,7 @@ function safeFork(reject, resolve) {
  */
 function Future(fn) {
     return Object.create(future, {
-        _value: {
+        _source: {
             value: fn,
             writable: false,
             configurable: false
@@ -182,6 +184,27 @@ var future = {
     get value() {
         return this._value;
     },
+    get source() {
+        return this._source;
+    },
+    /**
+     * @signature
+     * @description d
+     * @memberOf dataStructures.future
+     * @instance
+     * @function
+     * @return {*} - a
+     */
+    get extract() {
+        return this._source;
+        /*
+        if (!this.isComplete) {
+            this.fork(x => x, x => x);
+            return this.value;
+        }
+        return this.source();
+        */
+    },
     /**
      * @signature () -> {@link dataStructures.future}
      * @description Takes a function that is applied to the underlying value of the
@@ -266,7 +289,7 @@ var future = {
         return this._fork === identity;
     },
     fork: function _fork(reject, resolve) {
-        return this._fork(reject, safeFork(reject, resolve));
+        return this._fork(reject, safeFork.call(this, reject, resolve));
     },
     /**
      * @signature * -> boolean
@@ -281,19 +304,7 @@ var future = {
      * @return {boolean} - Returns a boolean indicating equality
      */
     equals: function _equals(ma) {
-        return Object.getPrototypeOf(this).isPrototypeOf(ma) && ma.value === this.value;
-    },
-    /**
-     * @signature
-     * @description d
-     * @memberOf dataStructures.future
-     * @instance
-     * @function
-     * @return {*} - a
-     */
-    get extract()  {
-        //return this.value();
-        return this.value;
+        return Object.getPrototypeOf(this).isPrototypeOf(ma) && ma.source === this.source;
     },
     /**
      * @signature () -> *
@@ -317,7 +328,7 @@ var future = {
      * and its underlying value.
      */
     toString: function _toString() {
-        return `Future(${this.value.name})`;
+        return `Future(${this.source.name})`;
     },
     get [Symbol.toStringTag]() {
         return 'Future';

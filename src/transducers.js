@@ -70,6 +70,7 @@ var mapped = curry(function _mapped(f, x) {
 
 /**
  * @signature
+ * @face
  * @description d
  * @param {function} xform - a
  * @param {function} reducing - b

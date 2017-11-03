@@ -351,7 +351,8 @@ var fl = {
     chain: 'fantasy-land/chain',
     chainRec: 'fantasy-land/chainRec',
     extend: 'fantasy-land/extend',
-    extract: 'fantasy-land/extract',
+
+    //extract: 'fantasy-land/extract',
     bimap: 'fantasy-land/bimap',
     promap: 'fantasy-land/promap'
 };

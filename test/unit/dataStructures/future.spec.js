@@ -5,13 +5,13 @@ var Future = monads.Future;
 
 function identity(val) { return val; }
 
-describe('Future functor test', function _testFutureFunctor() {
-    describe('Future functor object tests', function _testFutureFunctorObject() {
+describe('Future test', function _testFutureFunctor() {
+    describe('Future factory', function _testFutureFunctorObject() {
         it('should return a new identity functor instance with the mapped value', function _testIdentityFunctorMap() {
             var f = Future.of(1),
                 d = f.map(function _t() { return 2; });
 
-            f.value.should.not.eql(d.value);
+            f.source.should.not.eql(d.source);
             f.should.not.equal(d);
         });
 
@@ -50,6 +50,7 @@ describe('Future functor test', function _testFutureFunctor() {
             var f1 = Future.wrap(1),
                 f2 = Future.wrap(x => x);
 
+            console.log(f1.extract);
             f1.extract.should.be.a('function');
             f2.extract.should.be.a('function');
             f2.extract(identity, identity)(1).should.eql(1);
@@ -80,8 +81,8 @@ describe('Future functor test', function _testFutureFunctor() {
         });
     });
 
-    describe('Test future', function _testFuture() {
-        it('should create an empty future', function _testFutureDotEmpty() {
+    describe('Future data structure', function _testFuture() {
+        it('should create an empty future', function _testFutureEmpty() {
             var f1 = Future.empty();
 
             f1.isEmpty().should.be.true;
@@ -100,7 +101,7 @@ describe('Future functor test', function _testFutureFunctor() {
                 });
         });
 
-        it('should fail to map a function over a future', function _testFutureMap(done) {
+        it('should fail to map a function over a future', function _testFutureMapFailure(done) {
             Future(function _to(rej, res) {
                 setTimeout(function _timeout() {
                     rej(5);
@@ -111,6 +112,21 @@ describe('Future functor test', function _testFutureFunctor() {
                     err.should.eql(5);
                     done();
                 }, console.log);
+        });
+
+        it('should catch a thrown exception and call the reject handler when a mapping function throws', function _testFutureMapException(done) {
+            Future(function _to(rej, res) {
+                setTimeout(function _timeout() {
+                    res(10);
+                }, 10);
+            })
+                .map(function _exception(x) {
+                    throw `x: ${x}`;
+                })
+                .fork(function _err(err) {
+                    err.should.eql('x: 10');
+                    done();
+                });
         });
 
         it('should chain a function over a future', function _testFutureChain(done) {
