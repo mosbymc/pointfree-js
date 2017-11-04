@@ -1,4 +1,4 @@
-import { monad_apply, join, pointMaker, equals, stringMaker, valueOf, get, orElse, getOrElse } from './data_structure_util';
+import { monad_apply, join, equals, stringMaker, valueOf } from './data_structure_util';
 
 /**
  * @signature - :: * -> {@link dataStructures.constant}
@@ -134,15 +134,6 @@ var constant = {
     traverse: function _traverse(a, f) {
         return this.factory.of(this.value);
     },
-    /**
-     * @signature () -> *
-     * @description Returns the underlying value of the current functor 'instance'.
-     * @memberOf dataStructures.constant
-     * @instance
-     * @function
-     * @return {*} - Returns the underlying value of the current functor 'instance'.
-     */
-    get: get,
     /**
      * @signature * -> boolean
      * @description Determines if 'this' identity functor is equal to another functor. Equality

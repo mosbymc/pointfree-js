@@ -1,7 +1,7 @@
 import { nil, javaScriptTypes } from '../../helpers';
 import { type, strictEquals } from '../../functionalHelpers';
 import { not } from '../../decorators';
-import { constant, when } from '../../combinators';
+import { constant } from '../../combinators';
 import { equals, stringMaker, valueOf, extendMaker } from '../data_structure_util';
 
 /**
