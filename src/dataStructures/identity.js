@@ -200,13 +200,13 @@ var identity = {
      * @description Accepts any applicative object with a mapping function and invokes that object's mapping
      * function on the identity's underlying value. In order for this function to execute properly and
      * not throw, the identity's underlying value must be a function that can be used as a mapping function
-     * on the monad object supplied as the argument.
+     * on the data structure supplied as the argument.
      *
      * Alias: ap
      * @memberOf dataStructures.identity
      * @instance
      * @function apply
-     * @param {Object} ma - Any object with a map function - i.e. a monad.
+     * @param {Object} ma - Any data structure with a map function - i.e. a functor.
      * @return {Object} Returns an instance of the data structure object provide as an argument.
      *
      * @example Identity(x => x + 10).apply(Just(10))  // => Just(20)
@@ -215,7 +215,7 @@ var identity = {
     /**
      * @signature () -> *
      * @description Accepts a function that is used to map over the identity's underlying value
-     * and returns the returns value of the function without 're-wrapping' it in a new identity
+     * and returns the value of the function without 're-wrapping' it in a new identity
      * instance.
      *
      * Alias: reduce
@@ -241,7 +241,7 @@ var identity = {
      * @function sequence
      * @param {Object} p - Any pointed data structure with a '#of' function property
      * @return {Object} Returns a data structure of the type passed as an argument that 'wraps'
-     * and identity that 'wraps' the current identity's underlying value.
+     * an identity that 'wraps' the current identity's underlying value.
      */
     sequence: function _sequence(p) {
         return this.traverse(p, p.of);
