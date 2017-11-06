@@ -158,6 +158,49 @@ describe('Future test', function _testFutureFunctor() {
                     done();
                 }, console.log);
         });
+        /*
+        it('should flatten nested futures', function _testFutureJoin(done) {
+            Future(function _to(rej, res) {
+                setTimeout(function _timeout() {
+                    res(5);
+                }, 25);
+            })
+                .map(function _chain(val) {
+                    return Future.of(val * val);
+                })
+                .mjoin()
+                .fork(console.error, function _res(res) {
+                    res.should.eql(25);
+                    done();
+                })
+        });
+        */
+
+        it('should map the first function over a future', function _testFutureBimapSuccess(done) {
+            Future(function _to(rej, res) {
+                setTimeout(function _timeout() {
+                    res(5);
+                }, 25);
+            })
+                .bimap(x => x * x, x => x - 5)
+                .fork(console.error, function _res(res) {
+                    res.should.eql(25);
+                    done();
+                });
+        });
+
+        it('should map the second function over a future', function _testFutureBimapFailure(done) {
+            Future(function _to(rej, res) {
+                setTimeout(function _timeout() {
+                    rej(5);
+                }, 25);
+            })
+                .bimap(x => x * x, x => x - 5)
+                .fork(function _err(err) {
+                    err.should.eql(0);
+                    done();
+                }, console.log);
+        });
 
         it('should return a boolean indicating future equality', function _testFutureEquals() {
             function fn1() {}

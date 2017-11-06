@@ -283,7 +283,7 @@ var future = {
         });
     },
     bimap: function _bimap(f, g) {
-        return this.factory.of((reject, resolve) => this._fork(safeFork(reject, err => reject(f(err))), safeFork(reject, res => resolve(g(res)))));
+        return this.factory.of((reject, resolve) => this._fork(safeFork(reject, err => reject(g(err))), safeFork(reject, res => resolve(f(res)))));
     },
     isEmpty: function _isEmpty() {
         return this._fork === identity;
