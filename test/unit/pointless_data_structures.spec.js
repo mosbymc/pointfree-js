@@ -259,7 +259,7 @@ describe('Test pointless_data_structures', function _testFunctionalContainerHelp
             var i1 = Identity(x => x * x),
                 i2 = Identity(15);
 
-            var res = apply(i2, i1);
+            var res = apply(i1, i2);
             Object.getPrototypeOf(i1).isPrototypeOf(res).should.be.true;
             res.value.should.eql(225);
         });
@@ -298,7 +298,7 @@ describe('Test pointless_data_structures', function _testFunctionalContainerHelp
             var i1 = Identity(x => x * x),
                 i2 = Identity(2);
 
-            var res = chain(x => x, apply(i2, contramap(x => x + 5, i1)));
+            var res = chain(x => x, apply(contramap(x => x + 5, i1), i2));
             Object.getPrototypeOf(Identity()).isPrototypeOf(res).should.be.true;
             res.value.should.eql(49);
         });
@@ -306,34 +306,31 @@ describe('Test pointless_data_structures', function _testFunctionalContainerHelp
 
     describe('Test lift', function _testLift() {
         it('should accept four data structures and a single function and return a data structure', function _testLift4() {
-            var m1 = Identity(x => x + 5),
+            var m1 = Identity(10),
                 m2 = Identity(x => x * x),
                 m3 = Identity(x => x - 33),
-                m4 = Identity(10);
+                m4 = Identity(x => x + 5);
 
-            var mapper = f => g => h => i => h(g(f(i)));
-            lift4(mapper, m1, m2, m3, m4).value.should.eql(192);
+            lift4(x => x, m1, m2, m3, m4).value.should.eql(72);
         });
 
         it('should arrive at the same value at lift4', function _testLiftNSameness() {
-            var m1 = Identity(x => x + 5),
+            var m1 = Identity(10),
                 m2 = Identity(x => x * x),
                 m3 = Identity(x => x - 33),
-                m4 = Identity(10),
-                mapper = f => g => h => i => h(g(f(i)));
-            liftN(mapper, m1, m2, m3, m4).value.should.eql(192);
+                m4 = Identity(x => x + 5);
+            liftN(x => x, m1, m2, m3, m4).value.should.eql(72);
         });
 
         it('should accept n data structures and a single function and return a data structure of the same shape', function _testLiftN() {
-            var m1 = Identity(x => x + 5),
-                m2 = Identity(x => x * (x - 1204145)),
+            var m1 = Identity(3),
+                m2 = Identity(x => x * x),
                 m3 = Identity(x => x - 178931),
                 m4 = Identity(x => Math.pow(x, (x / 2))),
                 m5 = Identity(x => x + 13),
                 m6 = Identity(x => x - 4),
-                m7 = Identity(3),
-                mapper = f => g => h => i => j => k => l => k(f(g(h(i(j(k(l)))))));
-            liftN(mapper, m1, m2, m3, m4, m5, m6, m7).value.should.eql(4499447710125);
+                m7 = Identity(x => x + 5);
+            liftN(x => x, m1, m2, m3, m4, m5, m6, m7).value.should.eql(14);
         });
     });
 

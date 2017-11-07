@@ -1,4 +1,4 @@
-import { monad_apply, chain, contramap, dimap, join, equals, stringMaker, valueOf, extendMaker } from './data_structure_util';
+import { apply, chain, contramap, dimap, join, equals, stringMaker, valueOf, extendMaker } from './data_structure_util';
 
 /**
  * @signature - :: * -> {@link dataStructures.identity}
@@ -211,7 +211,7 @@ var identity = {
      *
      * @example Identity(x => x + 10).apply(Just(10))  // => Just(20)
      */
-    apply: monad_apply,
+    apply: apply,
     /**
      * @signature () -> *
      * @description Accepts a function that is used to map over the identity's underlying value

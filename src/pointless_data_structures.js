@@ -273,6 +273,20 @@ var bimap = curry(function _bimap(f, g, ma) {
  * @signature
  * @description d
  * @kind function
+ * @function dimap
+ * @param {function} f - a
+ * @param {function} g - b
+ * @param {Object} m - c
+ * @return {Object} - d
+ */
+var dimap = curry(function _dimap(f, g, m) {
+    return m.dimap(f, g);
+});
+
+/**
+ * @signature
+ * @description d
+ * @kind function
  * @function chain
  * @param {function} f - a
  * @param {Object} m - b
@@ -384,6 +398,8 @@ var lift4 = curry(function _lift4(f, m1, m2, m3, m4) {
  */
 var liftN = curry(function _liftN(f, ...ms) {
     return ms.slice(1).reduce(function _apply(curM, nextM) {
+        console.log(curM.value);
+        console.log(nextM.value);
         return curM.apply(nextM);
     }, ms.shift().map(f));
 });
@@ -546,5 +562,5 @@ var takeWhile = curry(function _takeWhile(xs, predicate) {
 export { ap, apply, fmap, map, mapWith, flatMap, lift2, lift3, lift4, liftN, mjoin, pluckWith,
         chain, bind, mcompose, filter, intersect, except, isConstant, isEither, isFuture, isIdentity, isIo,
         isJust, isLeft, isList, isMaybe, isImmutableDataStructure, isNothing, isRight, isValidation, fold, sequence, traverse,
-        contramap, isEmpty, equals, bimap, toList, toLeft, toRight, toEither, toIdentity, toMaybe, toNothing,
+        contramap, isEmpty, equals, bimap, dimap, toList, toLeft, toRight, toEither, toIdentity, toMaybe, toNothing,
         toJust, toFuture, toConstant };

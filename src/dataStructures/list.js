@@ -1075,7 +1075,30 @@ var list_core = {
      * @return {list} - c
      */
     traverse: function _traverse(f, g) {
-        return this.foldl((ys, x) => g(x).map(x => y => y.concat([x])).apply(ys), f(List.empty));
+        //return this.foldl((ys, x) => g(x).map(x => y => y.concat([x])).apply(ys), f(List.empty));
+        console.log(f);
+        console.log(g);
+        return this.foldl(function _foldl(ys, x) {
+            console.log(ys);
+            console.log(x);
+
+            console.log(g(x));
+
+            return ys.apply(g(x).map(function _map1(x) {
+                return function _map2(y) {
+                    return y.concat([x]);
+                 };
+            }));
+
+            /*
+            return g(x).map(function _map1(x) {
+                console.log(x);
+                return function _map2(y) {
+                    console.log(y);
+                    return y.concat([x]);
+                };
+            }).apply(ys);*/
+        }, f(List.empty));
     },
 
     /**
