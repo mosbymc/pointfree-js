@@ -1,5 +1,4 @@
-import { identity } from '../combinators';
-import { disjunctionEqualMaker, stringMaker, valueOf, monad_apply, chain, join, sharedEitherFns } from './data_structure_util';
+import { apply, disjunctionEqualMaker, stringMaker, valueOf, monad_apply, chain, join, sharedEitherFns } from './data_structure_util';
 
 /**
  * @signature
@@ -44,12 +43,6 @@ function Either(val, fork) {
                 value: val,
                 writable: false,
                 configurable: false
-            },
-            isRight: {
-                value: true
-            },
-            isLeft: {
-                value: false
             }
         }) :
         Object.create(left, {
@@ -57,12 +50,6 @@ function Either(val, fork) {
                 value: val,
                 writable: false,
                 configurable: false
-            },
-            isRight: {
-                value: false
-            },
-            isLeft: {
-                value: true
             }
         });
 }
@@ -173,16 +160,6 @@ function Left(val) {
             value: val,
             writable: false,
             configurable: false
-        },
-        isRight: {
-            value: false,
-            writable: false,
-            configurable: false
-        },
-        isLeft: {
-            value: true,
-            writable: false,
-            configurable: false
         }
     });
 }
@@ -236,16 +213,6 @@ function Right(val) {
     return Object.create(right, {
         _value: {
             value: val,
-            writable: false,
-            configurable: false
-        },
-        isRight: {
-            value: true,
-            writable: false,
-            configurable: false
-        },
-        isLeft: {
-            value: false,
             writable: false,
             configurable: false
         }
@@ -323,6 +290,8 @@ var right = {
     get extract() {
         return this.value;
     },
+    isRight: true,
+    isLeft: false,
     /**
      * @signature () -> {@link dataStructures.right}
      * @description Takes a function that is applied to the underlying value of the
@@ -402,6 +371,7 @@ var right = {
     traverse: function _traverse(a, f) {
         return f(this.value).map(this.factory.of);
     },
+    apply: apply,
     /**
      * @signature * -> boolean
      * @description Determines if 'this' right functor is equal to another functor. Equality
@@ -502,6 +472,8 @@ var left = {
     get extract() {
         return this.value;
     },
+    isRight: false,
+    isLeft: true,
     /**
      * @signature () -> {@link dataStructures.left}
      * @description Takes a function that is applied to the underlying value of the
@@ -581,6 +553,9 @@ var left = {
     traverse: function _traverse(a, f) {
         return f(this.value).map(Left);
     },
+    apply: function _apply(m) {
+        return this;
+    },
     /**
      * @signature * -> boolean
      * @description Determines if 'this' left functor is equal to another functor. Equality
@@ -638,11 +613,9 @@ var left = {
 
 right.chain = chain;
 right.mjoin = join;
-right.apply = monad_apply;
 
 left.chain = chain;
 left.mjoin = join;
-left.apply = monad_apply;
 
 right.ap = right.apply;
 left.ap = left.apply;

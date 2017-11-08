@@ -253,7 +253,7 @@ describe('Maybe functor tests', function _testMaybeFunctor() {
             err2.should.be.true;
         });
 
-        it('should return correct boolean value for #isJust and #isNothing properties', function _testMaybeFunctorIsJustAndIsNothing() {
+        it('should return correct boolean value for #isJust and #isNothing properties', function _testMaybeIsJustAndIsNothing() {
             var m1 = Maybe(),
                 m2 = Maybe(null),
                 m3 = Maybe.of(),
@@ -276,7 +276,7 @@ describe('Maybe functor tests', function _testMaybeFunctor() {
             m5.isNothing.should.eql(false);
         });
 
-        it('should return a new maybe functor instance with the mapped value', function _testMaybeFunctorMap() {
+        it('should return a new maybe instance with the mapped value', function _testMaybeMap() {
             var m1 = Maybe(1),
                 m2 = Maybe(),
                 d1 = m1.map(function _t() { return 2; }),
@@ -306,7 +306,7 @@ describe('Maybe functor tests', function _testMaybeFunctor() {
             Just('10').extract.should.eql('10');
         });
 
-        it('should properly indicate equality when constant monads are indeed equal', function _testMaybeFunctorEquality() {
+        it('should properly indicate equality when justs and nothings are are indeed equal', function _testMaybeEquality() {
             var m1 = Maybe(null),
                 m2 = Maybe(null),
                 m3 = Maybe(1),
@@ -364,7 +364,7 @@ describe('Maybe functor tests', function _testMaybeFunctor() {
             Maybe(Maybe(1)).equals(Maybe(1)).should.be.true;
         });
 
-        it('should have a functioning iterator', function _testMaybeFunctorIterator() {
+        it('should have a functioning iterator', function _testMaybeIterator() {
             var m1 = Maybe(10),
                 m2 = Maybe({ a: 1, b: 2 });
 
@@ -375,7 +375,7 @@ describe('Maybe functor tests', function _testMaybeFunctor() {
             m2Res.should.eql([m2.value]);
         });
 
-        it('should allow "expected" functionality of concatenation for strings and mathematical operators for numbers', function _testMaybeFunctorValueOf() {
+        it('should allow "expected" functionality of concatenation for strings and mathematical operators for numbers', function _testMaybeValueOf() {
             var m1 = Maybe('Mark'),
                 m2 = Maybe(10);
 
@@ -392,7 +392,7 @@ describe('Maybe functor tests', function _testMaybeFunctor() {
             num4.should.eql(2);
         });
 
-        it('should represent the maybe\'s \'type\' when \'Object.prototype.toString.call\' is invoked', function _testIdentityTypeString() {
+        it('should represent the maybe\'s \'type\' when \'Object.prototype.toString.call\' is invoked', function _testMaybeTypeString() {
             var j = Just(),
                 n = Nothing();
 
@@ -400,7 +400,7 @@ describe('Maybe functor tests', function _testMaybeFunctor() {
             Object.prototype.toString.call(n).should.eql('[object Nothing]');
         });
 
-        it('should print the correct container type + value when .toString() is invoked', function _testMaybeFunctorToString() {
+        it('should print the correct container type + value when .toString() is invoked', function _testMaybeToString() {
             var c1 = Maybe(1),
                 c2 = Maybe(null),
                 c3 = Maybe([1, 2, 3]),

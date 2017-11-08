@@ -48,6 +48,21 @@ function any(xs, predicate) {
 /**
  * @signature
  * @description d
+ * @param {dataStructures.list_core} xs - a
+ * @param {dataStructures.list_core} ys - b
+ * @return {generator} - c
+ */
+function apply(xs, ys) {
+    return function *_applyIterator() {
+        for (let y of ys) {
+            for (let x of xs) yield y(x);
+        }
+    };
+}
+
+/**
+ * @signature
+ * @description d
  * @param {Array|generator|dataStructures.list_core} xs - a
  * @param {*} val - b
  * @param {function} comparer - c
@@ -94,10 +109,13 @@ function chain(xs, fn) {
 
         for (let x of xs) {
             res = fn(x);
-            //If the result is a list, then we need to unwrap the values contained within and yield
-            //each one of them individually...
+            //We have to travel up the prototype chain twice here because we could be dealing with an
+            //ordered list, in which case, we need to check if list_core is in the prototype chain,
+            //not list or ordered_list
             if (Object.getPrototypeOf(Object.getPrototypeOf(xs)).isPrototypeOf(res)) {
-                for (let item of res.value) {
+                //If the result is a list, then we need to unwrap the values contained within and yield
+                //each one of them individually...
+                for (let item of res) {
                     yield item;
                 }
             }
@@ -792,6 +810,6 @@ function zip(xs, ys, selector) {
     };
 }
 
-export { all, any, binarySearch, chain, concat, concatAll, contains, copyWithin, count, distinct, equals, except, fill, filter,
+export { all, any, apply, binarySearch, chain, concat, concatAll, contains, copyWithin, count, distinct, equals, except, fill, filter,
         findIndex, findLastIndex, first, foldLeft, foldRight, groupBy, groupJoin, intersect, intersperse, join, last, map, ofType,
         pop, prepend, prependAll, reduceRight, repeat, reverse, set, skipWhile, slice, sortBy, takeWhile, unfold, union, zip };

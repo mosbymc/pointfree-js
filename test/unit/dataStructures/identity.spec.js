@@ -280,38 +280,42 @@ describe('Identity monad test', function _testIdentityMonad() {
             }).value.should.eql(27);
         });
 
-        /*
         it('should return the applied data structure\'s type after mapping the identity\'s underlying value', function _testIdentityApply() {
-            var i = Identity(function _identityMap(val) {
-                return val ? val + 50 : 0;
-            });
+            var id = Identity(10),
+                i = Identity(x => x * x),
+                c = monads.Constant(x => x * x),
+                l = monads.List(x => x * x),
+                n = monads.Nothing(x => x * x),
+                j = monads.Just(x => x * x),
+                le = monads.Left(x => x * x),
+                r = monads.Right(x => x * x);
 
-            var c = monads.Constant(10),
-                e1 = monads.Either(100, 'right'),
-                e2 = monads.Either('error'),
-                l = monads.List([1, 2, 3, 4, 5]),
-                m1 = monads.Maybe(15),
-                m2 = monads.Maybe(null),
-                m3 = monads.Maybe(false);
+            var res1 = id.apply(c),
+                res2 = id.apply(l),
+                res3 = id.apply(n),
+                res4 = id.apply(j),
+                res5 = id.apply(le),
+                res6 = id.apply(r),
+                res = id.apply(i);
 
-            var cRes = i.apply(c),
-                e1Res = i.apply(e1),
-                e2Res = i.apply(e2),
-                lRes =  i.apply(l),
-                m1Res = i.apply(m1),
-                m2Res = i.apply(m2),
-                m3Res = i.apply(m3);
+            identity.isPrototypeOf(res1).should.be.true;
+            identity.isPrototypeOf(res2).should.be.true;
+            identity.isPrototypeOf(res3).should.be.true;
+            identity.isPrototypeOf(res4).should.be.true;
+            identity.isPrototypeOf(res5).should.be.true;
+            identity.isPrototypeOf(res6).should.be.true;
+            identity.isPrototypeOf(res).should.be.true;
 
-            Object.getPrototypeOf(lRes).should.eql(Object.getPrototypeOf(monads.List()));
-            Object.getPrototypeOf(cRes).should.eql(monads.Constant());
-            Object.getPrototypeOf(e1Res).should.eql(monads.Right());
-            e2Res.isRight.should.be.false;
-            e2Res.isLeft.should.be.true;
-            //Object.getPrototypeOf(m1Res).should.eql(monads.Maybe(65));
-            //Object.getPrototypeOf(m2Res).should.eql(monads.Maybe());
-            //Object.getPrototypeOf(m3Res).should.eql(monads.Maybe(false));
+            id.extract.should.eql(res1.extract);
+            id.extract.should.eql(res2.extract);
+            id.extract.should.eql(res3.extract);
+            id.extract.should.eql(res4.extract);
+            id.extract.should.eql(res5.extract);
+            id.extract.should.eql(res6.extract);
+            id.extract.should.not.eql(res.extract);
+
+            res.extract.should.eql(100);
         });
-        */
 
         it('should return underlying value when identity#fold is invoked', function _testIdentityFold() {
             Identity(10).fold((x, y) => x + y * 15, 0).should.eql(150);

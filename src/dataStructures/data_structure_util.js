@@ -121,17 +121,7 @@ function extendMaker(typeFactory) {
  * @return {Object} b
  */
 function apply(ma) {
-    return this.map(ma.value);
-}
-
-/**
- * @signature
- * @description d
- * @param {Object} ma - a
- * @return {*} - b
- */
-function monad_apply(ma) {
-    return ma.map(this.value);
+    return Object.getPrototypeOf(this).isPrototypeOf(ma) ? this.map(ma.value) : this;
 }
 
 /**
@@ -367,6 +357,6 @@ var fl = {
     promap: 'fantasy-land/promap'
 };
 
-export { monad_apply, apply, applyTransforms, chain, contramap, monadIterator, dimap, disjunctionEqualMaker, equals, lifter,
+export { apply, applyTransforms, chain, contramap, monadIterator, dimap, disjunctionEqualMaker, equals, lifter,
         join, stringMaker, valueOf, sharedMaybeFns, sharedEitherFns, applyFantasyLandSynonyms, applyAliases, chainRec, extendMaker,
         setIteratorAndLift };

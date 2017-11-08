@@ -1,6 +1,6 @@
 import { once, type, strictEquals } from '../functionalHelpers';
 import { ifElse, constant, identity } from '../combinators';
-import { join, pointMaker, valueOf } from './data_structure_util';
+import { join, valueOf } from './data_structure_util';
 import { javaScriptTypes } from '../helpers';
 
 /**

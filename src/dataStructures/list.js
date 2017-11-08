@@ -1,4 +1,4 @@
-import { all, any, binarySearch, chain, concat, concatAll, contains, copyWithin, count, distinct, equals, except, fill, filter,
+import { all, any, apply, binarySearch, chain, concat, concatAll, contains, copyWithin, count, distinct, equals, except, fill, filter,
         findIndex, findLastIndex, first, foldLeft, foldRight, groupBy, groupJoin, intersect, intersperse, join, last, map, ofType,
         pop, prepend, prependAll, reduceRight, repeat, reverse, set, skipWhile, slice, sortBy, takeWhile, unfold, union, zip } from './list_iterators';
 import { sortDirection, generatorProto } from '../helpers';
@@ -116,7 +116,7 @@ var list_core = {
         return this._value;
     },
     get extract() {
-        return this._value;
+        return this.data;
     },
     /**
      * @signature dataStructures.list_core -> dataStructures.list_core
@@ -127,12 +127,11 @@ var list_core = {
      * @instance
      * @function apply
      * @this dataStructures.list_core
-     * @param {Object} ma - a
+     * @param {dataStructures.list_core} l - a
      * @return {*} - b
      */
-    apply: function _apply(ma) {
-        //TODO: ensure this is the correct way to implement apply on a list
-        return this.data.map(x => ma.map(x));
+    apply: function _apply(l) {
+        return createList(this, _iteratorWrapper(apply(this, l)));
     },
 
     /**
@@ -1075,30 +1074,7 @@ var list_core = {
      * @return {list} - c
      */
     traverse: function _traverse(f, g) {
-        //return this.foldl((ys, x) => g(x).map(x => y => y.concat([x])).apply(ys), f(List.empty));
-        console.log(f);
-        console.log(g);
-        return this.foldl(function _foldl(ys, x) {
-            console.log(ys);
-            console.log(x);
-
-            console.log(g(x));
-
-            return ys.apply(g(x).map(function _map1(x) {
-                return function _map2(y) {
-                    return y.concat([x]);
-                 };
-            }));
-
-            /*
-            return g(x).map(function _map1(x) {
-                console.log(x);
-                return function _map2(y) {
-                    console.log(y);
-                    return y.concat([x]);
-                };
-            }).apply(ys);*/
-        }, f(List.empty));
+        return this.foldl((ys, x) => ys.apply(g(x).map(x => y => y.concat([x]))), f(List.empty));
     },
 
     /**
@@ -1687,7 +1663,7 @@ function _iteratorWrapper(it) {
             for (let item of this.evaluatedData) yield item;
         }
         else {
-            var res = [];
+            let res = [];
             for (let item of it()) {
                 res[res.length] = item;
                 yield item;

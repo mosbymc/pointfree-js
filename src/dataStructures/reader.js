@@ -1,4 +1,4 @@
-import { equals, pointMaker, stringMaker, valueOf, get, orElse, getOrElse } from './data_structure_util';
+import { equals, stringMaker, valueOf } from './data_structure_util';
 
 /**
  * @signature

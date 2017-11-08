@@ -1,4 +1,4 @@
-import { monad_apply, join, equals, stringMaker, valueOf } from './data_structure_util';
+import { join, equals, stringMaker, valueOf } from './data_structure_util';
 
 /**
  * @signature - :: * -> {@link dataStructures.constant}
@@ -134,6 +134,9 @@ var constant = {
     traverse: function _traverse(a, f) {
         return this.factory.of(this.value);
     },
+    apply: function _apply(ma) {
+        return this;
+    },
     /**
      * @signature * -> boolean
      * @description Determines if 'this' identity functor is equal to another functor. Equality
@@ -208,7 +211,6 @@ var constant = {
 constant.bimap = constant.map;
 
 constant.mjoin = join;
-constant.apply = monad_apply;
 
 constant.ap = constant.apply;
 constant.fmap = constant.chain;

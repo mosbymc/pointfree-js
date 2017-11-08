@@ -1,4 +1,4 @@
-import { monad_apply, applyTransforms, chain, monadIterator, disjunctionEqualMaker, equals, lifter,
+import { apply, applyTransforms, chain, monadIterator, disjunctionEqualMaker, equals, lifter,
     join, stringMaker, valueOf, sharedMaybeFns, sharedEitherFns, applyFantasyLandSynonyms, chainRec } from '../../../src/dataStructures/data_structure_util';
 
 function Identity(val) {
@@ -72,19 +72,6 @@ var i = {
 };
 
 describe('Test data structure utils', function _testDataStructureUtils() {
-    describe('Test monad_apply', function _testApply() {
-        it('should map an object\'s function value over a functor\'s value and return the functor', function _testApply() {
-            var list = [1, 2, 3, 4, 5],
-                obj = {
-                    value: function _map(num) { return num * num; }
-                };
-
-            var res = monad_apply.call(obj, list);
-            res.should.be.an('array');
-            res.should.eql([1, 4, 9, 16, 25]);
-        });
-    });
-
     describe('Test applyTransform', function _testApplyTransform() {
         //it('');
     });

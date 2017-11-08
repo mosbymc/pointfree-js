@@ -1,5 +1,5 @@
 import { identity } from '../combinators';
-import { monad_apply, chain, contramap, dimap, join, disjunctionEqualMaker, stringMaker, valueOf, sharedMaybeFns } from './data_structure_util';
+import { monad_apply, apply, chain, contramap, dimap, join, disjunctionEqualMaker, stringMaker, valueOf, sharedMaybeFns } from './data_structure_util';
 
 /**
  * @signature
@@ -360,7 +360,7 @@ var just = {
      *
      * @example Just(x => x + 10).apply(Identity(10))  // => Identity(20)
      */
-    apply: monad_apply,
+    apply: apply,
     /**
      * @signature (* -> *) -> (* -> *) -> dataStructures.just<T>
      * @description Acts as a map for the disjunction between just and nothing data structures. If the
@@ -600,7 +600,7 @@ var nothing = {
     bimap: returnNothing,
     chain: returnNothing,
     mjoin: returnNothing,
-    apply: monad_apply,
+    apply: returnNothing,
     fold: function _fold(fn) {
         return Nothing();
     },

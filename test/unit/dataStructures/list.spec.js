@@ -194,6 +194,12 @@ describe('List functor test', function _testListFunctor() {
             l.should.not.equal(d);
         });
 
+        it('should extract the underlying values as an array', function _testListExtract() {
+            List([1, 2, 3, 4, 5])
+                .map(x => x * x)
+                .extract.should.eql([1, 4, 9, 16, 25]);
+        });
+
         it('should transform a List to the other data structures', function _testListTransforms() {
             var l = List(1);
             var c = l.mapToConstant(),
@@ -213,11 +219,11 @@ describe('List functor test', function _testListFunctor() {
             Object.getPrototypeOf(r).should.eql(Object.getPrototypeOf(monads.Right()));
         });
 
-        it('should allow "expected" functionality of concatenation for strings and mathematical operators for numbers', function _testListFunctorValueOf() {
+        it('should allow "expected" functionality of concatenation for strings and mathematical operators for numbers', function _testListValueOf() {
             ('Hello my name is: ' + List('Mark').data).should.eql('Hello my name is: Mark');
         });
 
-        it('should print the correct container type + value when .toString() is invoked', function _testListFunctorToString() {
+        it('should print the correct container type + value when .toString() is invoked', function _testListToString() {
             var c1 = List(1),
                 c2 = List(null),
                 c3 = List([1, 2, 3]),
@@ -256,7 +262,7 @@ describe('List functor test', function _testListFunctor() {
             List(null).constructor.should.eql(List);
         });
 
-        it('should apply a mutating function to the underlying value and return the new value unwrapped in a List when chain is called', function _testListDotChain() {
+        it('should apply a mutating function to the underlying value and return the new value unwrapped in a List when chain is called', function _testListChain() {
             var l1 = List([1, 2, 3, 4, 5]),
                 l2 = List.from([false, false, true, false, true]),
                 l3 = List(List([{ a: 1, b: 2 }, { a: 3, b: 4 }, { a: 5, b: 6 }, { a: 7, b: 8 }]));
@@ -274,7 +280,7 @@ describe('List functor test', function _testListFunctor() {
             }).data.should.eql([3, 7, 11, 15]);
         });
 
-        it('should return a flattened list when mjoin is called', function _testListMjoin() {
+        it('should return a flattened list when join is called', function _testListJoin() {
             var l1 = List([1, 2, 3, 4, 5]),
                 l2 = List.from([false, false, true, false, true]),
                 l3 = List(List([{ a: 1, b: 2 }, { a: 3, b: 4 }, { a: 5, b: 6 }, { a: 7, b: 8 }]));
@@ -292,15 +298,20 @@ describe('List functor test', function _testListFunctor() {
                 fn3 = x => x * 3,
                 fn4 = x => x * 4,
                 fn5 = x => x * 5,
-                list = List.from(fn1, fn2, fn3, fn4, fn5),
-                identity = monads.Identity(1),
-                res = list.apply(identity);
+                l1 = List.from(fn1, fn2, fn3, fn4, fn5),
+                l2 = List([1, 2, 3, 4, 5]),
+                res = l2.apply(l1);
 
-            res.should.be.an('array');
-            res.should.have.lengthOf(5);
-            res.forEach(function _testTypeAndValue(item, idx) {
-                Object.getPrototypeOf(identity).isPrototypeOf(item).should.be.true;
-                item.value.should.eql(1 * (idx + 1));
+            Object.getPrototypeOf(l1).isPrototypeOf(res).should.be.true;
+            res.data.should.have.lengthOf(25);
+            console.log(res.data);
+            var idx1 = 1,
+                idx2 = 1;
+            res.forEach(function _testTypeAndValue(item) {
+                item.should.be.a('number');
+                item.should.eql(idx1 * idx2);
+                idx2 = 5 === idx2 ? 1 : ++idx2;
+                idx1 = 1 === idx2 ? ++idx1 : idx1;
             });
         });
     });

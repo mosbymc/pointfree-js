@@ -242,50 +242,28 @@ describe('Constant monad tests', function _testConstantMonad() {
             }).value.should.eql(25);
         });
 
-        it('should return the applied monad type after mapping the constant monad\'s underlying value', function _testConstantMonadApply() {
-            var i = Constant(function _iconstantyMap(val) {
-                return val ? val + 50 : 0;
-            });
+        it('should ignore the function application and return a constant with the same underlying value', function _testConstantApply() {
+            var c1 = Constant(10),
+                c2 = Constant(x => x * x),
+                res = c1.apply(c2);
 
-            var c = monads.Constant(10),
-                e1 = monads.Either(100, 'right'),
-                e2 = monads.Either('error'),
-                l = monads.List([1, 2, 3, 4, 5]),
-                m1 = monads.Maybe(15),
-                m2 = monads.Maybe(null),
-                m3 = monads.Maybe(false);
-
-            var cRes = i.apply(c),
-                e1Res = i.apply(e1),
-                e2Res = i.apply(e2),
-                lRes =  i.apply(l),
-                m1Res = i.apply(m1),
-                m2Res = i.apply(m2),
-                m3Res = i.apply(m3);
-
-            Object.getPrototypeOf(lRes).should.eql(Object.getPrototypeOf(monads.List()));
-            Object.getPrototypeOf(cRes).should.eql(monads.Constant());
-            Object.getPrototypeOf(e1Res).should.eql(monads.Right());
-            e2Res.isRight.should.be.false;
-            e2Res.isLeft.should.be.true;
-            //Object.getPrototypeOf(m1Res).should.eql(monads.Maybe(65));
-            //Object.getPrototypeOf(m2Res).should.eql(monads.Maybe());
-            //Object.getPrototypeOf(m3Res).should.eql(monads.Maybe(false));
+            Object.getPrototypeOf(c1).isPrototypeOf(res).should.be.true;
+            c1.extract.should.eql(res.extract);
         });
 
-        it('should return underlying value when constant_functor#fold is invoked', function _testConstantDotFold() {
+        it('should return underlying value when constant_functor#fold is invoked', function _testConstantFold() {
             Constant(10).fold(x => x * 15).should.eql(150);
         });
 
-        it('should return a constant<T> and ignore the point when #sequence is invoked', function _testConstantDotSequence() {
+        it('should return a constant<T> and ignore the point when #sequence is invoked', function _testConstantSequence() {
             Constant(10).sequence(monads.Identity).toString().should.eql('Constant(10)');
         });
 
-        it('should return a constant<T> and ignore the params when #traverse is invoked', function _testConstantDotTraverse() {
+        it('should return a constant<T> and ignore the params when #traverse is invoked', function _testConstantTraverse() {
             Constant(1).traverse(monads.Identity).toString().should.eql('Constant(1)');
         });
 
-        it('should have a .constructor property that points to the factory function', function _testConstantMonadIsStupidViaFantasyLandSpecCompliance() {
+        it('should have a .constructor property that points to the factory function', function _testConstantIsStupidViaFantasyLandSpecCompliance() {
             Constant(null).constructor.should.eql(Constant);
         });
     });
@@ -308,7 +286,7 @@ describe('Constant monad tests', function _testConstantMonad() {
             //Identity
             Constant(identity).apply(Constant(identity)).value.should.eql(identity);
 
-            Constant.of(x).map(identity).value.should.eql(Constant.of(identity).apply(Constant.of(x)).value);
+            Constant.of(x).map(identity).value.should.eql(Constant.of(x).apply(Constant.of(identity)).value);
 
             //Interchange
             var u = Constant(t);

@@ -1,4 +1,4 @@
-import { equals, pointMaker, stringMaker, valueOf, get, orElse, getOrElse } from './data_structure_util';
+import { equals, stringMaker, valueOf } from './data_structure_util';
 import { constant } from '../combinators';
 
 /**
@@ -69,26 +69,6 @@ var state = {
     changeState: function _changeState(val) {
 
     },
-    /**
-     * @signature
-     * @description d
-     * @return {*} - a
-     */
-    get: get,
-    /**
-     * @signature
-     * @description d
-     * @param {function} f - a
-     * @return {*} - b
-     */
-    orElse: orElse,
-    /**
-     * @signature
-     * @description d
-     * @param {*} x - a
-     * @return {*} - b
-     */
-    getOrElse: getOrElse,
     /**
      * @signature
      * @description d
