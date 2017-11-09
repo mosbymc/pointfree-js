@@ -209,7 +209,7 @@ var identity = {
      * @param {Object} ma - Any data structure with a map function - i.e. a functor.
      * @return {Object} Returns an instance of the data structure object provide as an argument.
      *
-     * @example Identity(x => x + 10).apply(Just(10))  // => Just(20)
+     * @example Identity(10).apply(Identity(x => x + 10))  // => Identity(20)
      */
     apply: apply,
     /**

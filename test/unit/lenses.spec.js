@@ -130,6 +130,8 @@ describe('Test lenses', function _testLenses() {
 
             const L = makeLenses('entries', 'id');
 
+            console.log(L.id);
+
             const eachEntrysId = compose(L.entries, mapped, L.id);
             const makeInt = x => parseInt(x, 10);
             over(eachEntrysId, makeInt)(dataset).should.eql({

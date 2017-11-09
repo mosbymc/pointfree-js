@@ -124,7 +124,7 @@ function makeLenses(...paths) {
     return paths.reduce(function _pathReduce(cur, next) {
         var ol = objectLens(next);
         return put(ol, ol, cur);
-    }, {num: arrayLens});
+    }, { num: arrayLens });
 }
 
 /**

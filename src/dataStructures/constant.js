@@ -1,5 +1,9 @@
 import { join, equals, stringMaker, valueOf } from './data_structure_util';
 
+function returnMe() {
+    return this;
+}
+
 /**
  * @signature - :: * -> {@link dataStructures.constant}
  * @description Factory function used to create a new object that delegates to
@@ -110,21 +114,15 @@ var constant = {
      * delegator whose underlying value is the result of the mapping operation
      * just performed.
      */
-    map: function _map(fn) {
-        return this;
-    },
-    chain: function _chain() {
-        return this;
-    },
+    map: returnMe,
+    chain: returnMe,
     /**
      * @signature
      * @description d
      * @param {dataStructures.constant} con - Another constant data structure
      * @return {dataStructures.constant} Returns itself
      */
-    concat: function _concat(con) {
-        return this;
-    },
+    concat: returnMe,
     fold: function _fold(f) {
         return f(this.value);
     },
@@ -134,9 +132,7 @@ var constant = {
     traverse: function _traverse(a, f) {
         return this.factory.of(this.value);
     },
-    apply: function _apply(ma) {
-        return this;
-    },
+    apply: returnMe,
     /**
      * @signature * -> boolean
      * @description Determines if 'this' identity functor is equal to another functor. Equality
