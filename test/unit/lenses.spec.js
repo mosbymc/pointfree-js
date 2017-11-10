@@ -52,9 +52,11 @@ describe('Test lenses', function _testLenses() {
         it('should work', function _createPathOnList() {
             var list = monads.List(testData.dataSource.data),
                 drillDown = lensPath('drillDownData'),
-                year = lensPath('Year');
+                year = lensPath('Year'),
+                third = lensPath(2),
+                second = lensPath(1);
 
-            //view(compose(year, drillDown), list);
+            view(compose(third, drillDown, second, year), list.extract).should.eql(testData.dataSource.data[2].drillDownData[1].Year);
         });
 
         it('should do stuff', function _doStuff() {
@@ -130,7 +132,7 @@ describe('Test lenses', function _testLenses() {
 
             const L = makeLenses('entries', 'id');
 
-            console.log(L.id);
+            //console.log(L.id);
 
             const eachEntrysId = compose(L.entries, mapped, L.id);
             const makeInt = x => parseInt(x, 10);

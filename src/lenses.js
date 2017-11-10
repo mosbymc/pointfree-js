@@ -226,4 +226,17 @@ var split = curry(function _split(delimiter, string) {
     return string.split(delimiter);
 });
 
+var extract = i => i.extract;
+
+var map = curry((fn, f) => f.map(fn));
+
+var  mapped = curry((f, x) => Identity(map(compose(extract, f), x)));
+
+//+ traversed :: Functor f => (a -> f a) -> Setter (f a) (f b) a b
+var traversed = curry((point, f, x) => Identity(traverse(compose(extract, f), point, x)));
+
+var traverse = curry((f, point, fctr) => compose(sequenceA(point), map(f))(fctr));
+
+var sequenceA = curry((point, fctr) => fctr.traverse(id, point));
+
 export { arrayLens, objectLens, view, over, put, set, lens, prism, prismPath, makeLenses, lensPath, unifiedLens };
