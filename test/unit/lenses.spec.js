@@ -70,6 +70,34 @@ describe('Test lenses', function _testLenses() {
                 .should.eql({ id: 3, name: 'Charles Bronson', addresses: [{ street: '.rD tunlaW 99', zip: '04821' }, { street: '2321 Crane Way', zip: '08082' }]});
         });
 
+        it('should work on javascript maps', function _testLensPathOnMap() {
+            var obj = { id: 5, name: 'Test' },
+                friends = new Map();
+            friends.set('Mike', { id: 2, name: 'Mike' });
+            friends.set('Charles', { id: 4, name: 'Charles' });
+            friends.set('Tim', { id: 1, name: 'Tim' });
+            obj.friends = friends;
+
+            var friendLens = lensPath('friends'),
+                CharlesLens = lensPath('Charles'),
+                newFriendLens = lensPath('Anthony'),
+                nameLens = lensPath('name');
+
+            var friendCharles = compose(friendLens, CharlesLens),
+                charlesNames = compose(friendLens, CharlesLens, nameLens),
+                newFriend = compose(friendLens, newFriendLens);
+
+            function _x(...args) {
+                console.log(args);
+            }
+
+            var i = { id: 6, name: 'Face' };
+
+            view(friendCharles, obj).should.eql(friends.get('Charles'));
+            over(charlesNames, reverse, obj).friends.get('Charles').should.eql({ id: 4, name: 'selrahC' });
+            console.log(set(newFriend, i, obj).friends)
+        });
+
         it('should do other stuff', function _testOtherStuff() {
             var name = lensPath('name');
             over(compose(mapped, mapped, mapped, name), toUpper, monads.Identity.of(monads.Maybe.of([user])))

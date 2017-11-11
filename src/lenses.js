@@ -54,9 +54,9 @@ var objectLens = curry(function _objectLens(prop, f, xs) {
 var unifiedLens = curry(function _unifiedLens(prop, f, xs) {
     return mapWith(function _mapWith(value) {
         if (Array.isArray(xs)) return arraySet(prop, value, xs);
-        else if (Set.prototype.isPrototypeOf(xs)) return mapSet(prop, value, xs);
+        else if (Map.prototype.isPrototypeOf(xs)) return mapSet(prop, value, xs);
         return objectSet(prop, value, xs);
-    }, f(xs[prop]));
+    }, Map.prototype.isPrototypeOf(xs) ? f(xs.get(prop)) : f(xs[prop]));
 });
 
 /**
@@ -84,6 +84,12 @@ var view = curry(function _view(lens, target) {
  */
 var over = curry(function _over(lens, mapFn, target) {
     return lens(function _lens(y) {
+        if (mapFn.name === kestrel(1).name && target.friends) {
+            console.log(lens);
+            console.log(target);
+            console.log(mapFn(y));
+            console.log(y);
+        }
         return Identity(mapFn(y));
     })(target).value;
 });
@@ -141,7 +147,7 @@ function improvedLensPath(...paths) {
     });
 
     return compose(...paths.map(function _pathsMap(p) {
-        innerLensDef(p);
+        return innerLensDef(p);
     }));
 }
 
@@ -153,7 +159,7 @@ function improvedLensPath(...paths) {
  */
 function lensPath(...path) {
     return compose(...path.map(function _pathMap(p) {
-        return 'string' === typeof p ? objectLens(p) : arrayLens(p);
+        return unifiedLens(p);
     }));
 }
 
