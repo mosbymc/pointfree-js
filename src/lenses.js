@@ -84,12 +84,6 @@ var view = curry(function _view(lens, target) {
  */
 var over = curry(function _over(lens, mapFn, target) {
     return lens(function _lens(y) {
-        if (mapFn.name === kestrel(1).name && target.friends) {
-            console.log(lens);
-            console.log(target);
-            console.log(mapFn(y));
-            console.log(y);
-        }
         return Identity(mapFn(y));
     })(target).value;
 });

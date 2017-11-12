@@ -398,8 +398,6 @@ var lift4 = curry(function _lift4(f, m1, m2, m3, m4) {
  */
 var liftN = curry(function _liftN(f, ...ms) {
     return ms.slice(1).reduce(function _apply(curM, nextM) {
-        console.log(curM.value);
-        console.log(nextM.value);
         return curM.apply(nextM);
     }, ms.shift().map(f));
 });

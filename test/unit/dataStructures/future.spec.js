@@ -50,7 +50,6 @@ describe('Future test', function _testFutureFunctor() {
             var f1 = Future.wrap(1),
                 f2 = Future.wrap(x => x);
 
-            console.log(f1.extract);
             f1.extract.should.be.a('function');
             f2.extract.should.be.a('function');
             f2.extract(identity, identity)(1).should.eql(1);

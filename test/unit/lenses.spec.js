@@ -139,7 +139,7 @@ describe('Test lenses', function _testLenses() {
                     {body: 'sing out strong', title: 'Line 3'}]
             };
 
-            console.log(over(lensPath('comments', 0, 'body'), capitalizeFirst)(bigBird));//inline);
+            //console.log(over(lensPath('comments', 0, 'body'), capitalizeFirst)(bigBird));//inline);
 
             const firstCommentBody = lensPath('comments', 0, 'body');//assign lens to a resuable named variable
             //console.log(over(firstCommentBody, capitalizeFirst)(bigBird));//then use

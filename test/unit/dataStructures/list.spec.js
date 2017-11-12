@@ -304,7 +304,6 @@ describe('List functor test', function _testListFunctor() {
 
             Object.getPrototypeOf(l1).isPrototypeOf(res).should.be.true;
             res.data.should.have.lengthOf(25);
-            console.log(res.data);
             var idx1 = 1,
                 idx2 = 1;
             res.forEach(function _testTypeAndValue(item) {
