@@ -13,17 +13,46 @@ import { mapWith } from './pointless_data_structures';
  * @signature
  * @description d
  * @kind function
+ * @function lens
+ * @param {function} getter - a
+ * @param {function} setter - b
+ * @param {String} key - c
+ * @param {function} f - d
+ * @param {Array} xs - e
+ * @return {*} - f
+ */
+var lens = curry(function _lens(getter, setter, key, f, xs) {
+    return mapWith(replace => setter(key, replace, xs), f(getter(key, xs)));
+});
+
+/**
+ * @signature
+ * @description d
+ * @kind function
+ * @function prism
+ * @param {function} getter - a
+ * @param {function} setter - b
+ * @param {String} key - c
+ * @param {function} f - d
+ * @param {Array} xs - e
+ * @param {*} - f
+ * @return {*} - g
+ */
+var prism = curry(function _prism(getter, setter, key, f, xs) {
+    return mapWith(replace => setter(key, replace, xs), Maybe(f(getter(key, xs))));
+});
+
+/**
+ * @signature
+ * @description d
+ * @kind function
  * @function arrayLens
  * @param {number} idx - a
  * @param {function} f - b
  * @param {Array} xs - c
  * @return {Array} - c
  */
-var arrayLens = curry(function _arrayLens(idx, f, xs) {
-    return mapWith(function _mapWith(val) {
-        return arraySet(idx, val, xs);
-    }, f(xs[idx]));
-});
+var arrayLens = lens((idx, xs) => xs[idx], arraySet);
 
 /**
  * @signature
@@ -35,11 +64,7 @@ var arrayLens = curry(function _arrayLens(idx, f, xs) {
  * @param {Object} xs - c
  * @return {Object} - c
  */
-var objectLens = curry(function _objectLens(prop, f, xs) {
-    return mapWith(function _map(rep) {
-        return objectSet(prop, rep, xs);
-    }, f(xs[prop]));
-});
+var objectLens = lens((prop, xs) => xs[prop], objectSet);
 
 /**
  * @signature
@@ -178,39 +203,6 @@ var prismPath = curry(function _prismPath(path, obj) {
         ++idx;
     }
     return Maybe(val);
-});
-
-/**
- * @signature
- * @description d
- * @kind function
- * @function lens
- * @param {function} getter - a
- * @param {function} setter - b
- * @param {String} key - c
- * @param {function} f - d
- * @param {Array} xs - e
- * @return {*} - f
- */
-var lens = curry(function _lens(getter, setter, key, f, xs) {
-    return mapWith(replace => setter(key, replace, xs), f(getter(key, xs)));
-});
-
-/**
- * @signature
- * @description d
- * @kind function
- * @function prism
- * @param {function} getter - a
- * @param {function} setter - b
- * @param {String} key - c
- * @param {function} f - d
- * @param {Array} xs - e
- * @param {*} - f
- * @return {*} - g
- */
-var prism = curry(function _prism(getter, setter, key, f, xs) {
-    return mapWith(replace => setter(key, replace, xs), Maybe(f(getter(key, xs))));
 });
 
 /**

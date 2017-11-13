@@ -78,6 +78,9 @@ describe('Test lenses', function _testLenses() {
             friends.set('Tim', { id: 1, name: 'Tim' });
             obj.friends = friends;
 
+            var mapLens = lens((prop, xs) => xs.get(prop), (prop, val, xs) => xs.set(prop, val));
+            view(mapLens('Mike'), obj.friends).should.eql({ id: 2, name: 'Mike' });
+
             var friendLens = lensPath('friends'),
                 CharlesLens = lensPath('Charles'),
                 newFriendLens = lensPath('Anthony'),
