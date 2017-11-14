@@ -375,12 +375,15 @@ var lessThanOrEqual = curry((x, y) => x <= y);
  * @function mapSet
  * @param {*} key - a
  * @param {*} val - b
- * @param {Map} map - c
+ * @param {Map} xs - c
  * @return {Map} - d
  */
-var mapSet = curry(function _mapSet(key, val, map) {
-    map.set(key, val);
-    return map;
+var mapSet = curry(function _mapSet(key, val, xs) {
+    var ret = new Map();
+    for (let k of xs.keys()) {
+        ret.set(k, xs.get(k));
+    }
+    return ret;
 });
 
 /**

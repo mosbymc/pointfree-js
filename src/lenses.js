@@ -70,6 +70,27 @@ var objectLens = lens((prop, xs) => xs[prop], objectSet);
  * @signature
  * @description d
  * @kind function
+ * @function mapLens
+ * @param {*} key - a
+ * @param {*} val - b
+ * @param {Map} xs - c
+ * @return {Map} d
+ */
+var mapLens = lens((key, xs) => xs.get(key), function _mapSet(key, val, xs) {
+    var ret = new Map();
+    for (let k of xs.keys()) {
+        if (k === key) {
+            ret.set(k, val);
+        }
+        else ret.set(k, xs.get(k));
+    }
+    return ret;
+});
+
+/**
+ * @signature
+ * @description d
+ * @kind function
  * @function unifiedLens
  * @param {string} prop - a
  * @param {function} f - b
@@ -109,6 +130,11 @@ var view = curry(function _view(lens, target) {
  */
 var over = curry(function _over(lens, mapFn, target) {
     return lens(function _lens(y) {
+        if (y === 'Charles') {
+            console.log(mapFn(y));
+            console.log(target);
+            console.log(lens(x => Identity(mapFn(x)))(target).value);
+        }
         return Identity(mapFn(y));
     })(target).value;
 });
@@ -231,4 +257,4 @@ var traverse = curry((f, point, fctr) => compose(sequenceA(point), map(f))(fctr)
 
 var sequenceA = curry((point, fctr) => fctr.traverse(id, point));
 
-export { arrayLens, objectLens, view, over, put, set, lens, prism, prismPath, makeLenses, lensPath, unifiedLens };
+export { arrayLens, objectLens, mapLens, view, over, put, set, lens, prism, prismPath, makeLenses, lensPath, unifiedLens };

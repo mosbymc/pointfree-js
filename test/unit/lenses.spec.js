@@ -1,4 +1,4 @@
-import { arrayLens, objectLens, view, over, put, set, lens, prism, prismPath, makeLenses, lensPath } from '../../src/lenses';
+import { arrayLens, objectLens, mapLens, view, over, put, set, lens, prism, prismPath, makeLenses, lensPath } from '../../src/lenses';
 import { reverse } from '../../src/functionalHelpers';
 import { compose, curry } from '../../src/combinators';
 import { map, mapWith } from '../../src/pointless_data_structures';
@@ -78,9 +78,18 @@ describe('Test lenses', function _testLenses() {
             friends.set('Tim', { id: 1, name: 'Tim' });
             obj.friends = friends;
 
-            var mapLens = lens((prop, xs) => xs.get(prop), (prop, val, xs) => xs.set(prop, val));
             view(mapLens('Mike'), obj.friends).should.eql({ id: 2, name: 'Mike' });
 
+            var c = compose(mapLens('Charles'), objectLens('name'));
+            over(c, x => 'Chuck', friends).should.eql({});
+
+            var numKeys = 0;
+            for (let k of friends.keys()) {
+                numKeys++;
+            }
+            numKeys.should.eql(3);
+
+            /*
             var friendLens = lensPath('friends'),
                 CharlesLens = lensPath('Charles'),
                 newFriendLens = lensPath('Anthony'),
@@ -99,6 +108,7 @@ describe('Test lenses', function _testLenses() {
             view(friendCharles, obj).should.eql(friends.get('Charles'));
             over(charlesNames, reverse, obj).friends.get('Charles').should.eql({ id: 4, name: 'selrahC' });
             console.log(set(newFriend, i, obj).friends)
+            */
         });
 
         it('should do other stuff', function _testOtherStuff() {
