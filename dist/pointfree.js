@@ -2,7 +2,7 @@
 require('babel-polyfill');
 
 window.pjs = {
-    monads: require('./src/dataStructures/monads/monads'),
+    monads: require('./src/dataStructures/dataStructures'),
     groups: require('./src/dataStructures/groups'),
     stream: require('./src/streams/observable'),
     combinators: require('./src/combinators'),
@@ -11,7 +11,7 @@ window.pjs = {
     lenses: require('./src/lenses'),
     functionalHelpers: require('./src/functionalHelpers')
 };
-},{"./src/combinators":330,"./src/dataStructures/groups":332,"./src/dataStructures/monads/monads":341,"./src/decorators":344,"./src/functionalHelpers":345,"./src/lenses":347,"./src/streams/observable":349,"./src/transducers":369,"babel-polyfill":2}],2:[function(require,module,exports){
+},{"./src/combinators":330,"./src/dataStructures/dataStructures":332,"./src/dataStructures/groups":336,"./src/decorators":344,"./src/functionalHelpers":345,"./src/lenses":347,"./src/streams/observable":349,"./src/transducers":369,"babel-polyfill":2}],2:[function(require,module,exports){
 (function (global){
 "use strict";
 
@@ -7740,8 +7740,39 @@ function constant(item) {
  *      c(1)(2, 3)(4)   //10
  */
 function curry(fn) {
-  if (!fn.length || 1 >= fn.length) return fn;
-  return curryN.call(this, fn.length, fn);
+  if (1 >= fn.length) return fn;
+  return _curry.call(this, fn.length, fn);
+}
+
+/**
+ * @signature
+ * @description d
+ * @private
+ * @param {number} arity - a
+ * @param {function} fn - b
+ * @param {Array} received - c
+ * @return {*} - d
+ */
+function _curry(arity, fn) {
+  var received = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : [];
+
+  if (fn.orig && fn.orig !== fn) return _curry.call(this, arity, fn.orig, received);
+  function _curry_() {
+    for (var _len3 = arguments.length, rest = Array(_len3), _key3 = 0; _key3 < _len3; _key3++) {
+      rest[_key3] = arguments[_key3];
+    }
+
+    var combined = received.concat(rest);
+    if (arity > combined.length) return _curry.call(this, arity, fn, combined);
+    return fn.call.apply(fn, [this].concat(_toConsumableArray(combined)));
+  }
+
+  _curry_.orig = fn;
+  _curry_.toString = function () {
+    return fn.toString() + '(' + received.join(', ') + ')';
+  };
+  Object.defineProperties(_curry_, { length: { value: arity - received.length } });
+  return _curry_;
 }
 
 /**
@@ -7764,8 +7795,8 @@ function curryN(arity, fn) {
 
   if (fn.orig && fn.orig !== fn) return curryN.call(this, arity, fn.orig, received);
   function _curryN() {
-    for (var _len3 = arguments.length, rest = Array(_len3), _key3 = 0; _key3 < _len3; _key3++) {
-      rest[_key3] = arguments[_key3];
+    for (var _len4 = arguments.length, rest = Array(_len4), _key4 = 0; _key4 < _len4; _key4++) {
+      rest[_key4] = arguments[_key4];
     }
 
     var combined = received.concat(rest);
@@ -7774,6 +7805,14 @@ function curryN(arity, fn) {
   }
 
   _curryN.orig = fn;
+  _curryN.toString = function () {
+    return fn.toString() + '(' + received.join(', ') + ')';
+  };
+
+  //Although Object.defineProperty works just fine to change a function's length, mocha freaks
+  //out for no apparent reason, so it won't do for testing purposes.
+  Object.defineProperties(_curryN, { length: { value: arity - received.length } });
+
   return _curryN;
 }
 
@@ -7803,8 +7842,8 @@ function curryRight(fn) {
    * in the pipeline returned.
    */
   return curryN.call(this, fn.length, function _wrapper() {
-    for (var _len4 = arguments.length, args = Array(_len4), _key4 = 0; _key4 < _len4; _key4++) {
-      args[_key4] = arguments[_key4];
+    for (var _len5 = arguments.length, args = Array(_len5), _key5 = 0; _key5 < _len5; _key5++) {
+      args[_key5] = arguments[_key5];
     }
 
     return fn.call.apply(fn, [this].concat(_toConsumableArray(args.reverse())));
@@ -7956,15 +7995,23 @@ var o = curry(function (a, b) {
  *      p(10)  //0
  */
 function pipe(fn) {
-  for (var _len5 = arguments.length, fns = Array(_len5 > 1 ? _len5 - 1 : 0), _key5 = 1; _key5 < _len5; _key5++) {
-    fns[_key5 - 1] = arguments[_key5];
+  for (var _len6 = arguments.length, fns = Array(_len6 > 1 ? _len6 - 1 : 0), _key6 = 1; _key6 < _len6; _key6++) {
+    fns[_key6 - 1] = arguments[_key6];
   }
 
-  return function _pipe() {
+  function _pipe() {
     return fns.reduce(function pipeReduce(item, f) {
       return f(item);
     }, fn.apply(undefined, arguments));
+  }
+
+  _pipe.toString = function () {
+    return [fn].concat(fns).reduce(function (str, f, idx) {
+      return str + ('' + f.toString() + (idx < fns.length ? '(' : ''));
+    }, '') + ')'.repeat(fns.length);
   };
+  //only curry the pipe if the leading function is not already curried - otherwise, leave as is
+  return fn.orig ? _pipe : _curry(fn.length, _pipe);
 }
 
 /**
@@ -8121,8 +8168,8 @@ var uncurryN = curry(function uncurryN(depth, fn) {
         idx = 0,
         endIdx;
 
-    for (var _len6 = arguments.length, args = Array(_len6), _key6 = 0; _key6 < _len6; _key6++) {
-      args[_key6] = arguments[_key6];
+    for (var _len7 = arguments.length, args = Array(_len7), _key7 = 0; _key7 < _len7; _key7++) {
+      args[_key7] = arguments[_key7];
     }
 
     while (currentDepth <= depth && 'function' === typeof value) {
@@ -8211,8 +8258,8 @@ function applyWhenReady(fn) {
    * @property {function} args
    */
   function _applyWhenReady() {
-    for (var _len7 = arguments.length, args = Array(_len7), _key7 = 0; _key7 < _len7; _key7++) {
-      args[_key7] = arguments[_key7];
+    for (var _len8 = arguments.length, args = Array(_len8), _key8 = 0; _key8 < _len8; _key8++) {
+      args[_key8] = arguments[_key8];
     }
 
     values = values.concat(args);
@@ -8277,13 +8324,13 @@ function applyWhenReady(fn) {
  */
 function applyAll(fn) {
   return function _applyAll() {
-    for (var _len8 = arguments.length, fns = Array(_len8), _key8 = 0; _key8 < _len8; _key8++) {
-      fns[_key8] = arguments[_key8];
+    for (var _len9 = arguments.length, fns = Array(_len9), _key9 = 0; _key9 < _len9; _key9++) {
+      fns[_key9] = arguments[_key9];
     }
 
     return function __applyAll() {
-      for (var _len9 = arguments.length, args = Array(_len9), _key9 = 0; _key9 < _len9; _key9++) {
-        args[_key9] = arguments[_key9];
+      for (var _len10 = arguments.length, args = Array(_len10), _key10 = 0; _key10 < _len10; _key10++) {
+        args[_key10] = arguments[_key10];
       }
 
       return fn(fns, args);
@@ -8329,28 +8376,374 @@ exports.y = y;
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.constant = exports.Constant = undefined;
+
+var _Symbol$toStringTag, _constant, _mutatorMap;
+
+var _data_structure_util = require('./data_structure_util');
+
+function _defineEnumerableProperties(obj, descs) { for (var key in descs) { var desc = descs[key]; desc.configurable = desc.enumerable = true; if ("value" in desc) desc.writable = true; Object.defineProperty(obj, key, desc); } return obj; }
+
+function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
+
+function returnMe() {
+  return this;
+}
+
+/**
+ * @signature - :: * -> {@link dataStructures.constant}
+ * @description Factory function used to create a new object that delegates to
+ * the {@link dataStructures.constant} object. Any single value may be provided as an argument
+ * which will be used to set the underlying value of the new {@link dataStructures.constant}
+ * delegator. If no argument is provided, the underlying value will be 'undefined'.
+ * @namespace Constant
+ * @memberOf dataStructures
+ * @property {function} of
+ * @property {function} is
+ * @property {function} lift
+ * @param {*} [val] - The value that should be set as the underlying
+ * value of the {@link dataStructures.constant}.
+ * @return {dataStructures.constant} - Returns a new object that delegates to the
+ * {@link dataStructures.constant}.
+ */
+function Constant(val) {
+  return Object.create(constant, {
+    _value: {
+      value: val,
+      writable: false,
+      configurable: false
+    }
+  });
+}
+
+/**
+ * @signature * -> {@link dataStructures.constant}
+ * @description Takes any value and places it in the correct context if it is
+ * not already and creates a new {@link dataStructures.constant} object delegator instance.
+ * Because the constant functor does not require any specific context for
+ * its value, this can be viewed as an alias for {@link dataStructures.Constant}
+ * @memberOf dataStructures.Constant
+ * @static
+ * @function of
+ * @param {*} [x] - The value that should be set as the underlying
+ * value of the {@link dataStructures.constant}.
+ * @return {dataStructures.constant} - Returns a new object that delegates to the
+ * {@link dataStructures.constant}.
+ */
+Constant.of = function (x) {
+  return Constant(x);
+};
+
+/**
+ * @signature * -> boolean
+ * @description Convenience function for determining if a value is an
+ * {@link dataStructures.constant} delegate or not. Available on the
+ * identity_functor's factory function as Identity.is.
+ * @memberOf dataStructures.Constant
+ * @function is
+ * @param {*} [f] - Any value may be used as an argument to this function.
+ * @return {boolean} Returns a boolean that indicates whether the
+ * argument provided delegates to the {@link dataStructures.constant} delegate.
+ */
+Constant.is = function (f) {
+  return constant.isPrototypeOf(f);
+};
+
+/**
+ * @typedef {Object} constant
+ * @property {function} value - returns the underlying value of the the functor
+ * @property {function} map - maps a single function over the underlying value of the functor
+ * @property {function} bimap
+ * @property {function} extract
+ * @property {function} valueOf - returns the underlying value of the functor; used during concatenation and coercion
+ * @property {function} toString - returns a string representation of the identity functor and its underlying value
+ * @property {function} factory - a reference to the constant factory function
+ * @property {function} [Symbol.Iterator] - Iterator for the constant
+ * @kind {Object}
+ * @memberOf dataStructures
+ * @namespace constant
+ * @description This is the delegate object that specifies the behavior of the identity functor. All
+ * operations that may be performed on an identity functor 'instance' delegate to this object. Constant
+ * functor 'instances' are created by the {@link dataStructures.Constant} factory function via Object.create,
+ * during which the underlying value is placed directly on the newly created object. No other
+ * properties exist directly on an identity functor delegator object beyond the ._value property.
+ * All behavior delegates to this object, or higher up the prototype chain.
+ */
+var constant = (_constant = {
+  /**
+   * @signature () -> *
+   * @description Returns the underlying value of an constant delegator. This
+   * getter is not expected to be used directly by consumers - it is meant as an internal
+   * access only. To manipulate the underlying value of an identity_functor delegator,
+   * see {@link dataStructures.constant#map} and {@link dataStructures.constant#bimap}.
+   * To retrieve the underlying value of an identity_functor delegator, see {@link dataStructures.constant#get},
+   * {@link dataStructures.constant#orElse}, {@link dataStructures.constant#getOrElse},
+   * and {@link dataStructures.constant#valueOf}.
+   * @memberOf dataStructures.constant
+   * @instance
+   * @protected
+   * @function
+   * @return {*} Returns the underlying value of the delegator. May be any value.
+   */
+  get value() {
+    return this._value;
+  },
+  get extract() {
+    return this.value;
+  },
+  /**
+   * @signature () -> {@link dataStructures.constant}
+   * @description Takes a function that is applied to the underlying value of the
+   * functor, the result of which is used to create a new {@link dataStructures.constant}
+   * delegator instance.
+   * @memberOf dataStructures.constant
+   * @instance
+   * @param {function} fn - A mapping function that can operate on the underlying
+   * value of the {@link dataStructures.constant}.
+   * @return {dataStructures.constant} Returns a new {@link dataStructures.constant}
+   * delegator whose underlying value is the result of the mapping operation
+   * just performed.
+   */
+  map: returnMe,
+  chain: returnMe,
+  /**
+   * @signature
+   * @description d
+   * @param {dataStructures.constant} con - Another constant data structure
+   * @return {dataStructures.constant} Returns itself
+   */
+  concat: returnMe,
+  fold: function _fold(f) {
+    return f(this.value);
+  },
+  sequence: function _sequence(p) {
+    return this.factory.of(this.value);
+  },
+  traverse: function _traverse(a, f) {
+    return this.factory.of(this.value);
+  },
+  apply: returnMe,
+  /**
+   * @signature * -> boolean
+   * @description Determines if 'this' identity functor is equal to another functor. Equality
+   * is defined as:
+   * 1) The other functor shares the same delegate object as 'this' identity functor
+   * 2) Both underlying values are strictly equal to each other
+   * @memberOf dataStructures.constant
+   * @instance
+   * @function
+   * @param {Object} ma - The other functor to check for equality with 'this' functor.
+   * @return {boolean} - Returns a boolean indicating equality
+   */
+  equals: _data_structure_util.equals,
+  /**
+   * @signature () -> *
+   * @description Returns the underlying value of the current functor 'instance'. This
+   * function property is not meant for explicit use. Rather, the JavaScript engine uses
+   * this property during implicit coercion like addition and concatenation.
+   * @memberOf dataStructures.constant
+   * @instance
+   * @function
+   * @return {*} Returns the underlying value of the current functor 'instance'.
+   */
+  valueOf: _data_structure_util.valueOf,
+  /**
+   * @signature () -> string
+   * @description Returns a string representation of the functor and its
+   * underlying value
+   * @memberOf dataStructures.constant
+   * @instance
+   * @function
+   * @return {string} Returns a string representation of the constant
+   * and its underlying value.
+   */
+  toString: (0, _data_structure_util.stringMaker)('Constant')
+}, _Symbol$toStringTag = Symbol.toStringTag, _mutatorMap = {}, _mutatorMap[_Symbol$toStringTag] = _mutatorMap[_Symbol$toStringTag] || {}, _mutatorMap[_Symbol$toStringTag].get = function () {
+  return 'Constant';
+}, _defineProperty(_constant, 'factory', Constant), _defineEnumerableProperties(_constant, _mutatorMap), _constant);
+
+/**
+ * @signature (* -> *) -> (* -> *) -> dataStructures.constant<T>
+ * @description Since the constant functor does not represent a disjunction, the Identity's
+ * bimap function property behaves just as its map function property. It is merely here as a
+ * convenience so that swapping out monads/monads does not break an application that is
+ * relying on its existence.
+ * @memberOf dataStructures.constant
+ * @instance
+ * @function
+ * @param {function} f - A function that will be used to map over the underlying data of the
+ * {@link dataStructures.constant} delegator.
+ * @param {function} [g] - An optional function that is simply ignored on the {@link dataStructures.constant}
+ * since there is no disjunction present.
+ * @return {dataStructures.constant} - Returns a new {@link dataStructures.constant} delegator after applying
+ * the mapping function to the underlying data.
+ */
+constant.bimap = constant.map;
+
+constant.mjoin = _data_structure_util.join;
+
+constant.ap = constant.apply;
+constant.fmap = constant.chain;
+constant.flapMap = constant.chain;
+constant.bind = constant.chain;
+constant.reduce = constant.fold;
+constant.constructor = constant.factory;
+
+exports.Constant = Constant;
+exports.constant = constant;
+
+},{"./data_structure_util":333}],332:[function(require,module,exports){
+'use strict';
+
+Object.defineProperty(exports, "__esModule", {
     value: true
 });
-exports.extract = exports.extendMaker = exports.chainRec = exports.applyAliases = exports.applyFantasyLandSynonyms = exports.sharedEitherFns = exports.sharedMaybeFns = exports.emptyGetOrElse = exports.getOrElse = exports.emptyOrElse = exports.orElse = exports.emptyGet = exports.get = exports.valueOf = exports.stringMaker = exports.pointMaker = exports.mjoin = exports.maybeFactoryHelper = exports.lifter = exports.equalMaker = exports.disjunctionEqualMaker = exports.monadIterator = exports.contramap = exports.chain = exports.applyTransforms = exports.monad_apply = undefined;
+exports.Validation = exports.Right = exports.Nothing = exports.Maybe = exports.List = exports.Left = exports.Just = exports.Io = exports.Identity = exports.Future = exports.Either = exports.Constant = undefined;
+
+var _constant = require('./constant');
+
+var _either = require('./either');
+
+var _future = require('./future');
+
+var _identity = require('./identity');
+
+var _io = require('./io');
+
+var _list = require('./list');
+
+var _maybe = require('./maybe');
+
+var _validation = require('./validation');
+
+var _data_structure_util = require('./data_structure_util');
+
+/**
+ * @namespace dataStructures
+ */
+
+/*
+    - Semigroup:
+        > a.concat(b).concat(c) is equivalent to a.concat(b.concat(c)) (associativity)
+
+    - Monoid:
+        > A value that implements the Monoid specification must also implement the Semigroup specification.
+        > m.concat(M.empty()) is equivalent to m (right identity)
+        > M.empty().concat(m) is equivalent to m (left identity)
+
+    - Functor:
+        > u.map(a => a) is equivalent to u (identity)
+        > u.map(x => f(g(x))) is equivalent to u.map(g).map(f) (composition)
+
+    - Apply:
+        > A value that implements the Apply specification must also implement the Functor specification.
+        > v.ap(u.ap(a.map(f => g => x => f(g(x))))) is equivalent to v.ap(u).ap(a) (composition)
+
+    - Applicative:
+        > A value that implements the Applicative specification must also implement the Apply specification.
+        > v.ap(A.of(x => x)) is equivalent to v (identity)
+        > A.of(x).ap(A.of(f)) is equivalent to A.of(f(x)) (homomorphism)
+        > A.of(y).ap(u) is equivalent to u.ap(A.of(f => f(y))) (interchange)
+
+    - Foldable:
+        > u.reduce is equivalent to u.reduce((acc, x) => acc.concat([x]), []).reduce
+
+    - Traversable:
+        > A value that implements the Traversable specification must also implement the Functor and Foldable specifications.
+        > t(u.traverse(F, x => x)) is equivalent to u.traverse(G, t) for any t such that t(a).map(f) is equivalent to t(a.map(f)) (naturality)
+        > u.traverse(F, F.of) is equivalent to F.of(u) for any Applicative F (identity)
+        > u.traverse(Compose, x => new Compose(x)) === new Compose(u.traverse(F, x => x).map(x => x.traverse(G, x => x)))
+                for Compose defined below and any Applicatives F and G (composition)
+
+    - Chain:
+        > A value that implements the Chain specification must also implement the Apply specification.
+        > m.chain(f).chain(g) is equivalent to m.chain(x => f(x).chain(g)) (associativity)
+
+    - ChainRec:
+        > A value that implements the ChainRec specification must also implement the Chain specification.
+        > M.chainRec((next, done, v) => p(v) ? d(v).map(done) : n(v).map(next), i) is equivalent to (function step(v) { return p(v) ? d(v) : n(v).chain(step); }(i)) (equivalence)
+        > Stack usage of M.chainRec(f, i) must be at most a constant multiple of the stack usage of f itself.
+
+    - Monad:
+        > A value that implements the Monad specification must also implement the Applicative and Chain specifications.
+        > M.of(a).chain(f) is equivalent to f(a) (left identity)
+        > m.chain(M.of) is equivalent to m (right identity)
+
+    - Extend:
+        > A value that implements the Extend specification must also implement the Functor specification.
+        > w.extend(g).extend(f) is equivalent to w.extend(_w => f(_w.extend(g)))
+
+    - Comonad:
+        > A value that implements the Comonad specification must also implement the Extend specification.
+        > w.extend(_w => _w.extract()) is equivalent to w (left identity)
+        > w.extend(f).extract() is equivalent to f(w) (right identity)
+
+    - Bifunctor:
+        > A value that implements the Bifunctor specification must also implement the Functor specification.
+        > p.bimap(a => a, b => b) is equivalent to p (identity)
+        > p.bimap(a => f(g(a)), b => h(i(b)) is equivalent to p.bimap(g, i).bimap(f, h) (composition)
+
+    - Profunctor:
+        > A value that implements the Profunctor specification must also implement the Functor specification.
+        > p.promap(a => a, b => b) is equivalent to p (identity)
+        > p.promap(a => f(g(a)), b => h(i(b))) is equivalent to p.promap(f, i).promap(g, h) (composition)
+ */
+
+var monads = [{ factory: _constant.Constant, delegate: _constant.constant }, { factory: _future.Future, delegate: _future.future }, { factory: _identity.Identity, delegate: _identity.identity }, { factory: _io.Io, delegate: _io.io }, { factory: _maybe.Just, delegate: _maybe.just }, { factory: _either.Left, delegate: _either.left }, { factory: _list.List, delegate: _list.list_core }, { factory: _maybe.Maybe }, { factory: _maybe.Nothing, delegate: _maybe.nothing }, { factory: _either.Right, delegate: _either.right }, { factory: _validation.Validation, delegate: _validation.validation }];
+
+(0, _data_structure_util.applyFantasyLandSynonyms)((0, _data_structure_util.applyTransforms)((0, _data_structure_util.applyAliases)((0, _data_structure_util.setIteratorAndLift)(monads))));
+
+exports.Constant = _constant.Constant;
+exports.Either = _either.Either;
+exports.Future = _future.Future;
+exports.Identity = _identity.Identity;
+exports.Io = _io.Io;
+exports.Just = _maybe.Just;
+exports.Left = _either.Left;
+exports.List = _list.List;
+exports.Maybe = _maybe.Maybe;
+exports.Nothing = _maybe.Nothing;
+exports.Right = _either.Right;
+exports.Validation = _validation.Validation;
+
+},{"./constant":331,"./data_structure_util":333,"./either":334,"./future":335,"./identity":337,"./io":338,"./list":339,"./maybe":341,"./validation":343}],333:[function(require,module,exports){
+'use strict';
+
+Object.defineProperty(exports, "__esModule", {
+    value: true
+});
+exports.setIteratorAndLift = exports.extendMaker = exports.chainRec = exports.applyAliases = exports.applyFantasyLandSynonyms = exports.sharedEitherFns = exports.sharedMaybeFns = exports.valueOf = exports.stringMaker = exports.join = exports.lifter = exports.equals = exports.disjunctionEqualMaker = exports.dimap = exports.monadIterator = exports.contramap = exports.chain = exports.applyTransforms = exports.apply = undefined;
 
 var _combinators = require('../combinators');
 
-/** @module dataStructures/data_structure_util */
+/** @module data_structure_util */
 
-var map = function map(m) {
-    return function (fn) {
-        return m.map(fn);
-    };
-};
-
+/**
+ * @signature contramap :: (b -> a) -> Ma
+ * @description Contramap accepts a single function as an argument and returns a
+ * new instance of the same data structure with an underlying function that is
+ * the result of the composition of the original underlying function and the
+ * function argument.
+ * @param {function} fn - A function that should be composed with the data structure's
+ * underlying function.
+ * @return {*} Returns a data structure of the same type.
+ */
 function contramap(fn) {
-    return this.of(compose(this.value, fn));
+    var _this = this;
+
+    return this.factory.of(function () {
+        return _this.value(fn.apply(undefined, arguments));
+    });
 }
 
-function compose(f, g) {
-    return function _compose() {
-        return f(g.apply(undefined, arguments));
-    };
+function dimap(f, g) {
+    var _this2 = this;
+
+    return this.factory.of(function () {
+        return g(_this2.value(f.apply(undefined, arguments)));
+    });
 }
 
 /**
@@ -8359,7 +8752,7 @@ function compose(f, g) {
  * @param {Object} type - a
  * @return {function} - b
  */
-function monadTransformer(type) {
+function transformer(type) {
     return function toType() {
         var fn = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : _combinators.identity;
 
@@ -8375,24 +8768,19 @@ function monadTransformer(type) {
  */
 function applyTransforms(types) {
     var fns = types.map(function (type) {
-        return [{ name: 'mapTo' + type.factory.name, fn: monadTransformer(type.factory) }, { name: 'to' + type.factory.name, fn: function _toType() {
-                return type.factory(this.value);
-            } }];
+        return { name: 'mapTo' + type.factory.name, fn: transformer(type.factory) };
     });
-
-    types.forEach(function _applyTransforms(type) {
+    return types.map(function _applyTransforms(type) {
         if (type.delegate) {
             var regex = new RegExp(type.factory.name, 'i');
-
-            fns.forEach(function _addTransformFunctionality(transforms) {
-                transforms.forEach(function (transform) {
-                    return type.delegate[transform.name] = regex.test(transform.name) ? map(type.delegate) : transform.fn;
-                });
+            fns.filter(function (fn) {
+                return !regex.test(fn.name);
+            }).forEach(function (fn) {
+                return type.delegate[fn.name] = fn.fn;
             });
         }
+        return type;
     });
-
-    return types;
 }
 
 /**
@@ -8403,14 +8791,14 @@ function applyTransforms(types) {
  * @return {*} Returns the array of monad 'types' that it received as an argument.
  */
 function applyFantasyLandSynonyms(monads) {
-    monads.forEach(function _applyFantasyLandSynonyms(monad) {
+    return monads.map(function _applyFantasyLandSynonyms(monad) {
         if (monad.delegate) {
             Object.keys(monad.delegate).forEach(function _forEachKey(key) {
                 if (key in fl) monad.delegate[fl[key]] = monad.delegate[key];
             });
         }
+        return monad;
     });
-    return monads;
 }
 
 /**
@@ -8432,22 +8820,20 @@ function monadIterator() {
     };
 }
 
-/**
- * @signature
- * @description d
- * @return {*} - a
- */
-function get() {
-    return this.value;
-}
+function _toPrimitive(hint) {
+    //if the underlying is a function, an object, or we didn't receive a hint, let JS determine how
+    //to turn the underlying value into a primitive if it is not already...
+    if (!Array.isArray(this.value) && null != hint) {
+        //..if the hint is a number or default, coerce the underlying to a number and return...
+        if ('number' === hint || 'number' === typeof this.value) return +this.value;
+        //...else the hint was 'string', so coerce to a string a return
+        return '' + this.value;
+    }
 
-/**
- * @signature
- * @description d
- * @return {string} - b
- */
-function emptyGet() {
-    throw new Error('Cannot extract a null value.');
+    if ('string' === hint) return this.value.join('');
+    if ('number' === hint || 'default' === hint) return this.value.reduce(function (curr, acc) {
+        return curr + acc;
+    }, 0);
 }
 
 /**
@@ -8465,61 +8851,12 @@ function extendMaker(typeFactory) {
 
 /**
  * @signature
- * @description Returns the underlying value of any given monad
- * @return {*} Returns the underlying value of any given monad
- */
-function extract() {
-    return this.value;
-}
-
-/**
- * @signature
- * @description d
- * @param {function} f - a
- * @return {*} - b
- */
-function orElse(f) {
-    return this.value;
-}
-
-/**
- * @signature
- * @description d
- * @param {function} f - a
- * @return {*} - b
- */
-function emptyOrElse(f) {
-    return f();
-}
-
-/**
- * @signature
- * @description d
- * @param {*} x - a
- * @return {*} - b
- */
-function getOrElse(x) {
-    return this.value;
-}
-
-/**
- * @signature
- * @description d
- * @param {*} x - a
- * @return {*} - b
- */
-function emptyGetOrElse(x) {
-    return x;
-}
-
-/**
- * @signature
  * @description d
  * @param {Object} ma - a
- * @return {*} - b
+ * @return {Object} b
  */
-function monad_apply(ma) {
-    return ma.map(this.value);
+function apply(ma) {
+    return Object.getPrototypeOf(this).isPrototypeOf(ma) ? this.map(ma.value) : this;
 }
 
 /**
@@ -8530,7 +8867,7 @@ function monad_apply(ma) {
  */
 function chain(fn) {
     var val = fn(this.value);
-    return Object.getPrototypeOf(this).isPrototypeOf(val) ? val : this.of(val);
+    return Object.getPrototypeOf(this).isPrototypeOf(val) ? val : this.factory.of(val);
 }
 
 /**
@@ -8552,32 +8889,29 @@ function chainRec(fn) {
     while (!state.done) {
         state = fn(next, done, state.value);
     }
-    return this.of(state.value);
+    return this.factory.of(state.value);
 }
 
 /**
  * @signature
  * @description d
- * @param {Object} type - a
  * @param {string} prop - b
  * @return {function} - c
  */
-function disjunctionEqualMaker(type, prop) {
+function disjunctionEqualMaker(prop) {
     return function _disjunctionEquals(a) {
-        return Object.getPrototypeOf(type).isPrototypeOf(a) && a[prop] && this.value === a.value;
+        return this.value && this.value.equals === _disjunctionEquals ? this.value.equals(a) : a.value && a.value.equals === _disjunctionEquals ? a.value.equals(this) : Object.getPrototypeOf(this).isPrototypeOf(a) && a[prop] && this.value === a.value;
     };
 }
 
 /**
  * @signature
  * @description d
- * @param {Object} type - a
- * @return {function} - b
+ * @param {Object} a - a
+ * @return {boolean} - b
  */
-function equalMaker(type) {
-    return function _equal(a) {
-        return Object.getPrototypeOf(type).isPrototypeOf(a) && this.value === a.value;
-    };
+function equals(a) {
+    return this.value && this.value.equals === equals ? this.value.equals(a) : a.value && a.value.equals === equals ? a.value.equals(this) : Object.getPrototypeOf(this).isPrototypeOf(a) && this.value === a.value;
 }
 
 /**
@@ -8597,45 +8931,21 @@ var lifter = function lifter(type) {
 /**
  * @signature
  * @description d
- * @param {function} type - a
- * @return {function} val - b
+ * @return {Object} Returns a data structure flattened by one level if capable.
  */
-var maybeFactoryHelper = function maybeFactoryHelper(type) {
-    return function (val) {
-        return type(val);
-    };
-};
-
-/**
- * @signature
- * @description d
- * @return {Object} Returns a monad flattened by one level if capable.
- */
-function mjoin() {
+function join() {
     return Object.getPrototypeOf(this).isPrototypeOf(this.value) ? this.value : this;
 }
 
 /**
  * @signature
  * @description d
- * @param {Object} type - a
+ * @param {string} factory - a
  * @return {function} - b
  */
-var pointMaker = function pointMaker(type) {
-    return function (val) {
-        return type.of(val);
-    };
-};
-
-/**
- * @signature
- * @description d
- * @param {string} typeString - a
- * @return {function} - b
- */
-function stringMaker(typeString) {
+function stringMaker(factory) {
     return function _toString() {
-        return typeString + '(' + this.value + ')';
+        return factory + '(' + (null == this.value ? this.value : this.value.toString()) + ')';
     };
 }
 
@@ -8654,30 +8964,16 @@ function valueOf() {
 //==========================================================================================================//
 //==========================================================================================================//
 function justMap(fn) {
-    return this.of(fn(this.value));
-}
-
-function nothingMapMaker(factory) {
-    return function nothingMap(fn) {
-        return factory(this.value);
-    };
+    return this.factory.of(fn(this.value));
 }
 
 function justBimap(f, g) {
-    return this.of(f(this.value));
-}
-
-function nothingBimapMaker(factory) {
-    return function nothingBimap(f, g) {
-        return factory(g(this.value));
-    };
+    return this.factory.of(f(this.value));
 }
 
 var sharedMaybeFns = {
     justMap: justMap,
-    nothingMapMaker: nothingMapMaker,
-    justBimap: justBimap,
-    nothingBimapMaker: nothingBimapMaker
+    justBimap: justBimap
 };
 
 //==========================================================================================================//
@@ -8692,7 +8988,7 @@ var sharedMaybeFns = {
  * @return {*} - b
  */
 function rightMap(fn) {
-    return this.of(fn(this.value));
+    return this.factory.of(fn(this.value));
 }
 
 /**
@@ -8715,7 +9011,7 @@ function leftMapMaker(factory) {
  * @return {*} - c
  */
 function rightBiMap(f, g) {
-    return this.of(f(this.value));
+    return this.factory.of(f(this.value));
 }
 
 /**
@@ -8747,8 +9043,21 @@ var factory_aliases = {
     of: ['pure', 'point', 'return']
 };
 
+function setIteratorAndLift(dataStructures) {
+    return dataStructures.map(function _forEachStructure(dataStructure) {
+        dataStructure.factory.lift = lifter(dataStructure.factory);
+        if (dataStructure.delegate) {
+            //TODO: for now, don't apply the toPrimitive symbol function - it's messing with operations I
+            //TODO: would not expect it to mess with.
+            dataStructure.delegate[Symbol.toPrimitive] = _toPrimitive;
+            if (!dataStructure.delegate[Symbol.iterator]) dataStructure.delegate[Symbol.iterator] = monadIterator;
+        }
+        return dataStructure;
+    });
+}
+
 function applyAliases(monads) {
-    monads.forEach(function _applyAliases(monad) {
+    return monads.map(function _applyAliases(monad) {
         Object.keys(factory_aliases).forEach(function _applyFactoryAliases(fn) {
             factory_aliases[fn].forEach(function _setAliases(alias) {
                 monad.factory[alias] = monad.factory[fn];
@@ -8762,9 +9071,8 @@ function applyAliases(monads) {
                 });
             });
         }
+        return monad;
     });
-
-    return monads;
 }
 
 var fl = {
@@ -8785,46 +9093,1103 @@ var fl = {
     chain: 'fantasy-land/chain',
     chainRec: 'fantasy-land/chainRec',
     extend: 'fantasy-land/extend',
-    extract: 'fantasy-land/extract',
+
+    //extract: 'fantasy-land/extract',
     bimap: 'fantasy-land/bimap',
     promap: 'fantasy-land/promap'
 };
 
-exports.monad_apply = monad_apply;
+exports.apply = apply;
 exports.applyTransforms = applyTransforms;
 exports.chain = chain;
 exports.contramap = contramap;
 exports.monadIterator = monadIterator;
+exports.dimap = dimap;
 exports.disjunctionEqualMaker = disjunctionEqualMaker;
-exports.equalMaker = equalMaker;
+exports.equals = equals;
 exports.lifter = lifter;
-exports.maybeFactoryHelper = maybeFactoryHelper;
-exports.mjoin = mjoin;
-exports.pointMaker = pointMaker;
+exports.join = join;
 exports.stringMaker = stringMaker;
 exports.valueOf = valueOf;
-exports.get = get;
-exports.emptyGet = emptyGet;
-exports.orElse = orElse;
-exports.emptyOrElse = emptyOrElse;
-exports.getOrElse = getOrElse;
-exports.emptyGetOrElse = emptyGetOrElse;
 exports.sharedMaybeFns = sharedMaybeFns;
 exports.sharedEitherFns = sharedEitherFns;
 exports.applyFantasyLandSynonyms = applyFantasyLandSynonyms;
 exports.applyAliases = applyAliases;
 exports.chainRec = chainRec;
 exports.extendMaker = extendMaker;
-exports.extract = extract;
+exports.setIteratorAndLift = setIteratorAndLift;
 
-},{"../combinators":330}],332:[function(require,module,exports){
+},{"../combinators":330}],334:[function(require,module,exports){
+'use strict';
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.left = exports.right = exports.Right = exports.Left = exports.Either = undefined;
+
+var _Symbol$toStringTag, _right, _mutatorMap, _Symbol$toStringTag2, _left, _mutatorMap2;
+
+var _data_structure_util = require('./data_structure_util');
+
+function _defineEnumerableProperties(obj, descs) { for (var key in descs) { var desc = descs[key]; desc.configurable = desc.enumerable = true; if ("value" in desc) desc.writable = true; Object.defineProperty(obj, key, desc); } return obj; }
+
+function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
+
+/**
+ * @signature
+ * @description Returns an either functor based on a loose equals null comparison. If
+ * the argument passed to the function loose equals null, a left is returned; other wise,
+ * a right.
+ * @private
+ * @param {*} x - Any value that should be placed inside an either functor.
+ * @return {dataStructures.left|dataStructures.right} - Either a left or a right functor
+ */
+function fromNullable(x) {
+  return null != x ? Right(x) : Left(x);
+}
+
+/**
+ * @signature - :: * -> dataStructures.left|dataStructures.right
+ * @description Factory function used to create a new object that delegates to
+ * the {@link dataStructures.left|dataStructures.right} object. Any single value may be provided as an argument
+ * which will be used to set the underlying value of the new {@link dataStructures.left|dataStructures.right}
+ * delegator. If no argument is provided, the underlying value will be 'undefined'.
+ * @namespace Either
+ * @memberOf dataStructures
+ * @property {function} of
+ * @property {function} is
+ * @property {function} isRight
+ * @property {function} isLeft
+ * @property {function} Right
+ * @property {function} Left
+ * @property {function} fromNullable
+ * @property {function} lift
+ * @param {*} [val] - The value that should be set as the underlying
+ * value of the {@link dataStructures.left|dataStructures.right}.
+ * @param {string} [fork] - Specifies if the either should be a left or a right. If no value
+ * is provided, the result is created as a left.
+ * @return {dataStructures.left|dataStructures.right} - Returns a new object that delegates to the
+ * {@link dataStructures.left|dataStructures.right}.
+ */
+function Either(val, fork) {
+  return 'right' === fork ? Object.create(right, {
+    _value: {
+      value: val,
+      writable: false,
+      configurable: false
+    }
+  }) : Object.create(left, {
+    _value: {
+      value: val,
+      writable: false,
+      configurable: false
+    }
+  });
+}
+
+/**
+ * @signature * -> {@link dataStructures.right}
+ * @description Takes any value and places it in the correct context if it is
+ * not already and creates a new {@link dataStructures.right} object delegator instance.
+ * Because the either functor does not require any specific context for
+ * its value, this can be viewed as an alias for {@link dataStructures.Right}
+ * @memberOf dataStructures.Either
+ * @static
+ * @function of
+ * @param {*} [x] - The value that should be set as the underlying
+ * value of the {@link dataStructures.right}.
+ * @return {dataStructures.right} - Returns a new object that delegates to the
+ * {@link dataStructures.right}.
+ */
+Either.of = function (x) {
+  return Either(x, 'right');
+};
+
+/**
+ * @signature * -> boolean
+ * @description Convenience function for determining if a value is an
+ * {@link dataStructures.left|dataStructures.right} delegate or not. Available on the
+ * {@link left|dataStructures.right}'s factory function as dataStructures.Either#is
+ * @memberOf dataStructures.Either
+ * @function is
+ * @param {*} [f] - Any value may be used as an argument to this function.
+ * @return {boolean} Returns a boolean that indicates whether the
+ * argument provided delegates to the {@link dataStructures.left|dataStructures.right} delegate.
+ */
+Either.is = function (f) {
+  return Left.is(f) || Right.is(f);
+};
+
+/**
+ * @signature Object -> boolean
+ * @description Takes any object and returns a boolean indicating if the object is
+ * a 'right' monad.
+ * @memberOf dataStructures.Either
+ * @function is
+ * @param {Object} [f] - a
+ * @return {boolean} - b
+ */
+Either.isRight = function (f) {
+  return f.isRight;
+};
+
+/**
+ * @signature Object -> boolean
+ * @description Takes any object and returns a boolean indicating if the object is
+ * a 'left' monad.
+ * @memberOf dataStructures.Either
+ * @function is
+ * @param {Object} [f] - a
+ * @return {boolean} - b
+ */
+Either.isLeft = function (f) {
+  return f.isLeft;
+};
+
+/**
+ * @signature * -> dataStructures.right
+ * @description Takes any value and creates a 'right' functor. Shorthand function
+ * for Either(*, right)
+ * @memberOf dataStructures.Either
+ * @function is
+ * @param {*} x - a
+ * @return {dataStructures.right} - b
+ */
+Either.Right = function (x) {
+  return Either(x, 'right');
+};
+
+/**
+ * @signature * -> dataStructures.left
+ * @description Takes any value and creates a 'left' functor. Shorthand function
+ * for Either(*, 'left')
+ * @memberOf dataStructures.Either
+ * @function is
+ * @param {*} [x] - a
+ * @return {dataStructures.left} - b
+ */
+Either.Left = function (x) {
+  return Either(x);
+};
+
+/**
+ * @signature * -> dataStructures.left|dataStructures.right
+ * @description Takes any value and returns a 'left' monad is the value
+ * loose equals null; other wise returns a 'right' monad.
+ * @memberOf dataStructures.Either
+ * @function is
+ * @param {*} [x] - a
+ * @return {dataStructures.left|dataStructures.right} - b
+ */
+Either.fromNullable = fromNullable;
+
+/**
+ * @signature - :: * -> dataStructures.left
+ * @description Factory function used to create a new object that delegates to
+ * the {@link dataStructures.left} object. Any single value may be provided as an argument
+ * which will be used to set the underlying value of the new {@link dataStructures.left}
+ * delegator. If no argument is provided, the underlying value will be 'undefined'.
+ * @namespace Left
+ * @memberOf dataStructures
+ * @property {function} of
+ * @property {function} is
+ * @property {function} lift
+ * @param {*} [val] - The value that should be set as the underlying
+ * value of the {@link dataStructures.left}.
+ * @return {dataStructures.left} - Returns a new object that delegates to the
+ * {@link dataStructures.left}.
+ */
+function Left(val) {
+  return Object.create(left, {
+    _value: {
+      value: val,
+      writable: false,
+      configurable: false
+    }
+  });
+}
+
+/**
+ * @signature * -> {@link dataStructures.left}
+ * @description Takes any value and places it in the correct context if it is
+ * not already and creates a new {@link dataStructures.left} object delegator instance.
+ * Because the either functor does not require any specific context for
+ * its value, this can be viewed as an alias for {@link dataStructures.Left}
+ * @memberOf dataStructures.Left
+ * @static
+ * @function of
+ * @param {*} [x] - The value that should be set as the underlying
+ * value of the {@link dataStructures.left}.
+ * @return {dataStructures.left} - Returns a new object that delegates to the
+ * {@link dataStructures.left}.
+ */
+Left.of = function (x) {
+  return Left(x);
+};
+
+/**
+ * @signature * -> boolean
+ * @description Convenience function for determining if a value is an
+ * {@link dataStructures.left} delegate or not. Available on the
+ * {@link left}'s factory function as dataStructures.Left#is
+ * @memberOf dataStructures.Left
+ * @function is
+ * @param {*} [f] - Any value may be used as an argument to this function.
+ * @return {boolean} Returns a boolean that indicates whether the
+ * argument provided delegates to the {@link dataStructures.left} delegate.
+ */
+Left.is = function (f) {
+  return left.isPrototypeOf(f);
+};
+
+/**
+ * @signature - :: * -> dataStructures.right
+ * @description Factory function used to create a new object that delegates to
+ * the {@link dataStructures.right} object. Any single value may be provided as an argument
+ * which will be used to set the underlying value of the new {@link dataStructures.right}
+ * delegator. If no argument is provided, the underlying value will be 'undefined'.
+ * @namespace Right
+ * @memberOf dataStructures
+ * @property {function} of
+ * @property {function} is
+ * @property {function} lift
+ * @param {*} [val] - The value that should be set as the underlying
+ * value of the {@link dataStructures.right}.
+ * @return {dataStructures.right} - Returns a new object that delegates to the
+ * {@link dataStructures.right}.
+ */
+function Right(val) {
+  return Object.create(right, {
+    _value: {
+      value: val,
+      writable: false,
+      configurable: false
+    }
+  });
+}
+
+/**
+ * @signature * -> boolean
+ * @description Convenience function for determining if a value is an
+ * {@link dataStructures.right} delegate or not. Available on the
+ * {@link dataStructures.right}'s factory function as dataStructures.Right#is
+ * @memberOf dataStructures.Right
+ * @function is
+ * @param {*} [x] - Any value may be used as an argument to this function.
+ * @return {boolean} Returns a boolean that indicates whether the
+ * argument provided delegates to the {@link dataStructures.right} delegate.
+ */
+Right.is = function (x) {
+  return right.isPrototypeOf(x);
+};
+
+/**
+ * @signature * -> {@link dataStructures.right}
+ * @description Takes any value and places it in the correct context if it is
+ * not already and creates a new {@link dataStructures.right} object delegator instance.
+ * Because the either functor does not require any specific context for
+ * its value, this can be viewed as an alias for {@link dataStructures.Right}
+ * @memberOf dataStructures.Right
+ * @static
+ * @function of
+ * @param {*} [x] - The value that should be set as the underlying
+ * value of the {@link dataStructures.right}.
+ * @return {dataStructures.right} - Returns a new object that delegates to the
+ * {@link dataStructures.right}.
+ */
+Right.of = function (x) {
+  return Right(x);
+};
+
+/**
+ * @typedef {Object} right
+ * @property {function} value - returns the underlying value of the the functor
+ * @property {function} map - maps a single function over the underlying value of the functor
+ * @property {function} bimap
+ * @property {function} extract
+ * @property {function} valueOf - returns the underlying value of the functor; used during concatenation and coercion
+ * @property {function} toString - returns a string representation of the identity functor and its underlying value
+ * @property {function} factory - a reference to the right factory function
+ * @property {function} [Symbol.Iterator] - Iterator for the right
+ * @kind {Object}
+ * @memberOf dataStructures
+ * @namespace right
+ * @description This is the delegate object that specifies the behavior of the right functor. All
+ * operations that may be performed on an right functor 'instance' delegate to this object. Right
+ * functor 'instances' are created by the {@link dataStructures.Either|dataStructures.Right} factory function via Object.create,
+ * during which the underlying value is placed directly on the newly created object. No other
+ * properties exist directly on an right functor delegator object beyond the ._value property.
+ * All behavior delegates to this object, or higher up the prototype chain.
+ */
+var right = (_right = {
+  /**
+   * @signature () -> *
+   * @description Returns the underlying value of an right delegator. This
+   * getter is not expected to be used directly by consumers - it is meant as an internal
+   * access only. To manipulate the underlying value of a right delegator,
+   * see {@link dataStructures.right#map} and {@link dataStructures.right#bimap}. To
+   * retrieve the underlying value of a right delegator, see {@link dataStructures.right#get},
+   * {@link dataStructures.right#orElse}, {@link dataStructures.right#getOrElse},
+   * and {@link dataStructures.right#valueOf}.
+   * @memberOf dataStructures.right
+   * @instance
+   * @protected
+   * @function
+   * @return {*} Returns the underlying value of the delegator. May be any value.
+   */
+  get value() {
+    return this._value;
+  },
+  get extract() {
+    return this.value;
+  },
+  isRight: true,
+  isLeft: false,
+  /**
+   * @signature () -> {@link dataStructures.right}
+   * @description Takes a function that is applied to the underlying value of the
+   * functor, the result of which is used to create a new {@link dataStructures.right}
+   * delegator instance.
+   * @memberOf dataStructures.right
+   * @instance
+   * @param {function} fn - A mapping function that can operate on the underlying
+   * value of the {@link dataStructures.right}.
+   * @return {dataStructures.right} Returns a new {@link dataStructures.right}
+   * delegator whose underlying value is the result of the mapping operation
+   * just performed.
+   */
+  map: _data_structure_util.sharedEitherFns.rightMap,
+  /**
+   * @signature (* -> *) -> (* -> *) -> dataStructures.right<T>
+   * @description Since the constant functor does not represent a disjunction, the Identity's
+   * bimap function property behaves just as its map function property. It is merely here as a
+   * convenience so that swapping out monads/monads does not break an application that is
+   * relying on its existence.
+   * @memberOf dataStructures.right
+   * @instance
+   * @function
+   * @param {function} f - A function that will be used to map over the underlying data of the
+   * {@link dataStructures.right} delegator.
+   * @param {function} [g] - An optional function that is simply ignored on the {@link dataStructures.right}
+   * since there is no disjunction present.
+   * @return {dataStructures.right} - Returns a new {@link dataStructures.right} delegator after applying
+   * the mapping function to the underlying data.
+   */
+  bimap: _data_structure_util.sharedEitherFns.rightBiMap,
+  /**
+   * @signature () -> *
+   * @description Accepts a function that is used to map over the identity's underlying value
+   * and returns the returns value of the function without 're-wrapping' it in a new identity
+   * monad instance.
+   * @memberOf dataStructures.right
+   * @instance
+   * @function fold
+   * @param {function} fn - Any mapping function that should be applied to the underlying value
+   * of the identity monad.
+   * @param {*} acc - An JavaScript value that should be used as an accumulator.
+   * @return {*} Returns the return value of the mapping function provided as an argument.
+   */
+  fold: function _fold(fn, acc) {
+    return fn(acc, this.value);
+  },
+  /**
+   * @signature monad -> monad<monad<T>>
+   * @description Returns a monad of the type passed as an argument that 'wraps'
+   * and identity monad that 'wraps' the current identity monad's underlying value.
+   * @memberOf dataStructures.right
+   * @instance
+   * @function sequence
+   * @param {Object} p - Any pointed monad with a '#of' function property
+   * @return {Object} Returns a monad of the type passed as an argument that 'wraps'
+   * and identity monad that 'wraps' the current identity monad's underlying value.
+   */
+  sequence: function _sequence(p) {
+    return this.traverse(p, p.of);
+  },
+  /**
+   * @signature Object -> () -> Object
+   * @description Accepts a pointed monad with a '#of' function property and a mapping function. The mapping
+   * function is applied to the identity monad's underlying value. The mapping function should return a monad
+   * of any type. Then the {@link dataStructures.Identity.of} function is used to map over the returned monad. Essentially
+   * creating a new object of type: monad<Identity<T>>, where 'monad' is the type of monad the mapping
+   * function returns.
+   * @memberOf dataStructures.right
+   * @instance
+   * @function traverse
+   * @param {Object} a - A pointed monad with a '#of' function property. Used only in cases
+   * where the mapping function cannot be run.
+   * @param {function} f - A mapping function that should be applied to the identity's underlying value.
+   * @return {Object} Returns a new identity monad that wraps the mapping function's returned monad type.
+   */
+  traverse: function _traverse(a, f) {
+    return f(this.value).map(this.factory.of);
+  },
+  apply: _data_structure_util.apply,
+  /**
+   * @signature * -> boolean
+   * @description Determines if 'this' right functor is equal to another functor. Equality
+   * is defined as:
+   * 1) The other functor shares the same delegate object as 'this' identity functor
+   * 2) Both underlying values are strictly equal to each other
+   * @memberOf dataStructures.right
+   * @instance
+   * @function
+   * @param {Object} ma - The other functor to check for equality with 'this' functor.
+   * @return {boolean} - Returns a boolean indicating equality
+   */
+  equals: (0, _data_structure_util.disjunctionEqualMaker)('isRight'),
+  /**
+   * @signature () -> *
+   * @description Returns the underlying value of the current functor 'instance'. This
+   * function property is not meant for explicit use. Rather, the JavaScript engine uses
+   * this property during implicit coercion like addition and concatenation.
+   * @memberOf dataStructures.right
+   * @instance
+   * @function
+   * @return {*} Returns the underlying value of the current functor 'instance'.
+   */
+  valueOf: _data_structure_util.valueOf,
+  /**
+   * @signature () -> string
+   * @description Returns a string representation of the functor and its
+   * underlying value
+   * @memberOf dataStructures.right
+   * @instance
+   * @function
+   * @return {string} Returns a string representation of the right
+   * and its underlying value.
+   */
+  toString: (0, _data_structure_util.stringMaker)('Right')
+}, _Symbol$toStringTag = Symbol.toStringTag, _mutatorMap = {}, _mutatorMap[_Symbol$toStringTag] = _mutatorMap[_Symbol$toStringTag] || {}, _mutatorMap[_Symbol$toStringTag].get = function () {
+  return 'Right';
+}, _defineProperty(_right, 'factory', Either), _defineEnumerableProperties(_right, _mutatorMap), _right);
+
+/**
+ * @typedef {Object} left
+ * @property {function} value - returns the underlying value of the the functor
+ * @property {function} map - maps a single function over the underlying value of the functor
+ * @property {function} bimap
+ * @property {function} get - returns the underlying value of the functor
+ * @property {function} orElse - returns the underlying value of the functor
+ * @property {function} getOrElse - returns the underlying value of the functor
+ * @property {function} of - creates a new left delegate with the value provided
+ * @property {function} valueOf - returns the underlying value of the functor; used during concatenation and coercion
+ * @property {function} toString - returns a string representation of the identity functor and its underlying value
+ * @property {function} factory - a reference to the left factory function
+ * @property {function} [Symbol.Iterator] - Iterator for the left
+ * @kind {Object}
+ * @memberOf dataStructures
+ * @namespace left
+ * @description This is the delegate object that specifies the behavior of the left functor. All
+ * operations that may be performed on an left functor 'instance' delegate to this object. Left
+ * functor 'instances' are created by the {@link dataStructures.Either|dataStructures.Left} factory function via Object.create,
+ * during which the underlying value is placed directly on the newly created object. No other
+ * properties exist directly on an identity functor delegator object beyond the ._value property.
+ * All behavior delegates to this object, or higher up the prototype chain.
+ */
+var left = (_left = {
+  /**
+   * @signature () -> *
+   * @description Returns the underlying value of an identity_functor delegator. This
+   * getter is not expected to be used directly by consumers - it is meant as an internal
+   * access only. To manipulate the underlying value of an identity_functor delegator,
+   * see {@link dataStructures.left#map} and {@link dataStructures.left#bimap}.
+   * To retrieve the underlying value of an identity_functor delegator, see {@link dataStructures.left#get},
+   * {@link dataStructures.left#orElse}, {@link dataStructures.left#getOrElse},
+   * and {@link dataStructures.left#valueOf}.
+   * @memberOf dataStructures.left
+   * @instance
+   * @protected
+   * @function
+   * @return {*} Returns the underlying value of the delegator. May be any value.
+   */
+  get value() {
+    return this._value;
+  },
+  get extract() {
+    return this.value;
+  },
+  isRight: false,
+  isLeft: true,
+  /**
+   * @signature () -> {@link dataStructures.left}
+   * @description Takes a function that is applied to the underlying value of the
+   * functor, the result of which is used to create a new {@link dataStructures.left}
+   * delegator instance.
+   * @memberOf dataStructures.left
+   * @instance
+   * @param {function} fn - A mapping function that can operate on the underlying
+   * value of the {@link dataStructures.left}.
+   * @return {dataStructures.left} Returns a new {@link dataStructures.left}
+   * delegator whose underlying value is the result of the mapping operation
+   * just performed.
+   */
+  map: _data_structure_util.sharedEitherFns.leftMapMaker(Left),
+  /**
+   * @signature (* -> *) -> (* -> *) -> dataStructures.left<T>
+   * @description Since the constant functor does not represent a disjunction, the Identity's
+   * bimap function property behaves just as its map function property. It is merely here as a
+   * convenience so that swapping out monads/monads does not break an application that is
+   * relying on its existence.
+   * @memberOf dataStructures.left
+   * @instance
+   * @function
+   * @param {function} f - A function that will be used to map over the underlying data of the
+   * {@link dataStructures.left} delegator.
+   * @param {function} [g] - An optional function that is simply ignored on the {@link dataStructures.left}
+   * since there is no disjunction present.
+   * @return {dataStructures.left} - Returns a new {@link dataStructures.left} delegator after applying
+   * the mapping function to the underlying data.
+   */
+  bimap: _data_structure_util.sharedEitherFns.leftBimapMaker(Left),
+  /**
+   * @signature () -> *
+   * @description Accepts a function that is used to map over the identity's underlying value
+   * and returns the returns value of the function without 're-wrapping' it in a new identity
+   * monad instance.
+   * @memberOf dataStructures.left
+   * @instance
+   * @function fold
+   * @param {function} fn - Any mapping function that should be applied to the underlying value
+   * of the identity monad.
+   * @param {*} acc - An JavaScript value that should be used as an accumulator.
+   * @return {*} Returns the return value of the mapping function provided as an argument.
+   */
+  fold: function _fold(fn, acc) {
+    return fn(acc, this.value);
+  },
+  /**
+   * @signature monad -> monad<monad<T>>
+   * @description Returns a monad of the type passed as an argument that 'wraps'
+   * and identity monad that 'wraps' the current identity monad's underlying value.
+   * @memberOf dataStructures.left
+   * @instance
+   * @function sequence
+   * @param {Object} p - Any pointed monad with a '#of' function property
+   * @return {Object} Returns a monad of the type passed as an argument that 'wraps'
+   * and identity monad that 'wraps' the current identity monad's underlying value.
+   */
+  sequence: function _sequence(p) {
+    return this.traverse(p, p.of);
+  },
+  /**
+   * @signature Object -> () -> Object
+   * @description Accepts a pointed monad with a '#of' function property and a mapping function. The mapping
+   * function is applied to the identity monad's underlying value. The mapping function should return a monad
+   * of any type. Then the {@link dataStructures.Identity.of} function is used to map over the returned monad. Essentially
+   * creating a new object of type: monad<Identity<T>>, where 'monad' is the type of monad the mapping
+   * function returns.
+   * @memberOf dataStructures.left
+   * @instance
+   * @function traverse
+   * @param {Object} a - A pointed monad with a '#of' function property. Used only in cases
+   * where the mapping function cannot be run.
+   * @param {function} f - A mapping function that should be applied to the identity's underlying value.
+   * @return {Object} Returns a new identity monad that wraps the mapping function's returned monad type.
+   */
+  traverse: function _traverse(a, f) {
+    return f(this.value).map(Left);
+  },
+  apply: function _apply(m) {
+    return this;
+  },
+  /**
+   * @signature * -> boolean
+   * @description Determines if 'this' left functor is equal to another functor. Equality
+   * is defined as:
+   * 1) The other functor shares the same delegate object as 'this' identity functor
+   * 2) Both underlying values are strictly equal to each other
+   * @memberOf dataStructures.left
+   * @instance
+   * @function
+   * @param {Object} ma - The other functor to check for equality with 'this' functor.
+   * @return {boolean} - Returns a boolean indicating equality
+   */
+  equals: (0, _data_structure_util.disjunctionEqualMaker)('isLeft'),
+  /**
+   * @signature () -> *
+   * @description Returns the underlying value of the current functor 'instance'. This
+   * function property is not meant for explicit use. Rather, the JavaScript engine uses
+   * this property during implicit coercion like addition and concatenation.
+   * @memberOf dataStructures.left
+   * @instance
+   * @function
+   * @return {*} Returns the underlying value of the current functor 'instance'.
+   */
+  valueOf: _data_structure_util.valueOf,
+  /**
+   * @signature () -> string
+   * @description Returns a string representation of the functor and its
+   * underlying value
+   * @memberOf dataStructures.left
+   * @instance
+   * @function
+   * @return {string} Returns a string representation of the left
+   * and its underlying value.
+   */
+  toString: (0, _data_structure_util.stringMaker)('Left')
+}, _Symbol$toStringTag2 = Symbol.toStringTag, _mutatorMap2 = {}, _mutatorMap2[_Symbol$toStringTag2] = _mutatorMap2[_Symbol$toStringTag2] || {}, _mutatorMap2[_Symbol$toStringTag2].get = function () {
+  return 'Left';
+}, _defineProperty(_left, 'factory', Either), _defineEnumerableProperties(_left, _mutatorMap2), _left);
+
+right.chain = _data_structure_util.chain;
+right.mjoin = _data_structure_util.join;
+
+left.chain = _data_structure_util.chain;
+left.mjoin = _data_structure_util.join;
+
+right.ap = right.apply;
+left.ap = left.apply;
+right.flatMap = right.chain;
+left.flatMap = left.chain;
+right.bind = right.chain;
+left.bind = left.chain;
+right.reduce = right.fold;
+left.reduce = left.fold;
+
+right.constructor = right.factory;
+left.constructor = left.factory;
+
+exports.Either = Either;
+exports.Left = Left;
+exports.Right = Right;
+exports.right = right;
+exports.left = left;
+
+},{"./data_structure_util":333}],335:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
     value: true
 });
+exports.future = exports.Future = undefined;
+
+var _Symbol$toStringTag, _future, _mutatorMap;
+
+var _functionalHelpers = require('../functionalHelpers');
+
+var _combinators = require('../combinators');
+
+var _data_structure_util = require('./data_structure_util');
+
+var _helpers = require('../helpers');
+
+function _defineEnumerableProperties(obj, descs) { for (var key in descs) { var desc = descs[key]; desc.configurable = desc.enumerable = true; if ("value" in desc) desc.writable = true; Object.defineProperty(obj, key, desc); } return obj; }
 
 function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
+
+/**
+ * @signature
+ * @description d
+ * @private
+ * @param {function} reject - a
+ * @param {function} resolve - b
+ * @return {function} - c
+ */
+function safeFork(reject, resolve) {
+    return function _safeFork(val) {
+        try {
+            var res = resolve(val);
+            //this._value = res;
+            return res;
+        } catch (ex) {
+            reject(ex);
+        }
+    };
+}
+
+/**
+ * @signature - :: * -> {@link dataStructures.future}
+ * @description Factory function used to create a new object that delegates to
+ * the {@link dataStructures.future} object. Any single value may be provided as an argument
+ * which will be used to set the underlying value of the new {@link dataStructures.future}
+ * delegator. If no argument is provided, the underlying value will be 'undefined'.
+ * @namespace Future
+ * @memberOf dataStructures
+ * @property {function} of
+ * @property {function} is
+ * @property {function} lift
+ * @param {*} fn - The value that should be set as the underlying
+ * value of the {@link dataStructures.future}.
+ * @return {dataStructures.future} - Returns a new object that delegates to the
+ * {@link dataStructures.future}.
+ */
+function Future(fn) {
+    return Object.create(future, {
+        _source: {
+            value: fn,
+            writable: false,
+            configurable: false
+        },
+        _fork: {
+            value: fn,
+            writable: false
+        }
+    });
+}
+
+/**
+ * @sig
+ * @description d
+ * @param {Object} f - a
+ * @return {boolean} - b
+ */
+Future.is = function (f) {
+    return future.isPrototypeOf(f);
+};
+
+/**
+ * @signature * -> {@link dataStructures.future}
+ * @description Takes any value and places it in the correct context if it is
+ * not already and creates a new {@link dataStructures.future} object delegator instance.
+ * Because the future monad 'runs' off of functions, if the value passed to
+ * {@link dataStructures.future#of} is a function, it is not wrapped in a function. If it
+ * is any other type, it is wrapped in a function that will be invoked on fork.
+ * @memberOf dataStructures.Future
+ * @static
+ * @function of
+ * @param {*} [val] - The value that should be set as the underlying
+ * value of the {@link dataStructures.future}.
+ * @return {dataStructures.future} - Returns a new object that delegates to the
+ * {@link dataStructures.future}.
+ */
+/*Future.of = function _of(val) {
+    if ('function' !== typeof val) return Future((_, resolve) => safeFork(noop, resolve(val)));
+    return Future(val);
+};*/
+Future.of = function (val) {
+    return (0, _combinators.ifElse)((0, _combinators.constant)((0, _functionalHelpers.strictEquals)(_helpers.javaScriptTypes.Function, (0, _functionalHelpers.type)(val))), Future, futureFunctionize, val);
+};
+
+var futureFunctionize = function futureFunctionize(val) {
+    return Future(function (_, resolve) {
+        return safeFork(_combinators.identity, resolve(val));
+    });
+};
+
+/**
+ * @description Similar to {@link dataStructures.future#of} except it will wrap any value
+ * passed as the argument, regardless if it is a function or not.
+ * @memberOf dataStructures.future
+ * @static
+ * @function wrap
+ * @param {*} val - The value that should be wrapped in a function and set as the
+ * underlying value of the {@link dataStructures.future}
+ * @return {dataStructures.future} Returns a new object that delegates to the {@link dataStructures.future}
+ */
+Future.wrap = function (val) {
+    return futureFunctionize(val);
+};
+
+/**
+ * @signature
+ * @description d
+ * @memberOf dataStructures.Future
+ * @static
+ * @function reject
+ * @param {*} val - a
+ * @return {future} - b
+ */
+Future.reject = function (val) {
+    return Future(function (reject, resolve) {
+        return reject(val);
+    });
+};
+
+/**
+ * @signature
+ * @description d
+ * @memberOf dataStructures.Future
+ * @static
+ * @function unit
+ * @param {function} val - a
+ * @return {future} - b
+ */
+Future.unit = function (val) {
+    return Future(val).complete();
+};
+
+/**
+ * @signature
+ * @description Takes any value (function or otherwise) and a delay time in
+ * milliseconds, and returns a new {@link dataStructures.future} that will fork in the amount
+ * of time given as the delay.
+ * @param {*} val - Any JavaScript value; {@link dataStructures.Future#of} is called under the
+ * covers, so it need not be a function.
+ * @param {number} delay - The amount of time in milliseconds the forking operation
+ * should be delayed
+ * @return {dataStructures.future} Returns a new future
+ */
+Future.delay = function _delay(val, delay) {
+    var f = Future.of(fn);
+    setTimeout(function _timeout() {
+        f.fork();
+    }, delay);
+    return f;
+};
+
+/**
+ * @signature () -> {@link dataStructures.future}
+ * @description Creates and returns an 'empty' identity monad.
+ * @return {dataStructures.future} - Returns a new identity monad.
+ */
+Future.empty = function () {
+    return Future(_combinators.identity);
+};
+
+/**
+ * @typedef {Object} future
+ * @property {function} value - returns the underlying value of the the monad
+ * @property {function} map - maps a single function over the underlying value of the monad
+ * @property {function} bimap
+ * @property {function} extract
+ * @property {function} valueOf - returns the underlying value of the monad; used during concatenation and coercion
+ * @property {function} toString - returns a string representation of the future monad and its underlying value
+ * @property {function} factory - a reference to the future factory function
+ * @property {function} [Symbol.Iterator] - Iterator for the future monad
+ * @kind {Object}
+ * @memberOf dataStructures
+ * @namespace future
+ * @description This is the delegate object that specifies the behavior of the identity functor. All
+ * operations that may be performed on an future monad 'instance' delegate to this object. Future
+ * functor 'instances' are created by the {@link dataStructures.Future} factory function via Object.create,
+ * during which the underlying value is placed directly on the newly created object. No other
+ * properties exist directly on an identity functor delegator object beyond the ._value property.
+ * All behavior delegates to this object, or higher up the prototype chain.
+ */
+var future = (_future = {
+    /**
+     * @signature () -> *
+     * @description Returns the underlying value of an future delegator. This
+     * getter is not expected to be used directly by consumers - it is meant as an internal
+     * access only. To manipulate the underlying value of an future delegator,
+     * see {@link dataStructures.future#map} and {@link dataStructures.future#bimap}.
+     * To retrieve the underlying value of an future delegator, see {@link dataStructures.future#get},
+     * {@link dataStructures.future#orElse}, {@link dataStructures.future#getOrElse},
+     * and {@link dataStructures.future#valueOf}.
+     * @memberOf dataStructures.future
+     * @instance
+     * @protected
+     * @function
+     * @return {*} Returns the underlying value of the delegator. May be any value.
+     */
+    get value() {
+        return this._value;
+    },
+    get source() {
+        return this._source;
+    },
+    /**
+     * @signature
+     * @description d
+     * @memberOf dataStructures.future
+     * @instance
+     * @function
+     * @return {*} - a
+     */
+    get extract() {
+        return this._source;
+        /*
+        if (!this.isComplete) {
+            this.fork(x => x, x => x);
+            return this.value;
+        }
+        return this.source();
+        */
+    },
+    /**
+     * @signature () -> {@link dataStructures.future}
+     * @description Takes a function that is applied to the underlying value of the
+     * monad, the result of which is used to create a new {@link dataStructures.future}
+     * delegator instance.
+     * @memberOf dataStructures.future
+     * @instance
+     * @param {function} fn - A mapping function that can operate on the underlying
+     * value of the {@link dataStructures.future}.
+     * @return {dataStructures.future} Returns a new {@link dataStructures.future}
+     * delegator whose underlying value is the result of the mapping operation
+     * just performed.
+     */
+    map: function _map(fn) {
+        var _this = this;
+
+        return this.factory.of(function (reject, resolve) {
+            return _this.fork(function (err) {
+                return reject(err);
+            }, function (res) {
+                return resolve(fn(res));
+            });
+        });
+    },
+    //TODO: probably need to compose here, not actually map over the value; this is a temporary fill-in until
+    //TODO: I have time to finish working on the Future
+    chain: function _chain(fn) {
+        var _this2 = this;
+
+        return this.factory.of(function (reject, resolve) {
+            return _this2.fork(function (err) {
+                return reject(err);
+            }, function (res) {
+                return fn(res).fork(reject, resolve);
+            });
+        });
+        /*
+        return this.of((reject, resolve) =>
+        {
+            let cancel,
+                outerFork = this._fork(a => reject(a), b => {
+                    cancel = fn(b).fork(reject, resolve);
+                });
+            return cancel ? cancel : (cancel = outerFork, x => cancel());
+        });
+        */
+    },
+    mjoin: function _mjoin() {
+        return this.chain(function (x) {
+            return x;
+        });
+    },
+    apply: function _apply(ma) {
+        var _this3 = this;
+
+        return this.factory.of(function (reject, resolve) {
+            var rej = (0, _functionalHelpers.once)(reject),
+                val = void 0,
+                mapper = void 0,
+                rejected = false;
+
+            var cur = _this3.fork(rej, guardResolve(function _gr(x) {
+                mapper = x;
+            }));
+
+            var other = ma.fork(rej, guardResolve(function _gr(x) {
+                val = x;
+            }));
+
+            function guardResolve(setter) {
+                return function _guardResolve(x) {
+                    if (rejected) return;
+
+                    setter(x);
+                    if (mapper && val) {
+                        return resolve(mapper(val));
+                    }
+                    return x;
+                };
+            }
+
+            return [cur, other];
+        });
+    },
+    fold: function _fold(f, g) {
+        var _this4 = this;
+
+        return this.factory.of(function (reject, resolve) {
+            return _this4.fork(function (err) {
+                return resolve(f(err));
+            }, function (res) {
+                return resolve(g(res));
+            });
+        });
+    },
+    traverse: function _traverse(fa, fn) {
+        return this.fold(function _reductioAdAbsurdum(xs, x) {
+            fn(x).map(function _map(x) {
+                return function _map_(y) {
+                    return y.concat([x]);
+                };
+            }).ap(xs);
+            return fa(this.empty);
+        });
+    },
+    bimap: function _bimap(f, g) {
+        var _this5 = this;
+
+        return this.factory.of(function (reject, resolve) {
+            return _this5._fork(safeFork(reject, function (err) {
+                return reject(g(err));
+            }), safeFork(reject, function (res) {
+                return resolve(f(res));
+            }));
+        });
+    },
+    isEmpty: function _isEmpty() {
+        return this._fork === _combinators.identity;
+    },
+    fork: function _fork(reject, resolve) {
+        return this._fork(reject, safeFork.call(this, reject, resolve));
+    },
+    /**
+     * @signature * -> boolean
+     * @description Determines if 'this' future monad is equal to another monad. Equality
+     * is defined as:
+     * 1) The other monad shares the same delegate object as 'this' future monad
+     * 2) Both underlying values are strictly equal to each other
+     * @memberOf dataStructures.future
+     * @instance
+     * @function
+     * @param {Object} ma - The other monad to check for equality with 'this' monad.
+     * @return {boolean} - Returns a boolean indicating equality
+     */
+    equals: function _equals(ma) {
+        return Object.getPrototypeOf(this).isPrototypeOf(ma) && ma.source === this.source;
+    },
+    /**
+     * @signature () -> *
+     * @description Returns the underlying value of the current monad 'instance'. This
+     * function property is not meant for explicit use. Rather, the JavaScript engine uses
+     * this property during implicit coercion like addition and concatenation.
+     * @memberOf dataStructures.future
+     * @instance
+     * @function
+     * @return {*} Returns the underlying value of the current monad 'instance'.
+     */
+    valueOf: _data_structure_util.valueOf,
+    /**
+     * @signature () -> string
+     * @description Returns a string representation of the monad and its
+     * underlying value
+     * @memberOf dataStructures.future
+     * @instance
+     * @function
+     * @return {string} Returns a string representation of the future
+     * and its underlying value.
+     */
+    toString: function _toString() {
+        return 'Future(' + this.source.name + ')';
+    }
+}, _Symbol$toStringTag = Symbol.toStringTag, _mutatorMap = {}, _mutatorMap[_Symbol$toStringTag] = _mutatorMap[_Symbol$toStringTag] || {}, _mutatorMap[_Symbol$toStringTag].get = function () {
+    return 'Future';
+}, _defineProperty(_future, 'factory', Future), _defineEnumerableProperties(_future, _mutatorMap), _future);
+
+future.mjoin = _data_structure_util.join;
+future.ap = future.apply;
+future.fmap = future.chain;
+future.flapMap = future.chain;
+future.bind = future.chain;
+future.reduce = future.fold;
+future.constructor = future.factory;
+
+exports.Future = Future;
+exports.future = future;
+
+},{"../combinators":330,"../functionalHelpers":345,"../helpers":346,"./data_structure_util":333}],336:[function(require,module,exports){
+'use strict';
+
+Object.defineProperty(exports, "__esModule", {
+    value: true
+});
+exports.divisionSemigroupFactory = exports.functionMonoidFactory = exports.xorMonoidFactory = exports.subtractionMonoidFactory = exports.stringMonoidFactory = exports.orGroupFactory = exports.andGroupFactory = exports.multiplicationGroupFactory = exports.additionGroupFactory = exports.groupFactoryCreator = undefined;
+
+var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
+
+var _combinators = require('../combinators');
+
+function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
+
+/**
+ * @namespace group
+ */
 
 //TODO: Abelian Groups:
 //TODO: - addition
@@ -8845,6 +10210,14 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
 //TODO: Semigroups:
 //TODO: - division
 
+/**
+ * @description d
+ * @namespace baseGroupObject
+ * @memberOf group
+ * @typedef {Object}
+ * @property {function} extract
+ * @property {function} valueOf
+ */
 var baseGroupObject = _defineProperty({
     /**
      * @description d
@@ -8852,6 +10225,9 @@ var baseGroupObject = _defineProperty({
      */
     get value() {
         return this._value;
+    },
+    extract: function _extract() {
+        return this.value;
     },
     /**
      * @signature valueOf :: () -> *
@@ -8861,17 +10237,6 @@ var baseGroupObject = _defineProperty({
      */
     valueOf: function _valueOf() {
         return this.value;
-    },
-    /**
-     * @signature toString :: () -> String
-     * @description Returns a string representation of the current monoid and its
-     * underlying value. If the 'type' param was set upon creation of this specific
-     * monoid factory, the type name will be included in the returned string. Otherwise,
-     * simply 'Monoid' will be used.
-     * @return {string} Returns a string
-     */
-    toString: function _toString() {
-        return type + '(' + this.value + ')';
     }
 }, Symbol.iterator, function _iterator() {
     var first = true,
@@ -8890,6 +10255,7 @@ var baseGroupObject = _defineProperty({
 /**
  * @signature
  * @description d
+ * @memberOf group
  * @param {function} concatFn - A
  * @param {*} [identity] - B
  * @param {function} [inverseFn] - C
@@ -8897,7 +10263,9 @@ var baseGroupObject = _defineProperty({
  * @return {function} - E
  */
 function groupFactoryCreator(concatFn, identity, inverseFn, type) {
-    switch (createBitMask(!!concatFn, identity, !!inverseFn)) {
+    //console.log(createBitMask('function' === typeof concatFn, null != identity, 'function' === typeof inverseFn));
+
+    switch (createBitMask('function' === typeof concatFn, null != identity, 'function' === typeof inverseFn)) {
         case 1:
             return semigroupFactory(concatFn, type);
         case 3:
@@ -8924,17 +10292,15 @@ function groupFactoryCreator(concatFn, identity, inverseFn, type) {
     }
 }
 
-function semigroupFactory(concatFn) {
+function semigroupFactory(concatFn, type) {
     function semigroupFactory(val) {
         return Object.create(baseGroupObject, {
             _value: {
-                value: val,
-                writable: false,
-                configurable: false
+                value: val
             },
             concat: {
                 value: function _concat(g) {
-                    return Object.getPrototypeOf(this) === Object.getPrototypeOf(g) ? this.factory(concatFn(this, g)) : this;
+                    return Object.getPrototypeOf(this) === Object.getPrototypeOf(g) ? this.factory(concatFn(this.value, g.value)) : this;
                 }
             },
             concatAll: {
@@ -8950,6 +10316,20 @@ function semigroupFactory(concatFn) {
             },
             factory: {
                 value: semigroupFactory
+            },
+            /**
+             * @signature toString :: () -> String
+             * @description Returns a string representation of the current monoid and its
+             * underlying value. If the 'type' param was set upon creation of this specific
+             * monoid factory, the type name will be included in the returned string. Otherwise,
+             * simply 'Monoid' will be used.
+             * @memberOf group
+             * @return {string} Returns a string
+             */
+            toString: {
+                value: function _toString() {
+                    return type + '(' + this.value + ')';
+                }
             }
         });
     }
@@ -8957,10 +10337,16 @@ function semigroupFactory(concatFn) {
     return semigroupFactory;
 }
 
-function monoidFactory(concatFn, identity) {
-    var sgFactory = semigroupFactory(concatFn);
+function monoidFactory(concatFn, identity, type) {
+    var sgFactory = semigroupFactory(concatFn, type),
+        base = Object.create(sgFactory()),
+        objectProto = Object.getPrototypeOf({});
     function monoidFactory(val) {
-        return Object.create(sgFactory(val), {
+        val = typeValidator(val);
+        return Object.create(base, {
+            _value: {
+                value: val
+            },
             isEmpty: {
                 value: val === identity
             },
@@ -8968,18 +10354,32 @@ function monoidFactory(concatFn, identity) {
                 value: monoidFactory
             }
         });
+
+        function typeValidator(val) {
+            return 'object' !== (typeof identity === 'undefined' ? 'undefined' : _typeof(identity)) ? (typeof val === 'undefined' ? 'undefined' : _typeof(val)) === (typeof identity === 'undefined' ? 'undefined' : _typeof(identity)) ? val : identity : objectProto !== Object.getPrototypeOf(val) && Object.getPrototypeOf(identity).isPrototypeOf(val) || Object.keys(identity).every(function (key) {
+                return key in val;
+            }) && Object.keys(val).every(function (key) {
+                return key in val;
+            }) ? val : identity;
+        }
     }
 
     monoidFactory.empty = monoidFactory(identity);
     return monoidFactory;
 }
 
-function groupFactory(concatFn, identity, inverseFn) {
-    var mFactory = monoidFactory(concatFn, identity);
+function groupFactory(concatFn, identity, inverseFn, type) {
+    var mFactory = monoidFactory(concatFn, identity, type),
+        base = Object.create(mFactory());
     function groupFactory(val) {
-        return Object.create(mFactory(val), {
+        return Object.create(base, {
+            _value: {
+                value: val
+            },
             inverseConcat: {
-                value: inverseFn
+                value: function _concat(g) {
+                    return Object.getPrototypeOf(this) === Object.getPrototypeOf(g) ? this.factory(concatFn(this.value, inverseFn(g.value))) : this;
+                }
             },
             factory: {
                 value: groupFactory
@@ -8989,6 +10389,10 @@ function groupFactory(concatFn, identity, inverseFn) {
 
     groupFactory.empty = groupFactory(identity);
     return groupFactory;
+}
+
+function _compose(x, y) {
+    return (0, _combinators.compose)(x, y);
 }
 
 var additionGroupFactory = groupFactoryCreator(function (x, y) {
@@ -9020,12 +10424,16 @@ var stringMonoidFactory = groupFactoryCreator(function (x, y) {
 }, 0, null, 'Subtraction'),
     xorMonoidFactory = groupFactoryCreator(function (x, y) {
     return x !== y;
-}, false, null, 'XOR');
+}, false, null, 'XOR'),
+    functionMonoidFactory = groupFactoryCreator(_compose, function (x) {
+    return x;
+}, null, 'Function');
 
 var divisionSemigroupFactory = groupFactoryCreator(function (x, y) {
     return x / y;
 }, null, null, 'Division');
 
+exports.groupFactoryCreator = groupFactoryCreator;
 exports.additionGroupFactory = additionGroupFactory;
 exports.multiplicationGroupFactory = multiplicationGroupFactory;
 exports.andGroupFactory = andGroupFactory;
@@ -9033,15 +10441,2594 @@ exports.orGroupFactory = orGroupFactory;
 exports.stringMonoidFactory = stringMonoidFactory;
 exports.subtractionMonoidFactory = subtractionMonoidFactory;
 exports.xorMonoidFactory = xorMonoidFactory;
+exports.functionMonoidFactory = functionMonoidFactory;
 exports.divisionSemigroupFactory = divisionSemigroupFactory;
 
-},{}],333:[function(require,module,exports){
+},{"../combinators":330}],337:[function(require,module,exports){
+'use strict';
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.identity = exports.Identity = undefined;
+
+var _Symbol$toStringTag, _identity, _mutatorMap;
+
+var _data_structure_util = require('./data_structure_util');
+
+function _defineEnumerableProperties(obj, descs) { for (var key in descs) { var desc = descs[key]; desc.configurable = desc.enumerable = true; if ("value" in desc) desc.writable = true; Object.defineProperty(obj, key, desc); } return obj; }
+
+function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
+
+/**
+ * @signature - :: * -> {@link dataStructures.identity}
+ * @description Factory function used to create a new object that delegates to
+ * the {@link dataStructures.identity} object. Any single value may be provided as an argument
+ * which will be used to set the underlying value of the new {@link dataStructures.identity}
+ * delegator. If no argument is provided, the underlying value will be 'undefined'.
+ * @namespace Identity
+ * @memberOf dataStructures
+ * @property {function} of
+ * @property {function} is
+ * @property {function} lift
+ * @param {*} [val] - The value that should be set as the underlying
+ * value of the {@link dataStructures.identity}.
+ * @return {dataStructures.identity} - Returns a new object that delegates to the
+ * {@link dataStructures.identity}.
+ */
+function Identity(val) {
+  return Object.create(identity, {
+    _value: {
+      value: val,
+      writable: false,
+      configurable: false
+    }
+  });
+}
+
+/**
+ * @signature * -> {@link dataStructures.identity}
+ * @description Takes any value and places it in the correct context if it is
+ * not already and creates a new {@link dataStructures.identity} object delegator instance.
+ * Because the identity data structure does not require any specific context for
+ * its value, this can be viewed as an alias for {@link Identity}
+ * @memberOf dataStructures.Identity
+ * @static
+ * @function of
+ * @param {*} [x] - The value that should be set as the underlying
+ * value of the {@link dataStructures.identity}.
+ * @return {dataStructures.identity} - Returns a new object that delegates to the
+ * {@link dataStructures.identity}.
+ */
+Identity.of = function (x) {
+  return Identity(x);
+};
+
+/**
+ * @signature * -> boolean
+ * @description Convenience function for determining if a value is an
+ * {@link dataStructures.identity} delegate or not. Available on the
+ * identity's factory function as Identity.is.
+ * @memberOf dataStructures.Identity
+ * @function is
+ * @param {*} [f] - Any value may be used as an argument to this function.
+ * @return {boolean} Returns a boolean that indicates whether the
+ * argument provided delegates to the {@link dataStructures.identity} delegate.
+ */
+Identity.is = function (f) {
+  return identity.isPrototypeOf(f);
+};
+
+/**
+ * @signature () -> {@link dataStructures.identity}
+ * @description Creates and returns an 'empty' identity data structure.
+ * @return {dataStructures.identity} - Returns a new identity.
+ */
+Identity.empty = function () {
+  return Identity();
+};
+
+/**
+ * @typedef {Object} identity
+ * @property {function} extract - returns the underlying value of the identity
+ * @property {function} map - maps a single function over the underlying value of the identity
+ * @property {function} chain - returns a new identity data structure
+ * @property {function} join - returns a new identity data structure
+ * @property {function} apply - returns a new instance of whatever data structure type's underlying value this
+ * identity's underlying function value should be mapped over.
+ * @property {function} bimap - returns a new identity data structure
+ * @property {function} contramap - maps over the input of a contravariant identity
+ * @property {function} dimap - maps over the input and output of a contravariant identity
+ * @property {function} fold - Applies a function to the identity's underlying value and returns the result
+ * @property {function} sequence - returns a new identity data structure
+ * @property {function} traverse - returns a new identity data structure
+ * @property {function} isEmpty - Returns a boolean indicating if the identity is 'empty'
+ * @property {function} mapToConstant - Accepts an optional function to map over the underlying data and converts the output into a {@link dataStructures.constant}
+ * @property {function} mapToEither - Accepts an optional function to map over the underlying data and converts the output into a {@link dataStructures.Either}
+ * @property {function} mapToLeft - Accepts an optional function to map over the underlying data and converts the output into a {@link dataStructures.left}
+ * @property {function} mapToRight - Accepts an optional function to map over the underlying data and converts the output into a {@link dataStructures.right}
+ * @property {function} mapToFuture - Accepts an optional function to map over the underlying data and converts the output into a {@link dataStructures.future}
+ * @property {function} mapToIo - Accepts an optional function to map over the underlying data and converts the output into a {@link dataStructures.io}
+ * @property {function} mapToList - Accepts an optional function to map over the underlying data and converts the output into a {@link dataStructures.list}
+ * @property {function} mapToMaybe - Accepts an optional function to map over the underlying data and converts the output into a {@link dataStructures.Maybe}
+ * @property {function} mapToJust - Accepts an optional function to map over the underlying data and converts the output into a {@link dataStructures.just}
+ * @property {function} mapToNothing - Accepts an optional function to map over the underlying data and converts the output into a {@link dataStructures.nothing}
+ * @property {function} mapToValidation - Accepts an optional function to map over the underlying data and converts the output into a {@link dataStructures.validation}
+ * @property {function} valueOf - returns the underlying value of the identity; used during concatenation and coercion
+ * @property {function} toString - returns a string representation of the identity data structure and its underlying value
+ * @property {function} factory - a reference to the identity factory function
+ * @property {function} [Symbol.Iterator] - Iterator for the identity
+ * @kind {Object}
+ * @memberOf dataStructures
+ * @namespace identity
+ * @description This is the delegate object that specifies the behavior of the identity data structure. All
+ * operations that may be performed on an identity 'instance' delegate to this object. Identity
+ * monad 'instances' are created by the {@link dataStructures.Identity} factory function via Object.create,
+ * during which the underlying value is placed directly on the newly created object. No other
+ * properties exist directly on an identity delegator object beyond the ._value property.
+ * All behavior delegates to this object, or higher up the prototype chain.
+ */
+var identity = (_identity = {
+  /**
+   * @signature () -> *
+   * @description Returns the underlying value of an identity delegator. This
+   * getter is not expected to be used directly by consumers - it is meant as an internal
+   * access only. To manipulate the underlying value of an identity delegator,
+   * see {@link dataStructures.identity#map} and {@link dataStructures.identity#bimap}.
+   * To retrieve the underlying value of an identity delegator, see {@link dataStructures.identity#extract}
+   * and {@link dataStructures.identity#valueOf}.
+   * @memberOf dataStructures.identity
+   * @instance
+   * @private
+   * @function
+   * @return {*} Returns the underlying value of the delegator. May be any value.
+   */
+  get value() {
+    return this._value;
+  },
+  /**
+   * @signature () -> *
+   * @description Returns the underlying value of an identity delegator. This is a getter function
+   * and thus works differently than the fantasy-land specification; rather than invoking identity#extract
+   * as a function, you merely need to reference as a non-function property. This makes infinitely more
+   * sense to me, especially if the underlying is a function... who wants to do this: identity.extract()(x, y, z)
+   * when they could do this: identity.extract(x, y, z)?
+   * @example Identity(10).extract // => 10
+   * @memberOf dataStructures.identity
+   * @instance
+   * @private
+   * @function
+   * @return {*} Returns the underlying value of the delegator. May be any value.
+   */
+  get extract() {
+    return this.value;
+  },
+  /**
+   * @signature () -> {@link dataStructures.identity}
+   * @description Takes a function as an argument and applies that function to the underlying value
+   * of the identity. A new identity instance that holds the result of the application as its underlying
+   * value is created and returned.
+   * @memberOf dataStructures.identity
+   * @instance
+   * @param {function} fn - A mapping function that can operate on the underlying
+   * value of the {@link dataStructures.identity}.
+   * @return {dataStructures.identity} Returns a new {@link dataStructures.identity}
+   * delegator whose underlying value is the result of the mapping operation
+   * just performed.
+   *
+   * @example Identity(10).map(x => x * x)    // => Identity(100)
+   */
+  map: function _map(fn) {
+    return Identity.of(fn(this.value));
+  },
+  /**
+   * @signature () -> {@link dataStructures.identity}
+   * @description Accepts a mapping function as an argument, applies the function to the
+   * underlying value. If the mapping function returns an identity data structure, chain will 'flatten'
+   * the nested identities by one level. If the mapping function does not return an identity,
+   * chain will just return an identity data structure that 'wraps' whatever the return value
+   * of the mapping function is. However, if the mapping function does not return a data structure  of
+   * the same type, then chain is probably not the functionality you should use. See
+   * {@link dataStructures.identity#map} instead.
+   *
+   * Alias: bind, flatMap
+   * @memberOf dataStructures.identity
+   * @instance
+   * @function chain
+   * @param {function} fn - A mapping function that returns a data structure of the same type
+   * @return {Object} Returns a new identity data structure that 'wraps' the return value of the
+   * mapping function after flattening it by one level.
+   *
+   * @example
+   * Identity(10).chain(x => Identity(x * x))    // => Identity(100)
+   * Identity(10).chain(x => x * x)              // => Identity(100)
+   * Identity(10).chain(x => Just(x * x))        // => Identity(Just(100))
+   */
+  chain: _data_structure_util.chain,
+  /**
+   * @signature () -> {@link dataStructures.identity}
+   * @description Returns a new identity data structure. If the current identity is nested, join
+   * will flatten it by one level. Very similar to {@link dataStructures.identity#chain} except no
+   * mapping function is accepted or run.
+   * @memberOf dataStructures.identity
+   * @instance
+   * @function mjoin
+   * @return {Object} Returns a new identity after flattening the nested data structures by one level.
+   *
+   * @example
+   * Identity(Identity(10)).join()   // => Identity(10)
+   * Identity(Just(10)).join()       // => Identity(Just(10))
+   * Identity(10).join()             // => Identity(10)
+   */
+  join: _data_structure_util.join,
+  /**
+   * @signature Object -> Object
+   * @description Accepts any applicative object with a mapping function and invokes that object's mapping
+   * function on the identity's underlying value. In order for this function to execute properly and
+   * not throw, the identity's underlying value must be a function that can be used as a mapping function
+   * on the data structure supplied as the argument.
+   *
+   * Alias: ap
+   * @memberOf dataStructures.identity
+   * @instance
+   * @function apply
+   * @param {Object} ma - Any data structure with a map function - i.e. a functor.
+   * @return {Object} Returns an instance of the data structure object provide as an argument.
+   *
+   * @example Identity(10).apply(Identity(x => x + 10))  // => Identity(20)
+   */
+  apply: _data_structure_util.apply,
+  /**
+   * @signature () -> *
+   * @description Accepts a function that is used to map over the identity's underlying value
+   * and returns the value of the function without 're-wrapping' it in a new identity
+   * instance.
+   *
+   * Alias: reduce
+   * @memberOf dataStructures.identity
+   * @instance
+   * @function fold
+   * @param {function} fn - Any mapping function that should be applied to the underlying value
+   * of the identity.
+   * @param {*} acc - An JavaScript value that should be used as an accumulator.
+   * @return {*} Returns the return value of the mapping function provided as an argument.
+   *
+   * @example Identity(10).fold((acc, x) => x + acc, 5)   // => 15
+   */
+  fold: function _fold(fn, acc) {
+    return fn(acc, this.value);
+  },
+  /**
+   * @signature identity -> M<identity<T>>
+   * @description Returns a data structure of the type passed as an argument that 'wraps'
+   * and identity object that 'wraps' the current identity's underlying value.
+   * @memberOf dataStructures.identity
+   * @instance
+   * @function sequence
+   * @param {Object} p - Any pointed data structure with a '#of' function property
+   * @return {Object} Returns a data structure of the type passed as an argument that 'wraps'
+   * an identity that 'wraps' the current identity's underlying value.
+   */
+  sequence: function _sequence(p) {
+    return this.traverse(p, p.of);
+  },
+  /**
+   * @signature Object -> () -> Object
+   * @description Accepts a pointed data structure with a '#of' function property and a mapping function. The mapping
+   * function is applied to the identity's underlying value. The mapping function should return a data structure
+   * of any type. Then the {@link dataStructures.Identity.of} function is used to map over the returned data structure. Essentially
+   * creating a new object of type: M<Identity<T>>, where 'M' is the type of data structure the mapping
+   * function returns.
+   * @memberOf dataStructures.identity
+   * @instance
+   * @function traverse
+   * @param {Object} a - A pointed data structure with a '#of' function property. Used only in cases
+   * where the mapping function cannot be run.
+   * @param {function} f - A mapping function that should be applied to the identity's underlying value.
+   * @return {Object} Returns a new identity that wraps the mapping function's returned data structure type.
+   *
+   * @example Identity(10).traverse(Just, x => Just(x * x))   // => Just(Identity(100))
+   */
+  traverse: function _traverse(a, f) {
+    return f(this.value).map(this.factory.of);
+  },
+  /**
+   * @signature (b -> a) -> dataStructures.Identity
+   * @description This property is for contravariant identity data structures and will not function
+   * correctly if the underlying value is anything other than a function. Contramap accepts a
+   * function argument and returns a new identity with the composition of the function argument and
+   * the underlying function value as the new underlying. The supplied function argument is executed
+   * first in the composition, so its signature must be (b -> a) so that the value it passes as an
+   * argument to the previous underlying function will be of the expected type.
+   * @memberOf dataStructures.identity
+   * @instance
+   * @function contramap
+   * @param {function} fn - A function that should be composed with the current identity's
+   * underlying function.
+   * @return {dataStructures.identity} Returns a new identity data structure.
+   *
+   * @example Identity(x => x * x).contramap(x => x + 10).apply(Identity(5))  // => Identity(225)
+   */
+  contramap: _data_structure_util.contramap,
+
+  /**
+   * @signature dimap :: (b -> a) -> (d -> c) -> identity<c>
+   * @description Like {@link dataStructures.identity#contramap}, dimap is for use on contravariant
+   * identity instances, and thus, requires that the identity instance dimap is invoked on has an
+   * underlying function value. Dimap accepts two arguments, both of them functions. The first argument
+   * is used to map over the input the current contravariant identity, while the second argument maps
+   * over the output. Dimap is like contramap, but with an additional mapping thrown in after it has run.
+   * Thus, dimap can be derived from contramap and map: i.dimap(f, g) === i.contramap(f).map(g)
+   * @memberOf dataStructures.identity
+   * @instance
+   * @function dimap
+   * @param {function} f - f
+   * @param {function} g - g
+   * @return {dataStructures.identity} l
+   *
+   * @example Identity(x => x * x).dimap(x => x + 10, x => x / 5).apply(Identity(5))  // => Identity(45)
+   */
+  dimap: _data_structure_util.dimap,
+  /**
+   * @signature () -> boolean
+   * @description Returns a boolean indicating if the identity is 'empty'. Because there is
+   * no innate 'empty' value for an identity data structure, isEmpty will always return false.
+   * @memberOf dataStructures.identity
+   * @instance
+   * @function isEmpty
+   * @return {boolean} Returns a boolean indicating if the identity instance is 'empty'.
+   *
+   * @example
+   * Identity(10).isEmpty()  // => false
+   * Identity().isEmpty()    // => false
+   */
+  isEmpty: function _isEmpty() {
+    return false;
+  },
+  /**
+   * @signature (identity<A> -> B) -> identity<B>
+   * @description Takes a function that operates on the current identity and returns
+   * any value, invokes that function, passing the current identity as the only argument,
+   * and then returns a new identity that wraps the return value of the provided function.
+   * @param {function} fn - A function that can operate on an identity data structure
+   * @return {Identity<T>} Returns a new identity that wraps the return value of the
+   * function that was provided as an argument.
+   */
+  extend: (0, _data_structure_util.extendMaker)(Identity),
+  /**
+   * @signature * -> boolean
+   * @description Determines if 'this' identity is equal to another data structure. Equality
+   * is defined as:
+   * 1) The other data structure shares the same delegate object as 'this' identity
+   * 2) Both underlying values are strictly equal to each other
+   * @memberOf dataStructures.identity
+   * @instance
+   * @function
+   * @param {Object} ma - The other data structure to check for equality with 'this' identity.
+   * @return {boolean} - Returns a boolean indicating equality
+   *
+   * @example
+   * Identity(10).equals(Identity(10))    // => true
+   * Identity(10).equals(Identity(1))     // => false
+   * Identity(10).equals(Just(10))        // => false
+   */
+  equals: _data_structure_util.equals,
+  /**
+   * @signature () -> *
+   * @description Returns the underlying value of the current identity 'instance'. This
+   * function property is not meant for explicit use. Rather, the JavaScript engine uses
+   * this property during implicit coercion like addition and concatenation.
+   * @memberOf dataStructures.identity
+   * @instance
+   * @function
+   * @return {*} Returns the underlying value of the current monad 'instance'.
+   *
+   * @example
+   * 5 + Identity(10)     // => 15
+   * 'Hello my name is: ' + Identity('Identity')  // => 'Hello my name is : Identity'
+   */
+  valueOf: _data_structure_util.valueOf,
+  /**
+   * @signature () -> string
+   * @description Returns a string representation of the identity and its
+   * underlying value
+   * @memberOf dataStructures.identity
+   * @instance
+   * @function
+   * @return {string} Returns a string representation of the identity
+   * and its underlying value.
+   *
+   * @example
+   * Identity(10).toString()      // => 'Identity(10)'
+   * Identity(Identity(true))     // => 'Identity(Identity(true))'
+   */
+  toString: (0, _data_structure_util.stringMaker)('Identity')
+}, _Symbol$toStringTag = Symbol.toStringTag, _mutatorMap = {}, _mutatorMap[_Symbol$toStringTag] = _mutatorMap[_Symbol$toStringTag] || {}, _mutatorMap[_Symbol$toStringTag].get = function () {
+  return 'Identity';
+}, _defineProperty(_identity, 'factory', Identity), _defineEnumerableProperties(_identity, _mutatorMap), _identity);
+
+/**
+ * @signature (* -> *) -> (* -> *) -> dataStructures.identity<T>
+ * @description Since the identity data structure does not represent a disjunction, the identity's
+ * bimap function property behaves just as its map function property. It is merely here as a
+ * convenience so that swapping out data structure does not break an application that is
+ * relying on its existence.
+ * @memberOf dataStructures.identity
+ * @instance
+ * @function bimap
+ * @param {function} f - A function that will be used to map over the underlying data of the
+ * {@link dataStructures.identity} delegator.
+ * @param {function} [g] - An optional function that is simply ignored on the {@link dataStructures.identity}
+ * since there is no disjunction present.
+ * @return {dataStructures.identity<T>} - Returns a new {@link dataStructures.identity} delegator after applying
+ * the mapping function to the underlying data.
+ *
+ * @example Identity(10).bimap(x => x + 10, x => x - 10)    // => Identity(20)
+ */
+identity.bimap = identity.map;
+
+/**
+ * @signature Object -> Object
+ * @description Alias for {@link dataStructures.identity#apply}
+ * @memberOf dataStructures.identity
+ * @instance
+ * @function ap
+ * @ignore
+ * @see dataStructures.identity#apply
+ * @param {Object} ma - Any object with a map function - i.e. a monad.
+ * @return {Object} Returns an instance of the data structure object provide as an argument.
+ */
+identity.ap = identity.apply;
+
+/**
+ * @signature () -> {@link dataStructures.identity}
+ * @description Alias for {@link dataStructures.identity#chain}
+ * @memberOf dataStructures.identity
+ * @instance
+ * @function fmap
+ * @ignore
+ * @see dataStructures.identity#chain
+ * @param {function} fn - A mapping function that returns a data structure of the same type
+ * @return {Object} Returns a new identity that 'wraps' the return value of the
+ * mapping function after flattening it by one level.
+ */
+identity.fmap = identity.chain;
+
+/**
+ * @signature () -> {@link dataStructures.identity}
+ * @description Alias for {@link dataStructures.identity#chain}
+ * @memberOf dataStructures.identity
+ * @instance
+ * @function flatMap
+ * @ignore
+ * @see dataStructures.identity#chain
+ * @param {function} fn - A mapping function that returns a data structure of the same type
+ * @return {Object} Returns a new identity that 'wraps' the return value of the
+ * mapping function after flattening it by one level.
+ */
+identity.flapMap = identity.chain;
+
+/**
+ * @signature () -> {@link dataStructures.identity}
+ * @description Alias for {@link dataStructures.identity#chain}
+ * @memberOf dataStructures.identity
+ * @instance
+ * @function bind
+ * @ignore
+ * @see dataStructures.identity#chain
+ * @param {function} fn - A mapping function that returns a data structure of the same type
+ * @return {Object} Returns a new identity that 'wraps' the return value of the
+ * mapping function after flattening it by one level.
+ */
+identity.bind = identity.chain;
+
+/**
+ * @signature () -> *
+ * @description Alias for {@link dataStructures.identity#fold}
+ * @memberOf dataStructures.identity
+ * @instance
+ * @function reduce
+ * @ignore
+ * @see dataStructures.identity#fold
+ * @param {function} fn - Any mapping function that should be applied to the underlying value
+ * of the identity data structure.
+ * @return {*} Returns the return value of the mapping function provided as an argument.
+ */
+identity.reduce = identity.fold;
+
+identity.constructor = identity.factory;
+
+exports.Identity = Identity;
+exports.identity = identity;
+
+},{"./data_structure_util":333}],338:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
     value: true
 });
-exports.zip = exports.union = exports.unfold = exports.takeWhile = exports.sortBy = exports.slice = exports.skipWhile = exports.reverse = exports.repeat = exports.reduceRight = exports.prependAll = exports.prepend = exports.ofType = exports.map = exports.last = exports.join = exports.intersperse = exports.intersect = exports.groupJoin = exports.groupBy = exports.foldRight = exports.foldLeft = exports.first = exports.findLastIndex = exports.findIndex = exports.filter = exports.fill = exports.except = exports.equals = exports.distinct = exports.count = exports.copyWithin = exports.contains = exports.concatAll = exports.concat = exports.chain = exports.binarySearch = exports.any = exports.all = undefined;
+exports.io = exports.Io = undefined;
+
+var _Symbol$toStringTag, _io, _mutatorMap;
+
+var _combinators = require('../combinators');
+
+var _functionalHelpers = require('../functionalHelpers');
+
+var _data_structure_util = require('./data_structure_util');
+
+var _helpers = require('../helpers');
+
+function _defineEnumerableProperties(obj, descs) { for (var key in descs) { var desc = descs[key]; desc.configurable = desc.enumerable = true; if ("value" in desc) desc.writable = true; Object.defineProperty(obj, key, desc); } return obj; }
+
+function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
+
+/**
+ * @signature
+ * @description d
+ * @namespace Io
+ * @memberOf dataStructures
+ * @param {function} item - a
+ * @return {dataStructures.io} - b
+ */
+function Io(item) {
+    return Object.create(io, {
+        _value: {
+            value: item,
+            writable: false,
+            configurable: false
+        },
+        run: {
+            value: item,
+            writable: false,
+            configurable: false
+        }
+    });
+}
+
+/**
+ * @signature
+ * @description d
+ * @memberOf dataStructures.Io
+ * @static
+ * @function
+ * @param {function|*} item - a
+ * @return {io} - b
+ */
+Io.of = function (item) {
+    return (0, _functionalHelpers.strictEquals)(_helpers.javaScriptTypes.Function, (0, _functionalHelpers.type)(item)) ? Io(item) : Io((0, _combinators.constant)(item));
+};
+
+/**
+ * @signature
+ * @description d
+ * @memberOf dataStructures.Io
+ * @static
+ * @function
+ * @param {Object} f - a
+ * @return {boolean} - b
+ */
+Io.is = function (f) {
+    return io.isPrototypeOf(f);
+};
+
+/**
+ * @description d
+ * @namespace io
+ * @memberOf dataStructures
+ * @typedef {Object}
+ */
+var io = (_io = {
+    get value() {
+        return this._value;
+    },
+    map: function _map(fn) {
+        return this.chain(function (a) {
+            return Io.of(fn(a));
+        });
+    },
+    fold: function _fold(fn, x) {
+        return fn(this.value, x);
+    },
+    traverse: function _traverse(fa, fn) {
+        return this.fold(function _reductioAdAbsurdum(xs, x) {
+            fn(x).map(function _map(x) {
+                return function _map_(y) {
+                    return y.concat([x]);
+                };
+            }).ap(xs);
+            return fa(this.empty);
+        });
+    },
+    runIo: function _runIo() {
+        return this.run.apply(this, arguments);
+    },
+    apply: _data_structure_util.apply,
+    equals: _data_structure_util.equals,
+    valueOf: _data_structure_util.valueOf,
+    toString: (0, _data_structure_util.stringMaker)('Io')
+}, _Symbol$toStringTag = Symbol.toStringTag, _mutatorMap = {}, _mutatorMap[_Symbol$toStringTag] = _mutatorMap[_Symbol$toStringTag] || {}, _mutatorMap[_Symbol$toStringTag].get = function () {
+    return 'Io';
+}, _defineProperty(_io, 'factory', Io), _defineEnumerableProperties(_io, _mutatorMap), _io);
+
+/**
+ * @description: Since the constant functor does not represent a disjunction, the Io's
+ * bimap function property behaves just as its map function property. It is merely here as a
+ * convenience so that swapping out functors/monads does not break an application that is
+ * relying on its existence.
+ * @memberOf dataStructures.io
+ * @type: {{function}}
+ * @param: {function} f
+ * @param: {function} g
+ * @return: {@see io}
+ */
+io.bimap = io.map;
+
+io.chain = _data_structure_util.chain;
+io.mjoin = _data_structure_util.join;
+
+io.ap = io.apply;
+io.fmap = io.chain;
+io.flapMap = io.chain;
+io.bind = io.chain;
+io.reduce = io.fold;
+
+io.constructor = io.factory;
+
+exports.Io = Io;
+exports.io = io;
+
+},{"../combinators":330,"../functionalHelpers":345,"../helpers":346,"./data_structure_util":333}],339:[function(require,module,exports){
+'use strict';
+
+Object.defineProperty(exports, "__esModule", {
+    value: true
+});
+exports.createList = exports.ordered_list = exports.list = exports.list_core = exports.List = undefined;
+
+var _Symbol$toStringTag, _list_core, _mutatorMap;
+
+var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
+
+var _list_iterators = require('./list_iterators');
+
+var _helpers = require('../helpers');
+
+var _functionalHelpers = require('../functionalHelpers');
+
+var _combinators = require('../combinators');
+
+var _decorators = require('../decorators');
+
+var _sort_util = require('./sort_util');
+
+function _defineEnumerableProperties(obj, descs) { for (var key in descs) { var desc = descs[key]; desc.configurable = desc.enumerable = true; if ("value" in desc) desc.writable = true; Object.defineProperty(obj, key, desc); } return obj; }
+
+function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
+
+var listProxyHandler = {
+    get: function get(target, prop) {
+        if (Reflect.has(target, prop)) return target[prop];
+        if ('symbol' !== (typeof prop === 'undefined' ? 'undefined' : _typeof(prop))) {
+            var num = Number(prop);
+            if (Number.isInteger(num)) return target.toArray()[num];
+        }
+    }
+},
+    bitMaskMaxListValue = createBitMask(true, true, false);
+
+/**
+ * @description: Object that contains the core functionality of a List; both the list and ordered_list
+ * objects delegate to this object for all functionality besides orderBy/orderByDescending
+ * and thenBy/thenByDescending respectively. Getter/setters are present for state-manipulation
+ * at the consumer-object level, as well as to provide default values for a consumer-level
+ * object at creation if not specified.
+ * @typedef {Object}
+ * @property {function} value
+ * @property {function} extract
+ * @property {function} apply
+ * @property {function} append
+ * @property {function} appendAll
+ * @property {function} bimap
+ * @property {function} chain
+ * @property {function} concat
+ * @property {function} concatAll
+ * @property {function} copyWithin
+ * @property {function} distinct
+ * @property {function} except
+ * @property {function} fill
+ * @property {function} filter
+ * @property {function} groupBy
+ * @property {function} groupByDescending
+ * @property {function} groupJoin
+ * @property {function} intersect
+ * @property {function} intersperse
+ * @property {function} listJoin
+ * @property {function} map
+ * @property {function} join
+ * @property {function} ofType
+ * @property {function} prepend
+ * @property {function} prependAll
+ * @property {function} reverse
+ * @property {function} sequence
+ * @property {function} skip
+ * @property {function} skipWhile
+ * @property {function} take
+ * @property {function} takeWhile
+ * @property {function} union
+ * @property {function} zip
+ * @property {function} all
+ * @property {function} any
+ * @property {function} count
+ * @property {function} equals
+ * @property {function} data
+ * @property {function} extract
+ * @property {function} findIndex
+ * @property {function} findLastIndex
+ * @property {function} first
+ * @property {function} foldl
+ * @property {function} foldr
+ * @property {function} isEmpty
+ * @property {function} last
+ * @property {function} reduceRight
+ * @property {function} toArray
+ * @property {function} toEvaluatedList
+ * @property {function} toMap
+ * @property {function} toSet
+ * @property {function} toString
+ * @property {function} valueOf
+ * @property {function} factory
+ * @property {function} of
+ * @property {function} sequence
+ * @property {function} traverse
+ * @property {Symbol.iterator}
+ * @kind {Object}
+ * @memberOf dataStructures
+ * @namespace list_core
+ * @description This is the delegate object that specifies the behavior of the list functor. Most
+ * operations that may be performed on an list functor 'instance' delegate to this object. List
+ * functor 'instances' are created by the {@link List} factory function via Object.create,
+ * during which the underlying value is placed directly on the newly created object. No other
+ * properties exist directly on an list functor delegator object beyond the ._value property.
+ * All behavior delegates to this object, or higher up the prototype chain.
+ */
+var list_core = (_list_core = {
+    //Using getters for these properties because there's a chance the setting and/or getting
+    //functionality could change; this will allow for a consistent interface while the
+    //logic beneath changes
+    /**
+     * @signature () -> *
+     * @description Returns the underlying value of a list delegator. This
+     * getter is not expected to be used directly by consumers - it is meant as an internal
+     * access only. To manipulate the underlying value of a list delegator,
+     * see {@link dataStructures.list_core#map} and {@link dataStructures.list_core#bimap}.
+     * To retrieve the underlying value of an identity_functor delegator, see {@link dataStructures.list_core#get},
+     * {@link dataStructures.list_core#orElse}, {@link dataStructures.list_core#getOrElse},
+     * and {@link dataStructures.list_core#valueOf}.
+     * @memberOf dataStructures.list_core
+     * @instance
+     * @protected
+     * @function value
+     * @return {*} Returns the underlying value of the delegator. May be any value.
+     */
+    get value() {
+        return this._value;
+    },
+    get extract() {
+        return this.data;
+    },
+    /**
+     * @signature dataStructures.list_core -> dataStructures.list_core
+     * @description Applies a function contained in another functor to the source
+     * of this List object instance's underlying source. A new List object instance
+     * is returned.
+     * @memberOf dataStructures.list_core
+     * @instance
+     * @function apply
+     * @this dataStructures.list_core
+     * @param {dataStructures.list_core} l - a
+     * @return {*} - b
+     */
+    apply: function _apply(l) {
+        return createList(this, _iteratorWrapper((0, _list_iterators.apply)(this, l)));
+    },
+
+    /**
+     * @signature () -> dataStructures.list_core
+     * @description d
+     * @memberOf dataStructures.list_core
+     * @instance
+     * @function chain
+     * @this dataStructures.list_core
+     * @param {function} fn - a
+     * @return {list} - b
+     */
+    chain: function _chain(fn) {
+        return createList(this, _iteratorWrapper((0, _list_iterators.chain)(this, fn)));
+    },
+
+    /**
+     * @signature [...iterable] -> dataStructures.list_core
+     * @description Concatenates two or more lists by appending the "method's" List argument(s) to the
+     * List's value. This function is a deferred execution call that returns
+     * a new queryable object delegator instance that contains all the requisite
+     * information on how to perform the operation.
+     * @memberOf dataStructures.list_core
+     * @instance
+     * @function concat
+     * @this dataStructures.list_core
+     * @param {Array | *} ys - a
+     * @return {list} - b
+     */
+    concat: function _concat(ys) {
+        return createList(this, _iteratorWrapper((0, _list_iterators.concat)(this, List.of(ys))));
+    },
+
+    /**
+     * @signature
+     * @description d
+     * @memberOf dataStructures.list_core
+     * @instance
+     * @function concatAll
+     * @this list
+     * @param {list|ordered_list} ys - One or more lists to concatenate with this list
+     * @return {list} Returns a new list
+     */
+    concatAll: function _concatAll() {
+        for (var _len = arguments.length, ys = Array(_len), _key = 0; _key < _len; _key++) {
+            ys[_key] = arguments[_key];
+        }
+
+        return createList(this, _iteratorWrapper((0, _list_iterators.concatAll)(this, ys.map(function (y) {
+            return List.of(y);
+        }))));
+    },
+
+    /**
+     * @signature
+     * @description d
+     * @memberOf dataStructures.list_core
+     * @instance
+     * @function copyWithin
+     * @this list
+     * @external Array
+     * @see {@link https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/copyWithin}
+     * @param {number} index - a
+     * @param {number} start - b
+     * @param {number} end - c
+     * @return {list} - d
+     */
+    copyWithin: function _copyWithin(index, start, end) {
+        return createList(this, _iteratorWrapper((0, _list_iterators.copyWithin)(index, start, end, this)));
+    },
+
+    /**
+     * @signature (a -> boolean) -> List<b>
+     * @description d
+     * @memberOf dataStructures.list_core
+     * @instance
+     * @function distinct
+     * @this dataStructures.list_core
+     * @param {function} comparer - a
+     * @return {list} - b
+     */
+    distinct: function _distinct(comparer) {
+        return createList(this, _iteratorWrapper((0, _list_iterators.distinct)(this, comparer)));
+    },
+
+    /**
+     * @signature
+     * @description Produces a List that contains the objectSet difference between the queryable object
+     * and the List that is passed as a function argument. A comparer function may be
+     * provided to the function that determines the equality/inequality of the items in
+     * each List; if left undefined, the function will use a default equality comparer.
+     * This function is a deferred execution call that returns a new queryable
+     * object delegator instance that contains all the requisite information on
+     * how to perform the operation.
+     * equality comparer.
+     * @memberOf dataStructures.list_core
+     * @instance
+     * @function except
+     * @this list
+     * @param {Array|generator} xs - a
+     * @param {function} [comparer] - b
+     * @return {list} - c
+     */
+    except: function _except(xs, comparer) {
+        return createList(this, _iteratorWrapper((0, _list_iterators.except)(this, xs, comparer)));
+    },
+
+    /**
+     * @signature
+     * @description d
+     * @memberOf dataStructures.list_core
+     * @instance
+     * @function fill
+     * @this list
+     * @external Array
+     * @see {@link https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/fill}
+     * @param {number} value - a
+     * @param {number} start - b
+     * @param {number} end - c
+     * @return {list} - d
+     */
+    fill: function _fill(value, start, end) {
+        return createList(this, _iteratorWrapper((0, _list_iterators.fill)(value, start, end, this)));
+    },
+
+    /**
+     * @signature
+     * @description d
+     * @memberOf dataStructures.list_core
+     * @instance
+     * @function filter
+     * @this dataStructures.list_core
+     * @param {function} predicate - a
+     * @return {dataStructures.list_core} - b
+     */
+    filter: function _filter(predicate) {
+        return createList(this, _iteratorWrapper((0, _list_iterators.filter)(this, predicate)));
+    },
+
+    /**
+     * @signature
+     * @description d
+     * @memberOf dataStructures.list_core
+     * @instance
+     * @function groupBy
+     * @this dataStructures.list_core
+     * @param {function} keySelector - a
+     * @param {function} [comparer] - b
+     * @return {dataStructures.list_core} - c
+     */
+    groupBy: function _groupBy(keySelector, comparer) {
+        return createList(this, _iteratorWrapper((0, _list_iterators.groupBy)(this, [(0, _sort_util.createSortObject)(keySelector, comparer, _helpers.sortDirection.ascending)], createGroupedListDelegate)));
+    },
+
+    /**
+     * @signature
+     * @description d
+     * @memberOf dataStructures.list_core
+     * @instance
+     * @function groupByDescending
+     * @this dataStructures.list_core
+     * @param {function} keySelector - a
+     * @param {function} [comparer] - b
+     * @return {dataStructures.list_core} - c
+     */
+    groupByDescending: function _groupByDescending(keySelector, comparer) {
+        return createList(this, _iteratorWrapper((0, _list_iterators.groupBy)(this, [(0, _sort_util.createSortObject)(keySelector, comparer, _helpers.sortDirection.descending)], createGroupedListDelegate)));
+    },
+
+    /**
+     * @signature
+     * @description Correlates the items in two lists based on the equality of a key and groups
+     * all items that share the same key. A comparer function may be provided to
+     * the function that determines the equality/inequality of the items in each
+     * List; if left undefined, the function will use a default equality comparer.
+     * This function is a deferred execution call that returns a new queryable
+     * object delegator instance that contains all the requisite information on
+     * how to perform the operation.
+     * @memberOf dataStructures.list_core
+     * @instance
+     * @function groupJoin
+     * @this dataStructures.list_core
+     * @param {dataStructures.list_core | Array} ys - a
+     * @param {function} xSelector - b
+     * @param {function} ySelector - c
+     * @param {function} projector - d
+     * @param {function} [comparer] - e
+     * @return {dataStructures.list_core} - f
+     */
+    groupJoin: function _groupJoin(ys, xSelector, ySelector, projector, comparer) {
+        return createList(this, _iteratorWrapper((0, _list_iterators.groupJoin)(this, ys, xSelector, ySelector, projector, createGroupedListDelegate, comparer)));
+    },
+
+    head: function _head() {
+        return this.take(1);
+    },
+
+    /**
+     * @signature
+     * @description Produces the objectSet intersection of the List object's value and the List
+     * that is passed as a function argument. A comparer function may be
+     * provided to the function that determines the equality/inequality of the items in
+     * each List; if left undefined, the function will use a default equality comparer.
+     * This function is a deferred execution call that returns a new queryable
+     * object delegator instance that contains all the requisite information on
+     * how to perform the operation.
+     * @memberOf dataStructures.list_core
+     * @instance
+     * @function intersect
+     * @this dataStructures.list_core
+     * @param {Array|generator} xs - a
+     * @param {function} [comparer] - b
+     * @return {dataStructures.list_core} - c
+     */
+    intersect: function _intersect(xs, comparer) {
+        return createList(this, _iteratorWrapper((0, _list_iterators.intersect)(this, xs, comparer)));
+    },
+
+    /**
+     * @signature
+     * @description d
+     * @memberOf dataStructures.list_core
+     * @instance
+     * @function intersperse
+     * @this dataStructures.list_core
+     * @param {*} val - a
+     * @return {dataStructures.list_core} - b
+     */
+    intersperse: function _intersperse(val) {
+        return createList(this, _iteratorWrapper((0, _list_iterators.intersperse)(this, val)));
+    },
+
+    /**
+     * @signature
+     * @description Correlates the items in two lists based on the equality of items in each
+     * List. A comparer function may be provided to the function that determines
+     * the equality/inequality of the items in each List; if left undefined, the
+     * function will use a default equality comparer. This function is a deferred
+     * execution call that returns a new queryable object delegator instance that
+     * contains all the requisite information on how to perform the operation.
+     * @memberOf dataStructures.list_core
+     * @instance
+     * @function listJoin
+     * @this dataStructures.list_core
+     * @param {Array|List} ys - a
+     * @param {function} xSelector - b
+     * @param {function} ySelector - c
+     * @param {function} projector - d
+     * @param {function} [comparer] - e
+     * @return {dataStructures.list_core} - f
+     */
+    listJoin: function _join(ys, xSelector, ySelector, projector, comparer) {
+        return createList(this, _iteratorWrapper((0, _list_iterators.join)(this, ys, xSelector, ySelector, projector, comparer)));
+    },
+
+    /**
+     * @signature
+     * @description d
+     * @memberOf dataStructures.list_core
+     * @instance
+     * @function map
+     * @this dataStructures.list_core
+     * @param {function} mapFunc - a
+     * @return {dataStructures.list_core} - b
+     */
+    map: function _map(mapFunc) {
+        return createList(this, _iteratorWrapper((0, _list_iterators.map)(this, mapFunc)));
+    },
+
+    /**
+     * @signature
+     * @description d
+     * @memberOf dataStructures.list_core
+     * @instance
+     * @function mjoin
+     * @return {list} - a
+     */
+    mjoin: function _mjoin() {
+        return this.chain(function (x) {
+            return x;
+        });
+    },
+
+    /**
+     * @signature
+     * @description d
+     * @memberOf dataStructures.list_core
+     * @instance
+     * @function ofType
+     * @this dataStructures.list_core
+     * @param {string|Object} type - a
+     * @returns {dataStructures.list_core} - b
+     */
+    ofType: function _ofType(type) {
+        return createList(this, _iteratorWrapper((0, _list_iterators.ofType)(this, type)));
+    },
+
+    /**
+     * @signature
+     * @description d
+     * @return {dataStructures.list_core} a
+     */
+    pop: function _pop() {
+        return createList(this, _iteratorWrapper((0, _list_iterators.pop)(this)));
+    },
+
+    /**
+     * @signature
+     * @description d
+     * @memberOf dataStructures.list_core
+     * @instance
+     * @function prepend
+     * @this dataStructures.list_core
+     * @param {Array|generator} xs - a
+     * @return {dataStructures.list_core} - b
+     */
+    prepend: function _prepend(xs) {
+        return createList(this, _iteratorWrapper((0, _list_iterators.prepend)(this, List.of(xs))));
+    },
+
+    /**
+     * @signature
+     * @description d
+     * @memberOf dataStructures.list_core
+     * @instance
+     * @function prependAll
+     * @this list
+     * @param {Array|list|ordered_list} xs - A list
+     * @return {list|ordered_list} Returns a new list
+     */
+    prependAll: function _prependAll() {
+        for (var _len2 = arguments.length, xs = Array(_len2), _key2 = 0; _key2 < _len2; _key2++) {
+            xs[_key2] = arguments[_key2];
+        }
+
+        return createList(this, _iteratorWrapper((0, _list_iterators.prependAll)(this, xs.map(function (x) {
+            return List.of(x);
+        }))));
+    },
+
+    push: function _push() {
+        for (var _len3 = arguments.length, items = Array(_len3), _key3 = 0; _key3 < _len3; _key3++) {
+            items[_key3] = arguments[_key3];
+        }
+
+        return this.concat(items);
+    },
+
+    /**
+     * @signature
+     * @description d
+     * @memberOf dataStructures.list_core
+     * @instance
+     * @function reverse
+     * @this dataStructures.list_core
+     * @external Array
+     * @see {@link https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/reverse}
+     * @return {dataStructures.list_core} - a
+     */
+    reverse: function _reverse() {
+        return createList(this, _iteratorWrapper((0, _list_iterators.reverse)(this)));
+    },
+
+    shift: function _shift() {
+        return this.skip(1);
+    },
+
+    /**
+     * @signature
+     * @description Skips over a specified number of items in the source and returns the
+     * remaining items. If no amount is specified, an empty list is returned;
+     * Otherwise, a list containing the items collected from the source is
+     * returned.
+     * @memberOf dataStructures.list_core
+     * @instance
+     * @function skip
+     * @this dataStructures.list_core
+     * @param {number} amt - The number of items in the source to skip before
+     * returning the remainder.
+     * @return {dataStructures.list_core} - a
+     */
+    skip: function _skip(amt) {
+        if (!amt) return this;
+        var count = 0 < amt ? -1 : 1;
+        return 0 < amt ? this.skipWhile(function (idx) {
+            return ++count < amt;
+        }) : this.reverse().skipWhile(function (idx) {
+            return --count > amt;
+        }).reverse();
+    },
+
+    /**
+     * @signature
+     * @description d
+     * @memberOf dataStructures.list_core
+     * @instance
+     * @function skipWhile
+     * @this dataStructures.list_core
+     * @param {function} [predicate] - a
+     * @return {dataStructures.list_core} - b
+     */
+    skipWhile: function _skipWhile() {
+        var predicate = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : _functionalHelpers.defaultPredicate;
+
+        return createList(this, _iteratorWrapper((0, _list_iterators.skipWhile)(this, predicate)));
+    },
+
+    /**
+     * @signature
+     * @description d
+     * @memberOf dataStructures.list_core
+     * @instance
+     * @function slice
+     * @this dataStructures.list_core
+     * @external Array
+     * @see {@link https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/slice}
+     * @param {number} [start] - An optional integer value that indicates where the slice of the current
+     * list should begin. If no value is provided, the first index is used. If a negative value is provided,
+     * the index is counted from the end of the list.
+     * @param {number} [end] - An optional integer value that indicates where the slice of the current
+     * list should end. If no value is provided, it will continue taking values until it reaches the end
+     * of the list.
+     * @return {dataStructures.list_core} Returns a new list
+     */
+    slice: function _slice(start, end) {
+        return createList(this, _iteratorWrapper((0, _list_iterators.slice)(this, start, end)));
+    },
+
+    splice: function _splice(start, end) {
+        return createList(this, _iteratorWrapper((0, _list_iterators.slice)(this, start, end)));
+    },
+
+    tail: function _tail() {
+        return this.skip(1);
+    },
+
+    /**
+     * @signature
+     * @description d
+     * @memberOf dataStructures.list_core
+     * @instance
+     * @function take
+     * @this dataStructures.list_core
+     * @param {number} amt - a
+     * @return {dataStructures.list_core} - b
+     */
+    take: function _take(amt) {
+        if (!amt) return List.empty;
+        var count = 0 < amt ? -1 : 1;
+        return 0 < amt ? this.takeWhile(function (idx) {
+            return ++count < amt;
+        }) : this.reverse().takeWhile(function (idx) {
+            return --count > amt;
+        }).reverse();
+    },
+
+    /**
+     * @signature
+     * @description d
+     * @memberOf dataStructures.list_core
+     * @instance
+     * @function takeWhile
+     * @this dataStructures.list_core
+     * @param {function} [predicate] - a
+     * @return {dataStructures.list_core} - b
+     */
+    takeWhile: function _takeWhile() {
+        var predicate = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : _functionalHelpers.defaultPredicate;
+
+        return createList(this, _iteratorWrapper((0, _list_iterators.takeWhile)(this, predicate)));
+    },
+
+    /**
+     * @signature
+     * @description Produces the objectSet union of two lists by selecting each unique item in both
+     * lists. A comparer function may be provided to the function that determines
+     * the equality/inequality of the items in each List; if left undefined, the
+     * function will use a default equality comparer. This function is a deferred
+     * execution call that returns a new queryable object delegator instance that
+     * contains all the requisite information on how to perform the operation.
+     * @memberOf dataStructures.list_core
+     * @instance
+     * @function union
+     * @this dataStructures.list_core
+     * @param {Array|generator} xs - a
+     * @param {function} comparer - b
+     * @return {dataStructures.list_core} - c
+     */
+    union: function _union(xs, comparer) {
+        return createList(this, _iteratorWrapper((0, _list_iterators.union)(this, xs, comparer)));
+    },
+
+    unshift: function _unshift() {
+        for (var _len4 = arguments.length, items = Array(_len4), _key4 = 0; _key4 < _len4; _key4++) {
+            items[_key4] = arguments[_key4];
+        }
+
+        return this.prepend(items);
+    },
+
+    /**
+     * @signature
+     * @description Produces a List of the items in the queryable object and the List passed as
+     * a function argument. A comparer function may be provided to the function that determines
+     * the equality/inequality of the items in each List; if left undefined, the
+     * function will use a default equality comparer. This function is a deferred
+     * execution call that returns a new queryable object delegator instance that
+     * contains all the requisite information on how to perform the operation.
+     * @memberOf dataStructures.list_core
+     * @instance
+     * @function zip
+     * @this dataStructures.list_core
+     * @param {function} selector - a
+     * @param {Array|generator} xs - b
+     * @return {dataStructures.list_core} - c
+     */
+    zip: function _zip(selector, xs) {
+        return createList(this, _iteratorWrapper((0, _list_iterators.zip)(this, xs, selector)));
+    },
+
+    /**
+     * @signature (a -> Boolean) -> [a] -> Boolean
+     * @description d
+     * @memberOf dataStructures.list_core
+     * @instance
+     * @function all
+     * @this dataStructures.list_core
+     * @param {function} [predicate] - a
+     * @return {boolean} - b
+     */
+    all: function _all() {
+        var predicate = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : _functionalHelpers.defaultPredicate;
+
+        return (0, _list_iterators.all)(this, predicate);
+    },
+
+    /**
+     * @signature: (a -> Boolean) -> [a] -> Boolean
+     * @description d
+     * @memberOf dataStructures.list_core
+     * @instance
+     * @function any
+     * @this dataStructures.list_core
+     * @param {function} [predicate] - a
+     * @return {boolean} - b
+     */
+    any: function _any() {
+        var predicate = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : _functionalHelpers.defaultPredicate;
+
+        return (0, _list_iterators.any)(this, predicate);
+    },
+
+    /**
+     * @signature
+     * @description d
+     * @memberOf dataStructures.list_core
+     * @instance
+     * @function count
+     * @this dataStructures.list_core
+     * @param {function} [predicate] - a
+     * @return {Number} -  b
+     */
+    count: function _count(predicate) {
+        return (0, _list_iterators.count)(this, predicate);
+    },
+
+    /**
+     * @signature
+     * @description d
+     * @memberOf dataStructures.list_core
+     * @instance
+     * @this dataStructures.list_core
+     * @return {Array} Returns an array after evaluating the entire pipeline by running
+     * the initial underlying data through each function.
+     */
+    get data() {
+        if (this.evaluatedData) return this.evaluatedData;
+        return Array.from(this);
+    },
+
+    /**
+     * @description Returns the _evaluatedData property if it has been set, or null otherwise.
+     * @return {Array|null} Returns either an array of values or null if there are none
+     */
+    get evaluatedData() {
+        return this._evaluatedData || null;
+    },
+
+    /**
+     * @description Sets the _evaluatedData property on a list object. This is only used
+     * internally to prevent multiple enumerations and the underlying data won't change
+     * and so can be cached after evaluation.
+     * @param {Array} val - An array of values
+     */
+    set evaluatedData(val) {
+        this._evaluatedData = val;
+    },
+
+    /**
+     * @signature
+     * @description d
+     * @external Array
+     * @see {@link https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/entries}
+     * @return {Iterator.<*>} Returns an iterator that contains the kvp's for
+     * each value in the list.
+     */
+    entries: function _entries() {
+        return this.data.entries();
+    },
+
+    /**
+     * @signature
+     * @description d
+     * @memberOf dataStructures.list_core
+     * @instance
+     * @function equals
+     * @this dataStructures.list_core
+     * @param {dataStructures.list_core} f - a
+     * @param {function} [comparer] - b
+     * @return {boolean} - c
+     */
+    equals: function _equals(f, comparer) {
+        return Object.getPrototypeOf(this).isPrototypeOf(f) && (0, _list_iterators.equals)(this, f, comparer);
+    },
+
+    /**
+     * @signature
+     * @description d
+     * @memberOf dataStructures.list_core
+     * @instance
+     * @function findIndex
+     * @this dataStructures.list_core
+     * @external Array
+     * @see {@link https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/findIndex}
+     * @param {function} [comparer] - a
+     * @return {Number} - b
+     */
+    findIndex: function _findIndex(comparer) {
+        return (0, _list_iterators.findIndex)(this, comparer);
+    },
+
+    /**
+     * @signature
+     * @description d
+     * @memberOf dataStructures.list_core
+     * @instance
+     * @function findLastIndex
+     * @this dataStructures.list_core
+     * @param {function} [comparer] - a
+     * @return {Number} - b
+     */
+    findLastIndex: function _findLastIndex(comparer) {
+        return (0, _list_iterators.findLastIndex)(this, comparer);
+    },
+
+    /**
+     * @signature
+     * @description d
+     * @memberOf dataStructures.list_core
+     * @instance
+     * @function first
+     * @this dataStructures.list_core
+     * @param {function} [predicate] - a
+     * @return {*} - b
+     */
+    first: function _first() {
+        var predicate = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : _functionalHelpers.defaultPredicate;
+
+        return (0, _list_iterators.first)(this, predicate);
+    },
+
+    /**
+     * @signature (a -> b -> c) -> a -> [b] -> a
+     * @description d
+     * @memberOf dataStructures.list_core
+     * @instance
+     * @function foldl
+     * @this dataStructures.list_core
+     * @param {function} fn - a
+     * @param {*} acc - b
+     * @return {*} - c
+     */
+    foldl: function _foldl(fn, acc) {
+        return (0, _list_iterators.foldLeft)(this, fn, acc);
+    },
+
+    /**
+     * @signature (a -> a -> a) -> [a] -> a
+     * @description d
+     * @memberOf dataStructures.list_core
+     * @instance
+     * @function foldr
+     * @this dataStructures.list_core
+     * @param {function} fn - a
+     * @param {*} acc - b
+     * @return {*} - c
+     */
+    foldr: function _foldr(fn, acc) {
+        return (0, _list_iterators.foldRight)(this, fn, acc);
+    },
+
+    /**
+     * @signature
+     * @description This function property is basically just a proxy for the normal javascript
+     * array#forEach. However, unlike the array#forEach function property, this function will
+     * return the same list that forEach was invoked on, so composition may continue. This is
+     * implemented on the list data structure because it exists on the array. However, this
+     * functionality should not be used to modify the list - rather it is for impure operations
+     * performed outside of the list. To alter the data contained within, see any of the deferred
+     * execution function properties.
+     * @memberOf dataStructures.list_core
+     * @instance
+     * @function forEach
+     * @this dataStructures.list_core
+     * @external Array
+     * @see {@link https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/forEach}
+     * @param {function} fn - A function that should be applied to each value held in the list
+     * @return {dataStructures.list_core} Returns a list
+     */
+    forEach: function _forEach(fn) {
+        this.data.forEach(fn);
+        return this;
+    },
+
+    /**
+     * @signature
+     * @description d
+     * @memberOf dataStructures.list_core
+     * @instance
+     * @function indexOf
+     * @this dataStructures.list_core
+     * @external Array
+     * @see {@link https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/indexOf}
+     * @param {*} val - Any javascript type/value that should be searched for in the list
+     * @return {number} - Returns an integer representing the index of the first appearance
+     * the value in the list. -1 indicates the value does not exist within the list.
+     */
+    indexOf: function _indexOf(val) {
+        return this.data.indexOf(val);
+    },
+
+    /**
+     * @signature
+     * @description d
+     * @memberOf dataStructures.list_core
+     * @instance
+     * @function isEmpty
+     * @this dataStructures.list_core
+     * @return {boolean} - a
+     */
+    isEmpty: function _isEmpty() {
+        return 0 === this.data.length;
+    },
+
+    /**
+     * @signature
+     * @description d
+     * @memberOf dataStructures.list_core
+     * @instance
+     * @function join
+     * @this dataStructures.list_core
+     * @external Array
+     * @see {@link https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/join}
+     * @param {*} [delimiter] - Any javascript type/value that should be used as a delimiter
+     * between value.
+     * @return {string} Returns a string of each element in the list, optionally separated by
+     * the provided delimiter.
+     */
+    join: function _join(delimiter) {
+        return this.data.join(delimiter);
+    },
+
+    /**
+     * @signature
+     * @description d
+     * @memberOf dataStructures.list_core
+     * @instance
+     * @function keys
+     * @this dataStructures.list_core
+     * @external Array
+     * @see {@link https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/keys}
+     * @return {Iterator.<number>} Returns an iterator that contains the keys for each index in the list.
+     */
+    keys: function _keys() {
+        return this.data.keys();
+    },
+
+    /**
+     * @signature
+     * @description d
+     * @memberOf  dataStructures.list_core
+     * @instance
+     * @function last
+     * @this dataStructures.list_core
+     * @param {function} [predicate] - a
+     * @return {*} - b
+     */
+    last: function _last() {
+        var predicate = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : _functionalHelpers.defaultPredicate;
+
+        return (0, _list_iterators.last)(this, predicate);
+    },
+
+    /**
+     * @signature
+     * @description d
+     * @memberOf dataStructures.list_core
+     * @instance
+     * @function reduceRight
+     * @this dataStructures.list_core
+     * @external Array
+     * @see {@link https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/reduceRight}
+     * @param {function} fn - a
+     * @param {*} acc - b
+     * @return {*} - c
+     */
+    reduceRight: function _reduceRight(fn, acc) {
+        return (0, _list_iterators.reduceRight)(this, fn, acc);
+    },
+
+    /**
+     * @signature
+     * @description d
+     * @memberOf dataStructures.list_core
+     * @instance
+     * @function toArray
+     * @return {Array} - a
+     */
+    toArray: function _toArray() {
+        return Array.from(this);
+    },
+
+    /**
+     * @signature
+     * @description Evaluates the current List instance and returns a new List
+     * instance with the evaluated data as its source. This is used when the
+     * initial List's data must be iterated more than once as it will cause
+     * the evaluation to happen each item it is iterated. Rather the pulling the
+     * initial data through the List's 'pipeline' every time, this property will
+     * allow you to evaluate the List's data and store it in a new List that can
+     * be iterated many times without needing to re-evaluate. It is effectively
+     * a syntactical shortcut for: List.from(listInstance.data)
+     * @memberOf dataStructures.list_core
+     * @instance
+     * @function toEvaluatedList
+     * @return {list} - a
+     */
+    toEvaluatedList: function _toEvaluatedList() {
+        return List.from(this.data /* the .data property is a getter function that forces evaluation */);
+    },
+
+    /**
+     * @signature
+     * @description d
+     * @memberOf dataStructures.list_core
+     * @instance
+     * @function toMap
+     * @return {Map} - a
+     */
+    toMap: function _toMap() {
+        return new Map(this.data.map(function _map(val, idx) {
+            return [idx, val];
+        }));
+    },
+
+    /**
+     * @signature
+     * @description d
+     * @memberOf dataStructures.list_core
+     * @instance
+     * @function toSet
+     * @return {Set} - a
+     */
+    toSet: function _toSet() {
+        return new Set(this);
+    },
+
+    /**
+     * @signature
+     * @description Returns a string representation of an instance of a List
+     * delegator object. This function does not cause evaluation of the source,
+     * but this also means the returned value only reflects the underlying
+     * data, not the evaluated data. In order to see a string representation of
+     * the evaluated data, an evaluation must occur before .toString in invoked.
+     * The most direct way of doing this is via the {@link dataStructures.list_core#toEvaluatedList}
+     * function property.
+     * @example
+     * var list = List([1, 2, 3, 4, 5])
+     *              .map(x => x * x);
+     *
+     * console.log(list.toString()); // => List(List(1, 2, 3, 4, 5)
+     *
+     * var evaledList = list.toEvaluatedList();
+     *
+     * console.log(evaledList.toString()); // => List(1, 4, 9, 16, 25);
+     * @memberOf dataStructures.list_core
+     * @instance
+     * @function toString
+     * @return {string} Returns a string representation of the list. NOTE: This functionality
+     * currently forces an evaluation of the pipelined operations.
+     */
+    toString: function _toString() {
+        //console.log(this.value);
+        //console.log(list_core.isPrototypeOf(this.value), this.value.toString(), this.value);
+
+        /*if (list_core.isPrototypeOf(this.value) || (Array.isArray(this.value) && this.value.length === 5)) {
+            console.log(list_core.isPrototypeOf(this.value));
+            console.log(this);
+            console.log(this.value);
+              if (list_core.isPrototypeOf(this.value)) {
+                console.log(this.value.toString());
+            }
+        }*/
+        //return list_core.isPrototypeOf(this.value) ? this.value.toString() : `List(${this.value})`;
+        //var val = list_core.isPrototypeOf(this.value) ? this.value.toString() : this.value;
+        return 'List(' + this.value + ')';
+    },
+
+    toLocaleString: function _toLocaleString() {
+        return this.toArray().toLocaleString();
+    },
+
+    toJSON: function _toJSON() {
+        return this.data;
+    }
+}, _Symbol$toStringTag = Symbol.toStringTag, _mutatorMap = {}, _mutatorMap[_Symbol$toStringTag] = _mutatorMap[_Symbol$toStringTag] || {}, _mutatorMap[_Symbol$toStringTag].get = function () {
+    return 'List';
+}, _defineProperty(_list_core, 'valueOf', function _valueOf() {
+    return this.data.value;
+}), _defineProperty(_list_core, 'factory', List), _defineProperty(_list_core, 'sequence', function _sequence(p) {
+    return this.traverse(p, p.of);
+    /*
+    return this.foldr((m, ma) => {
+        return m.chain(x => {
+            if (0 === ma.value.length) return List.of(x);
+            return ma.chain(xs => List.of(List.of(x).concat(xs)));
+        });
+    }, List.empty());
+    */
+}), _defineProperty(_list_core, 'traverse', function _traverse(f, g) {
+    return this.foldl(function (ys, x) {
+        return ys.apply(g(x).map(function (x) {
+            return function (y) {
+                return y.concat([x]);
+            };
+        }));
+    }, f(List.empty));
+}), _defineProperty(_list_core, Symbol.iterator, /*#__PURE__*/regeneratorRuntime.mark(function _iterator() {
+    var data, res, _iteratorNormalCompletion, _didIteratorError, _iteratorError, _iterator2, _step, item;
+
+    return regeneratorRuntime.wrap(function _iterator$(_context) {
+        while (1) {
+            switch (_context.prev = _context.next) {
+                case 0:
+                    data = this.evaluatedData ? this.evaluatedData : Array.from(this.value), res = [];
+                    _iteratorNormalCompletion = true;
+                    _didIteratorError = false;
+                    _iteratorError = undefined;
+                    _context.prev = 4;
+                    _iterator2 = data[Symbol.iterator]();
+
+                case 6:
+                    if (_iteratorNormalCompletion = (_step = _iterator2.next()).done) {
+                        _context.next = 14;
+                        break;
+                    }
+
+                    item = _step.value;
+                    _context.next = 10;
+                    return item;
+
+                case 10:
+                    res[res.length] = item;
+
+                case 11:
+                    _iteratorNormalCompletion = true;
+                    _context.next = 6;
+                    break;
+
+                case 14:
+                    _context.next = 20;
+                    break;
+
+                case 16:
+                    _context.prev = 16;
+                    _context.t0 = _context['catch'](4);
+                    _didIteratorError = true;
+                    _iteratorError = _context.t0;
+
+                case 20:
+                    _context.prev = 20;
+                    _context.prev = 21;
+
+                    if (!_iteratorNormalCompletion && _iterator2.return) {
+                        _iterator2.return();
+                    }
+
+                case 23:
+                    _context.prev = 23;
+
+                    if (!_didIteratorError) {
+                        _context.next = 26;
+                        break;
+                    }
+
+                    throw _iteratorError;
+
+                case 26:
+                    return _context.finish(23);
+
+                case 27:
+                    return _context.finish(20);
+
+                case 28:
+                    this.evaluatedData = res;
+
+                case 29:
+                case 'end':
+                    return _context.stop();
+            }
+        }
+    }, _iterator, this, [[4, 16, 20, 28], [21,, 23, 27]]);
+})), _defineEnumerableProperties(_list_core, _mutatorMap), _list_core);
+
+list_core.set = function _set(idx, val) {
+    var len = this.count();
+    var normalizedIdx = 0 > idx ? len + idx : idx;
+    if (0 <= normalizedIdx) {
+        return createList(this, _iteratorWrapper((0, _list_iterators.set)(this, normalizedIdx, val)));
+    }
+    return this;
+};
+
+list_core.get = function _get(idx) {
+    var len = this.count(),
+        normalizedIdx = 0 > idx ? len + idx : idx;
+    return this.toArray()[normalizedIdx];
+};
+
+/**
+ * @signature
+ * @description Alias for {@link dataStructures.list_core#concat}
+ * @memberOf dataStructures.list_core
+ * @instance
+ * @function append
+ * @see dataStructures.list_core#concat
+ * @param {Array | *} ys - a
+ * @return {dataStructures.list_core} - b
+ */
+list_core.append = list_core.concat;
+
+/**
+ * @signature Object -> Object
+ * @description Alias for {@link dataStructures.list_core#apply}
+ * @memberOf dataStructures.list_core
+ * @instance
+ * @function ap
+ * @see dataStructures.list_core#apply
+ * @param {Object} ma - Any object with a map function - i.e. a monad.
+ * @return {Object} Returns an instance of the monad object provide as an argument.
+ */
+list_core.ap = list_core.apply;
+
+/**
+ * @signature
+ * @description Alias for {@link dataStructures.list_core#chain}
+ * @memberOf dataStructures.list_core
+ * @instance
+ * @function fmap
+ * @param {function} fn - a
+ * @return {list} - b
+ */
+list_core.fmap = list_core.chain;
+
+/**
+ * @signature
+ * @description Alias for {@link dataStructures.list_core#chain}
+ * @memberOf dataStructures.list_core
+ * @instance
+ * @function fmap
+ * @param {function} fn - a
+ * @return {list} - b
+ */
+list_core.flapMap = list_core.chain;
+
+/**
+ * @signature
+ * @description Alias for {@link dataStructures.list_core#chain}
+ * @memberOf dataStructures.list_core
+ * @instance
+ * @function bind
+ * @property {function} fn
+ * @return {dataStructures.list_core} - Returns a new list monad
+ */
+list_core.bind = list_core.chain;
+
+/**
+ * @signature
+ * @description Alias for {@link dataStructures.list_core#all}
+ * @memberOf dataStructures.list_core
+ * @instance
+ * @function every
+ * @type {dataStructures.list_core.all}
+ * @this dataStructures.list_core
+ * @param {function} predicate - a
+ * @return {boolean} - b
+ */
+list_core.every = list_core.all;
+
+/**
+ * @signature
+ * @description Alias for {@link dataStructures.list_core#any}
+ * @memberOf dataStructures.list_core
+ * @instance
+ * @function every
+ * @type {dataStructures.list_core.any}
+ * @this dataStructures.list_core
+ * @param {function} predicate - a
+ * @return {boolean} - b
+ */
+list_core.some = list_core.any;
+
+/**
+ * @signature
+ * @description Alias for {@link dataStructures.list_core#isEmpty}
+ * @memberOf dataStructures.list_core
+ * @instance
+ * @function isIdentity
+ * @type {dataStructures.list_core#isEmpty}
+ * @this dataStructures.list_core
+ * @return {boolean} - b
+ */
+list_core.isIdentity = list_core.isEmpty;
+
+/**
+ * @delegate
+ * @delegator {@link dataStructures.list_core}
+ * @description: A list_core delegator object that, in addition to the delegatable functionality
+ * it has from the list_core object, also exposes .orderBy and .orderByDescending
+ * functions. These functions allow a consumer to sort a List's data by
+ * a given key.
+ * @typedef {Object}
+ * @property {function} sortBy
+ * @property {function} sortByDescending
+ * @property {function} contains
+ * @kind {Object}
+ * @memberOf dataStructures
+ * @namespace list
+ */
+var list = Object.create(list_core, /** @lends list_core */{
+    /**
+     * @signature
+     * @description d
+     * @memberOf dataStructures.list
+     * @instance
+     * @function sortBy
+     * @param {function} keySelector - a
+     * @param {function} comparer - b
+     * @return {dataStructures.ordered_list} - c
+     */
+    sortBy: {
+        value: function _orderBy() {
+            var keySelector = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : _combinators.identity;
+            var comparer = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : _functionalHelpers.defaultPredicate;
+
+            var sortObj = [(0, _sort_util.createSortObject)(keySelector, comparer, _helpers.sortDirection.ascending)];
+            return createList(this, _iteratorWrapper((0, _list_iterators.sortBy)(this, sortObj)), sortObj);
+        }
+    },
+    /**
+     * @signature
+     * @description d
+     * @memberOf dataStructures.list
+     * @instance
+     * @function sortByDescending
+     * @param {function} keySelector - a
+     * @param {function} comparer - b
+     * @return {dataStructures.ordered_list} - c
+     */
+    sortByDescending: {
+        value: function _orderByDescending(keySelector) {
+            var comparer = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : _functionalHelpers.defaultPredicate;
+
+            var sortObj = [(0, _sort_util.createSortObject)(keySelector, comparer, _helpers.sortDirection.descending)];
+            return createList(this, _iteratorWrapper((0, _list_iterators.sortBy)(this, sortObj)), sortObj);
+        }
+    },
+    /**
+     * @signature
+     * @description d
+     * @memberOf dataStructures.list
+     * @instance
+     * @function contains
+     * @param {*} val - a
+     * @param {function} comparer - b
+     * @return {boolean} - c
+     */
+    contains: {
+        value: function _contains(val, comparer) {
+            return (0, _list_iterators.contains)(this, val, comparer);
+        }
+    }
+});
+
+/**
+ * @description: A list_core delegator object that, in addition to the delegatable functionality
+ * it has from the queryable_core object, also exposes .thenBy and .thenByDescending
+ * functions. These functions allow a consumer to sort more on than a single column.
+ * @typedef {Object}
+ * @property {function} sortBy
+ * @property {function} sortByDescending
+ * @property {function} contains
+ * @memberOf dataStructures
+ * @namespace ordered_list
+ */
+var ordered_list = Object.create(list_core, /** @lends list_core */{
+    _appliedSorts: {
+        value: []
+    },
+    //In these two functions, feeding the call to "orderBy" with the .value property of the List delegate
+    //rather than the delegate itself, effectively excludes the previous call to the orderBy/orderByDescending
+    //since the iterator exists on the delegate, not on its value. Each subsequent call to thenBy/thenByDescending
+    //will continue to exclude the previous call's iterator... effectively what we're doing is ignoring all the
+    //prior calls made to orderBy/orderByDescending/thenBy/thenByDescending and calling it once but with an array
+    //of the the requested sorts.
+    /**
+     * @signature
+     * @description d
+     * @memberOf dataStructures.ordered_list
+     * @instance
+     * @function thenBy
+     * @param {function} keySelector - a
+     * @param {function} comparer - b
+     * @return {dataStructures.ordered_list} - c
+     */
+    thenBy: {
+        value: function _thenBy(keySelector) {
+            var comparer = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : _functionalHelpers.defaultPredicate;
+
+            var sortObj = this._appliedSorts.concat((0, _sort_util.createSortObject)(keySelector, comparer, _helpers.sortDirection.ascending));
+            return createList(this.value, _iteratorWrapper((0, _list_iterators.sortBy)(this, sortObj)), sortObj);
+        }
+    },
+    /**
+     * @signature
+     * @description d
+     * @memberOf dataStructures.ordered_list
+     * @instance
+     * @function thenByDescending
+     * @param {function} keySelector - a
+     * @param {function} comparer - b
+     * @return {dataStructures.ordered_list} - c
+     */
+    thenByDescending: {
+        value: function thenByDescending(keySelector) {
+            var comparer = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : _functionalHelpers.defaultPredicate;
+
+            var sortObj = this._appliedSorts.concat((0, _sort_util.createSortObject)(keySelector, comparer, _helpers.sortDirection.descending));
+            return createList(this.value, _iteratorWrapper((0, _list_iterators.sortBy)(this, sortObj)), sortObj);
+        }
+    },
+    /**
+     * @signature
+     * @description Performs the same functionality as dataStructures.list_core#contains, but utilizes
+     * a binary searching algorithm rather than a sequential search. If this function is called
+     * an a non-ordered List, it will internally delegate to dataStructures.list_core#contains instead. This
+     * function should not be called on a sorted List for look for a value that is not the
+     * primary field on which the List's data is sorted on as an incorrect result will likely
+     * be returned.
+     * @memberOf dataStructures.ordered_list
+     * @instance
+     * @function contains
+     * @param {*} val - The value that should be searched for
+     * @param {function} comparer - The function used to compare values in the List to
+     * the 'val' parameter
+     * @return {boolean} - Returns true if the List contains the searched for value, false
+     * otherwise.
+     */
+    contains: {
+        value: function _contains(val, comparer) {
+            return (0, _list_iterators.binarySearch)((0, _combinators.when)((0, _decorators.not)(_functionalHelpers.isArray), Array.from, this.value), val, comparer);
+        }
+    }
+});
+
+/**
+ * @signature
+ * @description d
+ * @private
+ * @param {*} [source] - a
+ * @return {list} - b
+ */
+var listFromNonGen = function listFromNonGen(source) {
+    return createList(source && source[Symbol.iterator] && 'string' !== typeof source ? source : (0, _functionalHelpers.wrap)(source));
+};
+
+/**
+ * @signature
+ * @description d
+ * @private
+ * @param {generator} source - a
+ * @return {list} - b
+ */
+var listFromGen = function listFromGen(source) {
+    return createList((0, _functionalHelpers.invoke)(source));
+};
+
+/**
+ * @signature
+ * @factory List
+ * @description Creator function for a new List object. Takes any value/type as a parameter
+ * and, if it has an iterator defined, with set it as the underlying source of the List as is,
+ * or, wrap the item in an array if there is no defined iterator.
+ * @namespace List
+ * @memberOf dataStructures
+ * @property {function} from {@link List#from}
+ * @property {function} of {@link List#of}
+ * @property {function} ordered {@link List#ordered}
+ * @property {Object} empty {@link List#empty}
+ * @property {function} just {@link List#just}
+ * @property {function} unfold {@link List#unfold}
+ * @property {function} is {@link List#is}
+ * @property {function} repeat {@link List#repeat}
+ * @property {function} extend {@link List#extend}
+ * @param {*} [source] - Any type, any value; used as the underlying source of the List
+ * @return {list} - A new List instance with the value provided as the underlying source.
+ */
+function List(source) {
+    return (0, _combinators.ifElse)(isList, _combinators.identity, (0, _combinators.ifElse)((0, _functionalHelpers.delegatesFrom)(_helpers.generatorProto), listFromGen, listFromNonGen), source);
+}
+
+var isOneArg = function isOneArg(args) {
+    return 1 === args.length;
+};
+var isList = function isList(val) {
+    return (0, _functionalHelpers.delegatesFrom)(list_core, val);
+};
+var isOneArgAndAList = function isOneArgAndAList(args) {
+    return !!(isOneArg(args) && isList(args[0]));
+};
+var createListFromArgs = function createListFromArgs(args) {
+    return 1 !== args.length ? List(args) : Array.isArray(args[0]) || (0, _functionalHelpers.delegatesFrom)(_helpers.generatorProto, args[0]) ? List(args[0]) : List(args);
+};
+
+/**
+ * @signature
+ * @description Convenience function for listCreate a new List instance; internally calls List.
+ * @memberOf List
+ * @static
+ * @function from
+ * @see List
+ * @param {*} [source] - Any type, any value; used as the underlying source of the List
+ * @return {list} - A new List instance with the value provided as the underlying source.
+ */
+List.from = function () {
+    for (var _len5 = arguments.length, source = Array(_len5), _key5 = 0; _key5 < _len5; _key5++) {
+        source[_key5] = arguments[_key5];
+    }
+
+    return (0, _combinators.ifElse)(isOneArgAndAList, _combinators.constant.apply(undefined, source), createListFromArgs, source);
+};
+
+/**
+ * @signature
+ * @description Alias for List.from
+ * @memberOf List
+ * @static
+ * @function of
+ * @see List.from
+ * @param {*}
+ * @return {list} - a
+ */
+List.of = List.from;
+
+//TODO: implement this so that a consumer can initiate a List as ordered
+/**
+ * @signature
+ * @description Creates a new {@link ordered_list} for the source provided. An optional
+ * source selector and comparer functions may be provided.
+ * @memberOf List
+ * @static
+ * @function ordered
+ * @param {*} [source] - Any JavaScript value
+ * @param {function} [selector] - A function that selects either a subset of each value in the list, or can
+ * act as the 'identity' function and just return the entire value.
+ * @param {function} [comparer] - A function that knows how to compare the type of values the selector function
+ * 'pulls' out of the list.
+ * @return {ordered_list} Returns a new list monad
+ */
+List.ordered = function (source, selector) {
+    var comparer = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : _functionalHelpers.defaultPredicate;
+    return createList(source, null, [(0, _sort_util.createSortObject)(selector, comparer, _helpers.sortDirection.ascending)]);
+};
+
+/**
+ * @description Holds a reference to an empty, ordered list.
+ * @memberOf List
+ * @property {Object} empty
+ * @see ordered_list
+ * @kind {Object}
+ */
+List.empty = createList([], null, [(0, _sort_util.createSortObject)(_combinators.identity, _functionalHelpers.defaultPredicate, _helpers.sortDirection.ascending)]);
+
+List.identity = List.empty;
+
+/**
+ * @signature
+ * @description Creates and returns a new {@link ordered_list} since a list with a single
+ * item is trivially ordered.
+ * @memberOf List
+ * @static
+ * @function just
+ * @see List
+ * @param {*} val - a
+ * @return {ordered_list} - b
+ */
+List.just = function (val) {
+    return createList([val], null, [(0, _sort_util.createSortObject)(_combinators.identity, _functionalHelpers.defaultPredicate, _helpers.sortDirection.ascending)]);
+};
+
+/**
+ * @signature
+ * @description Takes a function and a seed value. The function is used to 'unfold' the seed value
+ * into an array which is used as the source of a new List monad.
+ * @memberOf List
+ * @static
+ * @function unfold
+ * @see List
+ * @param {function|generator} fn - a
+ * @param {*} seed - b
+ * @return {list} - c
+ */
+List.unfold = function (fn, seed) {
+    return createList((0, _list_iterators.unfold)(fn)(seed));
+};
+
+/**
+ * @signature
+ * @description Takes any value as an argument and returns a boolean indicating if
+ * the value is a list.
+ * @memberOf List
+ * @static
+ * @function is
+ * @see List
+ * @param {*} f - Any JavaScript value
+ * @return {boolean} - Returns a boolean indicating of the value is a list.
+ */
+List.is = isList;
+
+/**
+ * @signature
+ * @description Generates a new list with the specified item repeated the specified number of times. Because
+ * this generates a list with the same item repeated n times, the resulting List is trivially
+ * sorted. Thus, a sorted List is returned rather than an unsorted list.
+ * @memberOf List
+ * @static
+ * @function repeat
+ * @see List
+ * @param {*} item - Any JavaScript value that should be used to build a new list monad.
+ * @param {number} count - The number of times the value should be repeated to build the list.
+ * @return {Proxy} - Returns a new ordered list monad.
+ */
+List.repeat = function _repeat(item, count) {
+    return createList([], (0, _list_iterators.repeat)(item, count), [(0, _sort_util.createSortObject)(_combinators.identity, _functionalHelpers.noop, _helpers.sortDirection.descending)]);
+};
+
+/**
+ * @signature
+ * @summary Extension function that allows new functionality to be applied to
+ * the queryable object
+ * @memberOf List
+ * @static
+ * @function extend
+ * @see List
+ * @param {string} prop - The name of the new property that should exist on the List; must be unique
+ * @param {function} fn - A function that defines the new List functionality and
+ * will be called when this new List property is invoked.
+ * @return {List} - a
+ *
+ * @description The fn parameter must be a non-generator function that takes one or more
+ * arguments. If this new List function should be an immediately evaluated
+ * function (like: foldl, any, reverse, etc.), it merely needs the accept one or more
+ * arguments and know how to iterate the source. In the case of an immediately evaluated
+ * function, the return type can be any javascript type. The first argument is always the
+ * previous List instance that must be iterated. Additional arguments may be specified
+ * if desired.
+ *
+ * If the function's evaluation should be deferred it needs to work a bit differently.
+ * In this case, the function should accept one or more arguments, the first and only
+ * required argument being the underlying source of the List object. This underlying
+ * source can be anything with an iterator (generator, array, map, set, another list, etc.).
+ * Any additional arguments that the function needs should be specified in the signature.
+ * The return value of the function should be a generator that knows how to iterate the
+ * underlying source. If the generator should operate like most List functions, i.e.
+ * take a single item, process it, and then yield it out before asking for the next, a
+ * for-of loop is the preferred method for employment. However, if the generator needs
+ * all of the underlying data upfront (like orderBy and groupBy), Array.from is the
+ * preferred method. Array.from will 'force' all the underlying List instances
+ * to evaluate their data before it is handed over in full to the generator. The generator
+ * can then act with full knowledge of the data and perform whatever operation is needed
+ * before ultimately yielding out a single item at a time. If your extension function
+ * needs to yield out all items at once, then that function is not a lazy evaluation
+ * function and should be constructed like the immediately evaluated functions described
+ * above.
+ */
+List.extend = function _extend(prop, fn) {
+    if (![list, ordered_list].some(function (type) {
+        return prop in type;
+    })) {
+        list_core[prop] = function _extension() {
+            for (var _len6 = arguments.length, args = Array(_len6), _key6 = 0; _key6 < _len6; _key6++) {
+                args[_key6] = arguments[_key6];
+            }
+
+            return createList(this, fn.apply(undefined, [this].concat(args)));
+        };
+    }
+    return List;
+};
+
+function createGroupedListDelegate(source, key) {
+    return createList(source, undefined, undefined, key);
+}
+
+/**
+ * @description Creates a new list object delegate instance; list type is determined by
+ * the parameters passed to the function. If only the 'source' parameter is provided, a
+ * 'basic' list delegate object instance is created. If the source and iterator parameters
+ * are passed as arguments, a 'basic' list delegate object instance is created and the
+ * iterator provided is used as the new instance object's iterator rather than the default
+ * list iterator. If the source, iterator, and sortObj parameters are passed as arguments,
+ * an ordered_list delegate object instance is created. The provided iterator is set on
+ * the instance object to be used in lieu of the default iterator and the ._appliedSorts
+ * field is set as the 'sortObj' parameter. If all four of the function's arguments are
+ * provided (source, iterator, sortObj, and key), then a list delegate object instance
+ * is created, setting the iterator for the object instance as the provided iterator, the
+ * ._appliedSorts field as the sortObj argument, and the ._key field as the 'key' parameter's
+ * value.
+ *
+ * The switch case inside the function only handles a subset of the possible bit flag values.
+ * Technically there could be as many as eight different scenarios to check, not including the
+ * default case. However, in practice, the only values received from the 'createBitMask' function
+ * will be odd. Thus, only odd values (plus the default case which covers a value of zero) need
+ * to be handled. A case of zero arises when only the 'source' argument is provided.
+ *
+ * @private
+ * @param {*} source - The value to be used as the underlying source of the list functor; may be
+ * anything javascript object that has an iterator.
+ * @param {generator|null} [iterator] - A generator function that is to be used on the new list delegate
+ * object instance's iterator.
+ * @param {Array|undefined} [sortObject] - An array of the sort(s) (field and direction} to be used when the
+ * instance is evaluated.
+ * @param {string} [key] - A string that denotes what value the new list delegate object instance
+ * was grouped on.
+ * @return {Proxy<dataStructure.list_core>|list_core|list|ordered_list} Returns either a {@link list} delegator object
+ * or an {@link ordered_list} delegator object based on the values passed as arguments.
+ */
+function createList(source, iterator, sortObject, key) {
+    var bm = createBitMask((0, _functionalHelpers.delegatesTo)(iterator, _helpers.generatorProto), (0, _functionalHelpers.isString)(key), (0, _functionalHelpers.isArray)(sortObject));
+    var proxiedList = bitMaskMaxListValue > bm ? new Proxy(Object.create(list, {
+        _value: { value: source, writable: false, configurable: false }
+    }), listProxyHandler) : new Proxy(Object.create(ordered_list, {
+        _value: { value: source, writable: false, configurable: false },
+        _appliedSorts: { value: sortObject, writable: false, configurable: false }
+    }), listProxyHandler);
+
+    switch (bm) {
+        /**
+         * @description: case 1 = An iterator has been passed, but nothing else. Create a
+         * basic list type object instance and set the iterator as the version provided.
+         */
+        case 1:
+            proxiedList[Symbol.iterator] = iterator;
+            return proxiedList;
+        case 2:
+            /**
+             * @description: case 2 = A key was passed as the only argument. Create a list
+             * object and set the ._key field as the key string argument.
+             */
+            return Object.defineProperties(proxiedList, {
+                '_key': { value: key, writable: false, configurable: false },
+                'key': { get: function _getKey() {
+                        return this._key;
+                    } }
+            });
+        /**
+         * @description: case 5 = Both an iterator and a sort object were passed in. The consumer
+         * invoked the sortBy/sortByDescending or thenBy/thenByDescending function properties. Create
+         * an ordered list type object instance, setting the iterator to the version provided (if any) and
+         * the _appliedSorts field as the sortObject param.
+         */
+        case 5:
+            proxiedList[Symbol.iterator] = iterator;
+            return proxiedList;
+        /**
+         * @description: default = Nothing beyond the 'source' param was passed to this
+         * function; results in a bitwise value of 00. Create a 'basic' list object type
+         * instance.
+         */
+        default:
+            return proxiedList;
+    }
+}
+
+/**
+ * @signature [...a] -> Number
+ * @description creates a bit mask value based on truthy/falsey arguments passed to the function
+ * @private
+ * @param {boolean} args - Zero or more arguments. All arguments are treated as booleans, so truthy,
+ * and falsey values will work.
+ * @return {number} Returns an integer that represents the bit mask value of the boolean arguments.
+ */
+function createBitMask() {
+    for (var _len7 = arguments.length, args = Array(_len7), _key7 = 0; _key7 < _len7; _key7++) {
+        args[_key7] = arguments[_key7];
+    }
+
+    return args.reduce(function _reduce(curr, next, idx) {
+        return curr |= next << idx;
+    }, args[0]);
+}
+
+function _iteratorWrapper(it) {
+    return (/*#__PURE__*/regeneratorRuntime.mark(function iterator() {
+            var _iteratorNormalCompletion2, _didIteratorError2, _iteratorError2, _iterator3, _step2, item, res, _iteratorNormalCompletion3, _didIteratorError3, _iteratorError3, _iterator4, _step3, _item;
+
+            return regeneratorRuntime.wrap(function iterator$(_context2) {
+                while (1) {
+                    switch (_context2.prev = _context2.next) {
+                        case 0:
+                            if (!this.evaluatedData) {
+                                _context2.next = 29;
+                                break;
+                            }
+
+                            _iteratorNormalCompletion2 = true;
+                            _didIteratorError2 = false;
+                            _iteratorError2 = undefined;
+                            _context2.prev = 4;
+                            _iterator3 = this.evaluatedData[Symbol.iterator]();
+
+                        case 6:
+                            if (_iteratorNormalCompletion2 = (_step2 = _iterator3.next()).done) {
+                                _context2.next = 13;
+                                break;
+                            }
+
+                            item = _step2.value;
+                            _context2.next = 10;
+                            return item;
+
+                        case 10:
+                            _iteratorNormalCompletion2 = true;
+                            _context2.next = 6;
+                            break;
+
+                        case 13:
+                            _context2.next = 19;
+                            break;
+
+                        case 15:
+                            _context2.prev = 15;
+                            _context2.t0 = _context2['catch'](4);
+                            _didIteratorError2 = true;
+                            _iteratorError2 = _context2.t0;
+
+                        case 19:
+                            _context2.prev = 19;
+                            _context2.prev = 20;
+
+                            if (!_iteratorNormalCompletion2 && _iterator3.return) {
+                                _iterator3.return();
+                            }
+
+                        case 22:
+                            _context2.prev = 22;
+
+                            if (!_didIteratorError2) {
+                                _context2.next = 25;
+                                break;
+                            }
+
+                            throw _iteratorError2;
+
+                        case 25:
+                            return _context2.finish(22);
+
+                        case 26:
+                            return _context2.finish(19);
+
+                        case 27:
+                            _context2.next = 58;
+                            break;
+
+                        case 29:
+                            res = [];
+                            _iteratorNormalCompletion3 = true;
+                            _didIteratorError3 = false;
+                            _iteratorError3 = undefined;
+                            _context2.prev = 33;
+                            _iterator4 = it()[Symbol.iterator]();
+
+                        case 35:
+                            if (_iteratorNormalCompletion3 = (_step3 = _iterator4.next()).done) {
+                                _context2.next = 43;
+                                break;
+                            }
+
+                            _item = _step3.value;
+
+                            res[res.length] = _item;
+                            _context2.next = 40;
+                            return _item;
+
+                        case 40:
+                            _iteratorNormalCompletion3 = true;
+                            _context2.next = 35;
+                            break;
+
+                        case 43:
+                            _context2.next = 49;
+                            break;
+
+                        case 45:
+                            _context2.prev = 45;
+                            _context2.t1 = _context2['catch'](33);
+                            _didIteratorError3 = true;
+                            _iteratorError3 = _context2.t1;
+
+                        case 49:
+                            _context2.prev = 49;
+                            _context2.prev = 50;
+
+                            if (!_iteratorNormalCompletion3 && _iterator4.return) {
+                                _iterator4.return();
+                            }
+
+                        case 52:
+                            _context2.prev = 52;
+
+                            if (!_didIteratorError3) {
+                                _context2.next = 55;
+                                break;
+                            }
+
+                            throw _iteratorError3;
+
+                        case 55:
+                            return _context2.finish(52);
+
+                        case 56:
+                            return _context2.finish(49);
+
+                        case 57:
+                            this.evaluatedData = res;
+
+                        case 58:
+                        case 'end':
+                            return _context2.stop();
+                    }
+                }
+            }, iterator, this, [[4, 15, 19, 27], [20,, 22, 26], [33, 45, 49, 57], [50,, 52, 56]]);
+        })
+    );
+}
+
+list_core.constructor = list_core.factory;
+list_core.fold = list_core.foldl;
+list_core.reduce = list_core.foldl;
+
+/**
+ * @signature
+ * @description Since the constant functor does not represent a disjunction, the List's
+ * bimap function property behaves just as its map function property. It is merely here as a
+ * convenience so that swapping out monads/monads does not break an application that is
+ * relying on its existence.
+ * @memberOf dataStructures.list_core
+ * @instance
+ * @function bimap
+ * @param {function} f - a
+ * @param {function} g - b
+ * @return {list} - c
+ */
+list_core.bimap = list_core.map;
+
+exports.List = List;
+exports.list_core = list_core;
+exports.list = list;
+exports.ordered_list = ordered_list;
+exports.createList = createList;
+
+},{"../combinators":330,"../decorators":344,"../functionalHelpers":345,"../helpers":346,"./list_iterators":340,"./sort_util":342}],340:[function(require,module,exports){
+'use strict';
+
+Object.defineProperty(exports, "__esModule", {
+    value: true
+});
+exports.zip = exports.union = exports.unfold = exports.takeWhile = exports.sortBy = exports.slice = exports.skipWhile = exports.set = exports.reverse = exports.repeat = exports.reduceRight = exports.prependAll = exports.prepend = exports.pop = exports.ofType = exports.map = exports.last = exports.join = exports.intersperse = exports.intersect = exports.groupJoin = exports.groupBy = exports.foldRight = exports.foldLeft = exports.first = exports.findLastIndex = exports.findIndex = exports.filter = exports.fill = exports.except = exports.equals = exports.distinct = exports.count = exports.copyWithin = exports.contains = exports.concatAll = exports.concat = exports.chain = exports.binarySearch = exports.apply = exports.any = exports.all = undefined;
 
 var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
 
@@ -9055,9 +13042,13 @@ var _helpers = require('../helpers');
 
 var _sort_util = require('./sort_util');
 
-var _marked = /*#__PURE__*/regeneratorRuntime.mark(_iterate);
-
 /** @module dataStructures/list_iterators */
+
+//TODO: see about adding an 'evaluatedData' property to a list once the generator is done yielding out
+//TODO: values. It would be nice to wrap each returned iterator in a generic iterator that just forwards
+//TODO: the values it receives from the primary, but also remember each value. Once there are no more value
+//TODO: to yield out, it can set the 'evaluatedData' property on the list object and from then on, the
+//TODO: list won't need to be iterated as it has already been evaluated.
 
 var asArray = (0, _combinators.when)((0, _decorators.not)(_functionalHelpers.isArray), Array.from);
 var arrayFromGenerator = function arrayFromGenerator(val) {
@@ -9065,89 +13056,16 @@ var arrayFromGenerator = function arrayFromGenerator(val) {
 };
 var toArray = (0, _combinators.ifElse)((0, _functionalHelpers.delegatesFrom)(_helpers.generatorProto), arrayFromGenerator, asArray);
 
-/**
- * @description d
- * @param {Array|monads.list|monads.ordered_list|generator} iterable - Any iterable item
- * @return {Array|monads.list|monads.ordered_list|generator} Returns an iterator
- */
-var getIterator = function getIterator(iterable) {
-    return (0, _functionalHelpers.delegatesFrom)(_helpers.generatorProto, iterable) ? (0, _functionalHelpers.invoke)(iterable) : iterable;
-};
+//var getIterator = iterable => delegatesFrom(generatorProto, iterable) ? invoke(iterable) : iterable;
 
-function _iterate(iterable, fn) {
-    var _iteratorNormalCompletion, _didIteratorError, _iteratorError, _iterator, _step, item;
-
-    return regeneratorRuntime.wrap(function _iterate$(_context) {
-        while (1) {
-            switch (_context.prev = _context.next) {
-                case 0:
-                    _iteratorNormalCompletion = true;
-                    _didIteratorError = false;
-                    _iteratorError = undefined;
-                    _context.prev = 3;
-                    _iterator = getIterator(iterable)[Symbol.iterator]();
-
-                case 5:
-                    if (_iteratorNormalCompletion = (_step = _iterator.next()).done) {
-                        _context.next = 12;
-                        break;
-                    }
-
-                    item = _step.value;
-                    _context.next = 9;
-                    return fn(item);
-
-                case 9:
-                    _iteratorNormalCompletion = true;
-                    _context.next = 5;
-                    break;
-
-                case 12:
-                    _context.next = 18;
-                    break;
-
-                case 14:
-                    _context.prev = 14;
-                    _context.t0 = _context['catch'](3);
-                    _didIteratorError = true;
-                    _iteratorError = _context.t0;
-
-                case 18:
-                    _context.prev = 18;
-                    _context.prev = 19;
-
-                    if (!_iteratorNormalCompletion && _iterator.return) {
-                        _iterator.return();
-                    }
-
-                case 21:
-                    _context.prev = 21;
-
-                    if (!_didIteratorError) {
-                        _context.next = 24;
-                        break;
-                    }
-
-                    throw _iteratorError;
-
-                case 24:
-                    return _context.finish(21);
-
-                case 25:
-                    return _context.finish(18);
-
-                case 26:
-                case 'end':
-                    return _context.stop();
-            }
-        }
-    }, _marked, this, [[3, 14, 18, 26], [19,, 21, 25]]);
-}
+/*function *_iterate(iterable, fn) {
+    for (let item of getIterator(iterable)) yield fn(item);
+}*/
 
 /**
  * @signature
  * @description d
- * @param {Array|generator|monads.list_core} xs - a
+ * @param {Array|generator|dataStructures.list_core} xs - a
  * @param {function} [predicate] - b
  * @return {boolean} - c
  */
@@ -9159,7 +13077,7 @@ function all(xs, predicate) {
 /**
  * @signature
  * @description d
- * @param {Array|generator|monads.list_core} xs - a
+ * @param {Array|generator|dataStructures.list_core} xs - a
  * @param {function} [predicate] - b
  * @return {boolean} - c
  */
@@ -9170,7 +13088,139 @@ function any(xs, predicate) {
 /**
  * @signature
  * @description d
- * @param {Array|generator|monads.list_core} xs - a
+ * @param {dataStructures.list_core} xs - a
+ * @param {dataStructures.list_core} ys - b
+ * @return {generator} - c
+ */
+function apply(xs, ys) {
+    return (/*#__PURE__*/regeneratorRuntime.mark(function _applyIterator() {
+            var _iteratorNormalCompletion, _didIteratorError, _iteratorError, _iterator, _step, y, _iteratorNormalCompletion2, _didIteratorError2, _iteratorError2, _iterator2, _step2, x;
+
+            return regeneratorRuntime.wrap(function _applyIterator$(_context) {
+                while (1) {
+                    switch (_context.prev = _context.next) {
+                        case 0:
+                            _iteratorNormalCompletion = true;
+                            _didIteratorError = false;
+                            _iteratorError = undefined;
+                            _context.prev = 3;
+                            _iterator = ys[Symbol.iterator]();
+
+                        case 5:
+                            if (_iteratorNormalCompletion = (_step = _iterator.next()).done) {
+                                _context.next = 36;
+                                break;
+                            }
+
+                            y = _step.value;
+                            _iteratorNormalCompletion2 = true;
+                            _didIteratorError2 = false;
+                            _iteratorError2 = undefined;
+                            _context.prev = 10;
+                            _iterator2 = xs[Symbol.iterator]();
+
+                        case 12:
+                            if (_iteratorNormalCompletion2 = (_step2 = _iterator2.next()).done) {
+                                _context.next = 19;
+                                break;
+                            }
+
+                            x = _step2.value;
+                            _context.next = 16;
+                            return y(x);
+
+                        case 16:
+                            _iteratorNormalCompletion2 = true;
+                            _context.next = 12;
+                            break;
+
+                        case 19:
+                            _context.next = 25;
+                            break;
+
+                        case 21:
+                            _context.prev = 21;
+                            _context.t0 = _context['catch'](10);
+                            _didIteratorError2 = true;
+                            _iteratorError2 = _context.t0;
+
+                        case 25:
+                            _context.prev = 25;
+                            _context.prev = 26;
+
+                            if (!_iteratorNormalCompletion2 && _iterator2.return) {
+                                _iterator2.return();
+                            }
+
+                        case 28:
+                            _context.prev = 28;
+
+                            if (!_didIteratorError2) {
+                                _context.next = 31;
+                                break;
+                            }
+
+                            throw _iteratorError2;
+
+                        case 31:
+                            return _context.finish(28);
+
+                        case 32:
+                            return _context.finish(25);
+
+                        case 33:
+                            _iteratorNormalCompletion = true;
+                            _context.next = 5;
+                            break;
+
+                        case 36:
+                            _context.next = 42;
+                            break;
+
+                        case 38:
+                            _context.prev = 38;
+                            _context.t1 = _context['catch'](3);
+                            _didIteratorError = true;
+                            _iteratorError = _context.t1;
+
+                        case 42:
+                            _context.prev = 42;
+                            _context.prev = 43;
+
+                            if (!_iteratorNormalCompletion && _iterator.return) {
+                                _iterator.return();
+                            }
+
+                        case 45:
+                            _context.prev = 45;
+
+                            if (!_didIteratorError) {
+                                _context.next = 48;
+                                break;
+                            }
+
+                            throw _iteratorError;
+
+                        case 48:
+                            return _context.finish(45);
+
+                        case 49:
+                            return _context.finish(42);
+
+                        case 50:
+                        case 'end':
+                            return _context.stop();
+                    }
+                }
+            }, _applyIterator, this, [[3, 38, 42, 50], [10, 21, 25, 33], [26,, 28, 32], [43,, 45, 49]]);
+        })
+    );
+}
+
+/**
+ * @signature
+ * @description d
+ * @param {Array|generator|dataStructures.list_core} xs - a
  * @param {*} val - b
  * @param {function} comparer - c
  * @return {boolean} - d
@@ -9182,7 +13232,7 @@ function binarySearch(xs, val, comparer) {
 /**
  * @signature
  * @description d
- * @param {Array|generator|monads.list_core} xs - a
+ * @param {Array|generator|dataStructures.list_core} xs - a
  * @param {number} left - b
  * @param {number} right - c
  * @param {*} val - d
@@ -9212,53 +13262,56 @@ function binarySearchRec(xs, left, right, val, comparer) {
  */
 function chain(xs, fn) {
     return (/*#__PURE__*/regeneratorRuntime.mark(function _chainIterator() {
-            var res, _iteratorNormalCompletion2, _didIteratorError2, _iteratorError2, _iterator2, _step2, x, _iteratorNormalCompletion3, _didIteratorError3, _iteratorError3, _iterator3, _step3, item;
+            var res, _iteratorNormalCompletion3, _didIteratorError3, _iteratorError3, _iterator3, _step3, x, _iteratorNormalCompletion4, _didIteratorError4, _iteratorError4, _iterator4, _step4, item;
 
             return regeneratorRuntime.wrap(function _chainIterator$(_context2) {
                 while (1) {
                     switch (_context2.prev = _context2.next) {
                         case 0:
-                            _iteratorNormalCompletion2 = true;
-                            _didIteratorError2 = false;
-                            _iteratorError2 = undefined;
+                            _iteratorNormalCompletion3 = true;
+                            _didIteratorError3 = false;
+                            _iteratorError3 = undefined;
                             _context2.prev = 3;
-                            _iterator2 = xs[Symbol.iterator]();
+                            _iterator3 = xs[Symbol.iterator]();
 
                         case 5:
-                            if (_iteratorNormalCompletion2 = (_step2 = _iterator2.next()).done) {
+                            if (_iteratorNormalCompletion3 = (_step3 = _iterator3.next()).done) {
                                 _context2.next = 42;
                                 break;
                             }
 
-                            x = _step2.value;
+                            x = _step3.value;
 
                             res = fn(x);
-                            //If the result is a list, then we need to unwrap the values contained within and yield
-                            //each one of them individually...
+                            //We have to travel up the prototype chain twice here because we could be dealing with an
+                            //ordered list, in which case, we need to check if list_core is in the prototype chain,
+                            //not list or ordered_list
 
                             if (!Object.getPrototypeOf(Object.getPrototypeOf(xs)).isPrototypeOf(res)) {
                                 _context2.next = 37;
                                 break;
                             }
 
-                            _iteratorNormalCompletion3 = true;
-                            _didIteratorError3 = false;
-                            _iteratorError3 = undefined;
+                            //If the result is a list, then we need to unwrap the values contained within and yield
+                            //each one of them individually...
+                            _iteratorNormalCompletion4 = true;
+                            _didIteratorError4 = false;
+                            _iteratorError4 = undefined;
                             _context2.prev = 12;
-                            _iterator3 = res.value[Symbol.iterator]();
+                            _iterator4 = res[Symbol.iterator]();
 
                         case 14:
-                            if (_iteratorNormalCompletion3 = (_step3 = _iterator3.next()).done) {
+                            if (_iteratorNormalCompletion4 = (_step4 = _iterator4.next()).done) {
                                 _context2.next = 21;
                                 break;
                             }
 
-                            item = _step3.value;
+                            item = _step4.value;
                             _context2.next = 18;
                             return item;
 
                         case 18:
-                            _iteratorNormalCompletion3 = true;
+                            _iteratorNormalCompletion4 = true;
                             _context2.next = 14;
                             break;
 
@@ -9269,26 +13322,26 @@ function chain(xs, fn) {
                         case 23:
                             _context2.prev = 23;
                             _context2.t0 = _context2['catch'](12);
-                            _didIteratorError3 = true;
-                            _iteratorError3 = _context2.t0;
+                            _didIteratorError4 = true;
+                            _iteratorError4 = _context2.t0;
 
                         case 27:
                             _context2.prev = 27;
                             _context2.prev = 28;
 
-                            if (!_iteratorNormalCompletion3 && _iterator3.return) {
-                                _iterator3.return();
+                            if (!_iteratorNormalCompletion4 && _iterator4.return) {
+                                _iterator4.return();
                             }
 
                         case 30:
                             _context2.prev = 30;
 
-                            if (!_didIteratorError3) {
+                            if (!_didIteratorError4) {
                                 _context2.next = 33;
                                 break;
                             }
 
-                            throw _iteratorError3;
+                            throw _iteratorError4;
 
                         case 33:
                             return _context2.finish(30);
@@ -9305,7 +13358,7 @@ function chain(xs, fn) {
                             return res;
 
                         case 39:
-                            _iteratorNormalCompletion2 = true;
+                            _iteratorNormalCompletion3 = true;
                             _context2.next = 5;
                             break;
 
@@ -9316,26 +13369,26 @@ function chain(xs, fn) {
                         case 44:
                             _context2.prev = 44;
                             _context2.t1 = _context2['catch'](3);
-                            _didIteratorError2 = true;
-                            _iteratorError2 = _context2.t1;
+                            _didIteratorError3 = true;
+                            _iteratorError3 = _context2.t1;
 
                         case 48:
                             _context2.prev = 48;
                             _context2.prev = 49;
 
-                            if (!_iteratorNormalCompletion2 && _iterator2.return) {
-                                _iterator2.return();
+                            if (!_iteratorNormalCompletion3 && _iterator3.return) {
+                                _iterator3.return();
                             }
 
                         case 51:
                             _context2.prev = 51;
 
-                            if (!_didIteratorError2) {
+                            if (!_didIteratorError3) {
                                 _context2.next = 54;
                                 break;
                             }
 
-                            throw _iteratorError2;
+                            throw _iteratorError3;
 
                         case 54:
                             return _context2.finish(51);
@@ -9356,36 +13409,36 @@ function chain(xs, fn) {
 /**
  * @signature:
  * @description description
- * @param {Array|generator|monads.list_core} xs - x
- * @param {Array|generator|monads.list_core} ys - y
+ * @param {Array|generator|dataStructures.list_core} xs - x
+ * @param {Array|generator|dataStructures.list_core} ys - y
  * @return {generator} - a
  */
 function concat(xs, ys) {
     return (/*#__PURE__*/regeneratorRuntime.mark(function concatIterator() {
-            var _iteratorNormalCompletion4, _didIteratorError4, _iteratorError4, _iterator4, _step4, x, _iteratorNormalCompletion5, _didIteratorError5, _iteratorError5, _iterator5, _step5, y;
+            var _iteratorNormalCompletion5, _didIteratorError5, _iteratorError5, _iterator5, _step5, x, _iteratorNormalCompletion6, _didIteratorError6, _iteratorError6, _iterator6, _step6, y;
 
             return regeneratorRuntime.wrap(function concatIterator$(_context3) {
                 while (1) {
                     switch (_context3.prev = _context3.next) {
                         case 0:
-                            _iteratorNormalCompletion4 = true;
-                            _didIteratorError4 = false;
-                            _iteratorError4 = undefined;
+                            _iteratorNormalCompletion5 = true;
+                            _didIteratorError5 = false;
+                            _iteratorError5 = undefined;
                             _context3.prev = 3;
-                            _iterator4 = xs[Symbol.iterator]();
+                            _iterator5 = xs[Symbol.iterator]();
 
                         case 5:
-                            if (_iteratorNormalCompletion4 = (_step4 = _iterator4.next()).done) {
+                            if (_iteratorNormalCompletion5 = (_step5 = _iterator5.next()).done) {
                                 _context3.next = 12;
                                 break;
                             }
 
-                            x = _step4.value;
+                            x = _step5.value;
                             _context3.next = 9;
                             return x;
 
                         case 9:
-                            _iteratorNormalCompletion4 = true;
+                            _iteratorNormalCompletion5 = true;
                             _context3.next = 5;
                             break;
 
@@ -9396,26 +13449,26 @@ function concat(xs, ys) {
                         case 14:
                             _context3.prev = 14;
                             _context3.t0 = _context3['catch'](3);
-                            _didIteratorError4 = true;
-                            _iteratorError4 = _context3.t0;
+                            _didIteratorError5 = true;
+                            _iteratorError5 = _context3.t0;
 
                         case 18:
                             _context3.prev = 18;
                             _context3.prev = 19;
 
-                            if (!_iteratorNormalCompletion4 && _iterator4.return) {
-                                _iterator4.return();
+                            if (!_iteratorNormalCompletion5 && _iterator5.return) {
+                                _iterator5.return();
                             }
 
                         case 21:
                             _context3.prev = 21;
 
-                            if (!_didIteratorError4) {
+                            if (!_didIteratorError5) {
                                 _context3.next = 24;
                                 break;
                             }
 
-                            throw _iteratorError4;
+                            throw _iteratorError5;
 
                         case 24:
                             return _context3.finish(21);
@@ -9424,24 +13477,24 @@ function concat(xs, ys) {
                             return _context3.finish(18);
 
                         case 26:
-                            _iteratorNormalCompletion5 = true;
-                            _didIteratorError5 = false;
-                            _iteratorError5 = undefined;
+                            _iteratorNormalCompletion6 = true;
+                            _didIteratorError6 = false;
+                            _iteratorError6 = undefined;
                             _context3.prev = 29;
-                            _iterator5 = ys[Symbol.iterator]();
+                            _iterator6 = ys[Symbol.iterator]();
 
                         case 31:
-                            if (_iteratorNormalCompletion5 = (_step5 = _iterator5.next()).done) {
+                            if (_iteratorNormalCompletion6 = (_step6 = _iterator6.next()).done) {
                                 _context3.next = 38;
                                 break;
                             }
 
-                            y = _step5.value;
+                            y = _step6.value;
                             _context3.next = 35;
                             return y;
 
                         case 35:
-                            _iteratorNormalCompletion5 = true;
+                            _iteratorNormalCompletion6 = true;
                             _context3.next = 31;
                             break;
 
@@ -9452,26 +13505,26 @@ function concat(xs, ys) {
                         case 40:
                             _context3.prev = 40;
                             _context3.t1 = _context3['catch'](29);
-                            _didIteratorError5 = true;
-                            _iteratorError5 = _context3.t1;
+                            _didIteratorError6 = true;
+                            _iteratorError6 = _context3.t1;
 
                         case 44:
                             _context3.prev = 44;
                             _context3.prev = 45;
 
-                            if (!_iteratorNormalCompletion5 && _iterator5.return) {
-                                _iterator5.return();
+                            if (!_iteratorNormalCompletion6 && _iterator6.return) {
+                                _iterator6.return();
                             }
 
                         case 47:
                             _context3.prev = 47;
 
-                            if (!_didIteratorError5) {
+                            if (!_didIteratorError6) {
                                 _context3.next = 50;
                                 break;
                             }
 
-                            throw _iteratorError5;
+                            throw _iteratorError6;
 
                         case 50:
                             return _context3.finish(47);
@@ -9492,37 +13545,37 @@ function concat(xs, ys) {
 /**
  * @signature
  * @description d
- * @param {monads.list_core|monads.list|monads.ordered_list} xs - A list
+ * @param {dataStructures.list_core|dataStructures.list|dataStructures.ordered_list|Array} xs - A list
  * @param {Array} yss - An array of one or more lists
  * @return {generator} Returns a generator to be used as an
  * iterator when the list is evaluated.
  */
 function concatAll(xs, yss) {
     return (/*#__PURE__*/regeneratorRuntime.mark(function _concatAllIterator() {
-            var _iteratorNormalCompletion6, _didIteratorError6, _iteratorError6, _iterator6, _step6, x, _iteratorNormalCompletion7, _didIteratorError7, _iteratorError7, _iterator7, _step7, ys, _iteratorNormalCompletion8, _didIteratorError8, _iteratorError8, _iterator8, _step8, y;
+            var _iteratorNormalCompletion7, _didIteratorError7, _iteratorError7, _iterator7, _step7, x, _iteratorNormalCompletion8, _didIteratorError8, _iteratorError8, _iterator8, _step8, ys, _iteratorNormalCompletion9, _didIteratorError9, _iteratorError9, _iterator9, _step9, y;
 
             return regeneratorRuntime.wrap(function _concatAllIterator$(_context4) {
                 while (1) {
                     switch (_context4.prev = _context4.next) {
                         case 0:
-                            _iteratorNormalCompletion6 = true;
-                            _didIteratorError6 = false;
-                            _iteratorError6 = undefined;
+                            _iteratorNormalCompletion7 = true;
+                            _didIteratorError7 = false;
+                            _iteratorError7 = undefined;
                             _context4.prev = 3;
-                            _iterator6 = xs[Symbol.iterator]();
+                            _iterator7 = xs[Symbol.iterator]();
 
                         case 5:
-                            if (_iteratorNormalCompletion6 = (_step6 = _iterator6.next()).done) {
+                            if (_iteratorNormalCompletion7 = (_step7 = _iterator7.next()).done) {
                                 _context4.next = 12;
                                 break;
                             }
 
-                            x = _step6.value;
+                            x = _step7.value;
                             _context4.next = 9;
                             return x;
 
                         case 9:
-                            _iteratorNormalCompletion6 = true;
+                            _iteratorNormalCompletion7 = true;
                             _context4.next = 5;
                             break;
 
@@ -9533,26 +13586,26 @@ function concatAll(xs, yss) {
                         case 14:
                             _context4.prev = 14;
                             _context4.t0 = _context4['catch'](3);
-                            _didIteratorError6 = true;
-                            _iteratorError6 = _context4.t0;
+                            _didIteratorError7 = true;
+                            _iteratorError7 = _context4.t0;
 
                         case 18:
                             _context4.prev = 18;
                             _context4.prev = 19;
 
-                            if (!_iteratorNormalCompletion6 && _iterator6.return) {
-                                _iterator6.return();
+                            if (!_iteratorNormalCompletion7 && _iterator7.return) {
+                                _iterator7.return();
                             }
 
                         case 21:
                             _context4.prev = 21;
 
-                            if (!_didIteratorError6) {
+                            if (!_didIteratorError7) {
                                 _context4.next = 24;
                                 break;
                             }
 
-                            throw _iteratorError6;
+                            throw _iteratorError7;
 
                         case 24:
                             return _context4.finish(21);
@@ -9561,37 +13614,37 @@ function concatAll(xs, yss) {
                             return _context4.finish(18);
 
                         case 26:
-                            _iteratorNormalCompletion7 = true;
-                            _didIteratorError7 = false;
-                            _iteratorError7 = undefined;
+                            _iteratorNormalCompletion8 = true;
+                            _didIteratorError8 = false;
+                            _iteratorError8 = undefined;
                             _context4.prev = 29;
-                            _iterator7 = yss[Symbol.iterator]();
+                            _iterator8 = yss[Symbol.iterator]();
 
                         case 31:
-                            if (_iteratorNormalCompletion7 = (_step7 = _iterator7.next()).done) {
+                            if (_iteratorNormalCompletion8 = (_step8 = _iterator8.next()).done) {
                                 _context4.next = 62;
                                 break;
                             }
 
-                            ys = _step7.value;
-                            _iteratorNormalCompletion8 = true;
-                            _didIteratorError8 = false;
-                            _iteratorError8 = undefined;
+                            ys = _step8.value;
+                            _iteratorNormalCompletion9 = true;
+                            _didIteratorError9 = false;
+                            _iteratorError9 = undefined;
                             _context4.prev = 36;
-                            _iterator8 = ys[Symbol.iterator]();
+                            _iterator9 = toArray(ys)[Symbol.iterator]();
 
                         case 38:
-                            if (_iteratorNormalCompletion8 = (_step8 = _iterator8.next()).done) {
+                            if (_iteratorNormalCompletion9 = (_step9 = _iterator9.next()).done) {
                                 _context4.next = 45;
                                 break;
                             }
 
-                            y = _step8.value;
+                            y = _step9.value;
                             _context4.next = 42;
                             return y;
 
                         case 42:
-                            _iteratorNormalCompletion8 = true;
+                            _iteratorNormalCompletion9 = true;
                             _context4.next = 38;
                             break;
 
@@ -9602,26 +13655,26 @@ function concatAll(xs, yss) {
                         case 47:
                             _context4.prev = 47;
                             _context4.t1 = _context4['catch'](36);
-                            _didIteratorError8 = true;
-                            _iteratorError8 = _context4.t1;
+                            _didIteratorError9 = true;
+                            _iteratorError9 = _context4.t1;
 
                         case 51:
                             _context4.prev = 51;
                             _context4.prev = 52;
 
-                            if (!_iteratorNormalCompletion8 && _iterator8.return) {
-                                _iterator8.return();
+                            if (!_iteratorNormalCompletion9 && _iterator9.return) {
+                                _iterator9.return();
                             }
 
                         case 54:
                             _context4.prev = 54;
 
-                            if (!_didIteratorError8) {
+                            if (!_didIteratorError9) {
                                 _context4.next = 57;
                                 break;
                             }
 
-                            throw _iteratorError8;
+                            throw _iteratorError9;
 
                         case 57:
                             return _context4.finish(54);
@@ -9630,7 +13683,7 @@ function concatAll(xs, yss) {
                             return _context4.finish(51);
 
                         case 59:
-                            _iteratorNormalCompletion7 = true;
+                            _iteratorNormalCompletion8 = true;
                             _context4.next = 31;
                             break;
 
@@ -9641,26 +13694,26 @@ function concatAll(xs, yss) {
                         case 64:
                             _context4.prev = 64;
                             _context4.t2 = _context4['catch'](29);
-                            _didIteratorError7 = true;
-                            _iteratorError7 = _context4.t2;
+                            _didIteratorError8 = true;
+                            _iteratorError8 = _context4.t2;
 
                         case 68:
                             _context4.prev = 68;
                             _context4.prev = 69;
 
-                            if (!_iteratorNormalCompletion7 && _iterator7.return) {
-                                _iterator7.return();
+                            if (!_iteratorNormalCompletion8 && _iterator8.return) {
+                                _iterator8.return();
                             }
 
                         case 71:
                             _context4.prev = 71;
 
-                            if (!_didIteratorError7) {
+                            if (!_didIteratorError8) {
                                 _context4.next = 74;
                                 break;
                             }
 
-                            throw _iteratorError7;
+                            throw _iteratorError8;
 
                         case 74:
                             return _context4.finish(71);
@@ -9681,9 +13734,9 @@ function concatAll(xs, yss) {
 /**
  * @signature
  * @description d
- * @param {Array|generator|monads.list_core} xs - a
+ * @param {Array|generator|dataStructures.list_core} xs - a
  * @param {*} val - b
- * @param {function} comparer - c
+ * @param {function} [comparer] - c
  * @return {*} - d
  */
 function contains(xs, val, comparer) {
@@ -9699,35 +13752,35 @@ function contains(xs, val, comparer) {
  * @param {number} idx - a
  * @param {number} start - b
  * @param {number} end - c
- * @param {monads.list_core|monads.list|monads.ordered_list} xs - d
+ * @param {dataStructures.list_core|dataStructures.list|dataStructures.ordered_list} xs - d
  * @returns {generator} - e
  */
 function copyWithin(idx, start, end, xs) {
     return (/*#__PURE__*/regeneratorRuntime.mark(function copyWithinIterator() {
-            var _iteratorNormalCompletion9, _didIteratorError9, _iteratorError9, _iterator9, _step9, x;
+            var _iteratorNormalCompletion10, _didIteratorError10, _iteratorError10, _iterator10, _step10, x;
 
             return regeneratorRuntime.wrap(function copyWithinIterator$(_context5) {
                 while (1) {
                     switch (_context5.prev = _context5.next) {
                         case 0:
-                            _iteratorNormalCompletion9 = true;
-                            _didIteratorError9 = false;
-                            _iteratorError9 = undefined;
+                            _iteratorNormalCompletion10 = true;
+                            _didIteratorError10 = false;
+                            _iteratorError10 = undefined;
                             _context5.prev = 3;
-                            _iterator9 = asArray(xs).copyWithin(idx, start, end)[Symbol.iterator]();
+                            _iterator10 = asArray(xs).copyWithin(idx, start, end)[Symbol.iterator]();
 
                         case 5:
-                            if (_iteratorNormalCompletion9 = (_step9 = _iterator9.next()).done) {
+                            if (_iteratorNormalCompletion10 = (_step10 = _iterator10.next()).done) {
                                 _context5.next = 12;
                                 break;
                             }
 
-                            x = _step9.value;
+                            x = _step10.value;
                             _context5.next = 9;
                             return x;
 
                         case 9:
-                            _iteratorNormalCompletion9 = true;
+                            _iteratorNormalCompletion10 = true;
                             _context5.next = 5;
                             break;
 
@@ -9738,26 +13791,26 @@ function copyWithin(idx, start, end, xs) {
                         case 14:
                             _context5.prev = 14;
                             _context5.t0 = _context5['catch'](3);
-                            _didIteratorError9 = true;
-                            _iteratorError9 = _context5.t0;
+                            _didIteratorError10 = true;
+                            _iteratorError10 = _context5.t0;
 
                         case 18:
                             _context5.prev = 18;
                             _context5.prev = 19;
 
-                            if (!_iteratorNormalCompletion9 && _iterator9.return) {
-                                _iterator9.return();
+                            if (!_iteratorNormalCompletion10 && _iterator10.return) {
+                                _iterator10.return();
                             }
 
                         case 21:
                             _context5.prev = 21;
 
-                            if (!_didIteratorError9) {
+                            if (!_didIteratorError10) {
                                 _context5.next = 24;
                                 break;
                             }
 
-                            throw _iteratorError9;
+                            throw _iteratorError10;
 
                         case 24:
                             return _context5.finish(21);
@@ -9778,7 +13831,7 @@ function copyWithin(idx, start, end, xs) {
 /**
  * @signature
  * @description d
- * @param {Array|generator|monads.list_core} xs - a
+ * @param {Array|generator|dataStructures.list_core} xs - a
  * @param {function} [predicate] - b
  * @return {Number} - c
  */
@@ -9789,7 +13842,7 @@ function count(xs, predicate) {
 /**
  * @signature
  * @description d
- * @param {Array|generator|monads.list_core} xs - a
+ * @param {Array|generator|dataStructures.list_core} xs - a
  * @param {function} [comparer] - b
  * @return {generator} - c
  */
@@ -9799,25 +13852,25 @@ function distinct(xs) {
     var cached = (0, _helpers.cacher)(comparer);
 
     return (/*#__PURE__*/regeneratorRuntime.mark(function distinctIterator() {
-            var _iteratorNormalCompletion10, _didIteratorError10, _iteratorError10, _iterator10, _step10, x;
+            var _iteratorNormalCompletion11, _didIteratorError11, _iteratorError11, _iterator11, _step11, x;
 
             return regeneratorRuntime.wrap(function distinctIterator$(_context6) {
                 while (1) {
                     switch (_context6.prev = _context6.next) {
                         case 0:
-                            _iteratorNormalCompletion10 = true;
-                            _didIteratorError10 = false;
-                            _iteratorError10 = undefined;
+                            _iteratorNormalCompletion11 = true;
+                            _didIteratorError11 = false;
+                            _iteratorError11 = undefined;
                             _context6.prev = 3;
-                            _iterator10 = xs[Symbol.iterator]();
+                            _iterator11 = xs[Symbol.iterator]();
 
                         case 5:
-                            if (_iteratorNormalCompletion10 = (_step10 = _iterator10.next()).done) {
+                            if (_iteratorNormalCompletion11 = (_step11 = _iterator11.next()).done) {
                                 _context6.next = 13;
                                 break;
                             }
 
-                            x = _step10.value;
+                            x = _step11.value;
 
                             if (cached(x)) {
                                 _context6.next = 10;
@@ -9828,7 +13881,7 @@ function distinct(xs) {
                             return x;
 
                         case 10:
-                            _iteratorNormalCompletion10 = true;
+                            _iteratorNormalCompletion11 = true;
                             _context6.next = 5;
                             break;
 
@@ -9839,26 +13892,26 @@ function distinct(xs) {
                         case 15:
                             _context6.prev = 15;
                             _context6.t0 = _context6['catch'](3);
-                            _didIteratorError10 = true;
-                            _iteratorError10 = _context6.t0;
+                            _didIteratorError11 = true;
+                            _iteratorError11 = _context6.t0;
 
                         case 19:
                             _context6.prev = 19;
                             _context6.prev = 20;
 
-                            if (!_iteratorNormalCompletion10 && _iterator10.return) {
-                                _iterator10.return();
+                            if (!_iteratorNormalCompletion11 && _iterator11.return) {
+                                _iterator11.return();
                             }
 
                         case 22:
                             _context6.prev = 22;
 
-                            if (!_didIteratorError10) {
+                            if (!_didIteratorError11) {
                                 _context6.next = 25;
                                 break;
                             }
 
-                            throw _iteratorError10;
+                            throw _iteratorError11;
 
                         case 25:
                             return _context6.finish(22);
@@ -9879,8 +13932,8 @@ function distinct(xs) {
 /**
  * @signature
  * @description d
- * @param {monads.list_core} xs - a
- * @param {monads.list_core} ys - b
+ * @param {dataStructures.list_core} xs - a
+ * @param {dataStructures.list_core} ys - b
  * @param {function} [comparer] - c
  * @return {boolean} - d
  */
@@ -9898,8 +13951,8 @@ function equals(xs, ys) {
 /**
  * @signature
  * @description d
- * @param {Array|generator|monads.list_core|monads.list|monads.ordered_list} xs - x
- * @param {Array|generator|monads.list_core|monads.list|monads.ordered_list} ys - y
+ * @param {Array|generator|dataStructures.list_core|dataStructures.list|dataStructures.ordered_list} xs - x
+ * @param {Array|generator|dataStructures.list_core|dataStructures.list|dataStructures.ordered_list} ys - y
  * @param {function} [comparer] - z
  * @return {generator} - a
  */
@@ -9910,15 +13963,15 @@ function except(xs, ys) {
     return (/*#__PURE__*/regeneratorRuntime.mark(function exceptIterator() {
             var _this = this;
 
-            var _iteratorNormalCompletion11, _didIteratorError11, _iteratorError11, _loop, _iterator11, _step11;
+            var _iteratorNormalCompletion12, _didIteratorError12, _iteratorError12, _loop, _iterator12, _step12;
 
             return regeneratorRuntime.wrap(function exceptIterator$(_context8) {
                 while (1) {
                     switch (_context8.prev = _context8.next) {
                         case 0:
-                            _iteratorNormalCompletion11 = true;
-                            _didIteratorError11 = false;
-                            _iteratorError11 = undefined;
+                            _iteratorNormalCompletion12 = true;
+                            _didIteratorError12 = false;
+                            _iteratorError12 = undefined;
                             _context8.prev = 3;
                             _loop = /*#__PURE__*/regeneratorRuntime.mark(function _loop() {
                                 var x;
@@ -9926,7 +13979,7 @@ function except(xs, ys) {
                                     while (1) {
                                         switch (_context7.prev = _context7.next) {
                                             case 0:
-                                                x = _step11.value;
+                                                x = _step12.value;
 
                                                 if (ys.some(function _comparer(y) {
                                                     return comparer(x, y);
@@ -9945,10 +13998,10 @@ function except(xs, ys) {
                                     }
                                 }, _loop, _this);
                             });
-                            _iterator11 = xs[Symbol.iterator]();
+                            _iterator12 = xs[Symbol.iterator]();
 
                         case 6:
-                            if (_iteratorNormalCompletion11 = (_step11 = _iterator11.next()).done) {
+                            if (_iteratorNormalCompletion12 = (_step12 = _iterator12.next()).done) {
                                 _context8.next = 11;
                                 break;
                             }
@@ -9956,7 +14009,7 @@ function except(xs, ys) {
                             return _context8.delegateYield(_loop(), 't0', 8);
 
                         case 8:
-                            _iteratorNormalCompletion11 = true;
+                            _iteratorNormalCompletion12 = true;
                             _context8.next = 6;
                             break;
 
@@ -9967,26 +14020,26 @@ function except(xs, ys) {
                         case 13:
                             _context8.prev = 13;
                             _context8.t1 = _context8['catch'](3);
-                            _didIteratorError11 = true;
-                            _iteratorError11 = _context8.t1;
+                            _didIteratorError12 = true;
+                            _iteratorError12 = _context8.t1;
 
                         case 17:
                             _context8.prev = 17;
                             _context8.prev = 18;
 
-                            if (!_iteratorNormalCompletion11 && _iterator11.return) {
-                                _iterator11.return();
+                            if (!_iteratorNormalCompletion12 && _iterator12.return) {
+                                _iterator12.return();
                             }
 
                         case 20:
                             _context8.prev = 20;
 
-                            if (!_didIteratorError11) {
+                            if (!_didIteratorError12) {
                                 _context8.next = 23;
                                 break;
                             }
 
-                            throw _iteratorError11;
+                            throw _iteratorError12;
 
                         case 23:
                             return _context8.finish(20);
@@ -10010,35 +14063,35 @@ function except(xs, ys) {
  * @param {*} val - a
  * @param {number} start - b
  * @param {number} end - c
- * @param {Array|monads.list_core|monads.list|monads.ordered_list} xs - d
+ * @param {Array|dataStructures.list_core|dataStructures.list|dataStructures.ordered_list} xs - d
  * @return {generator} - e
  */
 function fill(val, start, end, xs) {
     return (/*#__PURE__*/regeneratorRuntime.mark(function fillIterator() {
-            var _iteratorNormalCompletion12, _didIteratorError12, _iteratorError12, _iterator12, _step12, _x4;
+            var _iteratorNormalCompletion13, _didIteratorError13, _iteratorError13, _iterator13, _step13, _x4;
 
             return regeneratorRuntime.wrap(function fillIterator$(_context9) {
                 while (1) {
                     switch (_context9.prev = _context9.next) {
                         case 0:
-                            _iteratorNormalCompletion12 = true;
-                            _didIteratorError12 = false;
-                            _iteratorError12 = undefined;
+                            _iteratorNormalCompletion13 = true;
+                            _didIteratorError13 = false;
+                            _iteratorError13 = undefined;
                             _context9.prev = 3;
-                            _iterator12 = asArray(xs).fill(val, start, end)[Symbol.iterator]();
+                            _iterator13 = asArray(xs).fill(val, start, end)[Symbol.iterator]();
 
                         case 5:
-                            if (_iteratorNormalCompletion12 = (_step12 = _iterator12.next()).done) {
+                            if (_iteratorNormalCompletion13 = (_step13 = _iterator13.next()).done) {
                                 _context9.next = 12;
                                 break;
                             }
 
-                            _x4 = _step12.value;
+                            _x4 = _step13.value;
                             _context9.next = 9;
                             return _x4;
 
                         case 9:
-                            _iteratorNormalCompletion12 = true;
+                            _iteratorNormalCompletion13 = true;
                             _context9.next = 5;
                             break;
 
@@ -10049,26 +14102,26 @@ function fill(val, start, end, xs) {
                         case 14:
                             _context9.prev = 14;
                             _context9.t0 = _context9['catch'](3);
-                            _didIteratorError12 = true;
-                            _iteratorError12 = _context9.t0;
+                            _didIteratorError13 = true;
+                            _iteratorError13 = _context9.t0;
 
                         case 18:
                             _context9.prev = 18;
                             _context9.prev = 19;
 
-                            if (!_iteratorNormalCompletion12 && _iterator12.return) {
-                                _iterator12.return();
+                            if (!_iteratorNormalCompletion13 && _iterator13.return) {
+                                _iterator13.return();
                             }
 
                         case 21:
                             _context9.prev = 21;
 
-                            if (!_didIteratorError12) {
+                            if (!_didIteratorError13) {
                                 _context9.next = 24;
                                 break;
                             }
 
-                            throw _iteratorError12;
+                            throw _iteratorError13;
 
                         case 24:
                             return _context9.finish(21);
@@ -10089,31 +14142,31 @@ function fill(val, start, end, xs) {
 /**
  * @signature
  * @description d
- * @param {Array|generator|monads.list_core} xs - a
+ * @param {Array|generator|dataStructures.list_core} xs - a
  * @param {function} predicate - b
  * @return {generator} - c
  */
 function filter(xs, predicate) {
     return (/*#__PURE__*/regeneratorRuntime.mark(function filterIterator() {
-            var _iteratorNormalCompletion13, _didIteratorError13, _iteratorError13, _iterator13, _step13, _x5;
+            var _iteratorNormalCompletion14, _didIteratorError14, _iteratorError14, _iterator14, _step14, _x5;
 
             return regeneratorRuntime.wrap(function filterIterator$(_context10) {
                 while (1) {
                     switch (_context10.prev = _context10.next) {
                         case 0:
-                            _iteratorNormalCompletion13 = true;
-                            _didIteratorError13 = false;
-                            _iteratorError13 = undefined;
+                            _iteratorNormalCompletion14 = true;
+                            _didIteratorError14 = false;
+                            _iteratorError14 = undefined;
                             _context10.prev = 3;
-                            _iterator13 = xs[Symbol.iterator]();
+                            _iterator14 = xs[Symbol.iterator]();
 
                         case 5:
-                            if (_iteratorNormalCompletion13 = (_step13 = _iterator13.next()).done) {
+                            if (_iteratorNormalCompletion14 = (_step14 = _iterator14.next()).done) {
                                 _context10.next = 13;
                                 break;
                             }
 
-                            _x5 = _step13.value;
+                            _x5 = _step14.value;
 
                             if (!(false !== predicate(_x5))) {
                                 _context10.next = 10;
@@ -10124,7 +14177,7 @@ function filter(xs, predicate) {
                             return _x5;
 
                         case 10:
-                            _iteratorNormalCompletion13 = true;
+                            _iteratorNormalCompletion14 = true;
                             _context10.next = 5;
                             break;
 
@@ -10135,26 +14188,26 @@ function filter(xs, predicate) {
                         case 15:
                             _context10.prev = 15;
                             _context10.t0 = _context10['catch'](3);
-                            _didIteratorError13 = true;
-                            _iteratorError13 = _context10.t0;
+                            _didIteratorError14 = true;
+                            _iteratorError14 = _context10.t0;
 
                         case 19:
                             _context10.prev = 19;
                             _context10.prev = 20;
 
-                            if (!_iteratorNormalCompletion13 && _iterator13.return) {
-                                _iterator13.return();
+                            if (!_iteratorNormalCompletion14 && _iterator14.return) {
+                                _iterator14.return();
                             }
 
                         case 22:
                             _context10.prev = 22;
 
-                            if (!_didIteratorError13) {
+                            if (!_didIteratorError14) {
                                 _context10.next = 25;
                                 break;
                             }
 
-                            throw _iteratorError13;
+                            throw _iteratorError14;
 
                         case 25:
                             return _context10.finish(22);
@@ -10175,7 +14228,7 @@ function filter(xs, predicate) {
 /**
  * @signature
  * @description d
- * @param {Array|generator|monads.list_core} xs - a
+ * @param {Array|generator|dataStructures.list_core} xs - a
  * @param {function} [comparer] - b
  * @return {Number} - c
  */
@@ -10188,7 +14241,7 @@ function findIndex(xs) {
 /**
  * @signature
  * @description d
- * @param {Array|generator|monads.list_core} xs - a
+ * @param {Array|generator|dataStructures.list_core} xs - a
  * @param {function} [comparer] - b
  * @return {Number} - c
  */
@@ -10201,7 +14254,7 @@ function findLastIndex(xs) {
 /**
  * @signature
  * @description d
- * @param {Array|generator|monads.list_core} xs - a
+ * @param {Array|generator|dataStructures.list_core} xs - a
  * @param {function} [predicate] - b
  * @return {*} - c
  */
@@ -10212,7 +14265,7 @@ function first(xs, predicate) {
 /**
  * @signature
  * @description d
- * @param {Array|generator|monads.list_core} xs - a
+ * @param {Array|generator|dataStructures.list_core} xs - a
  * @param {function} fn - b
  * @param {*} [initial] - c
  * @return {*} - d
@@ -10226,7 +14279,7 @@ function foldLeft(xs, fn) {
 /**
  * @signature
  * @description d
- * @param {Array|monads.list_core} arr - a
+ * @param {Array|dataStructures.list_core} arr - a
  * @param {function} op - b
  * @param {*} acc - c
  * @return {*} - d
@@ -10244,14 +14297,14 @@ function foldRight(arr, op, acc) {
 /**
  * @signature
  * @description d
- * @param {Array|generator|monads.list_core} xs - a
+ * @param {Array|generator|dataStructures.list_core} xs - a
  * @param {Array} groupObject - b
  * @param {function} queryableConstructor - c
  * @return {generator} - d
  */
 function groupBy(xs, groupObject, queryableConstructor) {
     return (/*#__PURE__*/regeneratorRuntime.mark(function groupByIterator() {
-            var groupedData, _iteratorNormalCompletion14, _didIteratorError14, _iteratorError14, _iterator14, _step14, _x9;
+            var groupedData, _iteratorNormalCompletion15, _didIteratorError15, _iteratorError15, _iterator15, _step15, _x9;
 
             return regeneratorRuntime.wrap(function groupByIterator$(_context11) {
                 while (1) {
@@ -10259,24 +14312,24 @@ function groupBy(xs, groupObject, queryableConstructor) {
                         case 0:
                             //gather all data from the iterable before grouping
                             groupedData = nestLists(groupData(asArray(xs), groupObject), 0, null, queryableConstructor);
-                            _iteratorNormalCompletion14 = true;
-                            _didIteratorError14 = false;
-                            _iteratorError14 = undefined;
+                            _iteratorNormalCompletion15 = true;
+                            _didIteratorError15 = false;
+                            _iteratorError15 = undefined;
                             _context11.prev = 4;
-                            _iterator14 = groupedData[Symbol.iterator]();
+                            _iterator15 = groupedData[Symbol.iterator]();
 
                         case 6:
-                            if (_iteratorNormalCompletion14 = (_step14 = _iterator14.next()).done) {
+                            if (_iteratorNormalCompletion15 = (_step15 = _iterator15.next()).done) {
                                 _context11.next = 13;
                                 break;
                             }
 
-                            _x9 = _step14.value;
+                            _x9 = _step15.value;
                             _context11.next = 10;
                             return _x9;
 
                         case 10:
-                            _iteratorNormalCompletion14 = true;
+                            _iteratorNormalCompletion15 = true;
                             _context11.next = 6;
                             break;
 
@@ -10287,26 +14340,26 @@ function groupBy(xs, groupObject, queryableConstructor) {
                         case 15:
                             _context11.prev = 15;
                             _context11.t0 = _context11['catch'](4);
-                            _didIteratorError14 = true;
-                            _iteratorError14 = _context11.t0;
+                            _didIteratorError15 = true;
+                            _iteratorError15 = _context11.t0;
 
                         case 19:
                             _context11.prev = 19;
                             _context11.prev = 20;
 
-                            if (!_iteratorNormalCompletion14 && _iterator14.return) {
-                                _iterator14.return();
+                            if (!_iteratorNormalCompletion15 && _iterator15.return) {
+                                _iterator15.return();
                             }
 
                         case 22:
                             _context11.prev = 22;
 
-                            if (!_didIteratorError14) {
+                            if (!_didIteratorError15) {
                                 _context11.next = 25;
                                 break;
                             }
 
-                            throw _iteratorError14;
+                            throw _iteratorError15;
 
                         case 25:
                             return _context11.finish(22);
@@ -10393,8 +14446,8 @@ function findGroup(arr, field) {
 /**
  * @signature
  * @description d
- * @param {Array|generator|monads.list_core} xs - a
- * @param {Array|generator|monads.list_core} ys - b
+ * @param {Array|generator|dataStructures.list_core} xs - a
+ * @param {Array|generator|dataStructures.list_core} ys - b
  * @param {function} xSelector - c
  * @param {function} ySelector - d
  * @param {function} projector - e
@@ -10406,7 +14459,7 @@ function groupJoin(xs, ys, xSelector, ySelector, projector, listFactory) {
     var comparer = arguments.length > 6 && arguments[6] !== undefined ? arguments[6] : _functionalHelpers.strictEquals;
 
     return (/*#__PURE__*/regeneratorRuntime.mark(function groupJoinIterator() {
-            var groupObj, groupedY, _iteratorNormalCompletion15, _didIteratorError15, _iteratorError15, _iterator15, _step15, _x11, grp, _iteratorNormalCompletion16, _didIteratorError16, _iteratorError16, _iterator16, _step16, yGroup;
+            var groupObj, groupedY, _iteratorNormalCompletion16, _didIteratorError16, _iteratorError16, _iterator16, _step16, _x11, grp, _iteratorNormalCompletion17, _didIteratorError17, _iteratorError17, _iterator17, _step17, yGroup;
 
             return regeneratorRuntime.wrap(function groupJoinIterator$(_context12) {
                 while (1) {
@@ -10414,33 +14467,33 @@ function groupJoin(xs, ys, xSelector, ySelector, projector, listFactory) {
                         case 0:
                             groupObj = [{ keySelector: ySelector, comparer: comparer, direction: _helpers.sortDirection.ascending }];
                             groupedY = nestLists(groupData(asArray(ys), groupObj), 0, null, listFactory);
-                            _iteratorNormalCompletion15 = true;
-                            _didIteratorError15 = false;
-                            _iteratorError15 = undefined;
+                            _iteratorNormalCompletion16 = true;
+                            _didIteratorError16 = false;
+                            _iteratorError16 = undefined;
                             _context12.prev = 5;
-                            _iterator15 = xs[Symbol.iterator]();
+                            _iterator16 = xs[Symbol.iterator]();
 
                         case 7:
-                            if (_iteratorNormalCompletion15 = (_step15 = _iterator15.next()).done) {
+                            if (_iteratorNormalCompletion16 = (_step16 = _iterator16.next()).done) {
                                 _context12.next = 42;
                                 break;
                             }
 
-                            _x11 = _step15.value;
+                            _x11 = _step16.value;
                             grp = void 0;
-                            _iteratorNormalCompletion16 = true;
-                            _didIteratorError16 = false;
-                            _iteratorError16 = undefined;
+                            _iteratorNormalCompletion17 = true;
+                            _didIteratorError17 = false;
+                            _iteratorError17 = undefined;
                             _context12.prev = 13;
-                            _iterator16 = groupedY[Symbol.iterator]();
+                            _iterator17 = groupedY[Symbol.iterator]();
 
                         case 15:
-                            if (_iteratorNormalCompletion16 = (_step16 = _iterator16.next()).done) {
+                            if (_iteratorNormalCompletion17 = (_step17 = _iterator17.next()).done) {
                                 _context12.next = 23;
                                 break;
                             }
 
-                            yGroup = _step16.value;
+                            yGroup = _step17.value;
 
                             if (!comparer(xSelector(_x11), yGroup.key)) {
                                 _context12.next = 20;
@@ -10451,7 +14504,7 @@ function groupJoin(xs, ys, xSelector, ySelector, projector, listFactory) {
                             return _context12.abrupt('break', 23);
 
                         case 20:
-                            _iteratorNormalCompletion16 = true;
+                            _iteratorNormalCompletion17 = true;
                             _context12.next = 15;
                             break;
 
@@ -10462,26 +14515,26 @@ function groupJoin(xs, ys, xSelector, ySelector, projector, listFactory) {
                         case 25:
                             _context12.prev = 25;
                             _context12.t0 = _context12['catch'](13);
-                            _didIteratorError16 = true;
-                            _iteratorError16 = _context12.t0;
+                            _didIteratorError17 = true;
+                            _iteratorError17 = _context12.t0;
 
                         case 29:
                             _context12.prev = 29;
                             _context12.prev = 30;
 
-                            if (!_iteratorNormalCompletion16 && _iterator16.return) {
-                                _iterator16.return();
+                            if (!_iteratorNormalCompletion17 && _iterator17.return) {
+                                _iterator17.return();
                             }
 
                         case 32:
                             _context12.prev = 32;
 
-                            if (!_didIteratorError16) {
+                            if (!_didIteratorError17) {
                                 _context12.next = 35;
                                 break;
                             }
 
-                            throw _iteratorError16;
+                            throw _iteratorError17;
 
                         case 35:
                             return _context12.finish(32);
@@ -10494,7 +14547,7 @@ function groupJoin(xs, ys, xSelector, ySelector, projector, listFactory) {
                             return projector(_x11, grp || listFactory([]));
 
                         case 39:
-                            _iteratorNormalCompletion15 = true;
+                            _iteratorNormalCompletion16 = true;
                             _context12.next = 7;
                             break;
 
@@ -10505,26 +14558,26 @@ function groupJoin(xs, ys, xSelector, ySelector, projector, listFactory) {
                         case 44:
                             _context12.prev = 44;
                             _context12.t1 = _context12['catch'](5);
-                            _didIteratorError15 = true;
-                            _iteratorError15 = _context12.t1;
+                            _didIteratorError16 = true;
+                            _iteratorError16 = _context12.t1;
 
                         case 48:
                             _context12.prev = 48;
                             _context12.prev = 49;
 
-                            if (!_iteratorNormalCompletion15 && _iterator15.return) {
-                                _iterator15.return();
+                            if (!_iteratorNormalCompletion16 && _iterator16.return) {
+                                _iterator16.return();
                             }
 
                         case 51:
                             _context12.prev = 51;
 
-                            if (!_didIteratorError15) {
+                            if (!_didIteratorError16) {
                                 _context12.next = 54;
                                 break;
                             }
 
-                            throw _iteratorError15;
+                            throw _iteratorError16;
 
                         case 54:
                             return _context12.finish(51);
@@ -10545,8 +14598,8 @@ function groupJoin(xs, ys, xSelector, ySelector, projector, listFactory) {
 /**
  * @signature
  * @description d
- * @param {Array|generator|monads.list_core} xs - a
- * @param {Array|generator|monads.list_core} ys - b
+ * @param {Array|generator|dataStructures.list_core} xs - a
+ * @param {Array|generator|dataStructures.list_core} ys - b
  * @param {function} [comparer] - c
  * @return {generator} - d
  */
@@ -10556,16 +14609,16 @@ function intersect(xs, ys) {
     return (/*#__PURE__*/regeneratorRuntime.mark(function intersectIterator() {
             var _this2 = this;
 
-            var _iteratorNormalCompletion17, _didIteratorError17, _iteratorError17, _loop2, _iterator17, _step17;
+            var _iteratorNormalCompletion18, _didIteratorError18, _iteratorError18, _loop2, _iterator18, _step18;
 
             return regeneratorRuntime.wrap(function intersectIterator$(_context14) {
                 while (1) {
                     switch (_context14.prev = _context14.next) {
                         case 0:
                             ys = toArray(ys);
-                            _iteratorNormalCompletion17 = true;
-                            _didIteratorError17 = false;
-                            _iteratorError17 = undefined;
+                            _iteratorNormalCompletion18 = true;
+                            _didIteratorError18 = false;
+                            _iteratorError18 = undefined;
                             _context14.prev = 4;
                             _loop2 = /*#__PURE__*/regeneratorRuntime.mark(function _loop2() {
                                 var x;
@@ -10573,7 +14626,7 @@ function intersect(xs, ys) {
                                     while (1) {
                                         switch (_context13.prev = _context13.next) {
                                             case 0:
-                                                x = _step17.value;
+                                                x = _step18.value;
 
                                                 if (!(!(0, _functionalHelpers.strictEquals)(_helpers.javaScriptTypes.Undefined, x) && ys.some(function _checkEquivalency(it) {
                                                     return comparer(x, it);
@@ -10592,10 +14645,10 @@ function intersect(xs, ys) {
                                     }
                                 }, _loop2, _this2);
                             });
-                            _iterator17 = xs[Symbol.iterator]();
+                            _iterator18 = xs[Symbol.iterator]();
 
                         case 7:
-                            if (_iteratorNormalCompletion17 = (_step17 = _iterator17.next()).done) {
+                            if (_iteratorNormalCompletion18 = (_step18 = _iterator18.next()).done) {
                                 _context14.next = 12;
                                 break;
                             }
@@ -10603,7 +14656,7 @@ function intersect(xs, ys) {
                             return _context14.delegateYield(_loop2(), 't0', 9);
 
                         case 9:
-                            _iteratorNormalCompletion17 = true;
+                            _iteratorNormalCompletion18 = true;
                             _context14.next = 7;
                             break;
 
@@ -10614,26 +14667,26 @@ function intersect(xs, ys) {
                         case 14:
                             _context14.prev = 14;
                             _context14.t1 = _context14['catch'](4);
-                            _didIteratorError17 = true;
-                            _iteratorError17 = _context14.t1;
+                            _didIteratorError18 = true;
+                            _iteratorError18 = _context14.t1;
 
                         case 18:
                             _context14.prev = 18;
                             _context14.prev = 19;
 
-                            if (!_iteratorNormalCompletion17 && _iterator17.return) {
-                                _iterator17.return();
+                            if (!_iteratorNormalCompletion18 && _iterator18.return) {
+                                _iterator18.return();
                             }
 
                         case 21:
                             _context14.prev = 21;
 
-                            if (!_didIteratorError17) {
+                            if (!_didIteratorError18) {
                                 _context14.next = 24;
                                 break;
                             }
 
-                            throw _iteratorError17;
+                            throw _iteratorError18;
 
                         case 24:
                             return _context14.finish(21);
@@ -10654,7 +14707,7 @@ function intersect(xs, ys) {
 /**
  * @signature
  * @description d
- * @param {Array|generator|monads.list_core} xs - a
+ * @param {Array|generator|dataStructures.list_core} xs - a
  * @param {*} val - b
  * @return {generator} - c
  */
@@ -10704,8 +14757,8 @@ function intersperse(xs, val) {
 /**
  * @signature
  * @description d
- * @param {Array|generator|monads.list_core} xs - a
- * @param {Array|generator|monads.list_core} ys - b
+ * @param {Array|generator|dataStructures.list_core} xs - a
+ * @param {Array|generator|dataStructures.list_core} ys - b
  * @param {function} xSelector - c
  * @param {function} ySelector - d
  * @param {function} projector - e
@@ -10716,39 +14769,39 @@ function join(xs, ys, xSelector, ySelector, projector) {
     var comparer = arguments.length > 5 && arguments[5] !== undefined ? arguments[5] : _functionalHelpers.strictEquals;
 
     return (/*#__PURE__*/regeneratorRuntime.mark(function joinIterator() {
-            var _iteratorNormalCompletion18, _didIteratorError18, _iteratorError18, _iterator18, _step18, _x14, _iteratorNormalCompletion19, _didIteratorError19, _iteratorError19, _iterator19, _step19, y;
+            var _iteratorNormalCompletion19, _didIteratorError19, _iteratorError19, _iterator19, _step19, _x14, _iteratorNormalCompletion20, _didIteratorError20, _iteratorError20, _iterator20, _step20, y;
 
             return regeneratorRuntime.wrap(function joinIterator$(_context16) {
                 while (1) {
                     switch (_context16.prev = _context16.next) {
                         case 0:
                             ys = toArray(ys);
-                            _iteratorNormalCompletion18 = true;
-                            _didIteratorError18 = false;
-                            _iteratorError18 = undefined;
+                            _iteratorNormalCompletion19 = true;
+                            _didIteratorError19 = false;
+                            _iteratorError19 = undefined;
                             _context16.prev = 4;
-                            _iterator18 = xs[Symbol.iterator]();
+                            _iterator19 = xs[Symbol.iterator]();
 
                         case 6:
-                            if (_iteratorNormalCompletion18 = (_step18 = _iterator18.next()).done) {
+                            if (_iteratorNormalCompletion19 = (_step19 = _iterator19.next()).done) {
                                 _context16.next = 38;
                                 break;
                             }
 
-                            _x14 = _step18.value;
-                            _iteratorNormalCompletion19 = true;
-                            _didIteratorError19 = false;
-                            _iteratorError19 = undefined;
+                            _x14 = _step19.value;
+                            _iteratorNormalCompletion20 = true;
+                            _didIteratorError20 = false;
+                            _iteratorError20 = undefined;
                             _context16.prev = 11;
-                            _iterator19 = ys[Symbol.iterator]();
+                            _iterator20 = ys[Symbol.iterator]();
 
                         case 13:
-                            if (_iteratorNormalCompletion19 = (_step19 = _iterator19.next()).done) {
+                            if (_iteratorNormalCompletion20 = (_step20 = _iterator20.next()).done) {
                                 _context16.next = 21;
                                 break;
                             }
 
-                            y = _step19.value;
+                            y = _step20.value;
 
                             if (!comparer(xSelector(_x14), ySelector(y))) {
                                 _context16.next = 18;
@@ -10759,7 +14812,7 @@ function join(xs, ys, xSelector, ySelector, projector) {
                             return projector(_x14, y);
 
                         case 18:
-                            _iteratorNormalCompletion19 = true;
+                            _iteratorNormalCompletion20 = true;
                             _context16.next = 13;
                             break;
 
@@ -10770,26 +14823,26 @@ function join(xs, ys, xSelector, ySelector, projector) {
                         case 23:
                             _context16.prev = 23;
                             _context16.t0 = _context16['catch'](11);
-                            _didIteratorError19 = true;
-                            _iteratorError19 = _context16.t0;
+                            _didIteratorError20 = true;
+                            _iteratorError20 = _context16.t0;
 
                         case 27:
                             _context16.prev = 27;
                             _context16.prev = 28;
 
-                            if (!_iteratorNormalCompletion19 && _iterator19.return) {
-                                _iterator19.return();
+                            if (!_iteratorNormalCompletion20 && _iterator20.return) {
+                                _iterator20.return();
                             }
 
                         case 30:
                             _context16.prev = 30;
 
-                            if (!_didIteratorError19) {
+                            if (!_didIteratorError20) {
                                 _context16.next = 33;
                                 break;
                             }
 
-                            throw _iteratorError19;
+                            throw _iteratorError20;
 
                         case 33:
                             return _context16.finish(30);
@@ -10798,7 +14851,7 @@ function join(xs, ys, xSelector, ySelector, projector) {
                             return _context16.finish(27);
 
                         case 35:
-                            _iteratorNormalCompletion18 = true;
+                            _iteratorNormalCompletion19 = true;
                             _context16.next = 6;
                             break;
 
@@ -10809,26 +14862,26 @@ function join(xs, ys, xSelector, ySelector, projector) {
                         case 40:
                             _context16.prev = 40;
                             _context16.t1 = _context16['catch'](4);
-                            _didIteratorError18 = true;
-                            _iteratorError18 = _context16.t1;
+                            _didIteratorError19 = true;
+                            _iteratorError19 = _context16.t1;
 
                         case 44:
                             _context16.prev = 44;
                             _context16.prev = 45;
 
-                            if (!_iteratorNormalCompletion18 && _iterator18.return) {
-                                _iterator18.return();
+                            if (!_iteratorNormalCompletion19 && _iterator19.return) {
+                                _iterator19.return();
                             }
 
                         case 47:
                             _context16.prev = 47;
 
-                            if (!_didIteratorError18) {
+                            if (!_didIteratorError19) {
                                 _context16.next = 50;
                                 break;
                             }
 
-                            throw _iteratorError18;
+                            throw _iteratorError19;
 
                         case 50:
                             return _context16.finish(47);
@@ -10849,7 +14902,7 @@ function join(xs, ys, xSelector, ySelector, projector) {
 /**
  * @signature
  * @description d
- * @param {Array|generator|monads.list_core} xs - a
+ * @param {Array|generator|dataStructures.list_core} xs - a
  * @param {function} [predicate] - b
  * @return {*} - c
  */
@@ -10861,36 +14914,36 @@ function last(xs, predicate) {
 /**
  * @signature
  * @description d
- * @param {Array|generator|monads.list_core} xs - a
+ * @param {Array|generator|dataStructures.list_core} xs - a
  * @param {function} fn - b
  * @return {generator} - c
  */
 function map(xs, fn) {
     return (/*#__PURE__*/regeneratorRuntime.mark(function mapIterator() {
-            var _iteratorNormalCompletion20, _didIteratorError20, _iteratorError20, _iterator20, _step20, _x15;
+            var _iteratorNormalCompletion21, _didIteratorError21, _iteratorError21, _iterator21, _step21, _x15;
 
             return regeneratorRuntime.wrap(function mapIterator$(_context17) {
                 while (1) {
                     switch (_context17.prev = _context17.next) {
                         case 0:
-                            _iteratorNormalCompletion20 = true;
-                            _didIteratorError20 = false;
-                            _iteratorError20 = undefined;
+                            _iteratorNormalCompletion21 = true;
+                            _didIteratorError21 = false;
+                            _iteratorError21 = undefined;
                             _context17.prev = 3;
-                            _iterator20 = xs[Symbol.iterator]();
+                            _iterator21 = xs[Symbol.iterator]();
 
                         case 5:
-                            if (_iteratorNormalCompletion20 = (_step20 = _iterator20.next()).done) {
+                            if (_iteratorNormalCompletion21 = (_step21 = _iterator21.next()).done) {
                                 _context17.next = 12;
                                 break;
                             }
 
-                            _x15 = _step20.value;
+                            _x15 = _step21.value;
                             _context17.next = 9;
                             return fn(_x15);
 
                         case 9:
-                            _iteratorNormalCompletion20 = true;
+                            _iteratorNormalCompletion21 = true;
                             _context17.next = 5;
                             break;
 
@@ -10901,26 +14954,26 @@ function map(xs, fn) {
                         case 14:
                             _context17.prev = 14;
                             _context17.t0 = _context17['catch'](3);
-                            _didIteratorError20 = true;
-                            _iteratorError20 = _context17.t0;
+                            _didIteratorError21 = true;
+                            _iteratorError21 = _context17.t0;
 
                         case 18:
                             _context17.prev = 18;
                             _context17.prev = 19;
 
-                            if (!_iteratorNormalCompletion20 && _iterator20.return) {
-                                _iterator20.return();
+                            if (!_iteratorNormalCompletion21 && _iterator21.return) {
+                                _iterator21.return();
                             }
 
                         case 21:
                             _context17.prev = 21;
 
-                            if (!_didIteratorError20) {
+                            if (!_didIteratorError21) {
                                 _context17.next = 24;
                                 break;
                             }
 
-                            throw _iteratorError20;
+                            throw _iteratorError21;
 
                         case 24:
                             return _context17.finish(21);
@@ -10941,13 +14994,13 @@ function map(xs, fn) {
 /**
  * @signature
  * @description d
- * @param {Array|generator|monads.list_core} xs - a
- * @param {string} dataType - b
+ * @param {Array|generator|dataStructures.list_core} xs - a
+ * @param {string|Object|function|null|Array} dataType - b
  * @return {generator} - c
  */
 function ofType(xs, dataType) {
     return (/*#__PURE__*/regeneratorRuntime.mark(function ofTypeIterator() {
-            var _checkTypeKeys, _checkItemKeys, _iteratorNormalCompletion21, _didIteratorError21, _iteratorError21, _iterator21, _step21, _x16, _iteratorNormalCompletion22, _didIteratorError22, _iteratorError22, _iterator22, _step22, _x17, _iteratorNormalCompletion23, _didIteratorError23, _iteratorError23, _iterator23, _step23, _x18, _iteratorNormalCompletion24, _didIteratorError24, _iteratorError24, _iterator24, _step24, objItem, _iteratorNormalCompletion25, _didIteratorError25, _iteratorError25, _iterator25, _step25, _x19;
+            var _checkTypeKeys, _checkItemKeys, _iteratorNormalCompletion22, _didIteratorError22, _iteratorError22, _iterator22, _step22, _x16, _iteratorNormalCompletion23, _didIteratorError23, _iteratorError23, _iterator23, _step23, _x17, _iteratorNormalCompletion24, _didIteratorError24, _iteratorError24, _iterator24, _step24, _x18, _iteratorNormalCompletion25, _didIteratorError25, _iteratorError25, _iterator25, _step25, objItem, _iteratorNormalCompletion26, _didIteratorError26, _iteratorError26, _iterator26, _step26, arr;
 
             return regeneratorRuntime.wrap(function ofTypeIterator$(_context18) {
                 while (1) {
@@ -10966,19 +15019,19 @@ function ofType(xs, dataType) {
                                 break;
                             }
 
-                            _iteratorNormalCompletion21 = true;
-                            _didIteratorError21 = false;
-                            _iteratorError21 = undefined;
+                            _iteratorNormalCompletion22 = true;
+                            _didIteratorError22 = false;
+                            _iteratorError22 = undefined;
                             _context18.prev = 6;
-                            _iterator21 = xs[Symbol.iterator]();
+                            _iterator22 = xs[Symbol.iterator]();
 
                         case 8:
-                            if (_iteratorNormalCompletion21 = (_step21 = _iterator21.next()).done) {
+                            if (_iteratorNormalCompletion22 = (_step22 = _iterator22.next()).done) {
                                 _context18.next = 16;
                                 break;
                             }
 
-                            _x16 = _step21.value;
+                            _x16 = _step22.value;
 
                             if (!(_helpers.typeNames[dataType] === (typeof _x16 === 'undefined' ? 'undefined' : _typeof(_x16)))) {
                                 _context18.next = 13;
@@ -10989,7 +15042,7 @@ function ofType(xs, dataType) {
                             return _x16;
 
                         case 13:
-                            _iteratorNormalCompletion21 = true;
+                            _iteratorNormalCompletion22 = true;
                             _context18.next = 8;
                             break;
 
@@ -11000,26 +15053,26 @@ function ofType(xs, dataType) {
                         case 18:
                             _context18.prev = 18;
                             _context18.t0 = _context18['catch'](6);
-                            _didIteratorError21 = true;
-                            _iteratorError21 = _context18.t0;
+                            _didIteratorError22 = true;
+                            _iteratorError22 = _context18.t0;
 
                         case 22:
                             _context18.prev = 22;
                             _context18.prev = 23;
 
-                            if (!_iteratorNormalCompletion21 && _iterator21.return) {
-                                _iterator21.return();
+                            if (!_iteratorNormalCompletion22 && _iterator22.return) {
+                                _iterator22.return();
                             }
 
                         case 25:
                             _context18.prev = 25;
 
-                            if (!_didIteratorError21) {
+                            if (!_didIteratorError22) {
                                 _context18.next = 28;
                                 break;
                             }
 
-                            throw _iteratorError21;
+                            throw _iteratorError22;
 
                         case 28:
                             return _context18.finish(25);
@@ -11028,7 +15081,7 @@ function ofType(xs, dataType) {
                             return _context18.finish(22);
 
                         case 30:
-                            _context18.next = 153;
+                            _context18.next = 155;
                             break;
 
                         case 32:
@@ -11037,19 +15090,19 @@ function ofType(xs, dataType) {
                                 break;
                             }
 
-                            _iteratorNormalCompletion22 = true;
-                            _didIteratorError22 = false;
-                            _iteratorError22 = undefined;
+                            _iteratorNormalCompletion23 = true;
+                            _didIteratorError23 = false;
+                            _iteratorError23 = undefined;
                             _context18.prev = 36;
-                            _iterator22 = xs[Symbol.iterator]();
+                            _iterator23 = xs[Symbol.iterator]();
 
                         case 38:
-                            if (_iteratorNormalCompletion22 = (_step22 = _iterator22.next()).done) {
+                            if (_iteratorNormalCompletion23 = (_step23 = _iterator23.next()).done) {
                                 _context18.next = 46;
                                 break;
                             }
 
-                            _x17 = _step22.value;
+                            _x17 = _step23.value;
 
                             if (!(_x17 === dataType)) {
                                 _context18.next = 43;
@@ -11060,7 +15113,7 @@ function ofType(xs, dataType) {
                             return _x17;
 
                         case 43:
-                            _iteratorNormalCompletion22 = true;
+                            _iteratorNormalCompletion23 = true;
                             _context18.next = 38;
                             break;
 
@@ -11071,26 +15124,26 @@ function ofType(xs, dataType) {
                         case 48:
                             _context18.prev = 48;
                             _context18.t1 = _context18['catch'](36);
-                            _didIteratorError22 = true;
-                            _iteratorError22 = _context18.t1;
+                            _didIteratorError23 = true;
+                            _iteratorError23 = _context18.t1;
 
                         case 52:
                             _context18.prev = 52;
                             _context18.prev = 53;
 
-                            if (!_iteratorNormalCompletion22 && _iterator22.return) {
-                                _iterator22.return();
+                            if (!_iteratorNormalCompletion23 && _iterator23.return) {
+                                _iterator23.return();
                             }
 
                         case 55:
                             _context18.prev = 55;
 
-                            if (!_didIteratorError22) {
+                            if (!_didIteratorError23) {
                                 _context18.next = 58;
                                 break;
                             }
 
-                            throw _iteratorError22;
+                            throw _iteratorError23;
 
                         case 58:
                             return _context18.finish(55);
@@ -11099,7 +15152,7 @@ function ofType(xs, dataType) {
                             return _context18.finish(52);
 
                         case 60:
-                            _context18.next = 153;
+                            _context18.next = 155;
                             break;
 
                         case 62:
@@ -11108,19 +15161,19 @@ function ofType(xs, dataType) {
                                 break;
                             }
 
-                            _iteratorNormalCompletion23 = true;
-                            _didIteratorError23 = false;
-                            _iteratorError23 = undefined;
+                            _iteratorNormalCompletion24 = true;
+                            _didIteratorError24 = false;
+                            _iteratorError24 = undefined;
                             _context18.prev = 66;
-                            _iterator23 = xs[Symbol.iterator]();
+                            _iterator24 = xs[Symbol.iterator]();
 
                         case 68:
-                            if (_iteratorNormalCompletion23 = (_step23 = _iterator23.next()).done) {
+                            if (_iteratorNormalCompletion24 = (_step24 = _iterator24.next()).done) {
                                 _context18.next = 76;
                                 break;
                             }
 
-                            _x18 = _step23.value;
+                            _x18 = _step24.value;
 
                             if (!(dataType === _x18)) {
                                 _context18.next = 73;
@@ -11131,7 +15184,7 @@ function ofType(xs, dataType) {
                             return _x18;
 
                         case 73:
-                            _iteratorNormalCompletion23 = true;
+                            _iteratorNormalCompletion24 = true;
                             _context18.next = 68;
                             break;
 
@@ -11142,26 +15195,26 @@ function ofType(xs, dataType) {
                         case 78:
                             _context18.prev = 78;
                             _context18.t2 = _context18['catch'](66);
-                            _didIteratorError23 = true;
-                            _iteratorError23 = _context18.t2;
+                            _didIteratorError24 = true;
+                            _iteratorError24 = _context18.t2;
 
                         case 82:
                             _context18.prev = 82;
                             _context18.prev = 83;
 
-                            if (!_iteratorNormalCompletion23 && _iterator23.return) {
-                                _iterator23.return();
+                            if (!_iteratorNormalCompletion24 && _iterator24.return) {
+                                _iterator24.return();
                             }
 
                         case 85:
                             _context18.prev = 85;
 
-                            if (!_didIteratorError23) {
+                            if (!_didIteratorError24) {
                                 _context18.next = 88;
                                 break;
                             }
 
-                            throw _iteratorError23;
+                            throw _iteratorError24;
 
                         case 88:
                             return _context18.finish(85);
@@ -11170,7 +15223,7 @@ function ofType(xs, dataType) {
                             return _context18.finish(82);
 
                         case 90:
-                            _context18.next = 153;
+                            _context18.next = 155;
                             break;
 
                         case 92:
@@ -11179,19 +15232,19 @@ function ofType(xs, dataType) {
                                 break;
                             }
 
-                            _iteratorNormalCompletion24 = true;
-                            _didIteratorError24 = false;
-                            _iteratorError24 = undefined;
+                            _iteratorNormalCompletion25 = true;
+                            _didIteratorError25 = false;
+                            _iteratorError25 = undefined;
                             _context18.prev = 96;
-                            _iterator24 = xs[Symbol.iterator]();
+                            _iterator25 = xs[Symbol.iterator]();
 
                         case 98:
-                            if (_iteratorNormalCompletion24 = (_step24 = _iterator24.next()).done) {
+                            if (_iteratorNormalCompletion25 = (_step25 = _iterator25.next()).done) {
                                 _context18.next = 111;
                                 break;
                             }
 
-                            objItem = _step24.value;
+                            objItem = _step25.value;
 
                             if (!dataType.isPrototypeOf(objItem)) {
                                 _context18.next = 105;
@@ -11215,7 +15268,7 @@ function ofType(xs, dataType) {
                             return objItem;
 
                         case 108:
-                            _iteratorNormalCompletion24 = true;
+                            _iteratorNormalCompletion25 = true;
                             _context18.next = 98;
                             break;
 
@@ -11226,26 +15279,26 @@ function ofType(xs, dataType) {
                         case 113:
                             _context18.prev = 113;
                             _context18.t3 = _context18['catch'](96);
-                            _didIteratorError24 = true;
-                            _iteratorError24 = _context18.t3;
+                            _didIteratorError25 = true;
+                            _iteratorError25 = _context18.t3;
 
                         case 117:
                             _context18.prev = 117;
                             _context18.prev = 118;
 
-                            if (!_iteratorNormalCompletion24 && _iterator24.return) {
-                                _iterator24.return();
+                            if (!_iteratorNormalCompletion25 && _iterator25.return) {
+                                _iterator25.return();
                             }
 
                         case 120:
                             _context18.prev = 120;
 
-                            if (!_didIteratorError24) {
+                            if (!_didIteratorError25) {
                                 _context18.next = 123;
                                 break;
                             }
 
-                            throw _iteratorError24;
+                            throw _iteratorError25;
 
                         case 123:
                             return _context18.finish(120);
@@ -11254,71 +15307,115 @@ function ofType(xs, dataType) {
                             return _context18.finish(117);
 
                         case 125:
-                            _context18.next = 153;
+                            _context18.next = 155;
                             break;
 
                         case 127:
-                            _iteratorNormalCompletion25 = true;
-                            _didIteratorError25 = false;
-                            _iteratorError25 = undefined;
-                            _context18.prev = 130;
-                            _iterator25 = xs[Symbol.iterator]();
-
-                        case 132:
-                            if (_iteratorNormalCompletion25 = (_step25 = _iterator25.next()).done) {
-                                _context18.next = 139;
+                            if (!(0, _functionalHelpers.isArray)(dataType)) {
+                                _context18.next = 155;
                                 break;
                             }
 
-                            _x19 = _step25.value;
-                            _context18.next = 136;
-                            return _x19;
+                            _iteratorNormalCompletion26 = true;
+                            _didIteratorError26 = false;
+                            _iteratorError26 = undefined;
+                            _context18.prev = 131;
+                            _iterator26 = xs[Symbol.iterator]();
 
-                        case 136:
-                            _iteratorNormalCompletion25 = true;
-                            _context18.next = 132;
-                            break;
+                        case 133:
+                            if (_iteratorNormalCompletion26 = (_step26 = _iterator26.next()).done) {
+                                _context18.next = 141;
+                                break;
+                            }
 
-                        case 139:
-                            _context18.next = 145;
+                            arr = _step26.value;
+
+                            if (!(0, _functionalHelpers.isArray)(arr)) {
+                                _context18.next = 138;
+                                break;
+                            }
+
+                            _context18.next = 138;
+                            return arr;
+
+                        case 138:
+                            _iteratorNormalCompletion26 = true;
+                            _context18.next = 133;
                             break;
 
                         case 141:
-                            _context18.prev = 141;
-                            _context18.t4 = _context18['catch'](130);
-                            _didIteratorError25 = true;
-                            _iteratorError25 = _context18.t4;
+                            _context18.next = 147;
+                            break;
 
-                        case 145:
-                            _context18.prev = 145;
-                            _context18.prev = 146;
+                        case 143:
+                            _context18.prev = 143;
+                            _context18.t4 = _context18['catch'](131);
+                            _didIteratorError26 = true;
+                            _iteratorError26 = _context18.t4;
 
-                            if (!_iteratorNormalCompletion25 && _iterator25.return) {
-                                _iterator25.return();
-                            }
-
-                        case 148:
+                        case 147:
+                            _context18.prev = 147;
                             _context18.prev = 148;
 
-                            if (!_didIteratorError25) {
-                                _context18.next = 151;
+                            if (!_iteratorNormalCompletion26 && _iterator26.return) {
+                                _iterator26.return();
+                            }
+
+                        case 150:
+                            _context18.prev = 150;
+
+                            if (!_didIteratorError26) {
+                                _context18.next = 153;
                                 break;
                             }
 
-                            throw _iteratorError25;
-
-                        case 151:
-                            return _context18.finish(148);
-
-                        case 152:
-                            return _context18.finish(145);
+                            throw _iteratorError26;
 
                         case 153:
+                            return _context18.finish(150);
+
+                        case 154:
+                            return _context18.finish(147);
+
+                        case 155:
                         case 'end':
                             return _context18.stop();
                     }
                 }
-            }, ofTypeIterator, this, [[6, 18, 22, 30], [23,, 25, 29], [36, 48, 52, 60], [53,, 55, 59], [66, 78, 82, 90], [83,, 85, 89], [96, 113, 117, 125], [118,, 120, 124], [130, 141, 145, 153], [146,, 148, 152]]);
+            }, ofTypeIterator, this, [[6, 18, 22, 30], [23,, 25, 29], [36, 48, 52, 60], [53,, 55, 59], [66, 78, 82, 90], [83,, 85, 89], [96, 113, 117, 125], [118,, 120, 124], [131, 143, 147, 155], [148,, 150, 154]]);
+        })
+    );
+}
+
+function pop(xs) {
+    return (/*#__PURE__*/regeneratorRuntime.mark(function _popIterator() {
+            var it, next, last;
+            return regeneratorRuntime.wrap(function _popIterator$(_context19) {
+                while (1) {
+                    switch (_context19.prev = _context19.next) {
+                        case 0:
+                            it = xs[Symbol.iterator](), next = it.next(), last = next.value;
+
+                        case 1:
+                            if ((next = it.next()).done) {
+                                _context19.next = 7;
+                                break;
+                            }
+
+                            _context19.next = 4;
+                            return last;
+
+                        case 4:
+                            last = next.value;
+                            _context19.next = 1;
+                            break;
+
+                        case 7:
+                        case 'end':
+                            return _context19.stop();
+                    }
+                }
+            }, _popIterator, this);
         })
     );
 }
@@ -11326,8 +15423,8 @@ function ofType(xs, dataType) {
 /**
  * @signature 
  * @description -
- * @param {Array|generator|monads.list_core} xs - some stuff
- * @param {Array|generator|monads.list_core} ys - some other stuff
+ * @param {Array|generator|dataStructures.list_core} xs - some stuff
+ * @param {Array|generator|dataStructures.list_core} ys - some other stuff
  * @return {generator} - some other other stuff
  */
 function prepend(xs, ys) {
@@ -11337,18 +15434,18 @@ function prepend(xs, ys) {
 /**
  * @signature
  * @description d
- * @param {monads.list|monads.ordered_list} xs - A list
+ * @param {dataStructures.list|dataStructures.ordered_list|Array|generator} xs - A list
  * @param {Array} yss - An array of one or more lists
  * @return {generator} Returns a generator
  */
 function prependAll(xs, yss) {
-    return concatAll(yss.shift(), [xs].concat(yss).reverse());
+    return concatAll(toArray(yss[0]), yss.slice(1).concat([xs]));
 }
 
 /**
  * @signature
  * @description s
- * @param {Array|generator|monads.list_core} xs - a
+ * @param {Array|generator|dataStructures.list_core} xs - a
  * @param {function} fn - b
  * @param {*} initial - c
  * @return {*} - d
@@ -11367,29 +15464,29 @@ function reduceRight(xs, fn, initial) {
 function repeat(item, count) {
     return (/*#__PURE__*/regeneratorRuntime.mark(function repeatIterator() {
             var i;
-            return regeneratorRuntime.wrap(function repeatIterator$(_context19) {
+            return regeneratorRuntime.wrap(function repeatIterator$(_context20) {
                 while (1) {
-                    switch (_context19.prev = _context19.next) {
+                    switch (_context20.prev = _context20.next) {
                         case 0:
                             i = 0;
 
                         case 1:
                             if (!(i < count)) {
-                                _context19.next = 7;
+                                _context20.next = 7;
                                 break;
                             }
 
-                            _context19.next = 4;
+                            _context20.next = 4;
                             return item;
 
                         case 4:
                             ++i;
-                            _context19.next = 1;
+                            _context20.next = 1;
                             break;
 
                         case 7:
                         case 'end':
-                            return _context19.stop();
+                            return _context20.stop();
                     }
                 }
             }, repeatIterator, this);
@@ -11400,75 +15497,75 @@ function repeat(item, count) {
 /**
  * @signature
  * @description d
- * @param {Array|generator|monads.list_core} xs - a
+ * @param {Array|generator|dataStructures.list_core} xs - a
  * @return {generator} - b
  */
 function reverse(xs) {
     return (/*#__PURE__*/regeneratorRuntime.mark(function reverseIterator() {
-            var _iteratorNormalCompletion26, _didIteratorError26, _iteratorError26, _iterator26, _step26, _x20;
+            var _iteratorNormalCompletion27, _didIteratorError27, _iteratorError27, _iterator27, _step27, _x19;
 
-            return regeneratorRuntime.wrap(function reverseIterator$(_context20) {
+            return regeneratorRuntime.wrap(function reverseIterator$(_context21) {
                 while (1) {
-                    switch (_context20.prev = _context20.next) {
+                    switch (_context21.prev = _context21.next) {
                         case 0:
-                            _iteratorNormalCompletion26 = true;
-                            _didIteratorError26 = false;
-                            _iteratorError26 = undefined;
-                            _context20.prev = 3;
-                            _iterator26 = asArray(xs).reverse()[Symbol.iterator]();
+                            _iteratorNormalCompletion27 = true;
+                            _didIteratorError27 = false;
+                            _iteratorError27 = undefined;
+                            _context21.prev = 3;
+                            _iterator27 = asArray(xs).reverse()[Symbol.iterator]();
 
                         case 5:
-                            if (_iteratorNormalCompletion26 = (_step26 = _iterator26.next()).done) {
-                                _context20.next = 12;
+                            if (_iteratorNormalCompletion27 = (_step27 = _iterator27.next()).done) {
+                                _context21.next = 12;
                                 break;
                             }
 
-                            _x20 = _step26.value;
-                            _context20.next = 9;
-                            return _x20;
+                            _x19 = _step27.value;
+                            _context21.next = 9;
+                            return _x19;
 
                         case 9:
-                            _iteratorNormalCompletion26 = true;
-                            _context20.next = 5;
+                            _iteratorNormalCompletion27 = true;
+                            _context21.next = 5;
                             break;
 
                         case 12:
-                            _context20.next = 18;
+                            _context21.next = 18;
                             break;
 
                         case 14:
-                            _context20.prev = 14;
-                            _context20.t0 = _context20['catch'](3);
-                            _didIteratorError26 = true;
-                            _iteratorError26 = _context20.t0;
+                            _context21.prev = 14;
+                            _context21.t0 = _context21['catch'](3);
+                            _didIteratorError27 = true;
+                            _iteratorError27 = _context21.t0;
 
                         case 18:
-                            _context20.prev = 18;
-                            _context20.prev = 19;
+                            _context21.prev = 18;
+                            _context21.prev = 19;
 
-                            if (!_iteratorNormalCompletion26 && _iterator26.return) {
-                                _iterator26.return();
+                            if (!_iteratorNormalCompletion27 && _iterator27.return) {
+                                _iterator27.return();
                             }
 
                         case 21:
-                            _context20.prev = 21;
+                            _context21.prev = 21;
 
-                            if (!_didIteratorError26) {
-                                _context20.next = 24;
+                            if (!_didIteratorError27) {
+                                _context21.next = 24;
                                 break;
                             }
 
-                            throw _iteratorError26;
+                            throw _iteratorError27;
 
                         case 24:
-                            return _context20.finish(21);
+                            return _context21.finish(21);
 
                         case 25:
-                            return _context20.finish(18);
+                            return _context21.finish(18);
 
                         case 26:
                         case 'end':
-                            return _context20.stop();
+                            return _context21.stop();
                     }
                 }
             }, reverseIterator, this, [[3, 14, 18, 26], [19,, 21, 25]]);
@@ -11479,97 +15576,229 @@ function reverse(xs) {
 /**
  * @signature
  * @description d
- * @param {Array|generator|monads.list_core} xs - a
+ * @param {dataStructures.list_core} xs - a
+ * @param {number} idx - b
+ * @param {*} val - c
+ * @return {generator} d
+ */
+function set(xs, idx, val) {
+    return (/*#__PURE__*/regeneratorRuntime.mark(function _setIterator() {
+            var count, _iteratorNormalCompletion28, _didIteratorError28, _iteratorError28, _iterator28, _step28, item;
+
+            return regeneratorRuntime.wrap(function _setIterator$(_context22) {
+                while (1) {
+                    switch (_context22.prev = _context22.next) {
+                        case 0:
+                            count = 0;
+                            _iteratorNormalCompletion28 = true;
+                            _didIteratorError28 = false;
+                            _iteratorError28 = undefined;
+                            _context22.prev = 4;
+                            _iterator28 = xs[Symbol.iterator]();
+
+                        case 6:
+                            if (_iteratorNormalCompletion28 = (_step28 = _iterator28.next()).done) {
+                                _context22.next = 19;
+                                break;
+                            }
+
+                            item = _step28.value;
+
+                            if (!(idx === count)) {
+                                _context22.next = 13;
+                                break;
+                            }
+
+                            _context22.next = 11;
+                            return val;
+
+                        case 11:
+                            _context22.next = 15;
+                            break;
+
+                        case 13:
+                            _context22.next = 15;
+                            return item;
+
+                        case 15:
+                            ++count;
+
+                        case 16:
+                            _iteratorNormalCompletion28 = true;
+                            _context22.next = 6;
+                            break;
+
+                        case 19:
+                            _context22.next = 25;
+                            break;
+
+                        case 21:
+                            _context22.prev = 21;
+                            _context22.t0 = _context22['catch'](4);
+                            _didIteratorError28 = true;
+                            _iteratorError28 = _context22.t0;
+
+                        case 25:
+                            _context22.prev = 25;
+                            _context22.prev = 26;
+
+                            if (!_iteratorNormalCompletion28 && _iterator28.return) {
+                                _iterator28.return();
+                            }
+
+                        case 28:
+                            _context22.prev = 28;
+
+                            if (!_didIteratorError28) {
+                                _context22.next = 31;
+                                break;
+                            }
+
+                            throw _iteratorError28;
+
+                        case 31:
+                            return _context22.finish(28);
+
+                        case 32:
+                            return _context22.finish(25);
+
+                        case 33:
+                            if (!(count < idx)) {
+                                _context22.next = 45;
+                                break;
+                            }
+
+                        case 34:
+                            if (!(count <= idx)) {
+                                _context22.next = 45;
+                                break;
+                            }
+
+                            if (!(count !== idx)) {
+                                _context22.next = 40;
+                                break;
+                            }
+
+                            _context22.next = 38;
+                            return undefined;
+
+                        case 38:
+                            _context22.next = 42;
+                            break;
+
+                        case 40:
+                            _context22.next = 42;
+                            return val;
+
+                        case 42:
+                            ++count;
+                            _context22.next = 34;
+                            break;
+
+                        case 45:
+                        case 'end':
+                            return _context22.stop();
+                    }
+                }
+            }, _setIterator, this, [[4, 21, 25, 33], [26,, 28, 32]]);
+        })
+    );
+}
+
+/**
+ * @signature
+ * @description d
+ * @param {Array|generator|dataStructures.list_core} xs - a
  * @param {function} predicate - b
  * @return {generator} - c
  */
 function skipWhile(xs, predicate) {
     return (/*#__PURE__*/regeneratorRuntime.mark(function skipWhileIterator() {
-            var hasFailed, _iteratorNormalCompletion27, _didIteratorError27, _iteratorError27, _iterator27, _step27, _x21;
+            var hasFailed, _iteratorNormalCompletion29, _didIteratorError29, _iteratorError29, _iterator29, _step29, _x20;
 
-            return regeneratorRuntime.wrap(function skipWhileIterator$(_context21) {
+            return regeneratorRuntime.wrap(function skipWhileIterator$(_context23) {
                 while (1) {
-                    switch (_context21.prev = _context21.next) {
+                    switch (_context23.prev = _context23.next) {
                         case 0:
                             hasFailed = false;
-                            _iteratorNormalCompletion27 = true;
-                            _didIteratorError27 = false;
-                            _iteratorError27 = undefined;
-                            _context21.prev = 4;
-                            _iterator27 = xs[Symbol.iterator]();
+                            _iteratorNormalCompletion29 = true;
+                            _didIteratorError29 = false;
+                            _iteratorError29 = undefined;
+                            _context23.prev = 4;
+                            _iterator29 = xs[Symbol.iterator]();
 
                         case 6:
-                            if (_iteratorNormalCompletion27 = (_step27 = _iterator27.next()).done) {
-                                _context21.next = 20;
+                            if (_iteratorNormalCompletion29 = (_step29 = _iterator29.next()).done) {
+                                _context23.next = 20;
                                 break;
                             }
 
-                            _x21 = _step27.value;
+                            _x20 = _step29.value;
 
                             if (hasFailed) {
-                                _context21.next = 15;
+                                _context23.next = 15;
                                 break;
                             }
 
-                            if (predicate(_x21)) {
-                                _context21.next = 13;
+                            if (predicate(_x20)) {
+                                _context23.next = 13;
                                 break;
                             }
 
                             hasFailed = true;
-                            _context21.next = 13;
-                            return _x21;
+                            _context23.next = 13;
+                            return _x20;
 
                         case 13:
-                            _context21.next = 17;
+                            _context23.next = 17;
                             break;
 
                         case 15:
-                            _context21.next = 17;
-                            return _x21;
+                            _context23.next = 17;
+                            return _x20;
 
                         case 17:
-                            _iteratorNormalCompletion27 = true;
-                            _context21.next = 6;
+                            _iteratorNormalCompletion29 = true;
+                            _context23.next = 6;
                             break;
 
                         case 20:
-                            _context21.next = 26;
+                            _context23.next = 26;
                             break;
 
                         case 22:
-                            _context21.prev = 22;
-                            _context21.t0 = _context21['catch'](4);
-                            _didIteratorError27 = true;
-                            _iteratorError27 = _context21.t0;
+                            _context23.prev = 22;
+                            _context23.t0 = _context23['catch'](4);
+                            _didIteratorError29 = true;
+                            _iteratorError29 = _context23.t0;
 
                         case 26:
-                            _context21.prev = 26;
-                            _context21.prev = 27;
+                            _context23.prev = 26;
+                            _context23.prev = 27;
 
-                            if (!_iteratorNormalCompletion27 && _iterator27.return) {
-                                _iterator27.return();
+                            if (!_iteratorNormalCompletion29 && _iterator29.return) {
+                                _iterator29.return();
                             }
 
                         case 29:
-                            _context21.prev = 29;
+                            _context23.prev = 29;
 
-                            if (!_didIteratorError27) {
-                                _context21.next = 32;
+                            if (!_didIteratorError29) {
+                                _context23.next = 32;
                                 break;
                             }
 
-                            throw _iteratorError27;
+                            throw _iteratorError29;
 
                         case 32:
-                            return _context21.finish(29);
+                            return _context23.finish(29);
 
                         case 33:
-                            return _context21.finish(26);
+                            return _context23.finish(26);
 
                         case 34:
                         case 'end':
-                            return _context21.stop();
+                            return _context23.stop();
                     }
                 }
             }, skipWhileIterator, this, [[4, 22, 26, 34], [27,, 29, 33]]);
@@ -11580,7 +15809,7 @@ function skipWhile(xs, predicate) {
 /**
  * @signature
  * @description d
- * @param {Array|monads.list_core} xs - Any iterable object that may be treated as an array
+ * @param {Array|dataStructures.list_core} xs - Any iterable object that may be treated as an array
  * @param {number} [start] - A number representing the index of the array to being the slice
  * @param {number} [end] - A number representing the index of the array to end the slice
  * @return {generator} Returns a generator function that can be used to iterate the values
@@ -11588,70 +15817,70 @@ function skipWhile(xs, predicate) {
  */
 function slice(xs, start, end) {
     return (/*#__PURE__*/regeneratorRuntime.mark(function _sliceIterator() {
-            var _iteratorNormalCompletion28, _didIteratorError28, _iteratorError28, _iterator28, _step28, item;
+            var _iteratorNormalCompletion30, _didIteratorError30, _iteratorError30, _iterator30, _step30, item;
 
-            return regeneratorRuntime.wrap(function _sliceIterator$(_context22) {
+            return regeneratorRuntime.wrap(function _sliceIterator$(_context24) {
                 while (1) {
-                    switch (_context22.prev = _context22.next) {
+                    switch (_context24.prev = _context24.next) {
                         case 0:
-                            _iteratorNormalCompletion28 = true;
-                            _didIteratorError28 = false;
-                            _iteratorError28 = undefined;
-                            _context22.prev = 3;
-                            _iterator28 = asArray(xs).slice(start, end)[Symbol.iterator]();
+                            _iteratorNormalCompletion30 = true;
+                            _didIteratorError30 = false;
+                            _iteratorError30 = undefined;
+                            _context24.prev = 3;
+                            _iterator30 = asArray(xs).slice(start, end)[Symbol.iterator]();
 
                         case 5:
-                            if (_iteratorNormalCompletion28 = (_step28 = _iterator28.next()).done) {
-                                _context22.next = 12;
+                            if (_iteratorNormalCompletion30 = (_step30 = _iterator30.next()).done) {
+                                _context24.next = 12;
                                 break;
                             }
 
-                            item = _step28.value;
-                            _context22.next = 9;
+                            item = _step30.value;
+                            _context24.next = 9;
                             return item;
 
                         case 9:
-                            _iteratorNormalCompletion28 = true;
-                            _context22.next = 5;
+                            _iteratorNormalCompletion30 = true;
+                            _context24.next = 5;
                             break;
 
                         case 12:
-                            _context22.next = 18;
+                            _context24.next = 18;
                             break;
 
                         case 14:
-                            _context22.prev = 14;
-                            _context22.t0 = _context22['catch'](3);
-                            _didIteratorError28 = true;
-                            _iteratorError28 = _context22.t0;
+                            _context24.prev = 14;
+                            _context24.t0 = _context24['catch'](3);
+                            _didIteratorError30 = true;
+                            _iteratorError30 = _context24.t0;
 
                         case 18:
-                            _context22.prev = 18;
-                            _context22.prev = 19;
+                            _context24.prev = 18;
+                            _context24.prev = 19;
 
-                            if (!_iteratorNormalCompletion28 && _iterator28.return) {
-                                _iterator28.return();
+                            if (!_iteratorNormalCompletion30 && _iterator30.return) {
+                                _iterator30.return();
                             }
 
                         case 21:
-                            _context22.prev = 21;
+                            _context24.prev = 21;
 
-                            if (!_didIteratorError28) {
-                                _context22.next = 24;
+                            if (!_didIteratorError30) {
+                                _context24.next = 24;
                                 break;
                             }
 
-                            throw _iteratorError28;
+                            throw _iteratorError30;
 
                         case 24:
-                            return _context22.finish(21);
+                            return _context24.finish(21);
 
                         case 25:
-                            return _context22.finish(18);
+                            return _context24.finish(18);
 
                         case 26:
                         case 'end':
-                            return _context22.stop();
+                            return _context24.stop();
                     }
                 }
             }, _sliceIterator, this, [[3, 14, 18, 26], [19,, 21, 25]]);
@@ -11662,78 +15891,78 @@ function slice(xs, start, end) {
 /**
  * @signature
  * @description d
- * @param {Array|generator|monads.list_core} xs - a
+ * @param {Array|generator|dataStructures.list_core} xs - a
  * @param {Array} orderObject - b
  * @return {generator} - d
  */
 function sortBy(xs, orderObject) {
     return (/*#__PURE__*/regeneratorRuntime.mark(function orderByIterator() {
-            var x_s, _iteratorNormalCompletion29, _didIteratorError29, _iteratorError29, _iterator29, _step29, _x22;
+            var x_s, _iteratorNormalCompletion31, _didIteratorError31, _iteratorError31, _iterator31, _step31, _x21;
 
-            return regeneratorRuntime.wrap(function orderByIterator$(_context23) {
+            return regeneratorRuntime.wrap(function orderByIterator$(_context25) {
                 while (1) {
-                    switch (_context23.prev = _context23.next) {
+                    switch (_context25.prev = _context25.next) {
                         case 0:
                             //gather all data from the xs before sorting
                             x_s = (0, _sort_util.sortData)(asArray(xs), orderObject);
-                            _iteratorNormalCompletion29 = true;
-                            _didIteratorError29 = false;
-                            _iteratorError29 = undefined;
-                            _context23.prev = 4;
-                            _iterator29 = x_s[Symbol.iterator]();
+                            _iteratorNormalCompletion31 = true;
+                            _didIteratorError31 = false;
+                            _iteratorError31 = undefined;
+                            _context25.prev = 4;
+                            _iterator31 = x_s[Symbol.iterator]();
 
                         case 6:
-                            if (_iteratorNormalCompletion29 = (_step29 = _iterator29.next()).done) {
-                                _context23.next = 13;
+                            if (_iteratorNormalCompletion31 = (_step31 = _iterator31.next()).done) {
+                                _context25.next = 13;
                                 break;
                             }
 
-                            _x22 = _step29.value;
-                            _context23.next = 10;
-                            return _x22;
+                            _x21 = _step31.value;
+                            _context25.next = 10;
+                            return _x21;
 
                         case 10:
-                            _iteratorNormalCompletion29 = true;
-                            _context23.next = 6;
+                            _iteratorNormalCompletion31 = true;
+                            _context25.next = 6;
                             break;
 
                         case 13:
-                            _context23.next = 19;
+                            _context25.next = 19;
                             break;
 
                         case 15:
-                            _context23.prev = 15;
-                            _context23.t0 = _context23['catch'](4);
-                            _didIteratorError29 = true;
-                            _iteratorError29 = _context23.t0;
+                            _context25.prev = 15;
+                            _context25.t0 = _context25['catch'](4);
+                            _didIteratorError31 = true;
+                            _iteratorError31 = _context25.t0;
 
                         case 19:
-                            _context23.prev = 19;
-                            _context23.prev = 20;
+                            _context25.prev = 19;
+                            _context25.prev = 20;
 
-                            if (!_iteratorNormalCompletion29 && _iterator29.return) {
-                                _iterator29.return();
+                            if (!_iteratorNormalCompletion31 && _iterator31.return) {
+                                _iterator31.return();
                             }
 
                         case 22:
-                            _context23.prev = 22;
+                            _context25.prev = 22;
 
-                            if (!_didIteratorError29) {
-                                _context23.next = 25;
+                            if (!_didIteratorError31) {
+                                _context25.next = 25;
                                 break;
                             }
 
-                            throw _iteratorError29;
+                            throw _iteratorError31;
 
                         case 25:
-                            return _context23.finish(22);
+                            return _context25.finish(22);
 
                         case 26:
-                            return _context23.finish(19);
+                            return _context25.finish(19);
 
                         case 27:
                         case 'end':
-                            return _context23.stop();
+                            return _context25.stop();
                     }
                 }
             }, orderByIterator, this, [[4, 15, 19, 27], [20,, 22, 26]]);
@@ -11744,89 +15973,89 @@ function sortBy(xs, orderObject) {
 /**
  * @signature
  * @description d
- * @param {Array|generator|monads.list_core} xs - a
+ * @param {Array|generator|dataStructures.list_core} xs - a
  * @param {function} predicate - b
  * @return {generator} - c
  */
 function takeWhile(xs, predicate) {
     return (/*#__PURE__*/regeneratorRuntime.mark(function takeWhileIterator() {
-            var _iteratorNormalCompletion30, _didIteratorError30, _iteratorError30, _iterator30, _step30, _x23;
+            var _iteratorNormalCompletion32, _didIteratorError32, _iteratorError32, _iterator32, _step32, _x22;
 
-            return regeneratorRuntime.wrap(function takeWhileIterator$(_context24) {
+            return regeneratorRuntime.wrap(function takeWhileIterator$(_context26) {
                 while (1) {
-                    switch (_context24.prev = _context24.next) {
+                    switch (_context26.prev = _context26.next) {
                         case 0:
-                            _iteratorNormalCompletion30 = true;
-                            _didIteratorError30 = false;
-                            _iteratorError30 = undefined;
-                            _context24.prev = 3;
-                            _iterator30 = xs[Symbol.iterator]();
+                            _iteratorNormalCompletion32 = true;
+                            _didIteratorError32 = false;
+                            _iteratorError32 = undefined;
+                            _context26.prev = 3;
+                            _iterator32 = xs[Symbol.iterator]();
 
                         case 5:
-                            if (_iteratorNormalCompletion30 = (_step30 = _iterator30.next()).done) {
-                                _context24.next = 16;
+                            if (_iteratorNormalCompletion32 = (_step32 = _iterator32.next()).done) {
+                                _context26.next = 16;
                                 break;
                             }
 
-                            _x23 = _step30.value;
+                            _x22 = _step32.value;
 
-                            if (!predicate(_x23)) {
-                                _context24.next = 12;
+                            if (!predicate(_x22)) {
+                                _context26.next = 12;
                                 break;
                             }
 
-                            _context24.next = 10;
-                            return _x23;
+                            _context26.next = 10;
+                            return _x22;
 
                         case 10:
-                            _context24.next = 13;
+                            _context26.next = 13;
                             break;
 
                         case 12:
-                            return _context24.abrupt('break', 16);
+                            return _context26.abrupt('break', 16);
 
                         case 13:
-                            _iteratorNormalCompletion30 = true;
-                            _context24.next = 5;
+                            _iteratorNormalCompletion32 = true;
+                            _context26.next = 5;
                             break;
 
                         case 16:
-                            _context24.next = 22;
+                            _context26.next = 22;
                             break;
 
                         case 18:
-                            _context24.prev = 18;
-                            _context24.t0 = _context24['catch'](3);
-                            _didIteratorError30 = true;
-                            _iteratorError30 = _context24.t0;
+                            _context26.prev = 18;
+                            _context26.t0 = _context26['catch'](3);
+                            _didIteratorError32 = true;
+                            _iteratorError32 = _context26.t0;
 
                         case 22:
-                            _context24.prev = 22;
-                            _context24.prev = 23;
+                            _context26.prev = 22;
+                            _context26.prev = 23;
 
-                            if (!_iteratorNormalCompletion30 && _iterator30.return) {
-                                _iterator30.return();
+                            if (!_iteratorNormalCompletion32 && _iterator32.return) {
+                                _iterator32.return();
                             }
 
                         case 25:
-                            _context24.prev = 25;
+                            _context26.prev = 25;
 
-                            if (!_didIteratorError30) {
-                                _context24.next = 28;
+                            if (!_didIteratorError32) {
+                                _context26.next = 28;
                                 break;
                             }
 
-                            throw _iteratorError30;
+                            throw _iteratorError32;
 
                         case 28:
-                            return _context24.finish(25);
+                            return _context26.finish(25);
 
                         case 29:
-                            return _context24.finish(22);
+                            return _context26.finish(22);
 
                         case 30:
                         case 'end':
-                            return _context24.stop();
+                            return _context26.stop();
                     }
                 }
             }, takeWhileIterator, this, [[3, 18, 22, 30], [23,, 25, 29]]);
@@ -11839,8 +16068,8 @@ var unfold = _decorators.unfoldWith;
 /**
  * @signature
  * @description d
- * @param {Array|generator|monads.list_core} xs - a
- * @param {Array|generator|monads.list_core} ys - b
+ * @param {Array|generator|dataStructures.list_core} xs - a
+ * @param {Array|generator|dataStructures.list_core} ys - b
  * @param {function} comparer - c
  * @return {generator} - d
  */
@@ -11848,139 +16077,139 @@ function union(xs, ys) {
     var comparer = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : _functionalHelpers.strictEquals;
 
     return (/*#__PURE__*/regeneratorRuntime.mark(function unionIterator() {
-            var isInCache, _iteratorNormalCompletion31, _didIteratorError31, _iteratorError31, _iterator31, _step31, _x25, _iteratorNormalCompletion32, _didIteratorError32, _iteratorError32, _iterator32, _step32, y;
+            var isInCache, _iteratorNormalCompletion33, _didIteratorError33, _iteratorError33, _iterator33, _step33, _x24, _iteratorNormalCompletion34, _didIteratorError34, _iteratorError34, _iterator34, _step34, y;
 
-            return regeneratorRuntime.wrap(function unionIterator$(_context25) {
+            return regeneratorRuntime.wrap(function unionIterator$(_context27) {
                 while (1) {
-                    switch (_context25.prev = _context25.next) {
+                    switch (_context27.prev = _context27.next) {
                         case 0:
                             isInCache = (0, _helpers.cacher)(comparer);
-                            _iteratorNormalCompletion31 = true;
-                            _didIteratorError31 = false;
-                            _iteratorError31 = undefined;
-                            _context25.prev = 4;
-                            _iterator31 = xs[Symbol.iterator]();
+                            _iteratorNormalCompletion33 = true;
+                            _didIteratorError33 = false;
+                            _iteratorError33 = undefined;
+                            _context27.prev = 4;
+                            _iterator33 = xs[Symbol.iterator]();
 
                         case 6:
-                            if (_iteratorNormalCompletion31 = (_step31 = _iterator31.next()).done) {
-                                _context25.next = 14;
+                            if (_iteratorNormalCompletion33 = (_step33 = _iterator33.next()).done) {
+                                _context27.next = 14;
                                 break;
                             }
 
-                            _x25 = _step31.value;
+                            _x24 = _step33.value;
 
-                            if (isInCache(_x25)) {
-                                _context25.next = 11;
+                            if (isInCache(_x24)) {
+                                _context27.next = 11;
                                 break;
                             }
 
-                            _context25.next = 11;
-                            return _x25;
+                            _context27.next = 11;
+                            return _x24;
 
                         case 11:
-                            _iteratorNormalCompletion31 = true;
-                            _context25.next = 6;
+                            _iteratorNormalCompletion33 = true;
+                            _context27.next = 6;
                             break;
 
                         case 14:
-                            _context25.next = 20;
+                            _context27.next = 20;
                             break;
 
                         case 16:
-                            _context25.prev = 16;
-                            _context25.t0 = _context25['catch'](4);
-                            _didIteratorError31 = true;
-                            _iteratorError31 = _context25.t0;
+                            _context27.prev = 16;
+                            _context27.t0 = _context27['catch'](4);
+                            _didIteratorError33 = true;
+                            _iteratorError33 = _context27.t0;
 
                         case 20:
-                            _context25.prev = 20;
-                            _context25.prev = 21;
+                            _context27.prev = 20;
+                            _context27.prev = 21;
 
-                            if (!_iteratorNormalCompletion31 && _iterator31.return) {
-                                _iterator31.return();
+                            if (!_iteratorNormalCompletion33 && _iterator33.return) {
+                                _iterator33.return();
                             }
 
                         case 23:
-                            _context25.prev = 23;
+                            _context27.prev = 23;
 
-                            if (!_didIteratorError31) {
-                                _context25.next = 26;
+                            if (!_didIteratorError33) {
+                                _context27.next = 26;
                                 break;
                             }
 
-                            throw _iteratorError31;
+                            throw _iteratorError33;
 
                         case 26:
-                            return _context25.finish(23);
+                            return _context27.finish(23);
 
                         case 27:
-                            return _context25.finish(20);
+                            return _context27.finish(20);
 
                         case 28:
-                            _iteratorNormalCompletion32 = true;
-                            _didIteratorError32 = false;
-                            _iteratorError32 = undefined;
-                            _context25.prev = 31;
-                            _iterator32 = toArray(ys)[Symbol.iterator]();
+                            _iteratorNormalCompletion34 = true;
+                            _didIteratorError34 = false;
+                            _iteratorError34 = undefined;
+                            _context27.prev = 31;
+                            _iterator34 = toArray(ys)[Symbol.iterator]();
 
                         case 33:
-                            if (_iteratorNormalCompletion32 = (_step32 = _iterator32.next()).done) {
-                                _context25.next = 41;
+                            if (_iteratorNormalCompletion34 = (_step34 = _iterator34.next()).done) {
+                                _context27.next = 41;
                                 break;
                             }
 
-                            y = _step32.value;
+                            y = _step34.value;
 
                             if (isInCache(y)) {
-                                _context25.next = 38;
+                                _context27.next = 38;
                                 break;
                             }
 
-                            _context25.next = 38;
+                            _context27.next = 38;
                             return y;
 
                         case 38:
-                            _iteratorNormalCompletion32 = true;
-                            _context25.next = 33;
+                            _iteratorNormalCompletion34 = true;
+                            _context27.next = 33;
                             break;
 
                         case 41:
-                            _context25.next = 47;
+                            _context27.next = 47;
                             break;
 
                         case 43:
-                            _context25.prev = 43;
-                            _context25.t1 = _context25['catch'](31);
-                            _didIteratorError32 = true;
-                            _iteratorError32 = _context25.t1;
+                            _context27.prev = 43;
+                            _context27.t1 = _context27['catch'](31);
+                            _didIteratorError34 = true;
+                            _iteratorError34 = _context27.t1;
 
                         case 47:
-                            _context25.prev = 47;
-                            _context25.prev = 48;
+                            _context27.prev = 47;
+                            _context27.prev = 48;
 
-                            if (!_iteratorNormalCompletion32 && _iterator32.return) {
-                                _iterator32.return();
+                            if (!_iteratorNormalCompletion34 && _iterator34.return) {
+                                _iterator34.return();
                             }
 
                         case 50:
-                            _context25.prev = 50;
+                            _context27.prev = 50;
 
-                            if (!_didIteratorError32) {
-                                _context25.next = 53;
+                            if (!_didIteratorError34) {
+                                _context27.next = 53;
                                 break;
                             }
 
-                            throw _iteratorError32;
+                            throw _iteratorError34;
 
                         case 53:
-                            return _context25.finish(50);
+                            return _context27.finish(50);
 
                         case 54:
-                            return _context25.finish(47);
+                            return _context27.finish(47);
 
                         case 55:
                         case 'end':
-                            return _context25.stop();
+                            return _context27.stop();
                     }
                 }
             }, unionIterator, this, [[4, 16, 20, 28], [21,, 23, 27], [31, 43, 47, 55], [48,, 50, 54]]);
@@ -11991,91 +16220,91 @@ function union(xs, ys) {
 /**
  * @signature
  * @description d
- * @param {Array|generator|monads.list_core} xs - a
- * @param {Array|generator|monads.list_core} ys - b
+ * @param {Array|generator|dataStructures.list_core} xs - a
+ * @param {Array|generator|dataStructures.list_core} ys - b
  * @param {function} selector - c
  * @return {generator} - d
  */
 function zip(xs, ys, selector) {
     return (/*#__PURE__*/regeneratorRuntime.mark(function zipIterator() {
-            var idx, yArr, _iteratorNormalCompletion33, _didIteratorError33, _iteratorError33, _iterator33, _step33, _x26;
+            var idx, yArr, _iteratorNormalCompletion35, _didIteratorError35, _iteratorError35, _iterator35, _step35, _x25;
 
-            return regeneratorRuntime.wrap(function zipIterator$(_context26) {
+            return regeneratorRuntime.wrap(function zipIterator$(_context28) {
                 while (1) {
-                    switch (_context26.prev = _context26.next) {
+                    switch (_context28.prev = _context28.next) {
                         case 0:
                             idx = 0;
                             yArr = toArray(ys);
-                            _iteratorNormalCompletion33 = true;
-                            _didIteratorError33 = false;
-                            _iteratorError33 = undefined;
-                            _context26.prev = 5;
-                            _iterator33 = xs[Symbol.iterator]();
+                            _iteratorNormalCompletion35 = true;
+                            _didIteratorError35 = false;
+                            _iteratorError35 = undefined;
+                            _context28.prev = 5;
+                            _iterator35 = xs[Symbol.iterator]();
 
                         case 7:
-                            if (_iteratorNormalCompletion33 = (_step33 = _iterator33.next()).done) {
-                                _context26.next = 17;
+                            if (_iteratorNormalCompletion35 = (_step35 = _iterator35.next()).done) {
+                                _context28.next = 17;
                                 break;
                             }
 
-                            _x26 = _step33.value;
+                            _x25 = _step35.value;
 
                             if (!(idx >= yArr.length || !yArr.length)) {
-                                _context26.next = 11;
+                                _context28.next = 11;
                                 break;
                             }
 
-                            return _context26.abrupt('return');
+                            return _context28.abrupt('return');
 
                         case 11:
-                            _context26.next = 13;
-                            return selector(_x26, yArr[idx]);
+                            _context28.next = 13;
+                            return selector(_x25, yArr[idx]);
 
                         case 13:
                             ++idx;
 
                         case 14:
-                            _iteratorNormalCompletion33 = true;
-                            _context26.next = 7;
+                            _iteratorNormalCompletion35 = true;
+                            _context28.next = 7;
                             break;
 
                         case 17:
-                            _context26.next = 23;
+                            _context28.next = 23;
                             break;
 
                         case 19:
-                            _context26.prev = 19;
-                            _context26.t0 = _context26['catch'](5);
-                            _didIteratorError33 = true;
-                            _iteratorError33 = _context26.t0;
+                            _context28.prev = 19;
+                            _context28.t0 = _context28['catch'](5);
+                            _didIteratorError35 = true;
+                            _iteratorError35 = _context28.t0;
 
                         case 23:
-                            _context26.prev = 23;
-                            _context26.prev = 24;
+                            _context28.prev = 23;
+                            _context28.prev = 24;
 
-                            if (!_iteratorNormalCompletion33 && _iterator33.return) {
-                                _iterator33.return();
+                            if (!_iteratorNormalCompletion35 && _iterator35.return) {
+                                _iterator35.return();
                             }
 
                         case 26:
-                            _context26.prev = 26;
+                            _context28.prev = 26;
 
-                            if (!_didIteratorError33) {
-                                _context26.next = 29;
+                            if (!_didIteratorError35) {
+                                _context28.next = 29;
                                 break;
                             }
 
-                            throw _iteratorError33;
+                            throw _iteratorError35;
 
                         case 29:
-                            return _context26.finish(26);
+                            return _context28.finish(26);
 
                         case 30:
-                            return _context26.finish(23);
+                            return _context28.finish(23);
 
                         case 31:
                         case 'end':
-                            return _context26.stop();
+                            return _context28.stop();
                     }
                 }
             }, zipIterator, this, [[5, 19, 23, 31], [24,, 26, 30]]);
@@ -12085,6 +16314,7 @@ function zip(xs, ys, selector) {
 
 exports.all = all;
 exports.any = any;
+exports.apply = apply;
 exports.binarySearch = binarySearch;
 exports.chain = chain;
 exports.concat = concat;
@@ -12110,11 +16340,13 @@ exports.join = join;
 exports.last = last;
 exports.map = map;
 exports.ofType = ofType;
+exports.pop = pop;
 exports.prepend = prepend;
 exports.prependAll = prependAll;
 exports.reduceRight = reduceRight;
 exports.repeat = repeat;
 exports.reverse = reverse;
+exports.set = set;
 exports.skipWhile = skipWhile;
 exports.slice = slice;
 exports.sortBy = sortBy;
@@ -12123,3888 +16355,7 @@ exports.unfold = unfold;
 exports.union = union;
 exports.zip = zip;
 
-},{"../combinators":330,"../decorators":344,"../functionalHelpers":345,"../helpers":346,"./sort_util":343}],334:[function(require,module,exports){
-'use strict';
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-exports.constant = exports.Constant = undefined;
-
-var _data_structure_util = require('../data_structure_util');
-
-/**
- * @signature - :: * -> {@link monads.constant}
- * @description Factory function used to create a new object that delegates to
- * the {@link monads.constant} object. Any single value may be provided as an argument
- * which will be used to set the underlying value of the new {@link monads.constant}
- * delegator. If no argument is provided, the underlying value will be 'undefined'.
- * @namespace Constant
- * @memberOf monads
- * @property {function} of
- * @property {function} is
- * @property {function} lift
- * @param {*} [val] - The value that should be set as the underlying
- * value of the {@link monads.constant}.
- * @return {monads.constant} - Returns a new object that delegates to the
- * {@link monads.constant}.
- */
-function Constant(val) {
-  return Object.create(constant, {
-    _value: {
-      value: val,
-      writable: false,
-      configurable: false
-    }
-  });
-}
-
-/**
- * @signature * -> {@link monads.constant}
- * @description Takes any value and places it in the correct context if it is
- * not already and creates a new {@link monads.constant} object delegator instance.
- * Because the constant functor does not require any specific context for
- * its value, this can be viewed as an alias for {@link monads.Constant}
- * @memberOf monads.Constant
- * @static
- * @function of
- * @param {*} [x] - The value that should be set as the underlying
- * value of the {@link monads.constant}.
- * @return {monads.constant} - Returns a new object that delegates to the
- * {@link monads.constant}.
- */
-Constant.of = function (x) {
-  return Constant(x);
-};
-
-/**
- * @signature * -> boolean
- * @description Convenience function for determining if a value is an
- * {@link monads.constant} delegate or not. Available on the
- * identity_functor's factory function as Identity.is.
- * @memberOf monads.Constant
- * @function is
- * @param {*} [f] - Any value may be used as an argument to this function.
- * @return {boolean} Returns a boolean that indicates whether the
- * argument provided delegates to the {@link monads.constant} delegate.
- */
-Constant.is = function (f) {
-  return constant.isPrototypeOf(f);
-};
-
-/**
- * @typedef {Object} constant
- * @property {function} value - returns the underlying value of the the functor
- * @property {function} map - maps a single function over the underlying value of the functor
- * @property {function} bimap
- * @property {function} get - returns the underlying value of the functor
- * @property {function} orElse - returns the underlying value of the functor
- * @property {function} getOrElse - returns the underlying value of the functor
- * @property {function} of - creates a new constant delegate with the value provided
- * @property {function} valueOf - returns the underlying value of the functor; used during concatenation and coercion
- * @property {function} toString - returns a string representation of the identity functor and its underlying value
- * @property {function} factory - a reference to the constant factory function
- * @property {function} [Symbol.Iterator] - Iterator for the constant
- * @kind {Object}
- * @memberOf monads
- * @namespace constant
- * @description This is the delegate object that specifies the behavior of the identity functor. All
- * operations that may be performed on an identity functor 'instance' delegate to this object. Constant
- * functor 'instances' are created by the {@link monads.Constant} factory function via Object.create,
- * during which the underlying value is placed directly on the newly created object. No other
- * properties exist directly on an identity functor delegator object beyond the ._value property.
- * All behavior delegates to this object, or higher up the prototype chain.
- */
-var constant = {
-  /**
-   * @signature () -> *
-   * @description Returns the underlying value of an constant delegator. This
-   * getter is not expected to be used directly by consumers - it is meant as an internal
-   * access only. To manipulate the underlying value of an identity_functor delegator,
-   * see {@link monads.constant#map} and {@link monads.constant#bimap}.
-   * To retrieve the underlying value of an identity_functor delegator, see {@link monads.constant#get},
-   * {@link monads.constant#orElse}, {@link monads.constant#getOrElse},
-   * and {@link monads.constant#valueOf}.
-   * @memberOf monads.constant
-   * @instance
-   * @protected
-   * @function
-   * @return {*} Returns the underlying value of the delegator. May be any value.
-   */
-  get value() {
-    return this._value;
-  },
-  /**
-   * @signature () -> {@link monads.constant}
-   * @description Takes a function that is applied to the underlying value of the
-   * functor, the result of which is used to create a new {@link monads.constant}
-   * delegator instance.
-   * @memberOf monads.constant
-   * @instance
-   * @param {function} fn - A mapping function that can operate on the underlying
-   * value of the {@link monads.constant}.
-   * @return {monads.constant} Returns a new {@link monads.constant}
-   * delegator whose underlying value is the result of the mapping operation
-   * just performed.
-   */
-  map: function _map(fn) {
-    return this;
-  },
-  chain: function _chain() {
-    return this;
-  },
-  fold: function _fold(f) {
-    return f(this.value);
-  },
-  sequence: function _sequence(p) {
-    return this.of(this.value);
-  },
-  traverse: function _traverse(a, f) {
-    return this.of(this.value);
-  },
-  /**
-   * @signature () -> *
-   * @description Returns the underlying value of the current functor 'instance'.
-   * @memberOf monads.constant
-   * @instance
-   * @function
-   * @return {*} - Returns the underlying value of the current functor 'instance'.
-   */
-  get: _data_structure_util.get,
-  /**
-   * @signature () -> *
-   * @description Takes an optional function parameter as a default to be invoked and
-   * returned in cases where the current functor 'instance\'s' underlying value is not
-   * 'mappable'. Because the identity_functor does not support disjunctions, the
-   * parameter is entirely optional and will always be ignored. Whatever the actual
-   * underlying value is, it will always be returned.
-   * @memberOf monads.constant
-   * @instance
-   * @function
-   * @param {function} [f] - An optional function argument which is invoked and the result
-   * returned in cases where the underlying value is not 'mappable'.
-   * @return {*} - b
-   */
-  orElse: _data_structure_util.orElse,
-  /**
-   * @signature * -> *
-   * @description Takes an optional parameter of any value as a default return value in
-   * cases where the current functor 'instance\'s' underlying value is not 'mappable'.
-   * Because the identity_functor does not support disjunctions, the parameter is entirely
-   * optional and will always be ignored. Whatever the actual underlying value is, it will
-   * always be returned.
-   * @memberOf monads.constant
-   * @instance
-   * @function
-   * @param {*} [x] - a
-   * @return {*} Returns the underlying value of the current functor 'instance'.
-   */
-  getOrElse: _data_structure_util.getOrElse,
-  /**
-   * @signature * -> {@link monads.constant}
-   * @description Factory function used to create a new object that delegates to
-   * the {@link monads.constant} object. Any single value may be provided as an argument
-   * which will be used to set the underlying value of the new {@link monads.constant}
-   * delegator. If no argument is provided, the underlying value will be 'undefined'.
-   * @memberOf monads.constant
-   * @instance
-   * @function
-   * @param {*} item - The value that should be set as the underlying
-   * value of the {@link monads.constant}.
-   * @return {monads.constant} Returns a new {@link monads.constant} delegator object
-   * via the {@link monads.Constant#of} function.
-   */
-  of: (0, _data_structure_util.pointMaker)(Constant),
-  /**
-   * @signature () -> *
-   * @description Returns the underlying value of the current functor 'instance'. This
-   * function property is not meant for explicit use. Rather, the JavaScript engine uses
-   * this property during implicit coercion like addition and concatenation.
-   * @memberOf monads.constant
-   * @instance
-   * @function
-   * @return {*} Returns the underlying value of the current functor 'instance'.
-   */
-  valueOf: _data_structure_util.valueOf,
-  /**
-   * @signature () -> string
-   * @description Returns a string representation of the functor and its
-   * underlying value
-   * @memberOf monads.constant
-   * @instance
-   * @function
-   * @return {string} Returns a string representation of the constant
-   * and its underlying value.
-   */
-  toString: (0, _data_structure_util.stringMaker)('Constant'),
-  /**
-   * @signature * -> {@link monads.constant}
-   * @description Factory function used to create a new object that delegates to
-   * the {@link monads.constant} object. Any single value may be provided as an argument
-   * which will be used to set the underlying value of the new {@link monads.constant}
-   * delegator. If no argument is provided, the underlying value will be 'undefined'.
-   * @memberOf monads.constant
-   * @instance
-   * @function
-   * @see monads.Constant
-   * @param {*} val - The value that should be set as the underlying
-   * value of the {@link monads.constant}.
-   * @return {monads.constant} - Returns a new identity functor delegator
-   */
-  factory: Constant
-};
-
-/**
- * @signature * -> boolean
- * @description Determines if 'this' identity functor is equal to another functor. Equality
- * is defined as:
- * 1) The other functor shares the same delegate object as 'this' identity functor
- * 2) Both underlying values are strictly equal to each other
- * @memberOf monads.constant
- * @instance
- * @function
- * @param {Object} ma - The other functor to check for equality with 'this' functor.
- * @return {boolean} - Returns a boolean indicating equality
- */
-constant.equals = (0, _data_structure_util.equalMaker)(constant);
-
-/**
- * @signature (* -> *) -> (* -> *) -> monads.constant<T>
- * @description Since the constant functor does not represent a disjunction, the Identity's
- * bimap function property behaves just as its map function property. It is merely here as a
- * convenience so that swapping out monads/monads does not break an application that is
- * relying on its existence.
- * @memberOf monads.constant
- * @instance
- * @function
- * @param {function} f - A function that will be used to map over the underlying data of the
- * {@link monads.constant} delegator.
- * @param {function} [g] - An optional function that is simply ignored on the {@link monads.constant}
- * since there is no disjunction present.
- * @return {monads.constant} - Returns a new {@link monads.constant} delegator after applying
- * the mapping function to the underlying data.
- */
-constant.bimap = constant.map;
-
-/**
- * @description: sigh.... awesome spec ya got there fantasy-land. Yup, good thing you guys understand
- * JS and aren't treating it like a static, strongly-typed, class-based language with inheritance...
- * cause, ya know... that would be ridiculous if we were going around pretending there is such a thing
- * as constructors in the traditional OOP sense of the word in JS, or that JS has some form of inheritance.
- *
- * What's that? Put a constructor property on a functor that references the function used to create an
- * object that delegates to said functor? Okay.... but why would we call it a 'constructor'? Oh, that's
- * right, you wrote a spec for a language you don't understand rather than trying to understand it and
- * then writing the spec. Apparently your preferred approach is to bury your head in the sand and pretend
- * that JS has classes like the rest of the idiots.
- *
- * Thanks for your contribution to the continual misunderstanding, misapplication, reproach, and frustration
- * of JS developers; thanks for making the world of JavaScript a spec which has become the standard and as
- * such enforces poor practices, poor design, and mental hurdles.
- */
-constant.constructor = constant.factory;
-
-constant.mjoin = _data_structure_util.mjoin;
-constant.apply = _data_structure_util.monad_apply;
-
-constant.ap = constant.apply;
-constant.fmap = constant.chain;
-constant.flapMap = constant.chain;
-constant.bind = constant.chain;
-constant.reduce = constant.fold;
-
-//Since FantasyLand is the defacto standard for JavaScript algebraic data structures, and I want to maintain
-//compliance with the standard, a .constructor property must be on the container delegators. In this case, its
-//just an alias for the true .factory property, which points to the delegator factory. I am isolating this from
-//the actual delegator itself as it encourages poor JavaScript development patterns and ... the myth of Javascript
-//classes and inheritance. I do not recommend using the .constructor property at all since that just encourages
-//FantasyLand and others to continue either not learning how JavaScript actually works, or refusing to use it
-//as it was intended... you know, like Douglas Crockford and his "good parts", which is really just another
-//way of saying: "your too dumb to understand how JavaScript works, and I either don't know myself, or don't
-//care to know, so just stick with what I tell you to use."
-constant.constructor = constant.factory;
-
-exports.Constant = Constant;
-exports.constant = constant;
-
-},{"../data_structure_util":331}],335:[function(require,module,exports){
-'use strict';
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-exports.left = exports.right = exports.Right = exports.Left = exports.Either = undefined;
-
-var _combinators = require('../../combinators');
-
-var _data_structure_util = require('../data_structure_util');
-
-/**
- * @signature
- * @description Returns an either functor based on a loose equals null comparison. If
- * the argument passed to the function loose equals null, a left is returned; other wise,
- * a right.
- * @private
- * @param {*} x - Any value that should be placed inside an either functor.
- * @return {monads.left|monads.right} - Either a left or a right functor
- */
-function fromNullable(x) {
-  return null != x ? Right(x) : Left(x);
-}
-
-/**
- * @signature - :: * -> monads.left|monads.right
- * @description Factory function used to create a new object that delegates to
- * the {@link monads.left|monads.right} object. Any single value may be provided as an argument
- * which will be used to set the underlying value of the new {@link monads.left|monads.right}
- * delegator. If no argument is provided, the underlying value will be 'undefined'.
- * @namespace Either
- * @memberOf monads
- * @property {function} of
- * @property {function} is
- * @property {function} isRight
- * @property {function} isLeft
- * @property {function} Right
- * @property {function} Left
- * @property {function} fromNullable
- * @property {function} lift
- * @param {*} [val] - The value that should be set as the underlying
- * value of the {@link monads.left|monads.right}.
- * @param {string} [fork] - Specifies if the either should be a left or a right. If no value
- * is provided, the result is created as a left.
- * @return {monads.left|monads.right} - Returns a new object that delegates to the
- * {@link monads.left|monads.right}.
- */
-function Either(val, fork) {
-  return 'right' === fork ? Object.create(right, {
-    _value: {
-      value: val,
-      writable: false,
-      configurable: false
-    },
-    isRight: {
-      value: true
-    },
-    isLeft: {
-      value: false
-    }
-  }) : Object.create(left, {
-    _value: {
-      value: val,
-      writable: false,
-      configurable: false
-    },
-    isRight: {
-      value: false
-    },
-    isLeft: {
-      value: true
-    }
-  });
-}
-
-/**
- * @signature * -> {@link monads.right}
- * @description Takes any value and places it in the correct context if it is
- * not already and creates a new {@link monads.right} object delegator instance.
- * Because the either functor does not require any specific context for
- * its value, this can be viewed as an alias for {@link monads.Right}
- * @memberOf monads.Either
- * @static
- * @function of
- * @param {*} [x] - The value that should be set as the underlying
- * value of the {@link monads.right}.
- * @return {monads.right} - Returns a new object that delegates to the
- * {@link monads.right}.
- */
-Either.of = function (x) {
-  return Either(x, 'right');
-};
-
-/**
- * @signature * -> boolean
- * @description Convenience function for determining if a value is an
- * {@link monads.left|monads.right} delegate or not. Available on the
- * {@link left|monads.right}'s factory function as monads.Either#is
- * @memberOf monads.Either
- * @function is
- * @param {*} [f] - Any value may be used as an argument to this function.
- * @return {boolean} Returns a boolean that indicates whether the
- * argument provided delegates to the {@link monads.left|monads.right} delegate.
- */
-Either.is = function (f) {
-  return Left.is(f) || Right.is(f);
-};
-
-/**
- * @signature Object -> boolean
- * @description Takes any object and returns a boolean indicating if the object is
- * a 'right' monad.
- * @memberOf monads.Either
- * @function is
- * @param {Object} [f] - a
- * @return {boolean} - b
- */
-Either.isRight = function (f) {
-  return f.isRight;
-};
-
-/**
- * @signature Object -> boolean
- * @description Takes any object and returns a boolean indicating if the object is
- * a 'left' monad.
- * @memberOf monads.Either
- * @function is
- * @param {Object} [f] - a
- * @return {boolean} - b
- */
-Either.isLeft = function (f) {
-  return f.isLeft;
-};
-
-/**
- * @signature * -> monads.right
- * @description Takes any value and creates a 'right' functor. Shorthand function
- * for Either(*, right)
- * @memberOf monads.Either
- * @function is
- * @param {*} x - a
- * @return {monads.right} - b
- */
-Either.Right = function (x) {
-  return Either(x, 'right');
-};
-
-/**
- * @signature * -> monads.left
- * @description Takes any value and creates a 'left' functor. Shorthand function
- * for Either(*, 'left')
- * @memberOf monads.Either
- * @function is
- * @param {*} [x] - a
- * @return {monads.left} - b
- */
-Either.Left = function (x) {
-  return Either(x);
-};
-
-/**
- * @signature * -> monads.left|monads.right
- * @description Takes any value and returns a 'left' monad is the value
- * loose equals null; other wise returns a 'right' monad.
- * @memberOf monads.Either
- * @function is
- * @param {*} [x] - a
- * @return {monads.left|monads.right} - b
- */
-Either.fromNullable = fromNullable;
-
-/**
- * @signature - :: * -> monads.left
- * @description Factory function used to create a new object that delegates to
- * the {@link monads.left} object. Any single value may be provided as an argument
- * which will be used to set the underlying value of the new {@link monads.left}
- * delegator. If no argument is provided, the underlying value will be 'undefined'.
- * @namespace Left
- * @memberOf monads
- * @property {function} of
- * @property {function} is
- * @property {function} lift
- * @param {*} [val] - The value that should be set as the underlying
- * value of the {@link monads.left}.
- * @return {monads.left} - Returns a new object that delegates to the
- * {@link monads.left}.
- */
-function Left(val) {
-  return Object.create(left, {
-    _value: {
-      value: val,
-      writable: false,
-      configurable: false
-    },
-    isRight: {
-      value: false,
-      writable: false,
-      configurable: false
-    },
-    isLeft: {
-      value: true,
-      writable: false,
-      configurable: false
-    }
-  });
-}
-
-/**
- * @signature * -> {@link monads.left}
- * @description Takes any value and places it in the correct context if it is
- * not already and creates a new {@link monads.left} object delegator instance.
- * Because the either functor does not require any specific context for
- * its value, this can be viewed as an alias for {@link monads.Left}
- * @memberOf monads.Left
- * @static
- * @function of
- * @param {*} [x] - The value that should be set as the underlying
- * value of the {@link monads.left}.
- * @return {monads.left} - Returns a new object that delegates to the
- * {@link monads.left}.
- */
-Left.of = function (x) {
-  return Left(x);
-};
-
-/**
- * @signature * -> boolean
- * @description Convenience function for determining if a value is an
- * {@link monads.left} delegate or not. Available on the
- * {@link left}'s factory function as monads.Left#is
- * @memberOf monads.Left
- * @function is
- * @param {*} [f] - Any value may be used as an argument to this function.
- * @return {boolean} Returns a boolean that indicates whether the
- * argument provided delegates to the {@link monads.left} delegate.
- */
-Left.is = function (f) {
-  return left.isPrototypeOf(f);
-};
-
-/**
- * @signature - :: * -> monads.right
- * @description Factory function used to create a new object that delegates to
- * the {@link monads.right} object. Any single value may be provided as an argument
- * which will be used to set the underlying value of the new {@link monads.right}
- * delegator. If no argument is provided, the underlying value will be 'undefined'.
- * @namespace Right
- * @memberOf monads
- * @property {function} of
- * @property {function} is
- * @property {function} lift
- * @param {*} [val] - The value that should be set as the underlying
- * value of the {@link monads.right}.
- * @return {monads.right} - Returns a new object that delegates to the
- * {@link monads.right}.
- */
-function Right(val) {
-  return Object.create(right, {
-    _value: {
-      value: val,
-      writable: false,
-      configurable: false
-    },
-    isRight: {
-      value: true,
-      writable: false,
-      configurable: false
-    },
-    isLeft: {
-      value: false,
-      writable: false,
-      configurable: false
-    }
-  });
-}
-
-/**
- * @signature * -> boolean
- * @description Convenience function for determining if a value is an
- * {@link monads.right} delegate or not. Available on the
- * {@link monads.right}'s factory function as monads.Right#is
- * @memberOf monads.Right
- * @function is
- * @param {*} [x] - Any value may be used as an argument to this function.
- * @return {boolean} Returns a boolean that indicates whether the
- * argument provided delegates to the {@link monads.right} delegate.
- */
-Right.is = function (x) {
-  return right.isPrototypeOf(x);
-};
-
-/**
- * @signature * -> {@link monads.right}
- * @description Takes any value and places it in the correct context if it is
- * not already and creates a new {@link monads.right} object delegator instance.
- * Because the either functor does not require any specific context for
- * its value, this can be viewed as an alias for {@link monads.Right}
- * @memberOf monads.Right
- * @static
- * @function of
- * @param {*} [x] - The value that should be set as the underlying
- * value of the {@link monads.right}.
- * @return {monads.right} - Returns a new object that delegates to the
- * {@link monads.right}.
- */
-Right.of = function (x) {
-  return Right(x);
-};
-
-/**
- * @typedef {Object} right
- * @property {function} value - returns the underlying value of the the functor
- * @property {function} map - maps a single function over the underlying value of the functor
- * @property {function} bimap
- * @property {function} get - returns the underlying value of the functor
- * @property {function} orElse - returns the underlying value of the functor
- * @property {function} getOrElse - returns the underlying value of the functor
- * @property {function} of - creates a new right delegate with the value provided
- * @property {function} valueOf - returns the underlying value of the functor; used during concatenation and coercion
- * @property {function} toString - returns a string representation of the identity functor and its underlying value
- * @property {function} factory - a reference to the right factory function
- * @property {function} [Symbol.Iterator] - Iterator for the right
- * @kind {Object}
- * @memberOf monads
- * @namespace right
- * @description This is the delegate object that specifies the behavior of the right functor. All
- * operations that may be performed on an right functor 'instance' delegate to this object. Right
- * functor 'instances' are created by the {@link monads.Either|monads.Right} factory function via Object.create,
- * during which the underlying value is placed directly on the newly created object. No other
- * properties exist directly on an right functor delegator object beyond the ._value property.
- * All behavior delegates to this object, or higher up the prototype chain.
- */
-var right = {
-  /**
-   * @signature () -> *
-   * @description Returns the underlying value of an right delegator. This
-   * getter is not expected to be used directly by consumers - it is meant as an internal
-   * access only. To manipulate the underlying value of a right delegator,
-   * see {@link monads.right#map} and {@link monads.right#bimap}. To
-   * retrieve the underlying value of a right delegator, see {@link monads.right#get},
-   * {@link monads.right#orElse}, {@link monads.right#getOrElse},
-   * and {@link monads.right#valueOf}.
-   * @memberOf monads.right
-   * @instance
-   * @protected
-   * @function
-   * @return {*} Returns the underlying value of the delegator. May be any value.
-   */
-  get value() {
-    return this._value;
-  },
-  /**
-   * @signature () -> {@link monads.right}
-   * @description Takes a function that is applied to the underlying value of the
-   * functor, the result of which is used to create a new {@link monads.right}
-   * delegator instance.
-   * @memberOf monads.right
-   * @instance
-   * @param {function} fn - A mapping function that can operate on the underlying
-   * value of the {@link monads.right}.
-   * @return {monads.right} Returns a new {@link monads.right}
-   * delegator whose underlying value is the result of the mapping operation
-   * just performed.
-   */
-  map: _data_structure_util.sharedEitherFns.rightMap,
-  /**
-   * @signature (* -> *) -> (* -> *) -> monads.right<T>
-   * @description Since the constant functor does not represent a disjunction, the Identity's
-   * bimap function property behaves just as its map function property. It is merely here as a
-   * convenience so that swapping out monads/monads does not break an application that is
-   * relying on its existence.
-   * @memberOf monads.right
-   * @instance
-   * @function
-   * @param {function} f - A function that will be used to map over the underlying data of the
-   * {@link monads.right} delegator.
-   * @param {function} [g] - An optional function that is simply ignored on the {@link monads.right}
-   * since there is no disjunction present.
-   * @return {monads.right} - Returns a new {@link monads.right} delegator after applying
-   * the mapping function to the underlying data.
-   */
-  bimap: _data_structure_util.sharedEitherFns.rightBiMap,
-  fold: function _fold(fn) {
-    return fn(this.value);
-  },
-  sequence: function _sequence(p) {
-    return this.traverse(_combinators.identity, p);
-  },
-  traverse: function _traverse(a, f, g) {
-    return f(this.value).map(this.of);
-  },
-  /**
-   * @signature () -> *
-   * @description Returns the underlying value of the current functor 'instance'.
-   * @memberOf monads.right
-   * @instance
-   * @function
-   * @return {*} - Returns the underlying value of the current functor 'instance'.
-   */
-  get: _data_structure_util.get,
-  /**
-   * @signature * -> *
-   * @description Takes an optional parameter of any value as a default return value in
-   * cases where the current functor 'instance\'s' underlying value is not 'mappable'.
-   * Because the identity_functor does not support disjunctions, the parameter is entirely
-   * optional and will always be ignored. Whatever the actual underlying value is, it will
-   * always be returned.
-   * @memberOf monads.right
-   * @instance
-   * @function
-   * @param {*} [x] - a
-   * @return {*} Returns the underlying value of the current functor 'instance'.
-   */
-  getOrElse: _data_structure_util.getOrElse,
-  /**
-   * @signature () -> *
-   * @description Takes an optional function parameter as a default to be invoked and
-   * returned in cases where the current functor 'instance\'s' underlying value is not
-   * 'mappable'. Because the identity_functor does not support disjunctions, the
-   * parameter is entirely optional and will always be ignored. Whatever the actual
-   * underlying value is, it will always be returned.
-   * @memberOf monads.right
-   * @instance
-   * @function
-   * @param {function} [f] - An optional function argument which is invoked and the result
-   * returned in cases where the underlying value is not 'mappable'.
-   * @return {*} - b
-   */
-  orElse: _data_structure_util.orElse,
-  /**
-   * @signature * -> {@link monads.right}
-   * @description Factory function used to create a new object that delegates to
-   * the {@link monads.right} object. Any single value may be provided as an argument
-   * which will be used to set the underlying value of the new {@link monads.right}
-   * delegator. If no argument is provided, the underlying value will be 'undefined'.
-   * @memberOf monads.right
-   * @instance
-   * @function
-   * @param {*} item - The value that should be set as the underlying
-   * value of the {@link monads.right}.
-   * @return {monads.right} Returns a new {@link monads.right} delegator object
-   * via the {@link monads.Either#of} function.
-   */
-  of: (0, _data_structure_util.pointMaker)(Right),
-  /**
-   * @signature () -> *
-   * @description Returns the underlying value of the current functor 'instance'. This
-   * function property is not meant for explicit use. Rather, the JavaScript engine uses
-   * this property during implicit coercion like addition and concatenation.
-   * @memberOf monads.right
-   * @instance
-   * @function
-   * @return {*} Returns the underlying value of the current functor 'instance'.
-   */
-  valueOf: _data_structure_util.valueOf,
-  /**
-   * @signature () -> string
-   * @description Returns a string representation of the functor and its
-   * underlying value
-   * @memberOf monads.right
-   * @instance
-   * @function
-   * @return {string} Returns a string representation of the right
-   * and its underlying value.
-   */
-  toString: (0, _data_structure_util.stringMaker)('Right'),
-  /**
-   * @signature * -> {@link monads.right}
-   * @description Factory function used to create a new object that delegates to
-   * the {@link monads.right} object. Any single value may be provided as an argument
-   * which will be used to set the underlying value of the new {@link monads.right}
-   * delegator. If no argument is provided, the underlying value will be 'undefined'.
-   * @memberOf monads.right
-   * @instance
-   * @function
-   * @see monads.Either
-   * @param {*} val - The value that should be set as the underlying
-   * value of the {@link monads.right}.
-   * @return {monads.right} - Returns a new identity functor delegator
-   */
-  factory: Either
-};
-
-/**
- * @signature * -> boolean
- * @description Determines if 'this' right functor is equal to another functor. Equality
- * is defined as:
- * 1) The other functor shares the same delegate object as 'this' identity functor
- * 2) Both underlying values are strictly equal to each other
- * @memberOf monads.right
- * @instance
- * @function
- * @param {Object} ma - The other functor to check for equality with 'this' functor.
- * @return {boolean} - Returns a boolean indicating equality
- */
-right.equals = (0, _data_structure_util.disjunctionEqualMaker)(right, 'isRight');
-
-/**
- * @typedef {Object} left
- * @property {function} value - returns the underlying value of the the functor
- * @property {function} map - maps a single function over the underlying value of the functor
- * @property {function} bimap
- * @property {function} get - returns the underlying value of the functor
- * @property {function} orElse - returns the underlying value of the functor
- * @property {function} getOrElse - returns the underlying value of the functor
- * @property {function} of - creates a new left delegate with the value provided
- * @property {function} valueOf - returns the underlying value of the functor; used during concatenation and coercion
- * @property {function} toString - returns a string representation of the identity functor and its underlying value
- * @property {function} factory - a reference to the left factory function
- * @property {function} [Symbol.Iterator] - Iterator for the left
- * @kind {Object}
- * @memberOf monads
- * @namespace left
- * @description This is the delegate object that specifies the behavior of the left functor. All
- * operations that may be performed on an left functor 'instance' delegate to this object. Left
- * functor 'instances' are created by the {@link monads.Either|monads.Left} factory function via Object.create,
- * during which the underlying value is placed directly on the newly created object. No other
- * properties exist directly on an identity functor delegator object beyond the ._value property.
- * All behavior delegates to this object, or higher up the prototype chain.
- */
-var left = {
-  /**
-   * @signature () -> *
-   * @description Returns the underlying value of an identity_functor delegator. This
-   * getter is not expected to be used directly by consumers - it is meant as an internal
-   * access only. To manipulate the underlying value of an identity_functor delegator,
-   * see {@link monads.left#map} and {@link monads.left#bimap}.
-   * To retrieve the underlying value of an identity_functor delegator, see {@link monads.left#get},
-   * {@link monads.left#orElse}, {@link monads.left#getOrElse},
-   * and {@link monads.left#valueOf}.
-   * @memberOf monads.left
-   * @instance
-   * @protected
-   * @function
-   * @return {*} Returns the underlying value of the delegator. May be any value.
-   */
-  get value() {
-    return this._value;
-  },
-  /**
-   * @signature () -> {@link monads.left}
-   * @description Takes a function that is applied to the underlying value of the
-   * functor, the result of which is used to create a new {@link monads.left}
-   * delegator instance.
-   * @memberOf monads.left
-   * @instance
-   * @param {function} fn - A mapping function that can operate on the underlying
-   * value of the {@link monads.left}.
-   * @return {monads.left} Returns a new {@link monads.left}
-   * delegator whose underlying value is the result of the mapping operation
-   * just performed.
-   */
-  map: _data_structure_util.sharedEitherFns.leftMapMaker(Left),
-  /**
-   * @signature (* -> *) -> (* -> *) -> monads.left<T>
-   * @description Since the constant functor does not represent a disjunction, the Identity's
-   * bimap function property behaves just as its map function property. It is merely here as a
-   * convenience so that swapping out monads/monads does not break an application that is
-   * relying on its existence.
-   * @memberOf monads.left
-   * @instance
-   * @function
-   * @param {function} f - A function that will be used to map over the underlying data of the
-   * {@link monads.left} delegator.
-   * @param {function} [g] - An optional function that is simply ignored on the {@link monads.left}
-   * since there is no disjunction present.
-   * @return {monads.left} - Returns a new {@link monads.left} delegator after applying
-   * the mapping function to the underlying data.
-   */
-  bimap: _data_structure_util.sharedEitherFns.leftBimapMaker(Left),
-  fold: function _fold(fn) {
-    return fn(this.value);
-  },
-  sequence: function _sequence(p) {
-    return this.traverse(_combinators.identity, p);
-  },
-  traverse: function _traverse(a, f) {
-    return a.of(Left(this.value));
-  },
-  /**
-   * @signature () -> *
-   * @description Returns the underlying value of the current functor 'instance'.
-   * @memberOf monads.left
-   * @instance
-   * @function
-   * @return {*} - Returns the underlying value of the current functor 'instance'.
-   */
-  get: _data_structure_util.emptyGet,
-  /**
-   * @signature * -> *
-   * @description Takes an optional parameter of any value as a default return value in
-   * cases where the current functor 'instance\'s' underlying value is not 'mappable'.
-   * Because the left does not support disjunctions, the parameter is entirely
-   * optional and will always be ignored. Whatever the actual underlying value is, it will
-   * always be returned.
-   * @memberOf monads.left
-   * @instance
-   * @function
-   * @param {*} [x] - a
-   * @return {*} Returns the underlying value of the current functor 'instance'.
-   */
-  getOrElse: _data_structure_util.emptyGetOrElse,
-  /**
-   * @signature () -> *
-   * @description Takes an optional function parameter as a default to be invoked and
-   * returned in cases where the current functor 'instance\'s' underlying value is not
-   * 'mappable'. Because the identity_functor does not support disjunctions, the
-   * parameter is entirely optional and will always be ignored. Whatever the actual
-   * underlying value is, it will always be returned.
-   * @memberOf monads.left
-   * @instance
-   * @function
-   * @param {function} [f] - An optional function argument which is invoked and the result
-   * returned in cases where the underlying value is not 'mappable'.
-   * @return {*} - b
-   */
-  orElse: _data_structure_util.emptyOrElse,
-  /**
-   * @signature * -> {@link monads.left}
-   * @description Factory function used to create a new object that delegates to
-   * the {@link monads.left} object. Any single value may be provided as an argument
-   * which will be used to set the underlying value of the new {@link monads.left}
-   * delegator. If no argument is provided, the underlying value will be 'undefined'.
-   * @memberOf monads.left
-   * @instance
-   * @function
-   * @param {*} item - The value that should be set as the underlying
-   * value of the {@link monads.left}.
-   * @return {monads.left} Returns a new {@link monads.left} delegator object
-   * via the {@link monads.Either#of} function.
-   */
-  of: (0, _data_structure_util.pointMaker)(Right),
-  /**
-   * @signature () -> *
-   * @description Returns the underlying value of the current functor 'instance'. This
-   * function property is not meant for explicit use. Rather, the JavaScript engine uses
-   * this property during implicit coercion like addition and concatenation.
-   * @memberOf monads.left
-   * @instance
-   * @function
-   * @return {*} Returns the underlying value of the current functor 'instance'.
-   */
-  valueOf: _data_structure_util.valueOf,
-  /**
-   * @signature () -> string
-   * @description Returns a string representation of the functor and its
-   * underlying value
-   * @memberOf monads.left
-   * @instance
-   * @function
-   * @return {string} Returns a string representation of the left
-   * and its underlying value.
-   */
-  toString: (0, _data_structure_util.stringMaker)('Left'),
-  /**
-   * @signature * -> {@link monads.left}
-   * @description Factory function used to create a new object that delegates to
-   * the {@link monads.left} object. Any single value may be provided as an argument
-   * which will be used to set the underlying value of the new {@link monads.left}
-   * delegator. If no argument is provided, the underlying value will be 'undefined'.
-   * @memberOf monads.left
-   * @instance
-   * @function
-   * @see monads.Either
-   * @param {*} val - The value that should be set as the underlying
-   * value of the {@link monads.left}.
-   * @return {monads.left} - Returns a new identity functor delegator
-   */
-  factory: Either
-};
-
-/**
- * @signature * -> boolean
- * @description Determines if 'this' left functor is equal to another functor. Equality
- * is defined as:
- * 1) The other functor shares the same delegate object as 'this' identity functor
- * 2) Both underlying values are strictly equal to each other
- * @memberOf monads.left
- * @instance
- * @function
- * @param {Object} ma - The other functor to check for equality with 'this' functor.
- * @return {boolean} - Returns a boolean indicating equality
- */
-left.equals = (0, _data_structure_util.disjunctionEqualMaker)(left, 'isLeft');
-
-//Since FantasyLand is the defacto standard for JavaScript algebraic data structures, and I want to maintain
-//compliance with the standard, a .constructor property must be on the container delegators. In this case, its
-//just an alias for the true .factory property, which points to the delegator factory. I am isolating this from
-//the actual delegator itself as it encourages poor JavaScript development patterns and ... the myth of Javascript
-//classes and inheritance. I do not recommend using the .constructor property at all since that just encourages
-//FantasyLand and others to continue either not learning how JavaScript actually works, or refusing to use it
-//as it was intended... you know, like Douglas Crockford and his "good parts", which is really just another
-//way of saying: "your too dumb to understand how JavaScript works, and I either don't know myself, or don't
-//care to know, so just stick with what I tell you to use."
-right.constructor = right.factory;
-left.constructor = left.factory;
-right.chain = _data_structure_util.chain;
-right.mjoin = _data_structure_util.mjoin;
-right.apply = _data_structure_util.monad_apply;
-
-left.chain = _data_structure_util.chain;
-left.mjoin = _data_structure_util.mjoin;
-left.apply = _data_structure_util.monad_apply;
-
-right.ap = right.apply;
-left.ap = left.apply;
-right.flatMap = right.chain;
-left.flatMap = left.chain;
-right.bind = right.chain;
-left.bind = left.chain;
-right.reduce = right.fold;
-left.reduce = left.fold;
-
-//Since FantasyLand is the defacto standard for JavaScript algebraic data structures, and I want to maintain
-//compliance with the standard, a .constructor property must be on the container delegators. In this case, its
-//just an alias for the true .factory property, which points to the delegator factory. I am isolating this from
-//the actual delegator itself as it encourages poor JavaScript development patterns and ... the myth of Javascript
-//classes and inheritance. I do not recommend using the .constructor property at all since that just encourages
-//FantasyLand and others to continue either not learning how JavaScript actually works, or refusing to use it
-//as it was intended... you know, like Douglas Crockford and his "good parts", which is really just another
-//way of saying: "your too dumb to understand how JavaScript works, and I either don't know myself, or don't
-//care to know, so just stick with what I tell you to use."
-right.constructor = right.factory;
-left.constructor = left.factory;
-
-exports.Either = Either;
-exports.Left = Left;
-exports.Right = Right;
-exports.right = right;
-exports.left = left;
-
-},{"../../combinators":330,"../data_structure_util":331}],336:[function(require,module,exports){
-'use strict';
-
-Object.defineProperty(exports, "__esModule", {
-    value: true
-});
-exports.future = exports.Future = undefined;
-
-var _functionalHelpers = require('../../functionalHelpers');
-
-var _combinators = require('../../combinators');
-
-var _data_structure_util = require('../data_structure_util');
-
-var _helpers = require('../../helpers');
-
-/**
- * @signature
- * @description d
- * @private
- * @param {function} reject - a
- * @param {function} resolve - b
- * @return {function} - c
- */
-function safeFork(reject, resolve) {
-    return function _safeFork(val) {
-        try {
-            return resolve(val);
-        } catch (ex) {
-            reject(ex);
-        }
-    };
-}
-
-/**
- * @signature - :: * -> {@link monads.future}
- * @description Factory function used to create a new object that delegates to
- * the {@link monads.future} object. Any single value may be provided as an argument
- * which will be used to set the underlying value of the new {@link monads.future}
- * delegator. If no argument is provided, the underlying value will be 'undefined'.
- * @namespace Future
- * @memberOf monads
- * @property {function} of
- * @property {function} is
- * @property {function} lift
- * @param {*} fn - The value that should be set as the underlying
- * value of the {@link monads.future}.
- * @return {monads.future} - Returns a new object that delegates to the
- * {@link monads.future}.
- */
-function Future(fn) {
-    return Object.create(future, {
-        _value: {
-            value: fn,
-            writable: false,
-            configurable: false
-        },
-        _fork: {
-            value: fn,
-            writable: false
-        }
-    });
-}
-
-/**
- * @sig
- * @description d
- * @param {Object} f - a
- * @return {boolean} - b
- */
-Future.is = function (f) {
-    return future.isPrototypeOf(f);
-};
-
-/**
- * @signature * -> {@link monads.future}
- * @description Takes any value and places it in the correct context if it is
- * not already and creates a new {@link monads.future} object delegator instance.
- * Because the future monad 'runs' off of functions, if the value passed to
- * {@link monads.future#of} is a function, it is not wrapped in a function. If it
- * is any other type, it is wrapped in a function that will be invoked on fork.
- * @memberOf monads.Future
- * @static
- * @function of
- * @param {*} [val] - The value that should be set as the underlying
- * value of the {@link monads.future}.
- * @return {monads.future} - Returns a new object that delegates to the
- * {@link monads.future}.
- */
-Future.of = function _of(val) {
-    if ('function' !== typeof val) return Future(function (_, resolve) {
-        return safeFork(_functionalHelpers.noop, resolve(val));
-    });
-    return Future(val);
-};
-//Future.of = val => ifElse(constant(strictEquals(javaScriptTypes.Function, type(val))), Future, futureFunctionize, val);
-
-var futureFunctionize = function futureFunctionize(val) {
-    return Future(function (_, resolve) {
-        return safeFork(_functionalHelpers.noop, resolve(val));
-    });
-};
-
-/**
- * @description Similar to {@link monads.future#of} except it will wrap any value
- * passed as the argument, regardless if it is a function or not.
- * @memberOf monads.future
- * @static
- * @function wrap
- * @param {*} val - The value that should be wrapped in a function and set as the
- * underlying value of the {@link monads.future}
- * @return {monads.future} Returns a new object that delegates to the {@link monads.future}
- */
-Future.wrap = function (val) {
-    return futureFunctionize(val);
-};
-
-/**
- * @signature
- * @description d
- * @memberOf monads.Future
- * @static
- * @function reject
- * @param {*} val - a
- * @return {future} - b
- */
-Future.reject = function (val) {
-    return Future(function (reject, resolve) {
-        return reject(val);
-    });
-};
-
-/**
- * @signature
- * @description d
- * @memberOf monads.Future
- * @static
- * @function unit
- * @param {function} val - a
- * @return {future} - b
- */
-Future.unit = function (val) {
-    return Future(val).complete();
-};
-
-/**
- * @signature
- * @description Takes any value (function or otherwise) and a delay time in
- * milliseconds, and returns a new {@link monads.future} that will fork in the amount
- * of time given as the delay.
- * @param {*} val - Any JavaScript value; {@link monads.Future#of} is called under the
- * covers, so it need not be a function.
- * @param {number} delay - The amount of time in milliseconds the forking operation
- * should be delayed
- * @return {monads.future} Returns a new future
- */
-Future.delay = function _delay(val, delay) {
-    var f = Future.of(fn);
-    setTimeout(function _timeout() {
-        f.fork();
-    }, delay);
-    return f;
-};
-
-/**
- * @signature () -> {@link monads.future}
- * @description Creates and returns an 'empty' identity monad.
- * @return {monads.future} - Returns a new identity monad.
- */
-Future.empty = function () {
-    return Future(_functionalHelpers.noop);
-};
-
-/**
- * @typedef {Object} future
- * @property {function} value - returns the underlying value of the the monad
- * @property {function} map - maps a single function over the underlying value of the monad
- * @property {function} bimap
- * @property {function} get - returns the underlying value of the monad
- * @property {function} orElse - returns the underlying value of the monad
- * @property {function} getOrElse - returns the underlying value of the monad
- * @property {function} of - creates a new future delegate with the value provided
- * @property {function} valueOf - returns the underlying value of the monad; used during concatenation and coercion
- * @property {function} toString - returns a string representation of the future monad and its underlying value
- * @property {function} factory - a reference to the future factory function
- * @property {function} [Symbol.Iterator] - Iterator for the future monad
- * @kind {Object}
- * @memberOf monads
- * @namespace future
- * @description This is the delegate object that specifies the behavior of the identity functor. All
- * operations that may be performed on an future monad 'instance' delegate to this object. Future
- * functor 'instances' are created by the {@link monads.Future} factory function via Object.create,
- * during which the underlying value is placed directly on the newly created object. No other
- * properties exist directly on an identity functor delegator object beyond the ._value property.
- * All behavior delegates to this object, or higher up the prototype chain.
- */
-var future = {
-    /**
-     * @signature () -> *
-     * @description Returns the underlying value of an future delegator. This
-     * getter is not expected to be used directly by consumers - it is meant as an internal
-     * access only. To manipulate the underlying value of an future delegator,
-     * see {@link monads.future#map} and {@link monads.future#bimap}.
-     * To retrieve the underlying value of an future delegator, see {@link monads.future#get},
-     * {@link monads.future#orElse}, {@link monads.future#getOrElse},
-     * and {@link monads.future#valueOf}.
-     * @memberOf monads.future
-     * @instance
-     * @protected
-     * @function
-     * @return {*} Returns the underlying value of the delegator. May be any value.
-     */
-    get value() {
-        return this._value;
-    },
-    /**
-     * @signature () -> {@link monads.future}
-     * @description Takes a function that is applied to the underlying value of the
-     * monad, the result of which is used to create a new {@link monads.future}
-     * delegator instance.
-     * @memberOf monads.future
-     * @instance
-     * @param {function} fn - A mapping function that can operate on the underlying
-     * value of the {@link monads.future}.
-     * @return {monads.future} Returns a new {@link monads.future}
-     * delegator whose underlying value is the result of the mapping operation
-     * just performed.
-     */
-    map: function _map(fn) {
-        var _this = this;
-
-        return this.of(function (reject, resolve) {
-            return _this.fork(function (err) {
-                return reject(err);
-            }, function (res) {
-                return resolve(fn(res));
-            });
-        });
-    },
-    //TODO: probably need to compose here, not actually map over the value; this is a temporary fill-in until
-    //TODO: I have time to finish working on the Future
-    chain: function _chain(fn) {
-        var _this2 = this;
-
-        return this.of(function (resolve, reject) {
-            return _this2.fork(function (err) {
-                return reject(err);
-            }, function (res) {
-                return fn(res).fork(reject, resolve);
-            });
-        });
-        /*
-        return this.of((reject, resolve) =>
-        {
-            let cancel,
-                outerFork = this._fork(a => reject(a), b => {
-                    cancel = fn(b).fork(reject, resolve);
-                });
-            return cancel ? cancel : (cancel = outerFork, x => cancel());
-        });
-        */
-    },
-    mjoin: function _mjoin() {
-        return this.chain(function (x) {
-            return x;
-        });
-    },
-    apply: function _apply(ma) {
-        var _this3 = this;
-
-        return this.of(function (reject, resolve) {
-            var rej = (0, _functionalHelpers.once)(reject),
-                val = void 0,
-                mapper = void 0,
-                rejected = false;
-
-            var cur = _this3.fork(rej, guardResolve(function _gr(x) {
-                mapper = x;
-            }));
-
-            var other = ma.fork(rej, guardResolve(function _gr(x) {
-                val = x;
-            }));
-
-            function guardResolve(setter) {
-                return function _guardResolve(x) {
-                    if (rejected) return;
-
-                    setter(x);
-                    if (mapper && val) {
-                        return resolve(mapper(val));
-                    }
-                    return x;
-                };
-            }
-
-            return [cur, other];
-        });
-    },
-    fold: function _fold(f, g) {
-        var _this4 = this;
-
-        return this.of(function (reject, resolve) {
-            return _this4.fork(function (err) {
-                return resolve(f(err));
-            }, function (res) {
-                return resolve(g(res));
-            });
-        });
-    },
-    traverse: function _traverse(fa, fn) {
-        return this.fold(function _reductioAdAbsurdum(xs, x) {
-            fn(x).map(function _map(x) {
-                return function _map_(y) {
-                    return y.concat([x]);
-                };
-            }).ap(xs);
-            return fa(this.empty);
-        });
-    },
-    bimap: function _bimap(f, g) {
-        var _this5 = this;
-
-        return this.of(function (reject, resolve) {
-            return _this5._fork(safeFork(reject, function (err) {
-                return reject(f(err));
-            }), safeFork(reject, function (res) {
-                return resolve(g(res));
-            }));
-        });
-    },
-    empty: function _empty() {
-        return this.of(_functionalHelpers.noop);
-    },
-    isEmpty: function _isEmpty() {
-        return this._fork === _functionalHelpers.noop;
-    },
-    fork: function _fork(reject, resolve) {
-        return this._fork(reject, safeFork(reject, resolve));
-    },
-    /**
-     * @signature * -> boolean
-     * @description Determines if 'this' future monad is equal to another monad. Equality
-     * is defined as:
-     * 1) The other monad shares the same delegate object as 'this' future monad
-     * 2) Both underlying values are strictly equal to each other
-     * @memberOf monads.future
-     * @instance
-     * @function
-     * @param {Object} ma - The other monad to check for equality with 'this' monad.
-     * @return {boolean} - Returns a boolean indicating equality
-     */
-    equals: function _equals(ma) {
-        return Object.getPrototypeOf(this).isPrototypeOf(ma) && ma.value === this.value;
-    },
-    /**
-     * @signature * -> {@link monads.future}
-     * @description Factory function used to create a new object that delegates to
-     * the {@link monads.future} object. Any single value may be provided as an argument
-     * which will be used to set the underlying value of the new {@link monads.future}
-     * delegator. If no argument is provided, the underlying value will be 'undefined'.
-     * @memberOf monads.future
-     * @instance
-     * @function
-     * @param {*} item - The value that should be set as the underlying
-     * value of the {@link monads.future}.
-     * @return {monads.future} Returns a new {@link monads.future} delegator object
-     * via the {@link monads.Future#of} function.
-     */
-    of: (0, _data_structure_util.pointMaker)(Future),
-    /**
-     * @signature () -> *
-     * @description Returns the underlying value of the current monad 'instance'. This
-     * function property is not meant for explicit use. Rather, the JavaScript engine uses
-     * this property during implicit coercion like addition and concatenation.
-     * @memberOf monads.future
-     * @instance
-     * @function
-     * @return {*} Returns the underlying value of the current monad 'instance'.
-     */
-    valueOf: _data_structure_util.valueOf,
-    /**
-     * @signature () -> string
-     * @description Returns a string representation of the monad and its
-     * underlying value
-     * @memberOf monads.future
-     * @instance
-     * @function
-     * @return {string} Returns a string representation of the future
-     * and its underlying value.
-     */
-    toString: function _toString() {
-        return 'Future(' + this.value.name + ')';
-    },
-    /**
-     * @signature * -> {@link monads.future}
-     * @description Factory function used to create a new object that delegates to
-     * the {@link monads.future} object. Any single value may be provided as an argument
-     * which will be used to set the underlying value of the new {@link monads.future}
-     * delegator. If no argument is provided, the underlying value will be 'undefined'.
-     * @memberOf monads.future
-     * @instance
-     * @function
-     * @see monads.Future
-     * @param {*} val - The value that should be set as the underlying
-     * value of the {@link monads.future}.
-     * @return {monads.future} - Returns a new future monad delegator
-     */
-    factory: Future
-};
-
-future.mjoin = _data_structure_util.mjoin;
-future.ap = future.apply;
-future.fmap = future.chain;
-future.flapMap = future.chain;
-future.bind = future.chain;
-future.reduce = future.fold;
-
-//Since FantasyLand is the defacto standard for JavaScript algebraic data structures, and I want to maintain
-//compliance with the standard, a .constructor property must be on the container delegators. In this case, its
-//just an alias for the true .factory property, which points to the delegator factory. I am isolating this from
-//the actual delegator itself as it encourages poor JavaScript development patterns and ... the myth of Javascript
-//classes and inheritance. I do not recommend using the .constructor property at all since that just encourages
-//FantasyLand and others to continue either not learning how JavaScript actually works, or refusing to use it
-//as it was intended... you know, like Douglas Crockford and his "good parts", which is really just another
-//way of saying: "your too dumb to understand how JavaScript works, and I either don't know myself, or don't
-//care to know, so just stick with what I tell you to use."
-future.constructor = future.factory;
-
-exports.Future = Future;
-exports.future = future;
-
-},{"../../combinators":330,"../../functionalHelpers":345,"../../helpers":346,"../data_structure_util":331}],337:[function(require,module,exports){
-'use strict';
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-exports.identity = exports.Identity = undefined;
-
-var _helpers = require('../../helpers');
-
-var _data_structure_util = require('../data_structure_util');
-
-/**
- * @signature - :: * -> {@link monads.identity}
- * @description Factory function used to create a new object that delegates to
- * the {@link monads.identity} object. Any single value may be provided as an argument
- * which will be used to set the underlying value of the new {@link monads.identity}
- * delegator. If no argument is provided, the underlying value will be 'undefined'.
- * @namespace Identity
- * @memberOf monads
- * @property {function} of
- * @property {function} is
- * @property {function} lift
- * @param {*} [val] - The value that should be set as the underlying
- * value of the {@link monads.identity}.
- * @return {monads.identity} - Returns a new object that delegates to the
- * {@link monads.identity}.
- */
-function Identity(val) {
-  return Object.create(identity, {
-    _value: {
-      value: val,
-      writable: false,
-      configurable: false
-    }
-  });
-}
-
-/**
- * @signature * -> {@link monads.identity}
- * @description Takes any value and places it in the correct context if it is
- * not already and creates a new {@link monads.identity} object delegator instance.
- * Because the identity monad does not require any specific context for
- * its value, this can be viewed as an alias for {@link Identity}
- * @memberOf monads.Identity
- * @static
- * @function of
- * @param {*} [x] - The value that should be set as the underlying
- * value of the {@link monads.identity}.
- * @return {monads.identity} - Returns a new object that delegates to the
- * {@link monads.identity}.
- */
-Identity.of = function (x) {
-  return Identity(x);
-};
-
-/**
- * @signature * -> boolean
- * @description Convenience function for determining if a value is an
- * {@link monads.identity} delegate or not. Available on the
- * identity's factory function as Identity.is.
- * @memberOf monads.Identity
- * @function is
- * @param {*} [f] - Any value may be used as an argument to this function.
- * @return {boolean} Returns a boolean that indicates whether the
- * argument provided delegates to the {@link monads.identity} delegate.
- */
-Identity.is = function (f) {
-  return identity.isPrototypeOf(f);
-};
-
-/**
- * @signature () -> {@link monads.identity}
- * @description Creates and returns an 'empty' identity monad.
- * @return {monads.identity} - Returns a new identity monad.
- */
-Identity.empty = function () {
-  return Identity(Object.create(_helpers.nil));
-};
-
-/**
- * @typedef {Object} identity
- * @property {function} value - returns the underlying value of the the monad
- * @property {function} map - maps a single function over the underlying value of the monad
- * @property {function} chain - returns a new identity monad
- * @property {function} mjoin - returns a new identity monad
- * @property {function} apply - returns a new instance of whatever monad type's underlying value this
- * identity's underlying function value should be mapped over.
- * @property {function} bimap - returns a new identity monad
- * @property {function} fold - Applies a function to the identity's underlying value and returns the result
- * @property {function} sequence - returns a new identity monad
- * @property {function} traverse - returns a new identity monad
- * @property {function} empty - Creates a new, 'empty' identity monad
- * @property {function} isEmpty - Returns a boolean indicating if the identity monad is 'empty'
- * @property {function} get - returns the underlying value of the monad
- * @property {function} orElse - returns the underlying value of the monad
- * @property {function} getOrElse - returns the underlying value of the monad
- * @property {function} of - creates a new identity delegate with the value provided
- * @property {function} valueOf - returns the underlying value of the monad; used during concatenation and coercion
- * @property {function} toString - returns a string representation of the identity monad and its underlying value
- * @property {function} factory - a reference to the identity factory function
- * @property {function} [Symbol.Iterator] - Iterator for the identity
- * @kind {Object}
- * @memberOf monads
- * @namespace identity
- * @description This is the delegate object that specifies the behavior of the identity monad. All
- * operations that may be performed on an identity monad 'instance' delegate to this object. Identity
- * monad 'instances' are created by the {@link monads.Identity} factory function via Object.create,
- * during which the underlying value is placed directly on the newly created object. No other
- * properties exist directly on an identity monad delegator object beyond the ._value property.
- * All behavior delegates to this object, or higher up the prototype chain.
- */
-var identity = {
-  /**
-   * @signature () -> *
-   * @description Returns the underlying value of an identity delegator. This
-   * getter is not expected to be used directly by consumers - it is meant as an internal
-   * access only. To manipulate the underlying value of an identity delegator,
-   * see {@link monads.identity#map} and {@link monads.identity#bimap}.
-   * To retrieve the underlying value of an identity delegator, see {@link monads.identity#get},
-   * {@link monads.identity#orElse}, {@link monads.identity#getOrElse},
-   * and {@link monads.identity#valueOf}.
-   * @memberOf monads.identity
-   * @instance
-   * @protected
-   * @function
-   * @return {*} Returns the underlying value of the delegator. May be any value.
-   */
-  get value() {
-    return this._value;
-  },
-  /**
-   * @signature () -> {@link monads.identity}
-   * @description Takes a function that is applied to the underlying value of the
-   * monad, the result of which is used to create a new {@link monads.identity}
-   * delegator instance.
-   * @memberOf monads.identity
-   * @instance
-   * @param {function} fn - A mapping function that can operate on the underlying
-   * value of the {@link monads.identity}.
-   * @return {monads.identity} Returns a new {@link monads.identity}
-   * delegator whose underlying value is the result of the mapping operation
-   * just performed.
-   */
-  map: function _map(fn) {
-    return this.of(fn(this.value));
-  },
-  /**
-   * @signature () -> {@link monads.identity}
-   * @description Accepts a mapping function as an argument, applies the function to the
-   * underlying value. If the mapping function returns an identity monad, chain will 'flatten'
-   * the nested identities by one level. If the mapping function does not return an identity
-   * monad, chain will just return an identity monad that 'wraps' whatever the return value
-   * of the mapping function is. However, if the mapping function does not return a monad of
-   * the same type, then chain is probably not the functionality you should use. See
-   * {@link monads.identity#map} instead.
-   * @memberOf monads.identity
-   * @instance
-   * @function chain
-   * @param {function} fn - A mapping function that returns a monad of the same type
-   * @return {Object} Returns a new identity monad that 'wraps' the return value of the
-   * mapping function after flattening it by one level.
-   */
-  chain: _data_structure_util.chain,
-  /**
-   * @signature () -> {@link monads.identity}
-   * @description Returns a new identity monad. If the current identity monad is nested, mjoin
-   * will flatten it by one level. Very similar to {@link monads.identity#chain} except no
-   * mapping function is accepted or run.
-   * @memberOf monads.identity
-   * @instance
-   * @function mjoin
-   * @return {Object} Returns a new identity monad after flattening the nested monads by one level.
-   */
-  mjoin: _data_structure_util.mjoin,
-  /**
-   * @signature Object -> Object
-   * @description Accepts any monad object with a mapping function and invokes that object's mapping
-   * function on the identity's underlying value. In order for this function to execute properly and
-   * not throw, the identity's underlying value must be a function that can be used as a mapping function
-   * on the monad object supplied as the argument.
-   * @memberOf monads.identity
-   * @instance
-   * @function apply
-   * @param {Object} ma - Any object with a map function - i.e. a monad.
-   * @return {Object} Returns an instance of the monad object provide as an argument.
-   */
-  apply: _data_structure_util.monad_apply,
-  /**
-   * @signature () -> *
-   * @description Accepts a function that is used to map over the identity's underlying value
-   * and returns the returns value of the function without 're-wrapping' it in a new identity
-   * monad instance.
-   * @memberOf monads.identity
-   * @instance
-   * @function fold
-   * @param {function} fn - Any mapping function that should be applied to the underlying value
-   * of the identity monad.
-   * @param {*} acc - An JavaScript value that should be used as an accumulator.
-   * @return {*} Returns the return value of the mapping function provided as an argument.
-   */
-  fold: function _fold(fn, acc) {
-    return fn(acc, this.value);
-  },
-  /**
-   * @signature monad -> monad<monad<T>>
-   * @description Returns a monad of the type passed as an argument that 'wraps'
-   * and identity monad that 'wraps' the current identity monad's underlying value.
-   * @memberOf monads.identity
-   * @instance
-   * @function sequence
-   * @param {Object} p - Any pointed monad with a '#of' function property
-   * @return {Object} Returns a monad of the type passed as an argument that 'wraps'
-   * and identity monad that 'wraps' the current identity monad's underlying value.
-   */
-  sequence: function _sequence(p) {
-    return this.traverse(p, p.of);
-  },
-  /**
-   * @signature Object -> () -> Object
-   * @description Accepts a pointed monad with a '#of' function property and a mapping function. The mapping
-   * function is applied to the identity monad's underlying value. The mapping function should return a monad
-   * of any type. Then the {@link monads.Identity.of} function is used to map over the returned monad. Essentially
-   * creating a new object of type: monad<Identity<T>>, where 'monad' is the type of monad the mapping
-   * function returns.
-   * @memberOf monads.identity
-   * @instance
-   * @function traverse
-   * @param {Object} a - A pointed monad with a '#of' function property. Used only in cases
-   * where the mapping function cannot be run.
-   * @param {function} f - A mapping function that should be applied to the identity's underlying value.
-   * @return {Object} Returns a new identity monad that wraps the mapping function's returned monad type.
-   */
-  traverse: function _traverse(a, f) {
-    return f(this.value).map(this.of);
-  },
-  /**
-   * @signature (b -> a) -> monads.Identity
-   * @description This property will only function correctly if the underlying value of the
-   * current identity monad is a function type. Accepts a function argument and returns a new
-   * identity monad with the composition of the function argument and the underlying function
-   * value as the new underlying. The supplied function argument is executed first in the
-   * composition, so its signature must be (b -> a) so that the value it passes as an argument
-   * to the previous underlying function will be of the expected type.
-   * @memberOf monads.identity
-   * @instance
-   * @function contramap
-   * @param {function} fn - A function that should be composed with the current identity's
-   * underling function.
-   * @return {monads.identity} Returns a new identity monad.
-   */
-  contramap: _data_structure_util.contramap,
-  /**
-   * @signature () -> {@link monads.identity}
-   * @description Creates and returns a new, 'empty' identity monad.
-   * @memberOf monads.identity
-   * @instance
-   * @function empty
-   * @return {monads.identity} Creates and returns a new, 'empty' identity monad.
-   */
-  empty: function _empty() {
-    return this.of(Object.create(_helpers.nil));
-  },
-  /**
-   * @signature () -> boolean
-   * @description Returns a boolean indicating if the monad is 'empty'
-   * @memberOf monads.identity
-   * @instance
-   * @function isEmpty
-   * @return {boolean} Returns a boolean indicating if the monad is 'empty'
-   */
-  isEmpty: function _getIsEmpty() {
-    return _helpers.nil.isPrototypeOf(this.value);
-  },
-  /**
-   * @signature () -> *
-   * @description Returns the underlying value of the current monad 'instance'.
-   * @memberOf monads.identity
-   * @instance
-   * @function
-   * @return {*} - Returns the underlying value of the current monad 'instance'.
-   */
-  get: _data_structure_util.get,
-  /**
-   * @signature () -> *
-   * @description Takes an optional function parameter as a default to be invoked and
-   * returned in cases where the current monad 'instance\'s' underlying value is not
-   * 'mappable'. Because the identity does not support disjunctions, the
-   * parameter is entirely optional and will always be ignored. Whatever the actual
-   * underlying value is, it will always be returned.
-   * @memberOf monads.identity
-   * @instance
-   * @function
-   * @param {function} [f] - An optional function argument which is invoked and the result
-   * returned in cases where the underlying value is not 'mappable'.
-   * @return {*} - b
-   */
-  orElse: _data_structure_util.orElse,
-  /**
-   * @signature * -> *
-   * @description Takes an optional parameter of any value as a default return value in
-   * cases where the current monad 'instance\'s' underlying value is not 'mappable'.
-   * Because the identity does not support disjunctions, the parameter is entirely
-   * optional and will always be ignored. Whatever the actual underlying value is, it will
-   * always be returned.
-   * @memberOf monads.identity
-   * @instance
-   * @function
-   * @param {*} [x] - a
-   * @return {*} Returns the underlying value of the current monad 'instance'.
-   */
-  getOrElse: _data_structure_util.getOrElse,
-  /**
-   * @signature (identity<A> -> B) -> identity<B>
-   * @description Takes a function that operates on the current identity monad and returns
-   * any value, invokes that function, passing the current identity monad as the only argument,
-   * and then returns a new identity monad that wraps the return value of the provided function.
-   * @param {function} fn - A function that can operate on an identity monad
-   * @return {Identity<T>} Returns a new identity monad that wraps the return value of the
-   * function that was provided as an argument.
-   */
-  extend: (0, _data_structure_util.extendMaker)(Identity),
-  /**
-   * @signature * -> {@link monads.identity}
-   * @description Factory function used to create a new object that delegates to
-   * the {@link monads.identity} object. Any single value may be provided as an argument
-   * which will be used to set the underlying value of the new {@link monads.identity}
-   * delegator. If no argument is provided, the underlying value will be 'undefined'.
-   * @memberOf monads.identity
-   * @instance
-   * @function
-   * @param {*} item - The value that should be set as the underlying
-   * value of the {@link monads.identity}.
-   * @return {monads.identity} Returns a new {@link monads.identity} delegator object
-   * via the {@link monads.Identity#of} function.
-   */
-  of: (0, _data_structure_util.pointMaker)(Identity),
-  /**
-   * @signature () -> *
-   * @description Returns the underlying value of the current monad 'instance'. This
-   * function property is not meant for explicit use. Rather, the JavaScript engine uses
-   * this property during implicit coercion like addition and concatenation.
-   * @memberOf monads.identity
-   * @instance
-   * @function
-   * @return {*} Returns the underlying value of the current monad 'instance'.
-   */
-  valueOf: _data_structure_util.valueOf,
-  /**
-   * @signature () -> string
-   * @description Returns a string representation of the monad and its
-   * underlying value
-   * @memberOf monads.identity
-   * @instance
-   * @function
-   * @return {string} Returns a string representation of the identity
-   * and its underlying value.
-   */
-  toString: (0, _data_structure_util.stringMaker)('Identity'),
-  /**
-   * @signature * -> {@link monads.identity}
-   * @description Factory function used to create a new object that delegates to
-   * the {@link monads.identity} object. Any single value may be provided as an argument
-   * which will be used to set the underlying value of the new {@link monads.identity}
-   * delegator. If no argument is provided, the underlying value will be 'undefined'.
-   * @memberOf monads.identity
-   * @instance
-   * @function
-   * @see monads.Identity
-   * @param {*} val - The value that should be set as the underlying
-   * value of the {@link monads.identity}.
-   * @return {monads.identity} - Returns a new identity monad delegator
-   */
-  factory: Identity
-};
-
-/**
- * @signature * -> boolean
- * @description Determines if 'this' identity monad is equal to another monad. Equality
- * is defined as:
- * 1) The other monad shares the same delegate object as 'this' identity monad
- * 2) Both underlying values are strictly equal to each other
- * @memberOf monads.identity
- * @instance
- * @function
- * @param {Object} ma - The other monad to check for equality with 'this' monad.
- * @return {boolean} - Returns a boolean indicating equality
- */
-identity.equals = (0, _data_structure_util.equalMaker)(identity);
-
-/**
- * @signature (* -> *) -> (* -> *) -> monads.identity<T>
- * @description Since the constant monad does not represent a disjunction, the Identity's
- * bimap function property behaves just as its map function property. It is merely here as a
- * convenience so that swapping out monads/monads does not break an application that is
- * relying on its existence.
- * @memberOf monads.identity
- * @instance
- * @function bimap
- * @param {function} f - A function that will be used to map over the underlying data of the
- * {@link monads.identity} delegator.
- * @param {function} [g] - An optional function that is simply ignored on the {@link monads.identity}
- * since there is no disjunction present.
- * @return {monads.identity<T>} - Returns a new {@link monads.identity} delegator after applying
- * the mapping function to the underlying data.
- */
-identity.bimap = identity.map;
-
-/**
- * @signature Object -> Object
- * @description Alias for {@link monads.identity#apply}
- * @memberOf monads.identity
- * @instance
- * @function ap
- * @see monads.identity#apply
- * @param {Object} ma - Any object with a map function - i.e. a monad.
- * @return {Object} Returns an instance of the monad object provide as an argument.
- */
-identity.ap = identity.apply;
-
-/**
- * @signature () -> {@link monads.identity}
- * @description Alias for {@link monads.identity#chain}
- * @memberOf monads.identity
- * @instance
- * @function fmap
- * @see monads.identity#chain
- * @param {function} fn - A mapping function that returns a monad of the same type
- * @return {Object} Returns a new identity monad that 'wraps' the return value of the
- * mapping function after flattening it by one level.
- */
-identity.fmap = identity.chain;
-
-/**
- * @signature () -> {@link monads.identity}
- * @description Alias for {@link monads.identity#chain}
- * @memberOf monads.identity
- * @instance
- * @function flatMap
- * @see monads.identity#chain
- * @param {function} fn - A mapping function that returns a monad of the same type
- * @return {Object} Returns a new identity monad that 'wraps' the return value of the
- * mapping function after flattening it by one level.
- */
-identity.flapMap = identity.chain;
-
-/**
- * @signature () -> {@link monads.identity}
- * @description Alias for {@link monads.identity#chain}
- * @memberOf monads.identity
- * @instance
- * @function bind
- * @see monads.identity#chain
- * @param {function} fn - A mapping function that returns a monad of the same type
- * @return {Object} Returns a new identity monad that 'wraps' the return value of the
- * mapping function after flattening it by one level.
- */
-identity.bind = identity.chain;
-
-/**
- * @signature () -> *
- * @description Alias for {@link monads.identity#fold}
- * @memberOf monads.identity
- * @instance
- * @function reduce
- * @see monads.identity#fold
- * @param {function} fn - Any mapping function that should be applied to the underlying value
- * of the identity monad.
- * @return {*} Returns the return value of the mapping function provided as an argument.
- */
-identity.reduce = identity.fold;
-
-//Since FantasyLand is the defacto standard for JavaScript algebraic data structures, and I want to maintain
-//compliance with the standard, a .constructor property must be on the container delegators. In this case, its
-//just an alias for the true .factory property, which points to the delegator factory. I am isolating this from
-//the actual delegator itself as it encourages poor JavaScript development patterns and ... the myth of Javascript
-//classes and inheritance. I do not recommend using the .constructor property at all since that just encourages
-//FantasyLand and others to continue either not learning how JavaScript actually works, or refusing to use it
-//as it was intended... you know, like Douglas Crockford and his "good parts", which is really just another
-//way of saying: "you're too dumb to understand how JavaScript works, and I either don't know myself, or don't
-//care to know, so just stick with what I tell you to use."
-identity.constructor = identity.factory;
-
-exports.Identity = Identity;
-exports.identity = identity;
-
-},{"../../helpers":346,"../data_structure_util":331}],338:[function(require,module,exports){
-'use strict';
-
-Object.defineProperty(exports, "__esModule", {
-    value: true
-});
-exports.io = exports.Io = undefined;
-
-var _combinators = require('../../combinators');
-
-var _functionalHelpers = require('../../functionalHelpers');
-
-var _data_structure_util = require('../data_structure_util');
-
-var _helpers = require('../../helpers');
-
-/**
- * @signature
- * @description d
- * @param {function} item - a
- * @return {io} - b
- */
-function Io(item) {
-    return Object.create(io, {
-        _value: {
-            value: item,
-            writable: false,
-            configurable: false
-        },
-        run: {
-            value: item,
-            writable: false,
-            configurable: false
-        }
-    });
-}
-
-/**
- * @signature
- * @description d
- * @param {function|*} item - a
- * @return {io} - b
- */
-Io.of = function (item) {
-    return (0, _functionalHelpers.strictEquals)(_helpers.javaScriptTypes.Function, (0, _functionalHelpers.type)(item)) ? Io(item) : Io((0, _combinators.constant)(item));
-};
-
-/**
- * @signature
- * @description d
- * @param {Object} f - a
- * @return {boolean} - b
- */
-Io.is = function (f) {
-    return io.isPrototypeOf(f);
-};
-
-/**
- * @description d
- * @typedef {Object}
- */
-var io = {
-    get value() {
-        return this._value;
-    },
-    map: function _map(fn) {
-        return this.chain(function (a) {
-            return Io.of(fn(a));
-        });
-    },
-    fold: function _fold(fn, x) {
-        return fn(this.value, x);
-    },
-    traverse: function _traverse(fa, fn) {
-        return this.fold(function _reductioAdAbsurdum(xs, x) {
-            fn(x).map(function _map(x) {
-                return function _map_(y) {
-                    return y.concat([x]);
-                };
-            }).ap(xs);
-            return fa(this.empty);
-        });
-    },
-    runIo: function _runIo() {
-        return this.run.apply(this, arguments);
-    },
-    of: (0, _data_structure_util.pointMaker)(Io),
-    valueOf: _data_structure_util.valueOf,
-    toString: (0, _data_structure_util.stringMaker)('Io'),
-    factory: Io
-};
-
-/**
- * @description:
- * @return:
- */
-io.equals = (0, _data_structure_util.equalMaker)(io);
-
-/**
- * @description: Since the constant functor does not represent a disjunction, the Io's
- * bimap function property behaves just as its map function property. It is merely here as a
- * convenience so that swapping out functors/monads does not break an application that is
- * relying on its existence.
- * @type: {{function}}
- * @param: {function} f
- * @param: {function} g
- * @return: {@see io}
- */
-io.bimap = io.map;
-
-io.chain = _data_structure_util.chain;
-io.mjoin = _data_structure_util.mjoin;
-io.apply = _data_structure_util.monad_apply;
-
-io.ap = io.apply;
-io.fmap = io.chain;
-io.flapMap = io.chain;
-io.bind = io.chain;
-io.reduce = io.fold;
-
-//Since FantasyLand is the defacto standard for JavaScript algebraic data structures, and I want to maintain
-//compliance with the standard, a .constructor property must be on the container delegators. In this case, its
-//just an alias for the true .factory property, which points to the delegator factory. I am isolating this from
-//the actual delegator itself as it encourages poor JavaScript development patterns and ... the myth of Javascript
-//classes and inheritance. I do not recommend using the .constructor property at all since that just encourages
-//FantasyLand and others to continue either not learning how JavaScript actually works, or refusing to use it
-//as it was intended... you know, like Douglas Crockford and his "good parts", which is really just another
-//way of saying: "your too dumb to understand how JavaScript works, and I either don't know myself, or don't
-//care to know, so just stick with what I tell you to use."
-io.constructor = io.factory;
-
-exports.Io = Io;
-exports.io = io;
-
-},{"../../combinators":330,"../../functionalHelpers":345,"../../helpers":346,"../data_structure_util":331}],339:[function(require,module,exports){
-'use strict';
-
-Object.defineProperty(exports, "__esModule", {
-    value: true
-});
-exports.ordered_list = exports.list = exports.list_core = exports.List = undefined;
-
-var _list_iterators = require('../list_iterators');
-
-var _helpers = require('../../helpers');
-
-var _functionalHelpers = require('../../functionalHelpers');
-
-var _combinators = require('../../combinators');
-
-var _decorators = require('../../decorators');
-
-var _sort_util = require('../sort_util');
-
-function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
-
-/**
- * @description: Object that contains the core functionality of a List; both the m_list and ordered_m_list
- * objects delegate to this object for all functionality besides orderBy/orderByDescending
- * and thenBy/thenByDescending respectively. Getter/setters are present for state-manipulation
- * at the consumer-object level, as well as to provide default values for a consumer-level
- * object at creation if not specified.
- * @typedef {Object}
- * @property {function} value
- * @property {function} apply
- * @property {function} append
- * @property {function} appendAll
- * @property {function} bimap
- * @property {function} chain
- * @property {function} concat
- * @property {function} concatAll
- * @property {function} copyWithin
- * @property {function} distinct
- * @property {function} except
- * @property {function} fill
- * @property {function} filter
- * @property {function} groupBy
- * @property {function} groupByDescending
- * @property {function} groupJoin
- * @property {function} intersect
- * @property {function} intersperse
- * @property {function} listJoin
- * @property {function} map
- * @property {function} mjoin
- * @property {function} ofType
- * @property {function} prepend
- * @property {function} prependAll
- * @property {function} reverse
- * @property {function} sequence
- * @property {function} skip
- * @property {function} skipWhile
- * @property {function} take
- * @property {function} takeWhile
- * @property {function} union
- * @property {function} zip
- * @property {function} all
- * @property {function} any
- * @property {function} count
- * @property {function} equals
- * @property {function} data
- * @property {function} findIndex
- * @property {function} findLastIndex
- * @property {function} first
- * @property {function} foldl
- * @property {function} foldr
- * @property {function} isEmpty
- * @property {function} last
- * @property {function} reduceRight
- * @property {function} toArray
- * @property {function} toEvaluatedList
- * @property {function} toMap
- * @property {function} toSet
- * @property {function} toString
- * @property {function} valueOf
- * @property {function} factory
- * @property {function} of
- * @property {function} sequence
- * @property {function} traverse
- * @property {Symbol.iterator}
- * @kind {Object}
- * @memberOf monads
- * @namespace list_core
- * @description This is the delegate object that specifies the behavior of the list functor. Most
- * operations that may be performed on an list functor 'instance' delegate to this object. List
- * functor 'instances' are created by the {@link monads.List} factory function via Object.create,
- * during which the underlying value is placed directly on the newly created object. No other
- * properties exist directly on an list functor delegator object beyond the ._value property.
- * All behavior delegates to this object, or higher up the prototype chain.
- */
-var list_core = _defineProperty({
-    //Using getters for these properties because there's a chance the setting and/or getting
-    //functionality could change; this will allow for a consistent interface while the
-    //logic beneath changes
-    /**
-     * @signature () -> *
-     * @description Returns the underlying value of an identity_functor delegator. This
-     * getter is not expected to be used directly by consumers - it is meant as an internal
-     * access only. To manipulate the underlying value of an identity_functor delegator,
-     * see {@link monads.list#map} and {@link monads.list#bimap}.
-     * To retrieve the underlying value of an identity_functor delegator, see {@link monads.list#get},
-     * {@link monads.list#orElse}, {@link monads.list#getOrElse},
-     * and {@link monads.list#valueOf}.
-     * @memberOf monads.list_core
-     * @instance
-     * @protected
-     * @function value
-     * @return {*} Returns the underlying value of the delegator. May be any value.
-     */
-    get value() {
-        return this._value;
-    },
-
-    /**
-     * @signature monads.list_core -> monads.list_core
-     * @description Applies a function contained in another functor to the source
-     * of this List object instance's underlying source. A new List object instance
-     * is returned.
-     * @memberOf monads.list_core
-     * @instance
-     * @function apply
-     * @this monads.list_core
-     * @param {Object} ma - a
-     * @return {monads.list} - b
-     */
-    apply: function _apply(ma) {
-        return this.map(ma.value);
-    },
-
-    /**
-     * @signature () -> monads.list_core
-     * @description d
-     * @memberOf monads.list_core
-     * @instance
-     * @function chain
-     * @this monads.list_core
-     * @param {function} fn - a
-     * @return {monads.list} - b
-     */
-    chain: function _chain(fn) {
-        return this.of(this, (0, _list_iterators.chain)(this, fn));
-    },
-
-    /**
-     * @signature [...iterable] -> monads.list_core
-     * @description Concatenates two or more lists by appending the "method's" List argument(s) to the
-     * List's value. This function is a deferred execution call that returns
-     * a new queryable object delegator instance that contains all the requisite
-     * information on how to perform the operation.
-     * @memberOf monads.list_core
-     * @instance
-     * @function concat
-     * @this monads.list_core
-     * @param {Array | *} ys - a
-     * @return {monads.list} - b
-     */
-    concat: function _concat(ys) {
-        return this.of(this, (0, _list_iterators.concat)(this, List.of(ys)));
-    },
-
-    /**
-     * @signature
-     * @description d
-     * @memberOf monads.list_core
-     * @instance
-     * @function concatAll
-     * @this monads.list
-     * @param {list|ordered_list} ys - One or more lists to concatenate with this list
-     * @return {monads.list} Returns a new list
-     */
-    concatAll: function _concatAll() {
-        for (var _len = arguments.length, ys = Array(_len), _key = 0; _key < _len; _key++) {
-            ys[_key] = arguments[_key];
-        }
-
-        return this.of(this, (0, _list_iterators.concatAll)(this, ys.map(function (y) {
-            return List.of(y);
-        })));
-    },
-
-    /**
-     * @signature
-     * @description d
-     * @memberOf monads.list_core
-     * @instance
-     * @function copyWithin
-     * @this monads.list
-     * @external Array
-     * @see {@link https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/copyWithin}
-     * @param {number} index - a
-     * @param {number} start - b
-     * @param {number} end - c
-     * @return {monads.list} - d
-     */
-    copyWithin: function _copyWithin(index, start, end) {
-        return this.of(this, (0, _list_iterators.copyWithin)(index, start, end, this));
-    },
-
-    /**
-     * @signature (a -> boolean) -> List<b>
-     * @description d
-     * @memberOf monads.list_core
-     * @instance
-     * @function distinct
-     * @this monads.list_core
-     * @param {function} comparer - a
-     * @return {monads.list} - b
-     */
-    distinct: function _distinct(comparer) {
-        return this.of(this, (0, _list_iterators.distinct)(this, comparer));
-    },
-
-    /**
-     * @signature
-     * @description Produces a List that contains the objectSet difference between the queryable object
-     * and the List that is passed as a function argument. A comparer function may be
-     * provided to the function that determines the equality/inequality of the items in
-     * each List; if left undefined, the function will use a default equality comparer.
-     * This function is a deferred execution call that returns a new queryable
-     * object delegator instance that contains all the requisite information on
-     * how to perform the operation.
-     * equality comparer.
-     * @memberOf monads.list_core
-     * @instance
-     * @function except
-     * @this monads.list
-     * @param {Array|generator} xs - a
-     * @param {function} [comparer] - b
-     * @return {monads.list} - c
-     */
-    except: function _except(xs, comparer) {
-        return this.of(this, (0, _list_iterators.except)(this, xs, comparer));
-    },
-
-    /**
-     * @signature
-     * @description d
-     * @memberOf monads.list_core
-     * @instance
-     * @function fill
-     * @this monads.list
-     * @external Array
-     * @see {@link https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/fill}
-     * @param {number} value - a
-     * @param {number} start - b
-     * @param {number} end - c
-     * @return {monads.list} - d
-     */
-    fill: function _fill(value, start, end) {
-        return this.of(this, (0, _list_iterators.fill)(value, start, end, this));
-    },
-
-    /**
-     * @signature
-     * @description d
-     * @memberOf monads.list_core
-     * @instance
-     * @function filter
-     * @this monads.list_core
-     * @param {function} predicate - a
-     * @return {monads.list_core} - b
-     */
-    filter: function _filter(predicate) {
-        return this.of(this, (0, _list_iterators.filter)(this, predicate));
-    },
-
-    /**
-     * @signature
-     * @description d
-     * @memberOf monads.list_core
-     * @instance
-     * @function groupBy
-     * @this monads.list_core
-     * @param {function} keySelector - a
-     * @param {function} [comparer] - b
-     * @return {monads.list_core} - c
-     */
-    groupBy: function _groupBy(keySelector, comparer) {
-        return this.of(this, (0, _list_iterators.groupBy)(this, [(0, _sort_util.createSortObject)(keySelector, comparer, _helpers.sortDirection.ascending)], createGroupedListDelegate));
-    },
-
-    /**
-     * @signature
-     * @description d
-     * @memberOf monads.list_core
-     * @instance
-     * @function groupByDescending
-     * @this monads.list_core
-     * @param {function} keySelector - a
-     * @param {function} [comparer] - b
-     * @return {monads.list_core} - c
-     */
-    groupByDescending: function _groupByDescending(keySelector, comparer) {
-        return this.of(this, (0, _list_iterators.groupBy)(this, [(0, _sort_util.createSortObject)(keySelector, comparer, _helpers.sortDirection.descending)], createGroupedListDelegate));
-    },
-
-    /**
-     * @signature
-     * @description Correlates the items in two lists based on the equality of a key and groups
-     * all items that share the same key. A comparer function may be provided to
-     * the function that determines the equality/inequality of the items in each
-     * List; if left undefined, the function will use a default equality comparer.
-     * This function is a deferred execution call that returns a new queryable
-     * object delegator instance that contains all the requisite information on
-     * how to perform the operation.
-     * @memberOf monads.list_core
-     * @instance
-     * @function groupJoin
-     * @this monads.list_core
-     * @param {monads.list_core | Array} ys - a
-     * @param {function} xSelector - b
-     * @param {function} ySelector - c
-     * @param {function} projector - d
-     * @param {function} [comparer] - e
-     * @return {monads.list_core} - f
-     */
-    groupJoin: function _groupJoin(ys, xSelector, ySelector, projector, comparer) {
-        return this.of(this, (0, _list_iterators.groupJoin)(this, ys, xSelector, ySelector, projector, createGroupedListDelegate, comparer));
-    },
-
-    /**
-     * @signature
-     * @description Produces the objectSet intersection of the List object's value and the List
-     * that is passed as a function argument. A comparer function may be
-     * provided to the function that determines the equality/inequality of the items in
-     * each List; if left undefined, the function will use a default equality comparer.
-     * This function is a deferred execution call that returns a new queryable
-     * object delegator instance that contains all the requisite information on
-     * how to perform the operation.
-     * @memberOf monads.list_core
-     * @instance
-     * @function intersect
-     * @this monads.list_core
-     * @param {Array|generator} xs - a
-     * @param {function} [comparer] - b
-     * @return {monads.list_core} - c
-     */
-    intersect: function _intersect(xs, comparer) {
-        return this.of(this, (0, _list_iterators.intersect)(this, xs, comparer));
-    },
-
-    /**
-     * @signature
-     * @description d
-     * @memberOf monads.list_core
-     * @instance
-     * @function intersperse
-     * @this monads.list_core
-     * @param {*} val - a
-     * @return {monads.list_core} - b
-     */
-    intersperse: function _intersperse(val) {
-        return this.of(this, (0, _list_iterators.intersperse)(this, val));
-    },
-
-    /**
-     * @signature
-     * @description Correlates the items in two lists based on the equality of items in each
-     * List. A comparer function may be provided to the function that determines
-     * the equality/inequality of the items in each List; if left undefined, the
-     * function will use a default equality comparer. This function is a deferred
-     * execution call that returns a new queryable object delegator instance that
-     * contains all the requisite information on how to perform the operation.
-     * @memberOf monads.list_core
-     * @instance
-     * @function listJoin
-     * @this monads.list_core
-     * @param {Array|List} ys - a
-     * @param {function} xSelector - b
-     * @param {function} ySelector - c
-     * @param {function} projector - d
-     * @param {function} [comparer] - e
-     * @return {monads.list_core} - f
-     */
-    listJoin: function _join(ys, xSelector, ySelector, projector, comparer) {
-        return this.of(this, (0, _list_iterators.join)(this, ys, xSelector, ySelector, projector, comparer));
-    },
-
-    /**
-     * @signature
-     * @description d
-     * @memberOf monads.list_core
-     * @instance
-     * @function map
-     * @this monads.list_core
-     * @param {function} mapFunc - a
-     * @return {monads.list_core} - b
-     */
-    map: function _map(mapFunc) {
-        return this.of(this, (0, _list_iterators.map)(this, mapFunc));
-    },
-
-    /**
-     * @signature
-     * @description d
-     * @memberOf monads.list_core
-     * @instance
-     * @function mjoin
-     * @return {monads.list} - a
-     */
-    mjoin: function _mjoin() {
-        return this.value;
-    },
-
-    /**
-     * @signature
-     * @description d
-     * @memberOf monads.list_core
-     * @instance
-     * @function ofType
-     * @this monads.list_core
-     * @param {string|Object} type - a
-     * @returns {monads.list_core} - b
-     */
-    ofType: function _ofType(type) {
-        return this.of(this, (0, _list_iterators.ofType)(this, type));
-    },
-
-    /**
-     * @signature
-     * @description d
-     * @memberOf monads.list_core
-     * @instance
-     * @function prepend
-     * @this monads.list_core
-     * @param {Array|generator} xs - a
-     * @return {monads.list_core} - b
-     */
-    prepend: function _prepend(xs) {
-        return this.of(this, (0, _list_iterators.prepend)(this, List.of(xs)));
-    },
-
-    /**
-     * @signature
-     * @description d
-     * @memberOf monads.list_core
-     * @instance
-     * @function prependAll
-     * @this list
-     * @param {Array|monads.list|monads.ordered_list} xs - A list
-     * @return {monads.list|monads.ordered_list} Returns a new list
-     */
-    prependAll: function _prependAll() {
-        for (var _len2 = arguments.length, xs = Array(_len2), _key2 = 0; _key2 < _len2; _key2++) {
-            xs[_key2] = arguments[_key2];
-        }
-
-        return this.of(this, (0, _list_iterators.prependAll)(this, xs.map(function (x) {
-            return List.of(x);
-        })));
-    },
-
-    /**
-     * @signature
-     * @description d
-     * @memberOf monads.list_core
-     * @instance
-     * @function reverse
-     * @this monads.list_core
-     * @external Array
-     * @see {@link https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/reverse}
-     * @return {monads.list_core} - a
-     */
-    reverse: function _reverse() {
-        return this.of(this, (0, _list_iterators.reverse)(this));
-    },
-
-    /**
-     * @signature
-     * @description Skips over a specified number of items in the source and returns the
-     * remaining items. If no amount is specified, an empty list is returned;
-     * Otherwise, a list containing the items collected from the source is
-     * returned.
-     * @memberOf monads.list_core
-     * @instance
-     * @function skip
-     * @this monads.list_core
-     * @param {number} amt - The number of items in the source to skip before
-     * returning the remainder.
-     * @return {monads.list_core} - a
-     */
-    skip: function _skip(amt) {
-        var count = -1;
-        return this.skipWhile(function (idx) {
-            return ++count < amt;
-        });
-    },
-
-    /**
-     * @signature
-     * @description d
-     * @memberOf monads.list_core
-     * @instance
-     * @function skipWhile
-     * @this monads.list_core
-     * @param {function} [predicate] - a
-     * @return {monads.list_core} - b
-     */
-    skipWhile: function _skipWhile() {
-        var predicate = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : _functionalHelpers.defaultPredicate;
-
-        return this.of(this, (0, _list_iterators.skipWhile)(this, predicate));
-    },
-
-    /**
-     * @signature
-     * @description d
-     * @memberOf monads.list_core
-     * @instance
-     * @function slice
-     * @this monads.list_core
-     * @external Array
-     * @see {@link https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/slice}
-     * @param {number} [start] - An optional integer value that indicates where the slice of the current
-     * list should begin. If no value is provided, the first index is used. If a negative value is provided,
-     * the index is counted from the end of the list.
-     * @param {number} [end] - An optional integer value that indicates where the slice of the current
-     * list should end. If no value is provided, it will continue taking values until it reaches the end
-     * of the list.
-     * @return {monads.list_core} Returns a new list
-     */
-    slice: function _slice(start, end) {
-        return this.of(this, (0, _list_iterators.slice)(this, start, end));
-    },
-
-    /**
-     * @signature
-     * @description d
-     * @memberOf monads.list_core
-     * @instance
-     * @function take
-     * @this monads.list_core
-     * @param {number} amt - a
-     * @return {monads.list_core} - b
-     */
-    take: function _take(amt) {
-        var count = -1;
-        return this.takeWhile(function (idx) {
-            return ++count < amt;
-        });
-    },
-
-    /**
-     * @signature
-     * @description d
-     * @memberOf monads.list_core
-     * @instance
-     * @function takeWhile
-     * @this monads.list_core
-     * @param {function} [predicate] - a
-     * @return {monads.list_core} - b
-     */
-    takeWhile: function _takeWhile() {
-        var predicate = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : _functionalHelpers.defaultPredicate;
-
-        return this.of(this, (0, _list_iterators.takeWhile)(this, predicate));
-    },
-
-    /**
-     * @signature
-     * @description Produces the objectSet union of two lists by selecting each unique item in both
-     * lists. A comparer function may be provided to the function that determines
-     * the equality/inequality of the items in each List; if left undefined, the
-     * function will use a default equality comparer. This function is a deferred
-     * execution call that returns a new queryable object delegator instance that
-     * contains all the requisite information on how to perform the operation.
-     * @memberOf monads.list_core
-     * @instance
-     * @function union
-     * @this monads.list_core
-     * @param {Array|generator} xs - a
-     * @param {function} comparer - b
-     * @return {monads.list_core} - c
-     */
-    union: function _union(xs, comparer) {
-        return this.of(this, (0, _list_iterators.union)(this, xs, comparer));
-    },
-
-    /**
-     * @signature
-     * @description Produces a List of the items in the queryable object and the List passed as
-     * a function argument. A comparer function may be provided to the function that determines
-     * the equality/inequality of the items in each List; if left undefined, the
-     * function will use a default equality comparer. This function is a deferred
-     * execution call that returns a new queryable object delegator instance that
-     * contains all the requisite information on how to perform the operation.
-     * @memberOf monads.list_core
-     * @instance
-     * @function zip
-     * @this monads.list_core
-     * @param {function} selector - a
-     * @param {Array|generator} xs - b
-     * @return {monads.list_core} - c
-     */
-    zip: function _zip(selector, xs) {
-        return this.of(this, (0, _list_iterators.zip)(this, xs, selector));
-    },
-
-    /**
-     * @signature (a -> Boolean) -> [a] -> Boolean
-     * @description d
-     * @memberOf monads.list_core
-     * @instance
-     * @function all
-     * @this monads.list_core
-     * @param {function} [predicate] - a
-     * @return {boolean} - b
-     */
-    all: function _all() {
-        var predicate = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : _functionalHelpers.defaultPredicate;
-
-        return (0, _list_iterators.all)(this, predicate);
-    },
-
-    /**
-     * @signature: (a -> Boolean) -> [a] -> Boolean
-     * @description d
-     * @memberOf monads.list_core
-     * @instance
-     * @function any
-     * @this monads.list_core
-     * @param {function} [predicate] - a
-     * @return {boolean} - b
-     */
-    any: function _any() {
-        var predicate = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : _functionalHelpers.defaultPredicate;
-
-        return (0, _list_iterators.any)(this, predicate);
-    },
-
-    /**
-     * @signature
-     * @description d
-     * @memberOf monads.list_core
-     * @instance
-     * @function count
-     * @this monads.list_core
-     * @param {function} [predicate] - a
-     * @return {Number} -  b
-     */
-    count: function _count(predicate) {
-        return (0, _list_iterators.count)(this, predicate);
-    },
-
-    /**
-     * @signature
-     * @description d
-     * @memberOf monads.list_core
-     * @instance
-     * @this monads.list_core
-     * @return {Array} Returns an array after evaluating the entire pipeline by running
-     * the initial underlying data through each function.
-     */
-    get data() {
-        return Array.from(this);
-    },
-
-    /**
-     * @signature
-     * @description d
-     * @external Array
-     * @see {@link https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/entries}
-     * @return {Iterator.<*>} Returns an iterator that contains the kvp's for
-     * each value in the list.
-     */
-    entries: function _entries() {
-        return this.data.entries();
-    },
-
-    /**
-     * @signature
-     * @description d
-     * @memberOf monads.list_core
-     * @instance
-     * @function equals
-     * @this monads.list_core
-     * @param {monads.list_core} f - a
-     * @param {function} [comparer] - b
-     * @return {boolean} - c
-     */
-    equals: function _equals(f, comparer) {
-        return Object.getPrototypeOf(this).isPrototypeOf(f) && (0, _list_iterators.equals)(this, f, comparer);
-    },
-
-    /**
-     * @signature
-     * @description d
-     * @memberOf monads.list_core
-     * @instance
-     * @function findIndex
-     * @this monads.list_core
-     * @external Array
-     * @see {@link https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/findIndex}
-     * @param {function} [comparer] - a
-     * @return {Number} - b
-     */
-    findIndex: function _findIndex(comparer) {
-        return (0, _list_iterators.findIndex)(this, comparer);
-    },
-
-    /**
-     * @signature
-     * @description d
-     * @memberOf monads.list_core
-     * @instance
-     * @function findLastIndex
-     * @this monads.list_core
-     * @param {function} [comparer] - a
-     * @return {Number} - b
-     */
-    findLastIndex: function _findLastIndex(comparer) {
-        return (0, _list_iterators.findLastIndex)(this, comparer);
-    },
-
-    /**
-     * @signature
-     * @description d
-     * @memberOf monads.list_core
-     * @instance
-     * @function first
-     * @this monads.list_core
-     * @param {function} [predicate] - a
-     * @return {*} - b
-     */
-    first: function _first() {
-        var predicate = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : _functionalHelpers.defaultPredicate;
-
-        return (0, _list_iterators.first)(this, predicate);
-    },
-
-    /**
-     * @signature (a -> b -> c) -> a -> [b] -> a
-     * @description d
-     * @memberOf monads.list_core
-     * @instance
-     * @function foldl
-     * @this monads.list_core
-     * @param {function} fn - a
-     * @param {*} acc - b
-     * @return {*} - c
-     */
-    foldl: function _foldl(fn, acc) {
-        return (0, _list_iterators.foldLeft)(this, fn, acc);
-    },
-
-    /**
-     * @signature (a -> a -> a) -> [a] -> a
-     * @description d
-     * @memberOf monads.list_core
-     * @instance
-     * @function foldr
-     * @this monads.list_core
-     * @param {function} fn - a
-     * @param {*} acc - b
-     * @return {*} - c
-     */
-    foldr: function _foldr(fn, acc) {
-        return (0, _list_iterators.foldRight)(this, fn, acc);
-    },
-
-    /**
-     * @signature
-     * @description This function property is basically just a proxy for the normal javascript
-     * array#forEach. However, unlike the array#forEach function property, this function will
-     * return the same list that forEach was invoked on, so composition may continue. This is
-     * implemented on the list data structure because it exists on the array. However, this
-     * functionality should not be used to modify the list - rather it is for impure operations
-     * performed outside of the list. To alter the data contained within, see any of the deferred
-     * execution function properties.
-     * @memberOf monads.list_core
-     * @instance
-     * @function forEach
-     * @this monads.list_core
-     * @external Array
-     * @see {@link https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/forEach}
-     * @param {function} fn - A function that should be applied to each value held in the list
-     * @return {monads.list_core} Returns a list
-     */
-    forEach: function _forEach(fn) {
-        this.data.forEach(fn);
-        return this;
-    },
-
-    /**
-     * @signature
-     * @description d
-     * @memberOf monads.list_core
-     * @instance
-     * @function indexOf
-     * @this monads.list_core
-     * @external Array
-     * @see {@link https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/indexOf}
-     * @param {*} val - Any javascript type/value that should be searched for in the list
-     * @return {number} - Returns an integer representing the index of the first appearance
-     * the value in the list. -1 indicates the value does not exist within the list.
-     */
-    indexOf: function _indexOf(val) {
-        return this.data.indexOf(val);
-    },
-
-    /**
-     * @signature
-     * @description d
-     * @memberOf monads.list_core
-     * @instance
-     * @function isEmpty
-     * @this monads.list_core
-     * @return {boolean} - a
-     */
-    isEmpty: function _isEmpty() {
-        return 0 === this.data.length;
-    },
-
-    /**
-     * @signature
-     * @description d
-     * @memberOf monads.list_core
-     * @instance
-     * @function join
-     * @this monads.list_core
-     * @external Array
-     * @see {@link https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/join}
-     * @param {*} [delimiter] - Any javascript type/value that should be used as a delimiter
-     * between value.
-     * @return {string} Returns a string of each element in the list, optionally separated by
-     * the provided delimiter.
-     */
-    join: function _join(delimiter) {
-        return this.data.join(delimiter);
-    },
-
-    /**
-     * @signature
-     * @description d
-     * @memberOf monads.list_core
-     * @instance
-     * @function keys
-     * @this monads.list_core
-     * @external Array
-     * @see {@link https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/keys}
-     * @return {Iterator.<number>} Returns an iterator that contains the keys for each index in the list.
-     */
-    keys: function _keys() {
-        return this.data.keys();
-    },
-
-    /**
-     * @signature
-     * @description d
-     * @memberOf  monads.list_core
-     * @instance
-     * @function last
-     * @this monads.list_core
-     * @param {function} [predicate] - a
-     * @return {*} - b
-     */
-    last: function _last() {
-        var predicate = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : _functionalHelpers.defaultPredicate;
-
-        return (0, _list_iterators.last)(this, predicate);
-    },
-
-    /**
-     * @signature
-     * @description d
-     * @memberOf monads.list_core
-     * @instance
-     * @function reduceRight
-     * @this monads.list_core
-     * @external Array
-     * @see {@link https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/reduceRight}
-     * @param {function} fn - a
-     * @param {*} acc - b
-     * @return {*} - c
-     */
-    reduceRight: function _reduceRight(fn, acc) {
-        return (0, _list_iterators.reduceRight)(this, fn, acc);
-    },
-
-    /**
-     * @signature
-     * @description d
-     * @memberOf monads.list_core
-     * @instance
-     * @function toArray
-     * @return {Array} - a
-     */
-    toArray: function _toArray() {
-        return Array.from(this);
-    },
-
-    /**
-     * @signature
-     * @description Evaluates the current List instance and returns a new List
-     * instance with the evaluated data as its source. This is used when the
-     * initial List's data must be iterated more than once as it will cause
-     * the evaluation to happen each item it is iterated. Rather the pulling the
-     * initial data through the List's 'pipeline' every time, this property will
-     * allow you to evaluate the List's data and store it in a new List that can
-     * be iterated many times without needing to re-evaluate. It is effectively
-     * a syntactical shortcut for: List.from(listInstance.data)
-     * @memberOf monads.list_core
-     * @instance
-     * @function toEvaluatedList
-     * @return {monads.list} - a
-     */
-    toEvaluatedList: function _toEvaluatedList() {
-        return List.from(this.data /* the .data property is a getter function that forces evaluation */);
-    },
-
-    /**
-     * @signature
-     * @description d
-     * @memberOf monads.list_core
-     * @instance
-     * @function toMap
-     * @return {Map} - a
-     */
-    toMap: function _toMap() {
-        return new Map(this.data.map(function _map(val, idx) {
-            return [idx, val];
-        }));
-    },
-
-    /**
-     * @signature
-     * @description d
-     * @memberOf monads.list_core
-     * @instance
-     * @function toSet
-     * @return {Set} - a
-     */
-    toSet: function _toSet() {
-        return new Set(this);
-    },
-
-    /**
-     * @signature
-     * @description Returns a string representation of an instance of a List
-     * delegator object. This function does not cause evaluation of the source,
-     * but this also means the returned value only reflects the underlying
-     * data, not the evaluated data. In order to see a string representation of
-     * the evaluated data, an evaluation must occur before .toString in invoked.
-     * The most direct way of doing this is via the {@link list_core#toEvaluatedList}
-     * function property.
-     * @example
-     * var list = List([1, 2, 3, 4, 5])
-     *              .map(x => x * x);
-     *
-     * console.log(list.toString()); // => List(List(1, 2, 3, 4, 5)
-     *
-     * var evaledList = list.toEvaluatedList();
-     *
-     * console.log(evaledList.toString()); // => List(1, 4, 9, 16, 25);
-     * @memberOf monads.list_core
-     * @instance
-     * @function toString
-     * @return {string} Returns a string representation of the list. NOTE: This functionality
-     * currently forces an evaluation of the pipelined operations.
-     */
-    toString: function _toString() {
-        //console.log(this.value);
-        //console.log(list_core.isPrototypeOf(this.value), this.value.toString(), this.value);
-
-        /*if (list_core.isPrototypeOf(this.value) || (Array.isArray(this.value) && this.value.length === 5)) {
-            console.log(list_core.isPrototypeOf(this.value));
-            console.log(this);
-            console.log(this.value);
-              if (list_core.isPrototypeOf(this.value)) {
-                console.log(this.value.toString());
-            }
-        }*/
-        //return list_core.isPrototypeOf(this.value) ? this.value.toString() : `List(${this.value})`;
-        //var val = list_core.isPrototypeOf(this.value) ? this.value.toString() : this.value;
-        return 'List(' + this.value + ')';
-    },
-
-    /**
-     * @signature
-     * @description d
-     * @memberOf monads.list_core
-     * @instance
-     * @function valueOf
-     * @return {*} - a
-     */
-    valueOf: function _valueOf() {
-        return this.value;
-    },
-
-    /**
-     * @signature
-     * @description d
-     * @memberOf monads.list_core
-     * @instance
-     * @function values
-     * @external Array
-     * @see {@link https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/values}
-     * @return {Iterator.<*>} Returns an iterator that contains the values for each index in the list.
-     */
-    values: function _values() {
-        return this.data.values();
-    },
-
-    /**
-     * @signature
-     * @description d
-     * @memberOf monads.list_core
-     * @instance
-     * @function factory
-     * @return {monads.list_core} - a
-     */
-    factory: List,
-
-    /**
-     * @signature
-     * @description d
-     * @memberOf monads.list_core
-     * @instance
-     * @function of
-     * @param {list_core|list|ordered_list} xs - a
-     * @param {generator} [iterator] - b
-     * @param {Array.<Object>} [sortObj] - c
-     * @param {string} [key] - d
-     * @return {monads.list|monads.ordered_list} - e
-     */
-    of: function _of(xs, iterator, sortObj, key) {
-        return createListDelegateInstance(xs, iterator, sortObj, key);
-    },
-
-    /**
-     * @signature
-     * @description d
-     * @memberOf monads.list_core
-     * @instance
-     * @function sequence
-     * @param {function} p - a
-     * @return {monads.list} - b
-     */
-    sequence: function _sequence(p) {
-        return this.traverse(p, _combinators.identity);
-        /*
-        return this.foldr((m, ma) => {
-            return m.chain(x => {
-                if (0 === ma.value.length) return List.of(x);
-                return ma.chain(xs => List.of(List.of(x).concat(xs)));
-            });
-        }, List.empty());
-        */
-    },
-    /**
-     * @signature
-     * @description d
-     * @memberOf monads.list_core
-     * @instance
-     * @function traverse
-     * @param {function} f - a
-     * @param {function} g - b
-     * @return {monads.list} - c
-     */
-    traverse: function _traverse(f, g) {
-        return this.foldl(function (ys, x) {
-            return g(x).map(function (x) {
-                return function (y) {
-                    return y.concat([x]);
-                };
-            }).apply(ys);
-        }, f(List.empty));
-    }
-
-}, Symbol.iterator, /*#__PURE__*/regeneratorRuntime.mark(function _iterator() {
-    var data, _iteratorNormalCompletion, _didIteratorError, _iteratorError, _iterator2, _step, item;
-
-    return regeneratorRuntime.wrap(function _iterator$(_context) {
-        while (1) {
-            switch (_context.prev = _context.next) {
-                case 0:
-                    data = Array.from(this.value);
-                    _iteratorNormalCompletion = true;
-                    _didIteratorError = false;
-                    _iteratorError = undefined;
-                    _context.prev = 4;
-                    _iterator2 = data[Symbol.iterator]();
-
-                case 6:
-                    if (_iteratorNormalCompletion = (_step = _iterator2.next()).done) {
-                        _context.next = 13;
-                        break;
-                    }
-
-                    item = _step.value;
-                    _context.next = 10;
-                    return item;
-
-                case 10:
-                    _iteratorNormalCompletion = true;
-                    _context.next = 6;
-                    break;
-
-                case 13:
-                    _context.next = 19;
-                    break;
-
-                case 15:
-                    _context.prev = 15;
-                    _context.t0 = _context['catch'](4);
-                    _didIteratorError = true;
-                    _iteratorError = _context.t0;
-
-                case 19:
-                    _context.prev = 19;
-                    _context.prev = 20;
-
-                    if (!_iteratorNormalCompletion && _iterator2.return) {
-                        _iterator2.return();
-                    }
-
-                case 22:
-                    _context.prev = 22;
-
-                    if (!_didIteratorError) {
-                        _context.next = 25;
-                        break;
-                    }
-
-                    throw _iteratorError;
-
-                case 25:
-                    return _context.finish(22);
-
-                case 26:
-                    return _context.finish(19);
-
-                case 27:
-                case 'end':
-                    return _context.stop();
-            }
-        }
-    }, _iterator, this, [[4, 15, 19, 27], [20,, 22, 26]]);
-}));
-
-/**
- * @signature
- * @description Alias for {@link monads.list_core#concat}
- * @memberOf monads.list_core
- * @instance
- * @function append
- * @see monads.list_core#concat
- * @param {Array | *} ys - a
- * @return {monads.list_core} - b
- */
-list_core.append = list_core.concat;
-
-/**
- * @signature Object -> Object
- * @description Alias for {@link monads.list_core#apply}
- * @memberOf monads.list_core
- * @instance
- * @function ap
- * @see monads.list_core#apply
- * @param {Object} ma - Any object with a map function - i.e. a monad.
- * @return {Object} Returns an instance of the monad object provide as an argument.
- */
-list_core.ap = list_core.apply;
-
-/**
- * @signature
- * @description Alias for {@link monads.list_core#chain}
- * @memberOf monads.list_core
- * @instance
- * @function fmap
- * @param {function} fn - a
- * @return {monads.list} - b
- */
-list_core.fmap = list_core.chain;
-
-/**
- * @signature
- * @description Alias for {@link monads.list_core#chain}
- * @memberOf monads.list_core
- * @instance
- * @function fmap
- * @param {function} fn - a
- * @return {monads.list} - b
- */
-list_core.flapMap = list_core.chain;
-
-/**
- * @signature
- * @description Alias for {@link monads.list_core#chain}
- * @memberOf monads.list_core
- * @instance
- * @function bind
- * @property {function} fn
- * @return {monads.list_core} - Returns a new list monad
- */
-list_core.bind = list_core.chain;
-
-/**
- * @signature
- * @description Alias for {@link monads.list_core#all}
- * @memberOf monads.list_core
- * @instance
- * @function every
- * @type {monads.list_core.all}
- * @this monads.list_core
- * @param {function} predicate - a
- * @return {boolean} - b
- */
-list_core.every = list_core.all;
-
-/**
- * @signature
- * @description Alias for {@link monads.list_core#any}
- * @memberOf monads.list_core
- * @instance
- * @function every
- * @type {monads.list_core.any}
- * @this monads.list_core
- * @param {function} predicate - a
- * @return {boolean} - b
- */
-list_core.some = list_core.any;
-
-/**
- * @delegate
- * @delegator {@link monads.list_core}
- * @description: A list_core delegator object that, in addition to the delegatable functionality
- * it has from the list_core object, also exposes .orderBy and .orderByDescending
- * functions. These functions allow a consumer to sort a List's data by
- * a given key.
- * @typedef {Object}
- * @property {function} sortBy
- * @property {function} sortByDescending
- * @property {function} contains
- * @kind {Object}
- * @memberOf monads
- * @namespace list
- */
-var list = Object.create(list_core, {
-    /**
-     * @signature
-     * @description d
-     * @memberOf monads.list
-     * @instance
-     * @function sortBy
-     * @param {function} keySelector - a
-     * @param {function} comparer - b
-     * @return {ordered_list} - c
-     */
-    sortBy: {
-        value: function _orderBy() {
-            var keySelector = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : _combinators.identity;
-            var comparer = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : _functionalHelpers.defaultPredicate;
-
-            var sortObj = [(0, _sort_util.createSortObject)(keySelector, comparer, _helpers.sortDirection.ascending)];
-            return this.of(this, (0, _list_iterators.sortBy)(this, sortObj), sortObj);
-        }
-    },
-    /**
-     * @signature
-     * @description d
-     * @memberOf monads.list
-     * @instance
-     * @function sortByDescending
-     * @param {function} keySelector - a
-     * @param {function} comparer - b
-     * @return {ordered_list} - c
-     */
-    sortByDescending: {
-        value: function _orderByDescending(keySelector) {
-            var comparer = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : _functionalHelpers.defaultPredicate;
-
-            var sortObj = [(0, _sort_util.createSortObject)(keySelector, comparer, _helpers.sortDirection.descending)];
-            return this.of(this, (0, _list_iterators.sortBy)(this, sortObj), sortObj);
-        }
-    },
-    /**
-     * @signature
-     * @description d
-     * @memberOf monads.list
-     * @instance
-     * @function contains
-     * @param {*} val - a
-     * @param {function} comparer - b
-     * @return {boolean} - c
-     */
-    contains: {
-        value: function _contains(val, comparer) {
-            return (0, _list_iterators.contains)(this, val, comparer);
-        }
-    }
-});
-
-/**
- * @description: A list_core delegator object that, in addition to the delegatable functionality
- * it has from the queryable_core object, also exposes .thenBy and .thenByDescending
- * functions. These functions allow a consumer to sort more on than a single column.
- * @typedef {Object}
- * @property {function} sortBy
- * @property {function} sortByDescending
- * @property {function} contains
- * @memberOf monads
- * @namespace ordered_list
- */
-var ordered_list = Object.create(list_core, {
-    _appliedSorts: {
-        value: []
-    },
-    //In these two functions, feeding the call to "orderBy" with the .value property of the List delegate
-    //rather than the delegate itself, effectively excludes the previous call to the orderBy/orderByDescending
-    //since the iterator exists on the delegate, not on its value. Each subsequent call to thenBy/thenByDescending
-    //will continue to exclude the previous call's iterator... effectively what we're doing is ignoring all the
-    //prior calls made to orderBy/orderByDescending/thenBy/thenByDescending and calling it once but with an array
-    //of the the requested sorts.
-    /**
-     * @signature
-     * @description d
-     * @memberOf monads.ordered_list
-     * @instance
-     * @function thenBy
-     * @param {function} keySelector - a
-     * @param {function} comparer - b
-     * @return {ordered_list} - c
-     */
-    thenBy: {
-        value: function _thenBy(keySelector) {
-            var comparer = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : _functionalHelpers.defaultPredicate;
-
-            var sortObj = this._appliedSorts.concat((0, _sort_util.createSortObject)(keySelector, comparer, _helpers.sortDirection.ascending));
-            return this.of(this.value, (0, _list_iterators.sortBy)(this, sortObj), sortObj);
-        }
-    },
-    /**
-     * @signature
-     * @description d
-     * @memberOf monads.ordered_list
-     * @instance
-     * @function thenByDescending
-     * @param {function} keySelector - a
-     * @param {function} comparer - b
-     * @return {ordered_list} - c
-     */
-    thenByDescending: {
-        value: function thenByDescending(keySelector) {
-            var comparer = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : _functionalHelpers.defaultPredicate;
-
-            var sortObj = this._appliedSorts.concat((0, _sort_util.createSortObject)(keySelector, comparer, _helpers.sortDirection.descending));
-            return this.of(this.value, (0, _list_iterators.sortBy)(this, sortObj), sortObj);
-        }
-    },
-    /**
-     * @signature
-     * @description Performs the same functionality as list_core#contains, but utilizes
-     * a binary searching algorithm rather than a sequential search. If this function is called
-     * an a non-ordered List, it will internally delegate to list_core#contains instead. This
-     * function should not be called on a sorted List for look for a value that is not the
-     * primary field on which the List's data is sorted on as an incorrect result will likely
-     * be returned.
-     * @memberOf monads.ordered_list
-     * @instance
-     * @function contains
-     * @param {*} val - The value that should be searched for
-     * @param {function} comparer - The function used to compare values in the List to
-     * the 'val' parameter
-     * @return {boolean} - Returns true if the List contains the searched for value, false
-     * otherwise.
-     */
-    contains: {
-        value: function _contains(val, comparer) {
-            return (0, _list_iterators.binarySearch)((0, _combinators.when)((0, _decorators.not)(_functionalHelpers.isArray), Array.from, this.value), val, comparer);
-        }
-    }
-});
-
-/**
- * @signature
- * @description d
- * @private
- * @param {*} [source] - a
- * @return {monads.list} - b
- */
-var listFromNonGen = function listFromNonGen(source) {
-    return createListDelegateInstance(source && source[Symbol.iterator] && 'string' !== typeof source ? source : (0, _functionalHelpers.wrap)(source));
-};
-
-/**
- * @signature
- * @description d
- * @private
- * @param {generator} source - a
- * @return {monads.list} - b
- */
-var listFromGen = function listFromGen(source) {
-    return createListDelegateInstance((0, _functionalHelpers.invoke)(source));
-};
-
-/**
- * @signature
- * @factory List
- * @description Creator function for a new List object. Takes any value/type as a parameter
- * and, if it has an iterator defined, with set it as the underlying source of the List as is,
- * or, wrap the item in an array if there is no defined iterator.
- * @namespace List
- * @memberOf monads
- * @property {function} from {@link monads.List#from}
- * @property {function} of {@link monads.List#of}
- * @property {function} ordered {@link monads.List#ordered}
- * @property {Object} empty {@link monads.List#empty}
- * @property {function} just {@link monads.List#just}
- * @property {function} unfold {@link monads.List#unfold}
- * @property {function} is {@link monads.List#is}
- * @property {function} repeat {@link monads.List#repeat}
- * @property {function} extend {@link monads.List#extend}
- * @param {*} [source] - Any type, any value; used as the underlying source of the List
- * @return {monads.list} - A new List instance with the value provided as the underlying source.
- */
-function List(source) {
-    return (0, _combinators.ifElse)(isList, _combinators.identity, (0, _combinators.ifElse)((0, _functionalHelpers.delegatesFrom)(_helpers.generatorProto), listFromGen, listFromNonGen), source);
-}
-
-var isOneArg = function isOneArg(args) {
-    return 1 === args.length;
-};
-var isList = function isList(val) {
-    return (0, _functionalHelpers.delegatesFrom)(list_core, val);
-};
-var isOneArgAndAList = function isOneArgAndAList(args) {
-    return !!(isOneArg(args) && isList(args[0]));
-};
-var createListFromArgs = function createListFromArgs(args) {
-    return 1 !== args.length ? List(args) : Array.isArray(args[0]) || (0, _functionalHelpers.delegatesFrom)(_helpers.generatorProto, args[0]) ? List(args[0]) : List(args);
-};
-
-/**
- * @signature
- * @description Convenience function for listCreate a new List instance; internally calls List.
- * @memberOf monads.List
- * @static
- * @function from
- * @see List
- * @param {*} [source] - Any type, any value; used as the underlying source of the List
- * @return {monads.list} - A new List instance with the value provided as the underlying source.
- */
-List.from = function () {
-    for (var _len3 = arguments.length, source = Array(_len3), _key3 = 0; _key3 < _len3; _key3++) {
-        source[_key3] = arguments[_key3];
-    }
-
-    return (0, _combinators.ifElse)(isOneArgAndAList, _combinators.constant.apply(undefined, source), createListFromArgs, source);
-};
-
-/**
- * @signature
- * @description Alias for List.from
- * @memberOf monads.List
- * @static
- * @function of
- * @see List.from
- * @param {*}
- * @return {list} - a
- */
-List.of = List.from;
-
-//TODO: implement this so that a consumer can initiate a List as ordered
-/**
- * @signature
- * @description Creates a new {@link monads.ordered_list} for the source provided. An optional
- * source selector and comparer functions may be provided.
- * @memberOf monads.List
- * @static
- * @function ordered
- * @param {*} [source] - Any JavaScript value
- * @param {function} [selector] - A function that selects either a subset of each value in the list, or can
- * act as the 'identity' function and just return the entire value.
- * @param {function} [comparer] - A function that knows how to compare the type of values the selector function
- * 'pulls' out of the list.
- * @return {monads.ordered_list} Returns a new list monad
- */
-List.ordered = function (source, selector) {
-    var comparer = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : _functionalHelpers.defaultPredicate;
-    return createListDelegateInstance(source, null, [(0, _sort_util.createSortObject)(selector, comparer, _helpers.sortDirection.ascending)]);
-};
-
-/**
- * @description Holds a reference to an empty, ordered list.
- * @memberOf monads.List
- * @property {Object} empty
- * @see ordered_list
- * @kind {Object}
- */
-List.empty = createListDelegateInstance([], null, [(0, _sort_util.createSortObject)(_combinators.identity, _functionalHelpers.defaultPredicate, _helpers.sortDirection.ascending)]);
-
-/**
- * @signature
- * @description Creates and returns a new {@link monads.ordered_list} since a list with a single
- * item is trivially ordered.
- * @memberOf monads.List
- * @static
- * @function just
- * @see List
- * @param {*} val - a
- * @return {monads.ordered_list} - b
- */
-List.just = function (val) {
-    return createListDelegateInstance([val], null, [(0, _sort_util.createSortObject)(_combinators.identity, _functionalHelpers.defaultPredicate, _helpers.sortDirection.ascending)]);
-};
-
-/**
- * @signature
- * @description Takes a function and a seed value. The function is used to 'unfold' the seed value
- * into an array which is used as the source of a new List monad.
- * @memberOf monads.List
- * @static
- * @function unfold
- * @see List
- * @param {function|generator} fn - a
- * @param {*} seed - b
- * @return {monads.list} - c
- */
-List.unfold = function (fn, seed) {
-    return createListDelegateInstance((0, _list_iterators.unfold)(fn)(seed));
-};
-
-/**
- * @signature
- * @description Takes any value as an argument and returns a boolean indicating if
- * the value is a list.
- * @memberOf monads.List
- * @static
- * @function is
- * @see List
- * @param {*} f - Any JavaScript value
- * @return {boolean} - Returns a boolean indicating of the value is a list.
- */
-List.is = isList;
-
-/**
- * @signature
- * @description Generates a new list with the specified item repeated the specified number of times. Because
- * this generates a list with the same item repeated n times, the resulting List is trivially
- * sorted. Thus, a sorted List is returned rather than an unsorted list.
- * @memberOf monads.List
- * @static
- * @function repeat
- * @see List
- * @param {*} item - Any JavaScript value that should be used to build a new list monad.
- * @param {number} count - The number of times the value should be repeated to build the list.
- * @return {monads.ordered_list} - Returns a new ordered list monad.
- */
-List.repeat = function _repeat(item, count) {
-    return createListDelegateInstance([], (0, _list_iterators.repeat)(item, count), [(0, _sort_util.createSortObject)(_combinators.identity, _functionalHelpers.noop, _helpers.sortDirection.descending)]);
-};
-
-/**
- * @signature
- * @summary Extension function that allows new functionality to be applied to
- * the queryable object
- * @memberOf monads.List
- * @static
- * @function extend
- * @see List
- * @param {string} prop - The name of the new property that should exist on the List; must be unique
- * @param {function} fn - A function that defines the new List functionality and
- * will be called when this new List property is invoked.
- * @return {monads.List} - a
- *
- * @description The fn parameter must be a non-generator function that takes one or more
- * arguments. If this new List function should be an immediately evaluated
- * function (like: foldl, any, reverse, etc.), it merely needs the accept one or more
- * arguments and know how to iterate the source. In the case of an immediately evaluated
- * function, the return type can be any javascript type. The first argument is always the
- * previous List instance that must be iterated. Additional arguments may be specified
- * if desired.
- *
- * If the function's evaluation should be deferred it needs to work a bit differently.
- * In this case, the function should accept one or more arguments, the first and only
- * required argument being the underlying source of the List object. This underlying
- * source can be anything with an iterator (generator, array, map, set, another list, etc.).
- * Any additional arguments that the function needs should be specified in the signature.
- * The return value of the function should be a generator that knows how to iterate the
- * underlying source. If the generator should operate like most List functions, i.e.
- * take a single item, process it, and then yield it out before asking for the next, a
- * for-of loop is the preferred method for employment. However, if the generator needs
- * all of the underlying data upfront (like orderBy and groupBy), Array.from is the
- * preferred method. Array.from will 'force' all the underlying List instances
- * to evaluate their data before it is handed over in full to the generator. The generator
- * can then act with full knowledge of the data and perform whatever operation is needed
- * before ultimately yielding out a single item at a time. If your extension function
- * needs to yield out all items at once, then that function is not a lazy evaluation
- * function and should be constructed like the immediately evaluated functions described
- * above.
- */
-List.extend = function _extend(prop, fn) {
-    if (![list, ordered_list].some(function (type) {
-        return prop in type;
-    })) {
-        list_core[prop] = function _extension() {
-            for (var _len4 = arguments.length, args = Array(_len4), _key4 = 0; _key4 < _len4; _key4++) {
-                args[_key4] = arguments[_key4];
-            }
-
-            return createListDelegateInstance(this, fn.apply(undefined, [this].concat(args)));
-        };
-    }
-    return List;
-};
-
-function createGroupedListDelegate(source, key) {
-    return createListDelegateInstance(source, undefined, undefined, key);
-}
-
-/**
- * @description Creates a new list object delegate instance; list type is determined by
- * the parameters passed to the function. If only the 'source' parameter is provided, a
- * 'basic' list delegate object instance is created. If the source and iterator parameters
- * are passed as arguments, a 'basic' list delegate object instance is created and the
- * iterator provided is used as the new instance object's iterator rather than the default
- * list iterator. If the source, iterator, and sortObj parameters are passed as arguments,
- * an ordered_list delegate object instance is created. The provided iterator is set on
- * the instance object to be used in lieu of the default iterator and the ._appliedSorts
- * field is set as the 'sortObj' parameter. If all four of the function's arguments are
- * provided (source, iterator, sortObj, and key), then a list delegate object instance
- * is created, setting the iterator for the object instance as the provided iterator, the
- * ._appliedSorts field as the sortObj argument, and the ._key field as the 'key' parameter's
- * value.
- *
- * The switch case inside the function only handles a subset of the possible bit flag values.
- * Technically there could be as many as eight different scenarios to check, not including the
- * default case. However, in practice, the only values received from the 'createBitMask' function
- * will be odd. Thus, only odd values (plus the default case which covers a value of zero) need
- * to be handled. A case of zero arises when only the 'source' argument is provided.
- *
- * @private
- * @param {*} source - The value to be used as the underlying source of the list functor; may be
- * anything javascript object that has an iterator.
- * @param {generator|null} [iterator] - A generator function that is to be used on the new list delegate
- * object instance's iterator.
- * @param {Array|undefined} [sortObj] - An array of the sort(s) (field and direction} to be used when the
- * instance is evaluated.
- * @param {string} [key] - A string that denotes what value the new list delegate object instance
- * was grouped on.
- * @return {monads.list|monads.ordered_list} Returns either a {@link monads.list} delegator object
- * or an {@link monads.ordered_list} delegator object based on the values passed as arguments.
- */
-function createListDelegateInstance(source, iterator, sortObj, key) {
-    switch (createBitMask((0, _functionalHelpers.delegatesTo)(iterator, _helpers.generatorProto), (0, _functionalHelpers.isArray)(sortObj), (0, _functionalHelpers.isString)(key))) {
-        /**
-         * @description: case 1 = An iterator has been passed, but nothing else. Create a
-         * basic list type object instance and set the iterator as the version provided.
-         */
-        case 1:
-            return Object.create(list, _defineProperty({
-                _value: {
-                    value: source,
-                    writable: false,
-                    configurable: false
-                }
-            }, Symbol.iterator, {
-                value: iterator
-            }));
-        /**
-         * @description: case 2 = Only a sort object was passed in. The list is presumed to be either
-         * trivially sorted via List.just or List.empty, or was initialized as an ordered list. Create
-         * an ordered list type object instance, setting the _appliedSorts field as the sortObj param.
-         */
-        case 2:
-            return Object.create(ordered_list, {
-                _value: {
-                    value: source,
-                    writable: false,
-                    configurable: false
-                },
-                _appliedSorts: {
-                    value: sortObj,
-                    writable: false,
-                    configurable: false
-                }
-            });
-        /**
-         * @description: case 3 = Both an iterator and a sort object were passed in. The consumer
-         * invoked the sortBy/sortByDescending or thenBy/thenByDescending function properties. Create
-         * an ordered list type object instance, setting the iterator to the version provided (if any) and
-         * the _appliedSorts field as the sortObj param.
-         */
-        case 3:
-            return Object.create(ordered_list, _defineProperty({
-                _value: {
-                    value: source,
-                    writable: false,
-                    configurable: false
-                },
-                _appliedSorts: {
-                    value: sortObj,
-                    writable: false,
-                    configurable: false
-                }
-            }, Symbol.iterator, {
-                value: iterator
-            }));
-        /**
-         * @description: case 4 = An iterator, sort object, and a key were passed as arguments.
-         * Create a grouped list type and set the iterator as the version provided, the ._appliedSorts
-         * field as the sortObj param, and the ._key field as the key string argument.
-         */
-        case 4:
-            return Object.create(list, {
-                _value: {
-                    value: source,
-                    writable: false,
-                    configurable: false
-                },
-                _key: {
-                    value: key,
-                    writable: false,
-                    configurable: false
-                },
-                key: {
-                    get: function _getKey() {
-                        return this._key;
-                    }
-                }
-            });
-        /**
-         * @description: default = Nothing beyond the 'source' param was passed to this
-         * function; results in a bitwise value of 00. Create a 'basic' list object type
-         * instance.
-         */
-        default:
-            return Object.create(list, {
-                _value: {
-                    value: source,
-                    writable: false,
-                    configurable: false
-                }
-            });
-    }
-}
-
-/**
- * @signature [...a] -> Number
- * @description creates a bit mask value based on truthy/falsey arguments passed to the function
- * @param {boolean} args - Zero or more arguments. All arguments are treated as booleans, so truthy,
- * and falsey values will work.
- * @return {number} Returns an integer that represents the bit mask value of the boolean arguments.
- */
-function createBitMask() {
-    for (var _len5 = arguments.length, args = Array(_len5), _key5 = 0; _key5 < _len5; _key5++) {
-        args[_key5] = arguments[_key5];
-    }
-
-    return args.reduce(function _reduce(curr, next, idx) {
-        return curr |= next << idx;
-    }, args[0]);
-}
-
-//Since FantasyLand is the defacto standard for JavaScript algebraic data structures, and I want to maintain
-//compliance with the standard, a .constructor property must be on the container delegators. In this case, its
-//just an alias for the true .factory property, which points to the delegator factory. I am isolating this from
-//the actual delegator itself as it encourages poor JavaScript development patterns and ... the myth of Javascript
-//classes and inheritance. I do not recommend using the .constructor property at all since that just encourages
-//FantasyLand and others to continue either not learning how JavaScript actually works, or refusing to use it
-//as it was intended... you know, like Douglas Crockford and his "good parts", which is really just another
-//way of saying: "your too dumb to understand how JavaScript works, and I either don't know myself, or don't
-//care to know, so just stick with what I tell you to use."
-list_core.constructor = list_core.factory;
-list_core.fold = list_core.foldl;
-list_core.reduce = list_core.foldl;
-
-/**
- * @signature
- * @description Since the constant functor does not represent a disjunction, the List's
- * bimap function property behaves just as its map function property. It is merely here as a
- * convenience so that swapping out monads/monads does not break an application that is
- * relying on its existence.
- * @memberOf monads.list_core
- * @instance
- * @function bimap
- * @param {function} f - a
- * @param {function} g - b
- * @return {monads.list} - c
- */
-list_core.bimap = list_core.map;
-
-exports.List = List;
-exports.list_core = list_core;
-exports.list = list;
-exports.ordered_list = ordered_list;
-
-},{"../../combinators":330,"../../decorators":344,"../../functionalHelpers":345,"../../helpers":346,"../list_iterators":333,"../sort_util":343}],340:[function(require,module,exports){
+},{"../combinators":330,"../decorators":344,"../functionalHelpers":345,"../helpers":346,"./sort_util":342}],341:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -16012,18 +16363,24 @@ Object.defineProperty(exports, "__esModule", {
 });
 exports.nothing = exports.just = exports.Nothing = exports.Just = exports.Maybe = undefined;
 
-var _combinators = require('../../combinators');
+var _Symbol$toStringTag, _just, _mutatorMap, _Symbol$toStringTag2, _nothing, _mutatorMap2;
 
-var _data_structure_util = require('../data_structure_util');
+var _combinators = require('../combinators');
+
+var _data_structure_util = require('./data_structure_util');
+
+function _defineEnumerableProperties(obj, descs) { for (var key in descs) { var desc = descs[key]; desc.configurable = desc.enumerable = true; if ("value" in desc) desc.writable = true; Object.defineProperty(obj, key, desc); } return obj; }
+
+function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
 
 /**
  * @signature
- * @description Returns an either functor based on a loose equals null comparison. If
- * the argument passed to the function loose equals null, a left is returned; other wise,
- * a right.
+ * @description Returns a just or nothing data structure based on a loose equals null comparison. If
+ * the argument passed to the function loose equals null, a nothing is returned; other wise,
+ * a just.
  * @private
- * @param {*} x - Any value that should be placed inside an either functor.
- * @return {monads.just|monads.nothing} - Either a left or a right functor
+ * @param {*} x - Any value that should be placed inside a maybe type.
+ * @return {dataStructures.just|dataStructures.nothing} - Either a just or a nothing
  */
 function fromNullable(x) {
   return null != x ? Just(x) : Nothing();
@@ -16034,13 +16391,14 @@ var returnNothing = function returnNothing() {
 };
 
 /**
- * @signature - :: * -> monads.just|monads.nothing
- * @description Factory function used to create a new object that delegates to
- * the {@link monads.just|monads.nothing} object. Any single value may be provided as an argument
- * which will be used to set the underlying value of the new {@link monads.just|monads.nothing}
- * delegator. If no argument is provided, the underlying value will be 'undefined'.
+ * @signature - :: * -> dataStructures.just|dataStructures.nothing
+ * @description Factory function used to create a new object that delegates to either
+ * the {@link dataStructures.just} object or the {@link dataStructures.nothing}. Any 
+ * single value may be provided as an argument which will be used to set the underlying 
+ * value of the new {@link dataStructures.just|dataStructures.nothing} delegator. If no 
+ * argument is provided, the underlying value will be 'undefined'.
  * @namespace Maybe
- * @memberOf monads
+ * @memberOf dataStructures
  * @property {function} of
  * @property {function} is
  * @property {function} isJust
@@ -16050,31 +16408,30 @@ var returnNothing = function returnNothing() {
  * @property {function} fromNullable
  * @property {function} lift
  * @param {*} [val] - The value that should be set as the underlying
- * value of the {@link monads.just|monads.nothing}.
- * @return {monads.just|monads.nothing} - Returns a new object that delegates to the
- * {@link monads.just|monads.nothing}.
+ * value of the {@link dataStructures.just|dataStructures.nothing}.
+ * @return {dataStructures.just|dataStructures.nothing} - Returns a new object that delegates to the
+ * {@link dataStructures.just|dataStructures.nothing}.
  */
 function Maybe(val) {
   return null == val ? nothing : Object.create(just, {
-    _value: { value: val },
-    isJust: { value: true },
-    isNothing: { value: false }
+    _value: { value: val }
   });
 }
 
 /**
- * @signature * -> {@link monads.just}
+ * @signature * -> {@link dataStructures.just}
  * @description Takes any value and places it in the correct context if it is
- * not already and creates a new {@link monads.just} object delegator instance.
- * Because the either functor does not require any specific context for
- * its value, this can be viewed as an alias for {@link monads.just}
- * @memberOf monads.Maybe
+ * not already and creates a new {@link dataStructures.just} object delegator instance.
+ * In the case of a Maybe, the 'correct' context simply means that a {@link dataStructures.just}
+ * will be returned, even if null or undefined are given as the argument. This function can
+ * be viewed as an alias for {@link dataStructures.Just}
+ * @memberOf dataStructures.Maybe
  * @static
  * @function of
  * @param {*} [val] - The value that should be set as the underlying
- * value of the {@link monads.just}.
- * @return {monads.just} - Returns a new object that delegates to the
- * {@link monads.just}.
+ * value of the {@link dataStructures.just}.
+ * @return {dataStructures.just} - Returns a new object that delegates to the
+ * {@link dataStructures.just}.
  */
 Maybe.of = function _of(val) {
   return Object.create(just, {
@@ -16082,12 +16439,6 @@ Maybe.of = function _of(val) {
       value: val,
       writable: false,
       configurable: false
-    },
-    isJust: {
-      value: true
-    },
-    isNothing: {
-      value: false
     }
   });
 };
@@ -16095,13 +16446,13 @@ Maybe.of = function _of(val) {
 /**
  * @signature * -> boolean
  * @description Convenience function for determining if a value is an
- * {@link monads.just|monads.just} delegate or not. Available on the
- * {@link monads.just|monads.nothing}'s factory function as monads.Maybe#is
- * @memberOf monads.Maybe
+ * {@link dataStructures.just|dataStructures.just} delegate or not. Available on the
+ * {@link dataStructures.just|dataStructures.nothing}'s factory function as dataStructures.Maybe#is
+ * @memberOf dataStructures.Maybe
  * @function is
  * @param {*} [f] - Any value may be used as an argument to this function.
  * @return {boolean} Returns a boolean that indicates whether the
- * argument provided delegates to the {@link monads.just|monads.nothing} delegate.
+ * argument provided delegates to the {@link dataStructures.just|dataStructures.nothing} delegate.
  */
 Maybe.is = function (f) {
   return just.isPrototypeOf(f) || nothing === f;
@@ -16109,20 +16460,20 @@ Maybe.is = function (f) {
 
 /**
  * @signature
- * @description Alias for {@link monads.Maybe.of}
- * @memberOf monads.Maybe
+ * @description Alias for {@link dataStructures.Maybe.of}
+ * @memberOf dataStructures.Maybe
  * @function Just
  * @param {*} val - a
- * @return {just} - {@link monads.just}
+ * @return {just} - {@link dataStructures.just}
  */
 Maybe.Just = Maybe.of;
 
 /**
  * @signature
- * @description Creates and returns a new {@link monads.nothing} monad
- * @memberOf monads.Maybe
+ * @description Creates and returns a new {@link dataStructures.nothing} data structure
+ * @memberOf dataStructures.Maybe
  * @function Nothing
- * @return {monads.nothing} A new {@link monads.nothing}
+ * @return {dataStructures.nothing} A new {@link dataStructures.nothing}
  */
 Maybe.Nothing = function () {
   return Maybe();
@@ -16131,8 +16482,8 @@ Maybe.Nothing = function () {
 /**
  * @signature Object -> boolean
  * @description Takes any object and returns a boolean indicating if the object is
- * a 'just' monad.
- * @memberOf monads.Maybe
+ * a 'just' data structure
+ * @memberOf dataStructures.Maybe
  * @function is
  * @param {Object} [m] - a
  * @return {boolean} - b
@@ -16144,8 +16495,8 @@ Maybe.isJust = function (m) {
 /**
  * @signature Object -> boolean
  * @description Takes any object and returns a boolean indicating if the object is
- * a 'nothing' monad.
- * @memberOf monads.Maybe
+ * a 'nothing' data structure
+ * @memberOf dataStructures.Maybe
  * @function is
  * @param {Object} [m] - a
  * @return {boolean} - b
@@ -16155,35 +16506,31 @@ Maybe.isNothing = function (m) {
 };
 
 /**
- * @signature * -> monads.left|monads.right
- * @description Takes any value and returns a 'nothing' monad is the value
- * loose equals null; other wise returns a 'just' monad.
- * @memberOf monads.Maybe
+ * @signature * -> dataStructures.left|dataStructures.right
+ * @description Takes any value and returns a 'nothing' if the value
+ * loose equals null; other wise returns a 'just'
+ * @memberOf dataStructures.Maybe
  * @function is
  * @param {*} [x] - a
- * @return {monads.left|monads.right} - b
+ * @return {dataStructures.left|dataStructures.right} - b
  */
 Maybe.fromNullable = fromNullable;
 
-//TODO: determine if there is any purpose in splitting a maybe into two types... if those sub-types
-//TODO: are not exposed, what benefit is derived from them? And if they are exposed (Just being Identity,
-//TODO: and Nothing being Constant(null)), then the maybe container has a direct dependency on the Identity
-//TODO: and Constant containers. This becomes an issue due to circular dependencies.
 /**
- * @signature - :: * -> monads.just
+ * @signature - :: * -> dataStructures.just
  * @description Factory function used to create a new object that delegates to
- * the {@link monads.just} object. Any single value may be provided as an argument
- * which will be used to set the underlying value of the new {@link monads.just}
+ * the {@link dataStructures.just} object. Any single value may be provided as an argument
+ * which will be used to set the underlying value of the new {@link dataStructures.just}
  * delegator. If no argument is provided, the underlying value will be 'undefined'.
  * @namespace Just
- * @memberOf monads
+ * @memberOf dataStructures
  * @property {function} of
  * @property {function} is
  * @property {function} lift
  * @param {*} [val] - The value that should be set as the underlying
- * value of the {@link monads.just}.
- * @return {monads.just} - Returns a new object that delegates to the
- * {@link monads.just}.
+ * value of the {@link dataStructures.just}.
+ * @return {dataStructures.just} - Returns a new object that delegates to the
+ * {@link dataStructures.just}.
  */
 function Just(val) {
   return Object.create(just, {
@@ -16191,29 +16538,23 @@ function Just(val) {
       value: val,
       writable: false,
       configurable: false
-    },
-    isJust: {
-      value: true
-    },
-    isNothing: {
-      value: false
     }
   });
 }
 
 /**
- * @signature * -> {@link monads.just}
+ * @signature * -> {@link dataStructures.just}
  * @description Takes any value and places it in the correct context if it is
- * not already and creates a new {@link monads.just} object delegator instance.
- * Because the either functor does not require any specific context for
- * its value, this can be viewed as an alias for {@link monads.Just}
- * @memberOf monads.Just
+ * not already and creates a new {@link dataStructures.just} object delegator instance.
+ * Because the just data structure does not require any specific context for
+ * its value, this can be viewed as an alias for {@link dataStructures.Just}
+ * @memberOf dataStructures.Just
  * @static
  * @function of
  * @param {*} [val] - The value that should be set as the underlying
- * value of the {@link monads.just}.
- * @return {monads.just} - Returns a new object that delegates to the
- * {@link monads.just}.
+ * value of the {@link dataStructures.just}.
+ * @return {dataStructures.just} - Returns a new object that delegates to the
+ * {@link dataStructures.just}.
  */
 Just.of = function _of(val) {
   return Object.create(just, {
@@ -16221,12 +16562,6 @@ Just.of = function _of(val) {
       value: val,
       writable: false,
       configurable: false
-    },
-    isJust: {
-      value: true
-    },
-    isNothing: {
-      value: false
     }
   });
 };
@@ -16234,105 +16569,95 @@ Just.of = function _of(val) {
 /**
  * @signature * -> boolean
  * @description Convenience function for determining if a value is an
- * {@link monads.just} delegate or not. Available on the
- * {@link monads.just}'s factory function as monads.Right#is
- * @memberOf monads.Just
+ * {@link dataStructures.just} delegate or not. Available on the
+ * {@link dataStructures.just}'s factory function as dataStructures.Right#is
+ * @memberOf dataStructures.Just
  * @function is
  * @param {*} [f] - Any value may be used as an argument to this function.
  * @return {boolean} Returns a boolean that indicates whether the
- * argument provided delegates to the {@link monads.just} delegate.
+ * argument provided delegates to the {@link dataStructures.just} delegate.
  */
 Just.is = function (f) {
   return just.isPrototypeOf(f);
 };
 
 /**
- * @signature - :: * -> monads.nothing
+ * @signature - :: * -> dataStructures.nothing
  * @description Factory function used to create a new object that delegates to
- * the {@link monads.nothing} object. Any single value may be provided as an argument
- * which will be used to set the underlying value of the new {@link monads.nothing}
+ * the {@link dataStructures.nothing} object. Any single value may be provided as an argument
+ * which will be used to set the underlying value of the new {@link dataStructures.nothing}
  * delegator. If no argument is provided, the underlying value will be 'undefined'.
  * @namespace Nothing
- * @memberOf monads
+ * @memberOf dataStructures
  * @property {function} of
  * @property {function} is
  * @property {function} lift
- * @return {monads.nothing} - Returns a new object that delegates to the
- * {@link monads.nothing}.
+ * @return {dataStructures.nothing} - Returns a new object that delegates to the
+ * {@link dataStructures.nothing}.
  */
-var Nothing = returnNothing;
+function Nothing() {
+  return nothing;
+}
 
 /**
- * @signature * -> {@link monads.nothing}
+ * @signature * -> {@link dataStructures.nothing}
  * @description Takes any value and places it in the correct context if it is
- * not already and creates a new {@link monads.nothing} object delegator instance.
- * Because the either functor does not require any specific context for
- * its value, this can be viewed as an alias for {@link monads.Nothing}
- * @memberOf monads.Nothing
+ * not already and creates a new {@link dataStructures.nothing} object delegator instance.
+ * Because the nothing data structure does not require any specific context for
+ * its value, this can be viewed as an alias for {@link dataStructures.Nothing}
+ * @memberOf dataStructures.Nothing
  * @static
  * @function of
- * @return {monads.nothing} - Returns a new object that delegates to the
- * {@link monads.nothing}.
+ * @return {dataStructures.nothing} - Returns a new object that delegates to the
+ * {@link dataStructures.nothing}.
  */
 Nothing.of = Nothing;
 
 /**
  * @signature * -> boolean
- * @description Convenience function for determining if a value is an
- * {@link monads.nothing} delegate or not. Available on the
- * {@link left}'s factory function as monads.Nothing#is
- * @memberOf monads.Nothing
+ * @description Convenience function for determining if a value is a {@link dataStructures.nothing}.
+ * Available on the {@link left}'s factory function as dataStructures.Nothing#is
+ * @memberOf dataStructures.Nothing
  * @function is
  * @param {*} [n] - Any value may be used as an argument to this function.
  * @return {boolean} Returns a boolean that indicates whether the
- * argument provided delegates to the {@link monads.nothing} delegate.
+ * argument provided delegates to the {@link dataStructures.nothing} delegate.
  */
 Nothing.is = function (n) {
   return nothing === n;
 };
 
-//TODO: Using this.of in order to create a new instance of a Maybe container (functor/monad) will
-//TODO: not work as it is implemented here in terms of creating a new maybe container with the
-//TODO: proper values for the '.isJust' and '.isNothing' fields. The problem is that the '.of'
-//TODO: function property will create a new maybe instance with whatever value it receives as
-//TODO: as argument and treat the new maybe container instance as a 'Just', regardless of the
-//TODO: actual underlying value. As 'null' and 'undefined' underlying values are traditionally
-//TODO: treated as 'Nothing' maybe values, this will cause a problem during mapping/flat-mapping/etc.
-
 /**
  * @typedef {Object} just
- * @property {function} value - returns the underlying value of the the monad
- * @property {function} map - maps a single function over the underlying value of the monad
+ * @property {function} value - returns the underlying value of the just
+ * @property {function} map - maps a single function over the underlying value of the just
  * @property {function} bimap
- * @property {function} get - returns the underlying value of the monad
- * @property {function} orElse - returns the underlying value of the monad
- * @property {function} getOrElse - returns the underlying value of the monad
- * @property {function} of - creates a new right delegate with the value provided
- * @property {function} valueOf - returns the underlying value of the monad; used during concatenation and coercion
- * @property {function} toString - returns a string representation of the just monad and its underlying value
+ * @property {function} extract
+ * @property {function} valueOf - returns the underlying value of the just; used during concatenation and coercion
+ * @property {function} toString - returns a string representation of the just and its underlying value
  * @property {function} factory - a reference to the just factory function
- * @property {function} [Symbol.Iterator] - Iterator for the just monad
+ * @property {function} [Symbol.Iterator] - Iterator for the just
  * @kind {Object}
- * @memberOf monads
+ * @memberOf dataStructures
  * @namespace just
- * @description This is the delegate object that specifies the behavior of the just monad. All
- * operations that may be performed on an just monad 'instance' delegate to this object. Just
- * monad 'instances' are created by the {@link monads.Just|monads.Nothing} factory function via Object.create,
+ * @description This is the delegate object that specifies the behavior of the just data structure. All
+ * operations that may be performed on a just 'instance' delegate to this object. Just
+ * 'instances' are created by the {@link dataStructures.Just|dataStructures.Nothing} factory function via Object.create,
  * during which the underlying value is placed directly on the newly created object. No other
- * properties exist directly on an right monad delegator object beyond the ._value property.
+ * properties exist directly on an just instance beyond the ._value property.
  * All behavior delegates to this object, or higher up the prototype chain.
  */
-var just = {
+var just = (_just = {
   /**
    * @signature () -> *
-   * @description Returns the underlying value of an right delegator. This
+   * @description Returns the underlying value of a just instance. This
    * getter is not expected to be used directly by consumers - it is meant as an internal
-   * access only. To manipulate the underlying value of a right delegator,
-   * see {@link monads.just#map} and {@link monads.just#bimap}. To
-   * retrieve the underlying value of a right delegator, see {@link monads.just#get},
-   * {@link monads.just#orElse}, {@link monads.just#getOrElse},
-   * and {@link monads.just#valueOf}.
-   * @memberOf monads.just
+   * access only. To manipulate the underlying value of a just,
+   * see {@link dataStructures.just#map} and {@link dataStructures.just#bimap}. To
+   * retrieve the underlying value of a 'just', see {@link dataStructures.just#get},
+   * {@link dataStructures.just#orElse}, {@link dataStructures.just#getOrElse},
+   * and {@link dataStructures.just#valueOf}.
+   * @memberOf dataStructures.just
    * @instance
    * @protected
    * @function
@@ -16341,193 +16666,259 @@ var just = {
   get value() {
     return this._value;
   },
+  get extract() {
+    return this.value;
+  },
+  isJust: true,
+  isNothing: false,
   /**
-   * @signature () -> {@link monads.just}
+   * @signature () -> {@link dataStructures.just}
    * @description Takes a function that is applied to the underlying value of the
-   * functor, the result of which is used to create a new {@link monads.just}
-   * delegator instance.
-   * @memberOf monads.just
+   * 'just' instance, the result of which is used to create a new {@link dataStructures.just}
+   * instance.
+   * @memberOf dataStructures.just
    * @instance
    * @param {function} fn - A mapping function that can operate on the underlying
-   * value of the {@link monads.just}.
-   * @return {monads.just} Returns a new {@link monads.just}
+   * value of the {@link dataStructures.just}.
+   * @return {dataStructures.just} Returns a new {@link dataStructures.just}
    * delegator whose underlying value is the result of the mapping operation
    * just performed.
+   *
+   * @example Just(10).map(x => x * x)    // => Just(100)
    */
   map: _data_structure_util.sharedMaybeFns.justMap,
-  chain: _data_structure_util.chain,
-  mjoin: _data_structure_util.mjoin,
-  apply: _data_structure_util.monad_apply,
   /**
-   * @signature (* -> *) -> (* -> *) -> monads.just<T>
-   * @description Acts as a map for the disjunction between a just and a nothing monad. If the
-   * monad is a just, the first mapping function parameter is used to map over the underlying value
-   * and a new just is returned, 'wrapping' the return value of the function. If the monad is a nothing,
-   * the second mapping function is invoked with a 'null' valued argument and a new nothing monad is
-   * returned.
-   * @memberOf monads.just
+   * @signature () -> {@link dataStructures.just}
+   * @description Accepts a mapping function as an argument, applies the function to the
+   * underlying value. If the mapping function returns a just data structure, chain will 'flatten'
+   * the nested justs by one level. If the mapping function does not return a just,
+   * chain will return a just data structure that 'wraps' whatever the return value
+   * of the mapping function is. However, if the mapping function does not return a data structure  of
+   * the same type, then chain is probably not the functionality you should use. See
+   * {@link dataStructures.just#map} instead.
+   *
+   * Alias: bind, flatMap
+   * @memberOf dataStructures.just
+   * @instance
+   * @function chain
+   * @param {function} fn - A mapping function that returns a data structure of the same type
+   * @return {Object} Returns a new identity data structure that 'wraps' the return value of the
+   * mapping function after flattening it by one level.
+   *
+   * @example
+   * Just(10).chain(x => Just(x * x))         // => Just(100)
+   * Just(10).chain(x => x * x)               // => Just(100)
+   * Just(10).chain(x => Identity(x * x))     // => Just(Identity(100))
+   */
+  chain: _data_structure_util.chain,
+  /**
+   * @signature () -> {@link dataStructures.just}
+   * @description Returns a new just data structure. If the current just is nested, join
+   * will flatten it by one level. Very similar to {@link dataStructures.just#chain} except no
+   * mapping function is accepted or run.
+   * @memberOf dataStructures.just
+   * @instance
+   * @function mjoin
+   * @return {Object} Returns a new identity after flattening the nested data structures by one level.
+   *
+   * @example
+   * Just(Just(10)).join()        // => Just(10)
+   * Just(Identity(10)).join()    // => Just(Identity(10))
+   * Just(10).join()              // => Identity(10)
+   */
+  mjoin: _data_structure_util.join,
+  /**
+   * @signature Object -> Object
+   * @description Accepts any applicative object with a mapping function and invokes that object's mapping
+   * function on the just's underlying value. In order for this function to execute properly and
+   * not throw, the just's underlying value must be a function that can be used as a mapping function
+   * on the data structure supplied as the argument.
+   *
+   * Alias: ap
+   * @memberOf dataStructures.just
+   * @instance
+   * @function apply
+   * @param {Object} ma - Any data structure with a map function - i.e. a functor.
+   * @return {Object} Returns an instance of the data structure object provide as an argument.
+   *
+   * @example Just(x => x + 10).apply(Identity(10))  // => Identity(20)
+   */
+  apply: _data_structure_util.apply,
+  /**
+   * @signature (* -> *) -> (* -> *) -> dataStructures.just<T>
+   * @description Acts as a map for the disjunction between just and nothing data structures. If the
+   * data structure that bimap was invoked on is a just, the first mapping function parameter is used 
+   * to map over the underlying value and a new just is returned, 'wrapping' the return value of the 
+   * function. If the data structure is a nothing, the second mapping function is invoked with a 'null' 
+   * valued argument and 'nothing' is returned.
+   * @memberOf dataStructures.just
    * @instance
    * @function
    * @param {function} f - A function that will be used to map over the underlying data of the
-   * {@link monads.just} delegator.
+   * {@link dataStructures.just} delegator.
    * @param {function} g - A function that will be used to map over a null value if this is a
-   * nothing monad.
-   * @return {monads.just} - Returns a new {@link monads.just} delegator after applying
+   * 'nothing' instance.
+   * @return {dataStructures.just} - Returns a new {@link dataStructures.just} delegator after applying
    * the mapping function to the underlying data.
    */
   bimap: _data_structure_util.sharedMaybeFns.justBimap,
-  fold: function _fold(fn) {
-    return fn(this.value);
+  /**
+   * @signature () -> *
+   * @description Accepts a function that is used to map over the just's underlying value
+   * and returns the value of the function without 're-wrapping' it in a new just
+   * instance.
+   *
+   * Alias: reduce
+   * @memberOf dataStructures.just
+   * @instance
+   * @function fold
+   * @param {function} fn - Any mapping function that should be applied to the underlying value
+   * of the just.
+   * @param {*} acc - An JavaScript value that should be used as an accumulator.
+   * @return {*} Returns the return value of the mapping function provided as an argument.
+   *
+   * @example Just(10).fold((acc, x) => x + acc, 5)   // => 15
+   */
+  fold: function _fold(fn, acc) {
+    return fn(acc, this.value);
   },
+  /**
+   * @signature just -> M<just<T>>
+   * @description Returns a data structure of the type passed as an argument that 'wraps'
+   * and identity object that 'wraps' the current just's underlying value.
+   * @memberOf dataStructures.just
+   * @instance
+   * @function sequence
+   * @param {Object} p - Any pointed data structure with a '#of' function property
+   * @return {Object} Returns a data structure of the type passed as an argument that 'wraps'
+   * a just that 'wraps' the current just's underlying value.
+   */
   sequence: function _sequence(p) {
     return this.traverse(_combinators.identity, p);
   },
-  traverse: function _traverse(a, f, g) {
-    return f(this.value).map(this.of);
+  /**
+   * @signature Object -> () -> Object
+   * @description Accepts a pointed data structure with a '#of' function property and a mapping function. The mapping
+   * function is applied to the just's underlying value. The mapping function should return a data structure
+   * of any type. Then the {@link dataStructures.Just.of} function is used to map over the returned data structure. Essentially
+   * creating a new object of type: M<Just<T>>, where 'M' is the type of data structure the mapping
+   * function returns.
+   * @memberOf dataStructures.just
+   * @instance
+   * @function traverse
+   * @param {Object} a - A pointed data structure with a '#of' function property. Used only in cases
+   * where the mapping function cannot be run.
+   * @param {function} f - A mapping function that should be applied to the just's underlying value.
+   * @return {Object} Returns a new just that wraps the mapping function's returned data structure type.
+   *
+   * @example Just(10).traverse(Identity, x => Identity(x * x))   // => Identity(Just(100))
+   */
+  traverse: function _traverse(a, f) {
+    return f(this.value).map(this.factory.of);
   },
-  nothing: function _nothing() {
-    return Nothing();
-  },
+  /**
+   * @signature (b -> a) -> dataStructures.Just
+   * @description This property is for contravariant just data structures and will not function
+   * correctly if the underlying value is anything other than a function. Contramap accepts a
+   * function argument and returns a new just with the composition of the function argument and
+   * the underlying function value as the new underlying. The supplied function argument is executed
+   * first in the composition, so its signature must be (b -> a) so that the value it passes as an
+   * argument to the previous underlying function will be of the expected type.
+   * @memberOf dataStructures.just
+   * @instance
+   * @function contramap
+   * @param {function} fn - A function that should be composed with the current just's
+   * underlying function.
+   * @return {dataStructures.just} Returns a new just data structure.
+   *
+   * @example Just(x => x * x).contramap(x => x + 10).apply(Just(5))  // => Just(225)
+   */
+  contramap: _data_structure_util.contramap,
+  /**
+   * @signature dimap :: (b -> a) -> (d -> c) -> just<c>
+   * @description Like {@link dataStructures.just#contramap}, dimap is for use on contravariant
+   * identity instances, and thus, requires that the just instance dimap is invoked on has an
+   * underlying function value. Dimap accepts two arguments, both of them functions. The first argument
+   * is used to map over the input the current contravariant just, while the second argument maps
+   * over the output. Dimap is like contramap, but with an additional mapping thrown in after it has run.
+   * Thus, dimap can be derived from contramap and map: j.dimap(f, g) === i.contramap(f).map(g)
+   * @memberOf dataStructures.just
+   * @instance
+   * @function dimap
+   * @param {function} f - f
+   * @param {function} g - g
+   * @return {dataStructures.just} l
+   *
+   * @example Just(x => x * x).dimap(x => x + 10, x => x / 5).apply(Just(5))  // => Just(45)
+   */
+  dimap: _data_structure_util.dimap,
+  /**
+   * @signature * -> boolean
+   * @description Determines if the current 'just' is equal to another data structure. Equality
+   * is defined as:
+   * 1) The other data structure shares the same delegate object as 'this'
+   * 2) Both underlying values are strictly equal to each other
+   * @memberOf dataStructures.just
+   * @instance
+   * @function
+   * @param {Object} ma - The other data structure to check for equality with
+   * @return {boolean} - Returns a boolean indicating equality
+   */
+  equals: (0, _data_structure_util.disjunctionEqualMaker)('isJust'),
   /**
    * @signature () -> *
-   * @description Returns the underlying value of the current monad 'instance'.
-   * @memberOf monads.just
-   * @instance
-   * @function
-   * @return {*} - Returns the underlying value of the current monad 'instance'.
-   */
-  get: _data_structure_util.get,
-  /**
-   * @signature * -> *
-   * @description Takes an optional parameter of any value as a default return value in
-   * cases where the current functor 'instance\'s' underlying value is not 'mappable'.
-   * Because the identity_functor does not support disjunctions, the parameter is entirely
-   * optional and will always be ignored. Whatever the actual underlying value is, it will
-   * always be returned.
-   * @memberOf monads.just
-   * @instance
-   * @function
-   * @param {*} [x] - a
-   * @return {*} Returns the underlying value of the current monad 'instance'.
-   */
-  getOrElse: _data_structure_util.getOrElse,
-  /**
-   * @signature () -> *
-   * @description Takes an optional function parameter as a default to be invoked and
-   * returned in cases where the current functor 'instance\'s' underlying value is not
-   * 'mappable'. Because the identity_functor does not support disjunctions, the
-   * parameter is entirely optional and will always be ignored. Whatever the actual
-   * underlying value is, it will always be returned.
-   * @memberOf monads.just
-   * @instance
-   * @function
-   * @param {function} [f] - An optional function argument which is invoked and the result
-   * returned in cases where the underlying value is not 'mappable'.
-   * @return {*} - b
-   */
-  orElse: _data_structure_util.orElse,
-  /**
-   * @signature * -> {@link monads.just}
-   * @description Factory function used to create a new object that delegates to
-   * the {@link monads.just} object. Any single value may be provided as an argument
-   * which will be used to set the underlying value of the new {@link monads.just}
-   * delegator. If no argument is provided, the underlying value will be 'undefined'.
-   * @memberOf monads.just
-   * @instance
-   * @function
-   * @param {*} item - The value that should be set as the underlying
-   * value of the {@link monads.just}.
-   * @return {monads.just} Returns a new {@link monads.just} delegator object
-   * via the {@link monads.Maybe#of} function.
-   */
-  of: (0, _data_structure_util.pointMaker)(Just),
-  /**
-   * @signature () -> *
-   * @description Returns the underlying value of the current monad 'instance'. This
+   * @description Returns the underlying value of the current just 'instance'. This
    * function property is not meant for explicit use. Rather, the JavaScript engine uses
    * this property during implicit coercion like addition and concatenation.
-   * @memberOf monads.just
+   * @memberOf dataStructures.just
    * @instance
    * @function
-   * @return {*} Returns the underlying value of the current monad 'instance'.
+   * @return {*} Returns the underlying value of the current 'just' 'instance'.
    */
   valueOf: _data_structure_util.valueOf,
   /**
    * @signature () -> string
-   * @description Returns a string representation of the monad and its
-   * underlying value
-   * @memberOf monads.just
+   * @description Returns a string representation of the 'just' and its underlying value
+   * @memberOf dataStructures.just
    * @instance
    * @function
-   * @return {string} Returns a string representation of the just
-   * and its underlying value.
+   * @return {string} Returns a string representation of the just and its underlying value.
    */
-  toString: (0, _data_structure_util.stringMaker)('Just'),
-  /**
-   * @signature * -> {@link monads.just}
-   * @description Factory function used to create a new object that delegates to
-   * the {@link monads.just} object. Any single value may be provided as an argument
-   * which will be used to set the underlying value of the new {@link monads.just}
-   * delegator. If no argument is provided, the underlying value will be 'undefined'.
-   * @memberOf monads.just
-   * @instance
-   * @function
-   * @see monads.Maybe
-   * @param {*} val - The value that should be set as the underlying
-   * value of the {@link monads.just}.
-   * @return {monads.just} - Returns a new identity functor delegator
-   */
-  factory: Maybe
-};
-
-/**
- * @signature * -> boolean
- * @description Determines if 'this' just monad is equal to another monad. Equality
- * is defined as:
- * 1) The other functor shares the same delegate object as 'this' just monad
- * 2) Both underlying values are strictly equal to each other
- * @memberOf monads.just
- * @instance
- * @function
- * @param {Object} ma - The other monad to check for equality with 'this' monad.
- * @return {boolean} - Returns a boolean indicating equality
- */
-just.equals = (0, _data_structure_util.disjunctionEqualMaker)(just, 'isJust');
+  toString: (0, _data_structure_util.stringMaker)('Just')
+}, _Symbol$toStringTag = Symbol.toStringTag, _mutatorMap = {}, _mutatorMap[_Symbol$toStringTag] = _mutatorMap[_Symbol$toStringTag] || {}, _mutatorMap[_Symbol$toStringTag].get = function () {
+  return 'Just';
+}, _defineProperty(_just, 'factory', Maybe), _defineEnumerableProperties(_just, _mutatorMap), _just);
 
 /**
  * @typedef {Object} nothing
- * @property {function} value - returns the underlying value of the the monad
- * @property {function} map - maps a single function over the underlying value of the monad
+ * @property {function} value - returns the underlying value of the 'nothing' data structure (always null)
+ * @property {function} map - maps a single function over the underlying value of the 'nothing'
  * @property {function} bimap
- * @property {function} get - returns the underlying value of the monad
- * @property {function} orElse - returns the underlying value of the monad
- * @property {function} getOrElse - returns the underlying value of the monad
- * @property {function} of - creates a new nothing delegate with the value provided
- * @property {function} valueOf - returns the underlying value of the monad; used during concatenation and coercion
- * @property {function} toString - returns a string representation of the nothing monad and its underlying value
- * @property {function} factory - a reference to the nothing factory function
- * @property {function} [Symbol.Iterator] - Iterator for the nothing
+ * @property {function} extract
+ * @property {function} valueOf - returns the underlying value of the 'nothing'; used during concatenation and coercion
+ * @property {function} toString - returns a string representation of the 'nothing' and its underlying value
+ * @property {function} factory - a reference to the 'nothing' factory function
+ * @property {function} [Symbol.Iterator] - Iterator for the 'nothing'
  * @kind {Object}
- * @memberOf monads
+ * @memberOf dataStructures
  * @namespace nothing
- * @description This is the delegate object that specifies the behavior of the nothing monad. All
- * operations that may be performed on an nothing monad 'instance' delegate to this object. Nothing
- * monad 'instances' are created by the {@link monads.Nothing|monads.Maybe} factory function via Object.create,
- * during which the underlying value is placed directly on the newly created object. No other
- * properties exist directly on an nothing monad delegator object beyond the ._value property.
+ * @description This is the delegate object that specifies the behavior of the 'nothing' data structure. All
+ * operations that may be performed on a 'nothing' delegate to this object. Nothing 'instances' are created by 
+ * the {@link dataStructures.Nothing|dataStructures.Maybe} factory function via Object.create, during which 
+ * the underlying value is placed directly on the newly created object. No other properties exist directly on 
+ * the 'nothing' data structure beyond the ._value property.
  * All behavior delegates to this object, or higher up the prototype chain.
  */
-var nothing = {
+var nothing = (_nothing = {
   /**
    * @signature () -> *
-   * @description Returns the underlying value of a nothing monad delegator. This
+   * @description Returns the underlying value of a 'nothing' data structure. This
    * getter is not expected to be used directly by consumers - it is meant as an internal
-   * access only. To manipulate the underlying value of an identity_functor delegator,
-   * see {@link monads.nothing#map} and {@link monads.nothing#bimap}.
-   * To retrieve the underlying value of an nothing monad delegator, see {@link monads.nothing#get},
-   * {@link monads.nothing#orElse}, {@link monads.nothing#getOrElse},
-   * and {@link monads.nothing#valueOf}.
-   * @memberOf monads.nothing
+   * access only. To manipulate the underlying value of a 'nothing', see {@link dataStructures.nothing#map} 
+   * and {@link dataStructures.nothing#bimap}. To retrieve the underlying value of a
+   * 'nothing', see {@link dataStructures.nothing#get}, {@link dataStructures.nothing#orElse}, 
+   * {@link dataStructures.nothing#getOrElse}, and {@link dataStructures.nothing#valueOf}.
+   * @memberOf dataStructures.nothing
    * @instance
    * @protected
    * @function
@@ -16543,155 +16934,91 @@ var nothing = {
    */
   isNothing: true,
   /**
-   * @signature () -> {@link monads.nothing}
-   * @description Takes a function that is applied to the underlying value of the
-   * monad, the result of which is used to create a new {@link monads.nothing}
-   * delegator instance.
-   * @memberOf monads.nothing
+   * @signature () -> {@link dataStructures.nothing}
+   * @description Takes a single function as an argument and returns 'nothing'. A 'nothing' cannot
+   * be mapped over, so the result of the mapping operation is to return 'nothing' while ignoring
+   * the provided function argument.
+   * @memberOf dataStructures.nothing
    * @instance
    * @param {function} fn - A mapping function that can operate on the underlying
-   * value of the {@link monads.nothing}.
-   * @return {monads.nothing} Returns a new {@link monads.nothing}
+   * value of the {@link dataStructures.nothing}.
+   * @return {dataStructures.nothing} Returns a new {@link dataStructures.nothing}
    * delegator whose underlying value is the result of the mapping operation
    * just performed.
    */
   map: returnNothing,
   /**
-   * @signature (* -> *) -> (* -> *) -> monads.nothing<T>
-   * @description Since the nothing monad does not represent a disjunction, the Maybe's
-   * bimap function property behaves just as its map function property. It is merely here as a
-   * convenience so that swapping out monads does not break an application that is
-   * relying on its existence.
-   * @memberOf monads.nothing
+   * @signature (* -> *) -> (* -> *) -> dataStructures.nothing<T>
+   * @description Acts as a map for the disjunction between just and nothing data structures. If the
+   * data structure that bimap was invoked on is a just, the first mapping function parameter is used 
+   * to map over the underlying value and a new just is returned, 'wrapping' the return value of the 
+   * function. If the data structure is a nothing, the second mapping function is invoked with a 'null' 
+   * valued argument and 'nothing' is returned.
+   * @memberOf dataStructures.nothing
    * @instance
    * @function
    * @param {function} f - A function that will be used to map over the underlying data of the
-   * {@link monads.nothing} delegator.
-   * @param {function} [g] - An optional function that is simply ignored on the {@link monads.nothing}
-   * since there is no disjunction present.
-   * @return {monads.nothing} - Returns a new {@link monads.nothing} delegator after applying
+   * {@link dataStructures.just} delegator.
+   * @param {function} g - A function that will be used to map over a null value if this is a
+   * 'nothing' instance.
+   * @return {dataStructures.just} - Returns a new {@link dataStructures.just} delegator after applying
    * the mapping function to the underlying data.
    */
   bimap: returnNothing,
   chain: returnNothing,
   mjoin: returnNothing,
-  apply: _data_structure_util.monad_apply,
+  apply: returnNothing,
   fold: function _fold(fn) {
     return Nothing();
   },
-  sequence: function _sequence(a) {
-    return this.traverse(_combinators.identity, a);
+  sequence: function _sequence(p) {
+    return this.traverse(p, p.of);
   },
   traverse: function _traverse(a, f) {
     return a.of(Maybe.Nothing());
   },
   nothing: returnNothing,
   /**
-   * @signature () -> *
-   * @description Returns the underlying value of the current monad 'instance'.
-   * @memberOf monads.nothing
-   * @instance
-   * @function
-   * @return {*} - Returns the underlying value of the current monad 'instance'.
-   */
-  get: _data_structure_util.emptyGet,
-  /**
-   * @signature * -> *
-   * @description Takes an optional parameter of any value as a default return value in
-   * cases where the current monad 'instance\'s' underlying value is not 'mappable'.
-   * Because the left does not support disjunctions, the parameter is entirely
-   * optional and will always be ignored. Whatever the actual underlying value is, it will
-   * always be returned.
-   * @memberOf monads.nothing
-   * @instance
-   * @function
-   * @param {*} [x] - a
-   * @return {*} Returns the underlying value of the current monad 'instance'.
-   */
-  getOrElse: _data_structure_util.emptyGetOrElse,
-  /**
-   * @signature () -> *
-   * @description Takes an optional function parameter as a default to be invoked and
-   * returned in cases where the current monad 'instance\'s' underlying value is not
-   * 'mappable'. Because the nothing monad does not support disjunctions, the
-   * parameter is entirely optional and will always be ignored. Whatever the actual
-   * underlying value is, it will always be returned.
-   * @memberOf monads.nothing
-   * @instance
-   * @function
-   * @param {function} [f] - An optional function argument which is invoked and the result
-   * returned in cases where the underlying value is not 'mappable'.
-   * @return {*} - b
-   */
-  orElse: _data_structure_util.emptyOrElse,
-  /**
-   * @signature * -> {@link monads.nothing}
-   * @description Factory function used to create a new object that delegates to
-   * the {@link monads.nothing} object. Any single value may be provided as an argument
-   * which will be used to set the underlying value of the new {@link monads.nothing}
-   * delegator. If no argument is provided, the underlying value will be 'undefined'.
-   * @memberOf monads.nothing
-   * @instance
-   * @function
-   * @param {*} item - The value that should be set as the underlying
-   * value of the {@link monads.nothing}.
-   * @return {monads.nothing} Returns a new {@link monads.nothing} delegator object
-   * via the {@link monads.Maybe#of} function.
-   */
-  of: (0, _data_structure_util.pointMaker)(Just),
-  /**
    * @signature * -> boolean
-   * @description Determines if 'this' left functor is equal to another monad. Equality
+   * @description Determines if 'this' nothing is equal to another data structure. Equality
    * is defined as:
    * 1) The other monad shares the same delegate object as 'this' nothing monad
    * 2) Both underlying values are strictly equal to each other
-   * @memberOf monads.nothing
+   * Since 'nothing' is a singleton, the actual operation is a strict equality comparison
+   * between the both data structures; if they both point to the same place in memory, they
+   * are equal.
+   * @memberOf dataStructures.nothing
    * @instance
    * @function
-   * @param {Object} ma - The other monad to check for equality with 'this' monad.
+   * @param {Object} ma - The other data structure to check for equality.
    * @return {boolean} - Returns a boolean indicating equality
    */
   equals: Nothing.is,
   /**
    * @signature () -> *
-   * @description Returns the underlying value of the current monad 'instance'. This
+   * @description Returns the underlying value of the current 'nothing' 'instance'. This
    * function property is not meant for explicit use. Rather, the JavaScript engine uses
    * this property during implicit coercion like addition and concatenation.
-   * @memberOf monads.nothing
+   * @memberOf dataStructures.nothing
    * @instance
    * @function
-   * @return {*} Returns the underlying value of the current monad 'instance'.
+   * @return {*} Returns the underlying value of the 'nothing'
    */
   valueOf: _data_structure_util.valueOf,
   /**
    * @signature () -> string
-   * @description Returns a string representation of the monad and its
-   * underlying value
-   * @memberOf monads.nothing
+   * @description Returns a string representation of the 'nothing' and its underlying value
+   * @memberOf dataStructures.nothing
    * @instance
    * @function
-   * @return {string} Returns a string representation of the nothing
-   * and its underlying value.
+   * @return {string} Returns a string representation of the 'nothing' and its underlying value.
    */
   toString: function _toString() {
     return 'Nothing()';
-  },
-  /**
-   * @signature * -> {@link monads.nothing}
-   * @description Factory function used to create a new object that delegates to
-   * the {@link monads.nothing} object. Any single value may be provided as an argument
-   * which will be used to set the underlying value of the new {@link monads.nothing}
-   * delegator. If no argument is provided, the underlying value will be 'undefined'.
-   * @memberOf monads.nothing
-   * @instance
-   * @function
-   * @see monads.Maybe
-   * @param {*} val - The value that should be set as the underlying
-   * value of the {@link monads.nothing}.
-   * @return {monads.nothing} - Returns a new nothing monad delegator
-   */
-  factory: Maybe
-};
+  }
+}, _Symbol$toStringTag2 = Symbol.toStringTag, _mutatorMap2 = {}, _mutatorMap2[_Symbol$toStringTag2] = _mutatorMap2[_Symbol$toStringTag2] || {}, _mutatorMap2[_Symbol$toStringTag2].get = function () {
+  return 'Nothing';
+}, _defineProperty(_nothing, 'factory', Maybe), _defineEnumerableProperties(_nothing, _mutatorMap2), _nothing);
 
 just.ap = just.apply;
 just.fmap = just.chain;
@@ -16705,16 +17032,6 @@ nothing.flapMap = nothing.chain;
 nothing.bind = nothing.chain;
 nothing.reduce = nothing.fold;
 
-//Since FantasyLand is the defacto standard for JavaScript algebraic data structures, and I want to maintain
-//compliance with the standard, a .constructor property must be on the container delegators. In this case, its
-//just an alias for the true .factory property, which points to the delegator factory. I am isolating this from
-//the actual delegator itself as it encourages poor JavaScript development patterns and ... the myth of Javascript
-//classes and inheritance. I do not recommend using the .constructor property at all since that just encourages
-//FantasyLand and others to continue either not learning how JavaScript actually works, or refusing to use it
-//as it was intended... you know, like Douglas Crockford and his "good parts", which is really just another
-//way of saying: "your too dumb to understand how JavaScript works, and I either don't know myself, or don't
-//care to know, so just stick with what I tell you to use."
-//maybe_functor.constructor = maybe_functor.factory;
 just.constructor = just.factory;
 nothing.constructor = nothing.factory;
 
@@ -16724,279 +17041,7 @@ exports.Nothing = Nothing;
 exports.just = just;
 exports.nothing = nothing;
 
-},{"../../combinators":330,"../data_structure_util":331}],341:[function(require,module,exports){
-'use strict';
-
-Object.defineProperty(exports, "__esModule", {
-    value: true
-});
-exports.Validation = exports.Right = exports.Nothing = exports.Maybe = exports.List = exports.Left = exports.Just = exports.Io = exports.Identity = exports.Future = exports.Either = exports.Constant = undefined;
-
-var _constant = require('./constant');
-
-var _either = require('./either');
-
-var _future = require('./future');
-
-var _identity = require('./identity');
-
-var _io = require('./io');
-
-var _list = require('./list');
-
-var _maybe = require('./maybe');
-
-var _validation = require('./validation');
-
-var _data_structure_util = require('../data_structure_util');
-
-/**
- * @module dataStructures/monads
- * @namespace monads
- */
-
-/*
-    - Semigroup:
-        > a.concat(b).concat(c) is equivalent to a.concat(b.concat(c)) (associativity)
-
-    - Monoid:
-        > A value that implements the Monoid specification must also implement the Semigroup specification.
-        > m.concat(M.empty()) is equivalent to m (right identity)
-        > M.empty().concat(m) is equivalent to m (left identity)
-
-    - Functor:
-        > u.map(a => a) is equivalent to u (identity)
-        > u.map(x => f(g(x))) is equivalent to u.map(g).map(f) (composition)
-
-    - Apply:
-        > A value that implements the Apply specification must also implement the Functor specification.
-        > v.ap(u.ap(a.map(f => g => x => f(g(x))))) is equivalent to v.ap(u).ap(a) (composition)
-
-    - Applicative:
-        > A value that implements the Applicative specification must also implement the Apply specification.
-        > v.ap(A.of(x => x)) is equivalent to v (identity)
-        > A.of(x).ap(A.of(f)) is equivalent to A.of(f(x)) (homomorphism)
-        > A.of(y).ap(u) is equivalent to u.ap(A.of(f => f(y))) (interchange)
-
-    - Foldable:
-        > u.reduce is equivalent to u.reduce((acc, x) => acc.concat([x]), []).reduce
-
-    - Traversable:
-        > A value that implements the Traversable specification must also implement the Functor and Foldable specifications.
-        > t(u.traverse(F, x => x)) is equivalent to u.traverse(G, t) for any t such that t(a).map(f) is equivalent to t(a.map(f)) (naturality)
-        > u.traverse(F, F.of) is equivalent to F.of(u) for any Applicative F (identity)
-        > u.traverse(Compose, x => new Compose(x)) === new Compose(u.traverse(F, x => x).map(x => x.traverse(G, x => x)))
-                for Compose defined below and any Applicatives F and G (composition)
-
-    - Chain:
-        > A value that implements the Chain specification must also implement the Apply specification.
-        > m.chain(f).chain(g) is equivalent to m.chain(x => f(x).chain(g)) (associativity)
-
-    - ChainRec:
-        > A value that implements the ChainRec specification must also implement the Chain specification.
-        > M.chainRec((next, done, v) => p(v) ? d(v).map(done) : n(v).map(next), i) is equivalent to (function step(v) { return p(v) ? d(v) : n(v).chain(step); }(i)) (equivalence)
-        > Stack usage of M.chainRec(f, i) must be at most a constant multiple of the stack usage of f itself.
-
-    - Monad:
-        > A value that implements the Monad specification must also implement the Applicative and Chain specifications.
-        > M.of(a).chain(f) is equivalent to f(a) (left identity)
-        > m.chain(M.of) is equivalent to m (right identity)
-
-    - Extend:
-        > A value that implements the Extend specification must also implement the Functor specification.
-        > w.extend(g).extend(f) is equivalent to w.extend(_w => f(_w.extend(g)))
-
-    - Comonad:
-        > A value that implements the Comonad specification must also implement the Extend specification.
-        > w.extend(_w => _w.extract()) is equivalent to w (left identity)
-        > w.extend(f).extract() is equivalent to f(w) (right identity)
-
-    - Bifunctor:
-        > A value that implements the Bifunctor specification must also implement the Functor specification.
-        > p.bimap(a => a, b => b) is equivalent to p (identity)
-        > p.bimap(a => f(g(a)), b => h(i(b)) is equivalent to p.bimap(g, i).bimap(f, h) (composition)
-
-    - Profunctor:
-        > A value that implements the Profunctor specification must also implement the Functor specification.
-        > p.promap(a => a, b => b) is equivalent to p (identity)
-        > p.promap(a => f(g(a)), b => h(i(b))) is equivalent to p.promap(f, i).promap(g, h) (composition)
- */
-
-/**
- * @memberOf monads.constant
- * @type {monadIterator}
- * @description Iterator for the constant functor. Allows the constant functor
- * to be iterated via for-of or Array#from.
- */
-_constant.constant[Symbol.iterator] = _data_structure_util.monadIterator;
-_future.future[Symbol.iterator] = _data_structure_util.monadIterator;
-
-/**
- * @memberOf monads.identity
- * @type {monadIterator}
- * @description Iterator for the identity functor. Allows the identity functor
- * to be iterated via for-or of Array#from.
- */
-_identity.identity[Symbol.iterator] = _data_structure_util.monadIterator;
-_io.io[Symbol.iterator] = _data_structure_util.monadIterator;
-
-/**
- * @memberOf monads.left
- * @type {monadIterator}
- * @description Iterator for the left functor. Allows the left functor to
- * be iterated via for-of or Array#from.
- */
-_either.left[Symbol.iterator] = _data_structure_util.monadIterator;
-_maybe.just[Symbol.iterator] = _data_structure_util.monadIterator;
-_maybe.nothing[Symbol.iterator] = _data_structure_util.monadIterator;
-
-/**
- * @memberOf monads.right
- * @type {monadIterator}
- * @description Iterator for the right functor. Allows the right functor to
- * be iterated via for-of or Array#from.
- */
-_either.right[Symbol.iterator] = _data_structure_util.monadIterator;
-_validation.validation[Symbol.iterator] = _data_structure_util.monadIterator;
-
-/**
- * @memberOf monads.Constant
- * @type {Function}
- * @description Lifts any non-constant returning function into a {@link monads.Constant}
- * returning function.
- */
-_constant.Constant.lift = (0, _data_structure_util.lifter)(_constant.Constant);
-_either.Either.lift = (0, _data_structure_util.lifter)(_either.Either);
-_future.Future.lift = (0, _data_structure_util.lifter)(_future.Future);
-
-/**
- * @memberOf monads.Identity
- * @type {Function}
- * @description Lifts any non-identity returning function into a {@link monads.identity}
- * returning function.
- */
-_identity.Identity.lift = (0, _data_structure_util.lifter)(_identity.Identity);
-_io.Io.lift = (0, _data_structure_util.lifter)(_io.Io);
-_maybe.Just.lift = (0, _data_structure_util.lifter)(_maybe.Just);
-
-/**
- * @memberOf monads.Left
- * @type {Function}
- * @description Lifts any non-left returning function into a {@link monads.left}
- * returning function.
- */
-_either.Left.lift = (0, _data_structure_util.lifter)(_either.Left);
-_list.List.lift = (0, _data_structure_util.lifter)(_list.List);
-_maybe.Maybe.lift = (0, _data_structure_util.lifter)(_maybe.Maybe);
-_maybe.Nothing.lift = (0, _data_structure_util.lifter)(_maybe.Nothing);
-
-/**
- * @memberOf monads.Right
- * @type {Function}
- * @description Lifts any non-right returning function into a {@link monads.right}
- * returning function.
- */
-_either.Right.lift = (0, _data_structure_util.lifter)(_either.Right);
-_validation.Validation.lift = (0, _data_structure_util.lifter)(_validation.Validation);
-
-var monads = [{ factory: _constant.Constant, delegate: _constant.constant }, { factory: _future.Future, delegate: _future.future }, { factory: _identity.Identity, delegate: _identity.identity }, { factory: _io.Io, delegate: _io.io }, { factory: _maybe.Just, delegate: _maybe.just }, { factory: _either.Left, delegate: _either.left }, { factory: _list.List, delegate: _list.list_core }, { factory: _maybe.Maybe }, { factory: _maybe.Nothing, delegate: _maybe.nothing }, { factory: _either.Right, delegate: _either.right }, { factory: _validation.Validation, delegate: _validation.validation }];
-
-(0, _data_structure_util.applyFantasyLandSynonyms)((0, _data_structure_util.applyTransforms)((0, _data_structure_util.applyAliases)(monads)));
-
-exports.Constant = _constant.Constant;
-exports.Either = _either.Either;
-exports.Future = _future.Future;
-exports.Identity = _identity.Identity;
-exports.Io = _io.Io;
-exports.Just = _maybe.Just;
-exports.Left = _either.Left;
-exports.List = _list.List;
-exports.Maybe = _maybe.Maybe;
-exports.Nothing = _maybe.Nothing;
-exports.Right = _either.Right;
-exports.Validation = _validation.Validation;
-
-},{"../data_structure_util":331,"./constant":334,"./either":335,"./future":336,"./identity":337,"./io":338,"./list":339,"./maybe":340,"./validation":342}],342:[function(require,module,exports){
-'use strict';
-
-Object.defineProperty(exports, "__esModule", {
-    value: true
-});
-exports.validation = exports.Validation = undefined;
-
-var _data_structure_util = require('../data_structure_util');
-
-function Validation(val) {
-    return Object.create(validation, {
-        _value: {
-            value: val
-        }
-    });
-}
-
-Validation.of = function _of(val) {
-    return Validation(val);
-};
-
-/**
- * @sig
- * @description d
- * @param {Object} f - a
- * @return {boolean} - b
- */
-Validation.is = function (f) {
-    return validation.isPrototypeOf(f);
-};
-
-var validation = {
-    map: function _map(fn) {
-        return this.of(fn(this.value));
-    },
-    of: (0, _data_structure_util.pointMaker)(Validation),
-    valueOf: _data_structure_util.valueOf,
-    toString: (0, _data_structure_util.stringMaker)('Validation'),
-    factory: Validation
-};
-
-/**
- * @sig
- * @description d
- * @return {boolean} - a
- */
-validation.equals = (0, _data_structure_util.equalMaker)(validation);
-
-/**
- * @sig
- * @description Since the constant functor does not represent a disjunction, the Validation's
- * bimap function property behaves just as its map function property. It is merely here as a
- * convenience so that swapping out functors/monads does not break an application that is
- * relying on its existence.
- * @type {function}
- * @param {function} f - a
- * @param {function} g - b
- * @return {validation} - c
- */
-validation.bimap = validation.map;
-
-validation.chain = _data_structure_util.chain;
-validation.mjoin = _data_structure_util.mjoin;
-validation.apply = _data_structure_util.monad_apply;
-
-//Since FantasyLand is the defacto standard for JavaScript algebraic data structures, and I want to maintain
-//compliance with the standard, a .constructor property must be on the container delegators. In this case, its
-//just an alias for the true .factory property, which points to the delegator factory. I am isolating this from
-//the actual delegator itself as it encourages poor JavaScript development patterns and ... the myth of Javascript
-//classes and inheritance. I do not recommend using the .constructor property at all since that just encourages
-//FantasyLand and others to continue either not learning how JavaScript actually works, or refusing to use it
-//as it was intended... you know, like Douglas Crockford and his "good parts", which is really just another
-//way of saying: "your too dumb to understand how JavaScript works, and I either don't know myself, or don't
-//care to know, so just stick with what I tell you to use."
-validation.constructor = validation.factory;
-
-exports.Validation = Validation;
-exports.validation = validation;
-
-},{"../data_structure_util":331}],343:[function(require,module,exports){
+},{"../combinators":330,"./data_structure_util":333}],342:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -17006,7 +17051,7 @@ exports.createSortObject = exports.insertionSort = exports.mergeSort = exports.q
 
 var _helpers = require('../helpers');
 
-/** @module dataStructures/sort_util */
+/** @module sort_util */
 
 var sort_obj = {};
 
@@ -17210,7 +17255,99 @@ exports.mergeSort = mergeSort;
 exports.insertionSort = insertionSort;
 exports.createSortObject = createSortObject;
 
-},{"../helpers":346}],344:[function(require,module,exports){
+},{"../helpers":346}],343:[function(require,module,exports){
+'use strict';
+
+Object.defineProperty(exports, "__esModule", {
+    value: true
+});
+exports.validation = exports.Validation = undefined;
+
+var _Symbol$toStringTag, _validation, _mutatorMap;
+
+var _data_structure_util = require('./data_structure_util');
+
+function _defineEnumerableProperties(obj, descs) { for (var key in descs) { var desc = descs[key]; desc.configurable = desc.enumerable = true; if ("value" in desc) desc.writable = true; Object.defineProperty(obj, key, desc); } return obj; }
+
+function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
+
+/**
+ * @description d
+ * @namespace Validation
+ * @memberOf dataStructures
+ * @property {function} of
+ * @property {function} is
+ * @param {*} val - a
+ * @return {dataStructures.validation} - b
+ */
+function Validation(val) {
+    return Object.create(validation, {
+        _value: {
+            value: val
+        }
+    });
+}
+
+/**
+ * @description d
+ * @memberOf dataStructures.Validation
+ * @param {*} val - a
+ * @return {dataStructures.validation} - b
+ */
+Validation.of = function _of(val) {
+    return Validation(val);
+};
+
+/**
+ * @signature
+ * @description d
+ * @memberOf dataStructures.Validation
+ * @param {Object} f - a
+ * @return {boolean} - b
+ */
+Validation.is = function (f) {
+    return validation.isPrototypeOf(f);
+};
+
+/**
+ * @description d
+ * @namespace validation
+ * @memberOf dataStructures
+ */
+var validation = (_validation = {
+    map: function _map(fn) {
+        return this.of(fn(this.value));
+    },
+    valueOf: _data_structure_util.valueOf,
+    equals: _data_structure_util.equals,
+    toString: (0, _data_structure_util.stringMaker)('Validation')
+}, _Symbol$toStringTag = Symbol.toStringTag, _mutatorMap = {}, _mutatorMap[_Symbol$toStringTag] = _mutatorMap[_Symbol$toStringTag] || {}, _mutatorMap[_Symbol$toStringTag].get = function () {
+    return 'Validation';
+}, _defineProperty(_validation, 'factory', Validation), _defineEnumerableProperties(_validation, _mutatorMap), _validation);
+
+/**
+ * @signature
+ * @description Since the constant functor does not represent a disjunction, the Validation's
+ * bimap function property behaves just as its map function property. It is merely here as a
+ * convenience so that swapping out functors/monads does not break an application that is
+ * relying on its existence.
+ * @memberOf dataStructures.validation
+ * @type {function}
+ * @param {function} f - a
+ * @param {function} g - b
+ * @return {validation} - c
+ */
+validation.bimap = validation.map;
+
+validation.chain = _data_structure_util.chain;
+validation.mjoin = _data_structure_util.join;
+validation.apply = _data_structure_util.monad_apply;
+validation.constructor = validation.factory;
+
+exports.Validation = Validation;
+exports.validation = validation;
+
+},{"./data_structure_util":333}],344:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -18198,12 +18335,37 @@ var lessThanOrEqual = (0, _combinators.curry)(function (x, y) {
  * @function mapSet
  * @param {*} key - a
  * @param {*} val - b
- * @param {Map} map - c
+ * @param {Map} xs - c
  * @return {Map} - d
  */
-var mapSet = (0, _combinators.curry)(function _mapSet(key, val, map) {
-  map.set(key, val);
-  return map;
+var mapSet = (0, _combinators.curry)(function _mapSet(key, val, xs) {
+  var ret = new Map();
+  var _iteratorNormalCompletion = true;
+  var _didIteratorError = false;
+  var _iteratorError = undefined;
+
+  try {
+    for (var _iterator = xs.keys()[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
+      var k = _step.value;
+
+      ret.set(k, xs.get(k));
+    }
+  } catch (err) {
+    _didIteratorError = true;
+    _iteratorError = err;
+  } finally {
+    try {
+      if (!_iteratorNormalCompletion && _iterator.return) {
+        _iterator.return();
+      }
+    } finally {
+      if (_didIteratorError) {
+        throw _iteratorError;
+      }
+    }
+  }
+
+  return ret;
 });
 
 /**
@@ -18508,8 +18670,6 @@ Object.defineProperty(exports, "__esModule", {
 
 var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
 
-function _toConsumableArray(arr) { if (Array.isArray(arr)) { for (var i = 0, arr2 = Array(arr.length); i < arr.length; i++) { arr2[i] = arr[i]; } return arr2; } else { return Array.from(arr); } }
-
 /** @module helpers */
 
 /** @modules helpers */
@@ -18673,101 +18833,15 @@ function cacher(comparer) {
 /**
  * @signature
  * @description d
- * @param {Generator|Array|Map|Set} collection - a
- * @param {function} comparer - b
- * @return {{contains, getValue}} - c
- */
-function genericCacher(collection, comparer) {
-    function createCacheChequer() {
-        switch (createBitMask.apply(undefined, _toConsumableArray(buildTypeBits(collection)))) {
-            case 1:
-                collection = Array.from(collection);
-            case 2:
-                //The collection's type is some kind of an array (@see collectionTypes). We
-                //can use the .some and .find to determine if the cache already holds the
-                //value we're looking for or return the value respectively.
-                return {
-                    contains: function _contains(item) {
-                        return collection.some(function _checkEquality(it) {
-                            return comparer(it, item);
-                        });
-                    },
-                    getValue: function _getValue(value) {
-                        return collection.find(function _findKey(key) {
-                            return comparer(key, value);
-                        });
-                    }
-                };
-                break;
-            case 4:
-                //TODO: find out if an ArrayBuffer can be interacted with directly at all, and
-                //TODO: remove this case if it cannot, or implement this case if it can.
-                break;
-            case 8: //Map
-            case 16: //WeakMap
-            case 32: //Set
-            case 64:
-                //WeakSet
-                //Here, the type of the collection is a Map, WeakMap, Set, or WeakSet; we can use
-                //the native functionality to find the result of the cache contains the item we
-                //are looking for.
-                return {
-                    contains: function _contains(item) {
-                        return collection.values().some(function _checkEquality(it) {
-                            return comparer(it, item);
-                        });
-                    },
-                    getValue: function _getValue(value) {
-                        return collection.values().find(function _findKey(key) {
-                            return comparer(key, value);
-                        });
-                    }
-                };
-                break;
-            case 128:
-                //The collection's type is a generator. We need to turn it into an array
-                //and recursively call the 'createCacheChequer' function with the array
-                //that was created from the generator.
-                collection = Array.from(collection);
-                //return createCacheChequer(Array.from(collection));
-                break;
-            default:
-        }
-    }
-
-    function buildTypeBits(arrayType) {
-        return Object.keys(collectionTypes).map(function _buildBits(key) {
-            return collectionTypes[key].some(function _findDelegate(delegate) {
-                return delegate.isPrototypeOf(arrayType);
-            });
-        });
-    }
-
-    function createBitMask() {
-        for (var _len = arguments.length, args = Array(_len), _key = 0; _key < _len; _key++) {
-            args[_key] = arguments[_key];
-        }
-
-        return args.reduce(function _reduce(curr, next, idx) {
-            return curr |= next << idx;
-        }, args[0]);
-    }
-
-    return createCacheChequer();
-}
-
-/**
- * @signature
- * @description d
  * @param {function} fn - a
- * @param {function} keyMaker - b
+ * @param {function} [keyMaker] - b
  * @return {function} - c
  */
 function memoizer(fn, keyMaker) {
     var lookup = new Map();
     return function _memoized() {
-        for (var _len2 = arguments.length, args = Array(_len2), _key2 = 0; _key2 < _len2; _key2++) {
-            args[_key2] = arguments[_key2];
+        for (var _len = arguments.length, args = Array(_len), _key = 0; _key < _len; _key++) {
+            args[_key] = arguments[_key];
         }
 
         var key = javaScriptTypes.Function === (typeof keyMaker === 'undefined' ? 'undefined' : _typeof(keyMaker)) ? keyMaker.apply(undefined, args) : args;
@@ -18879,8 +18953,8 @@ function deepCopy(arr) {
  */
 function shallowClone(obj) {
     var clone = {};
-    for (var p in obj) {
-        clone[p] = obj[p];
+    for (var item in obj) {
+        clone[item] = obj[item];
     }
     return clone;
 }
@@ -18926,19 +19000,21 @@ exports.nil = nil;
 Object.defineProperty(exports, "__esModule", {
     value: true
 });
-exports.unifiedLens = exports.lensPath = exports.makeLenses = exports.prismPath = exports.lens = exports.set = exports.put = exports.over = exports.view = exports.objectLens = exports.arrayLens = undefined;
+exports.unifiedLens = exports.lensPath = exports.makeLenses = exports.prismPath = exports.prism = exports.lens = exports.set = exports.put = exports.over = exports.view = exports.mapLens = exports.objectLens = exports.arrayLens = undefined;
 
 var _functionalHelpers = require('./functionalHelpers');
+
+var _decorators = require('./decorators');
 
 var _combinators = require('./combinators');
 
 var _helpers = require('./helpers');
 
-var _maybe = require('./dataStructures/monads/maybe');
+var _maybe = require('./dataStructures/maybe');
 
-var _identity = require('./dataStructures/monads/identity');
+var _identity = require('./dataStructures/identity');
 
-var _constant = require('./dataStructures/monads/constant');
+var _constant = require('./dataStructures/constant');
 
 var _pointless_data_structures = require('./pointless_data_structures');
 
@@ -18950,17 +19026,52 @@ function _toConsumableArray(arr) { if (Array.isArray(arr)) { for (var i = 0, arr
  * @signature
  * @description d
  * @kind function
+ * @function lens
+ * @param {function} getter - a
+ * @param {function} setter - b
+ * @param {String} key - c
+ * @param {function} f - d
+ * @param {Array} xs - e
+ * @return {*} - f
+ */
+var lens = (0, _combinators.curry)(function _lens(getter, setter, key, f, xs) {
+    return (0, _pointless_data_structures.mapWith)(function (replace) {
+        return setter(key, replace, xs);
+    }, f(getter(key, xs)));
+});
+
+/**
+ * @signature
+ * @description d
+ * @kind function
+ * @function prism
+ * @param {function} getter - a
+ * @param {function} setter - b
+ * @param {String} key - c
+ * @param {function} f - d
+ * @param {Array} xs - e
+ * @param {*} - f
+ * @return {*} - g
+ */
+var prism = (0, _combinators.curry)(function _prism(getter, setter, key, f, xs) {
+    return (0, _pointless_data_structures.mapWith)(function (replace) {
+        return setter(key, replace, xs);
+    }, (0, _maybe.Maybe)(f(getter(key, xs))));
+});
+
+/**
+ * @signature
+ * @description d
+ * @kind function
  * @function arrayLens
  * @param {number} idx - a
  * @param {function} f - b
  * @param {Array} xs - c
  * @return {Array} - c
  */
-var arrayLens = (0, _combinators.curry)(function _arrayLens(idx, f, xs) {
-    return (0, _pointless_data_structures.mapWith)(function _mapWith(val) {
-        return (0, _functionalHelpers.arraySet)(idx, val, xs);
-    }, f(xs[idx]));
-});
+var arrayLens = lens(function (idx, xs) {
+    return xs[idx];
+}, _functionalHelpers.arraySet);
 
 /**
  * @signature
@@ -18972,10 +19083,52 @@ var arrayLens = (0, _combinators.curry)(function _arrayLens(idx, f, xs) {
  * @param {Object} xs - c
  * @return {Object} - c
  */
-var objectLens = (0, _combinators.curry)(function _objectLens(prop, f, xs) {
-    return (0, _pointless_data_structures.mapWith)(function _map(rep) {
-        return (0, _functionalHelpers.objectSet)(prop, rep, xs);
-    }, f(xs[prop]));
+var objectLens = lens(function (prop, xs) {
+    return xs[prop];
+}, _functionalHelpers.objectSet);
+
+/**
+ * @signature
+ * @description d
+ * @kind function
+ * @function mapLens
+ * @param {*} key - a
+ * @param {*} val - b
+ * @param {Map} xs - c
+ * @return {Map} d
+ */
+var mapLens = lens(function (key, xs) {
+    return xs.get(key);
+}, function _mapSet(key, val, xs) {
+    var ret = new Map();
+    var _iteratorNormalCompletion = true;
+    var _didIteratorError = false;
+    var _iteratorError = undefined;
+
+    try {
+        for (var _iterator = xs.keys()[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
+            var k = _step.value;
+
+            if (k === key) {
+                ret.set(k, val);
+            } else ret.set(k, xs.get(k));
+        }
+    } catch (err) {
+        _didIteratorError = true;
+        _iteratorError = err;
+    } finally {
+        try {
+            if (!_iteratorNormalCompletion && _iterator.return) {
+                _iterator.return();
+            }
+        } finally {
+            if (_didIteratorError) {
+                throw _iteratorError;
+            }
+        }
+    }
+
+    return ret;
 });
 
 /**
@@ -18990,9 +19143,9 @@ var objectLens = (0, _combinators.curry)(function _objectLens(prop, f, xs) {
  */
 var unifiedLens = (0, _combinators.curry)(function _unifiedLens(prop, f, xs) {
     return (0, _pointless_data_structures.mapWith)(function _mapWith(value) {
-        if (Array.isArray(xs)) return (0, _functionalHelpers.arraySet)(prop, value, xs);else if (Set.prototype.isPrototypeOf(xs)) return (0, _functionalHelpers.mapSet)(prop, value, xs);
+        if (Array.isArray(xs)) return (0, _functionalHelpers.arraySet)(prop, value, xs);else if (Map.prototype.isPrototypeOf(xs)) return (0, _functionalHelpers.mapSet)(prop, value, xs);
         return (0, _functionalHelpers.objectSet)(prop, value, xs);
-    }, f(xs[prop]));
+    }, Map.prototype.isPrototypeOf(xs) ? f(xs.get(prop)) : f(xs[prop]));
 });
 
 /**
@@ -19087,7 +19240,7 @@ function improvedLensPath() {
     }
 
     return _combinators.compose.apply(undefined, _toConsumableArray(paths.map(function _pathsMap(p) {
-        innerLensDef(p);
+        return innerLensDef(p);
     })));
 }
 
@@ -19103,7 +19256,7 @@ function lensPath() {
     }
 
     return _combinators.compose.apply(undefined, _toConsumableArray(path.map(function _pathMap(p) {
-        return 'string' === typeof p ? objectLens(p) : arrayLens(p);
+        return unifiedLens(p);
     })));
 }
 
@@ -19117,52 +19270,17 @@ function lensPath() {
  * @return {*} - c
  */
 var prismPath = (0, _combinators.curry)(function _prismPath(path, obj) {
-    path = (0, _combinators.when)(not(_functionalHelpers.isArray), split('.'), path);
+    path = (0, _combinators.when)((0, _decorators.not)(_functionalHelpers.isArray), split('.'), path);
+    console.log(path, obj);
     var val = obj,
         idx = 0;
     while (idx < path.length) {
         if (null == val) return _maybe.Maybe.Nothing();
+        console.log(val[path[idx]]);
         val = val[path[idx]];
         ++idx;
     }
     return (0, _maybe.Maybe)(val);
-});
-
-/**
- * @signature
- * @description d
- * @kind function
- * @function lens
- * @param {function} getter - a
- * @param {function} setter - b
- * @param {String} key - c
- * @param {function} f - d
- * @param {Array} xs - e
- * @return {*} - f
- */
-var lens = (0, _combinators.curry)(function _lens(getter, setter, key, f, xs) {
-    return (0, _pointless_data_structures.mapWith)(function (replace) {
-        return setter(key, replace, xs);
-    }, f(getter(key, xs)));
-});
-
-/**
- * @signature
- * @description d
- * @kind function
- * @function prism
- * @param {function} getter - a
- * @param {function} setter - b
- * @param {String} key - c
- * @param {function} f - d
- * @param {Array} xs - e
- * @param {*} - f
- * @return {*} - g
- */
-var prism = (0, _combinators.curry)(function _prism(getter, setter, key, f, xs) {
-    return (0, _pointless_data_structures.mapWith)(function (replace) {
-        return setter(key, replace, xs);
-    }, (0, _maybe.Maybe)(f(getter(key, xs))));
 });
 
 /**
@@ -19178,47 +19296,62 @@ var split = (0, _combinators.curry)(function _split(delimiter, string) {
     return string.split(delimiter);
 });
 
+var extract = function extract(i) {
+    return i.extract;
+};
+
+var map = (0, _combinators.curry)(function (fn, f) {
+    return f.map(fn);
+});
+
+var mapped = (0, _combinators.curry)(function (f, x) {
+    return (0, _identity.Identity)(map((0, _combinators.compose)(extract, f), x));
+});
+
+//+ traversed :: Functor f => (a -> f a) -> Setter (f a) (f b) a b
+var traversed = (0, _combinators.curry)(function (point, f, x) {
+    return (0, _identity.Identity)(traverse((0, _combinators.compose)(extract, f), point, x));
+});
+
+var traverse = (0, _combinators.curry)(function (f, point, fctr) {
+    return (0, _combinators.compose)(sequenceA(point), map(f))(fctr);
+});
+
+var sequenceA = (0, _combinators.curry)(function (point, fctr) {
+    return fctr.traverse(id, point);
+});
+
 exports.arrayLens = arrayLens;
 exports.objectLens = objectLens;
+exports.mapLens = mapLens;
 exports.view = view;
 exports.over = over;
 exports.put = put;
 exports.set = set;
 exports.lens = lens;
+exports.prism = prism;
 exports.prismPath = prismPath;
 exports.makeLenses = makeLenses;
 exports.lensPath = lensPath;
 exports.unifiedLens = unifiedLens;
 
-},{"./combinators":330,"./dataStructures/monads/constant":334,"./dataStructures/monads/identity":337,"./dataStructures/monads/maybe":340,"./functionalHelpers":345,"./helpers":346,"./pointless_data_structures":348}],348:[function(require,module,exports){
+},{"./combinators":330,"./dataStructures/constant":331,"./dataStructures/identity":337,"./dataStructures/maybe":341,"./decorators":344,"./functionalHelpers":345,"./helpers":346,"./pointless_data_structures":348}],348:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
-    value: true
+  value: true
 });
-exports.isValidation = exports.isRight = exports.isNothing = exports.isMonad = exports.isMaybe = exports.isList = exports.isLeft = exports.isJust = exports.isIo = exports.isIdentity = exports.isFuture = exports.isEither = exports.isConstant = exports.except = exports.intersect = exports.filter = exports.mcompose = exports.bind = exports.chain = exports.pluckWith = exports.mjoin = exports.liftN = exports.lift4 = exports.lift3 = exports.lift2 = exports.flatMapWith = exports.flatMap = exports.mapWith = exports.map = exports.fmap = exports.apply = exports.ap = undefined;
+exports.toConstant = exports.toFuture = exports.toJust = exports.toNothing = exports.toMaybe = exports.toIdentity = exports.toEither = exports.toRight = exports.toLeft = exports.toList = exports.dimap = exports.bimap = exports.equals = exports.isEmpty = exports.contramap = exports.traverse = exports.sequence = exports.fold = exports.isValidation = exports.isRight = exports.isNothing = exports.isImmutableDataStructure = exports.isMaybe = exports.isList = exports.isLeft = exports.isJust = exports.isIo = exports.isIdentity = exports.isFuture = exports.isEither = exports.isConstant = exports.except = exports.intersect = exports.filter = exports.mcompose = exports.bind = exports.chain = exports.pluckWith = exports.mjoin = exports.liftN = exports.lift4 = exports.lift3 = exports.lift2 = exports.flatMap = exports.mapWith = exports.map = exports.fmap = exports.apply = exports.ap = undefined;
 
 var _combinators = require('./combinators');
 
 var _functionalHelpers = require('./functionalHelpers');
 
-var _monads = require('./dataStructures/monads/monads');
-
-var monads = _interopRequireWildcard(_monads);
-
-function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
+var _dataStructures = require('./dataStructures/dataStructures');
 
 /** @module pointless_data_structures */
 
-/**
- * @signature
- * @description d
- * @param {*} fa - a
- * @return {boolean} - b
- */
-function isConstant(fa) {
-    return fa.factory === monads.Constant;
-}
+var factoryList = [_dataStructures.Constant, _dataStructures.Either, _dataStructures.Future, _dataStructures.Identity, _dataStructures.Io, _dataStructures.Just, _dataStructures.Left, _dataStructures.List, _dataStructures.Maybe, _dataStructures.Nothing, _dataStructures.Right, _dataStructures.Validation];
 
 /**
  * @signature
@@ -19226,9 +19359,7 @@ function isConstant(fa) {
  * @param {*} fa - a
  * @return {boolean} - b
  */
-function isEither(fa) {
-    return fa.factory === monads.Either;
-}
+var isConstant = _dataStructures.Constant.is;
 
 /**
  * @signature
@@ -19236,9 +19367,7 @@ function isEither(fa) {
  * @param {*} fa - a
  * @return {boolean} - b
  */
-function isFuture(fa) {
-    return fa.factory === monads.Future;
-}
+var isEither = _dataStructures.Either.is;
 
 /**
  * @signature
@@ -19246,9 +19375,15 @@ function isFuture(fa) {
  * @param {*} fa - a
  * @return {boolean} - b
  */
-function isIdentity(fa) {
-    return fa.factory === monads.Identity;
-}
+var isFuture = _dataStructures.Future.is;
+
+/**
+ * @signature
+ * @description d
+ * @param {*} fa - a
+ * @return {boolean} - b
+ */
+var isIdentity = _dataStructures.Identity.is;
 
 /**
  * @signature
@@ -19257,7 +19392,7 @@ function isIdentity(fa) {
  * @return {boolean} - b
  */
 function isIo(fa) {
-    return fa.factory === monads.Io;
+  return fa.factory === _dataStructures.Io;
 }
 
 /**
@@ -19266,9 +19401,7 @@ function isIo(fa) {
  * @param {*} fa - a
  * @return {boolean} - b
  */
-function isJust(fa) {
-    return !!(fa.isJust && fa.factory === monads.Maybe);
-}
+var isJust = _dataStructures.Just.is;
 
 /**
  * @signature
@@ -19276,9 +19409,7 @@ function isJust(fa) {
  * @param {*} fa - a
  * @return {boolean} - b
  */
-function isLeft(fa) {
-    return !!(fa.isLeft && fa.factory === monads.Either);
-}
+var isLeft = _dataStructures.Left.is;
 
 /**
  * @signature
@@ -19286,9 +19417,7 @@ function isLeft(fa) {
  * @param {*} fa - a
  * @return {boolean} - b
  */
-function isList(fa) {
-    return fa.factory === monads.List;
-}
+var isList = _dataStructures.List.is;
 
 /**
  * @signature
@@ -19296,9 +19425,7 @@ function isList(fa) {
  * @param {*} fa - a
  * @return {boolean} - b
  */
-function isMaybe(fa) {
-    return !!(fa.isNothing && fa.factory === monads.Maybe || fa.isJust && fa.factory === monads.Maybe);
-}
+var isMaybe = _dataStructures.Maybe.is;
 
 /**
  * @signature
@@ -19306,8 +19433,10 @@ function isMaybe(fa) {
  * @param {Object} ma - a
  * @return {boolean} - b
  */
-function isMonad(ma) {
-    return !!(ma && ma.factory && ma.factory === monads[ma.factory.name]);
+function isImmutableDataStructure(ma) {
+  return !!(ma && ma.factory && factoryList.some(function (factory) {
+    return ma.factory === factory;
+  }));
 }
 
 /**
@@ -19316,9 +19445,7 @@ function isMonad(ma) {
  * @param {*} fa - a
  * @return {boolean} - b
  */
-function isNothing(fa) {
-    return !!fa.isNothing;
-}
+var isNothing = _dataStructures.Nothing.is;
 
 /**
  * @signature
@@ -19326,9 +19453,7 @@ function isNothing(fa) {
  * @param {*} fa - a
  * @return {boolean} - b
  */
-function isRight(fa) {
-    return !!fa.isRight;
-}
+var isRight = _dataStructures.Right.is;
 
 /**
  * @signature
@@ -19336,9 +19461,7 @@ function isRight(fa) {
  * @param {*} fa - a
  * @return {boolean} - b
  */
-function isValidation(fa) {
-    return fa.factory === monads.Validation;
-}
+var isValidation = _dataStructures.Validation.is;
 
 /**
  * @signature
@@ -19350,7 +19473,7 @@ function isValidation(fa) {
  * @return {Object} - c
  */
 var apply = (0, _combinators.curry)(function _apply(ma, mb) {
-    return mb.apply(ma);
+  return mb.apply(ma);
 });
 
 /**
@@ -19369,39 +19492,13 @@ var ap = apply;
  * @signature
  * @description d
  * @kind function
- * @function flatMap
- * @param {Object} m - a
- * @param {function} fn :: (a) -> Monad b - b
- * @return {Object} - c
- */
-var flatMap = (0, _combinators.curry)(function _flatMap(m, fn) {
-    return m.flatMap(fn);
-});
-
-/**
- * @signature
- * @description d
- * @kind function
- * @function flatMapWith
- * @param {function} fn - a
- * @param {Object} m - b
- * @return {Object} - c
- */
-var flatMapWith = (0, _combinators.curry)(function _flatMapWith(fn, m) {
-    return m.flatMap(fn);
-});
-
-/**
- * @signature
- * @description d
- * @kind function
  * @function map
  * @param {Object} m - a
  * @param {function} fn :: (a) -> b
  * @return {Object} - b
  */
 var map = (0, _combinators.curry)(function _map(m, fn) {
-    return m.map(fn);
+  return m.map(fn);
 });
 
 /**
@@ -19414,7 +19511,7 @@ var map = (0, _combinators.curry)(function _map(m, fn) {
  * @return {Object} - c
  */
 var mapWith = (0, _combinators.curry)(function _map(fn, m) {
-    return m.map(fn);
+  return m.map(fn);
 });
 
 /**
@@ -19441,13 +19538,124 @@ var fmap = mapWith;
  * @signature
  * @description d
  * @kind function
+ * @function fold
+ * @param {function} fn - a
+ * @param {*} acc - b
+ * @param {Object} ma - c
+ * @return {*} - d
+ */
+var fold = (0, _combinators.curry)(function _fold(fn, acc, ma) {
+  return ma.fold(fn, acc);
+});
+
+/**
+ * @signature
+ * @description d
+ * @param {Object} p - a
+ * @param {Object} m - b
+ * @return {*|monads.list|Object} - c
+ */
+var sequence = (0, _combinators.curry)(function _sequence(p, m) {
+  return m.sequence(p);
+});
+
+/**
+ * @signature
+ * @description d
+ * @param {Object} a - a
+ * @param {function} f - b
+ * @param {Object} ma - c
+ * @return {Object} - d
+ */
+var traverse = (0, _combinators.curry)(function _traverse(a, f, ma) {
+  return ma.traverse(a, f);
+});
+
+/**
+ * @signature
+ * @description d
+ * @param {function} fn - a
+ * @type {Function|*}
+ */
+var contramap = (0, _combinators.curry)(function _contramap(fn, ma) {
+  return ma.contramap(fn);
+});
+
+/**
+ * @signature
+ * @description d
+ * @param {Object} ma - a
+ * @return {boolean} - b
+ */
+function isEmpty(ma) {
+  return ma.isEmpty;
+}
+
+/**
+ * @signature
+ * @description d
+ * @kind function
+ * @function equals
+ * @param {Object} a - a
+ * @param {Object} b - b
+ * @return {boolean} - c
+ */
+var equals = (0, _combinators.curry)(function _equals(a, b) {
+  return a.equals(b);
+});
+
+/**
+ * @signature
+ * @description d
+ * @kind function
+ * @function bimap
+ * @param {function} f - a
+ * @param {function} g = b
+ * @param {Object} ma - c
+ * @return {Object} d
+ */
+var bimap = (0, _combinators.curry)(function _bimap(f, g, ma) {
+  return ma.bimap(f, g);
+});
+
+/**
+ * @signature
+ * @description d
+ * @kind function
+ * @function dimap
+ * @param {function} f - a
+ * @param {function} g - b
+ * @param {Object} m - c
+ * @return {Object} - d
+ */
+var dimap = (0, _combinators.curry)(function _dimap(f, g, m) {
+  return m.dimap(f, g);
+});
+
+/**
+ * @signature
+ * @description d
+ * @kind function
  * @function chain
  * @param {function} f - a
  * @param {Object} m - b
  * @return {*} - c
  */
 var chain = (0, _combinators.curry)(function _chain(f, m) {
-    return m.map(f).join(); // or compose(join, mapWith(f))(m)
+  return m.chain(f); // or compose(join, mapWith(f))(m)
+});
+
+/**
+ * @signature
+ * @description d
+ * @kind function
+ * @function chainRec
+ * @param {function} fn - a
+ * @param {Object} ma - b
+ * @return {Object} b
+ */
+var chainRec = (0, _combinators.curry)(function _chainRec(fn, ma) {
+  return ma.chainRec(fn);
 });
 
 /**
@@ -19456,7 +19664,8 @@ var chain = (0, _combinators.curry)(function _chain(f, m) {
  * @kind function
  * @function bind
  */
-var bind = chain;
+var bind = chain,
+    flatMap = chain;
 
 /**
  * @signature
@@ -19466,7 +19675,7 @@ var bind = chain;
  * @return {function} - c
  */
 var mcompose = function _mcompose(f, g) {
-    return (0, _combinators.compose)(chain(f), g);
+  return (0, _combinators.compose)(chain(f), g);
 };
 
 /**
@@ -19479,7 +19688,7 @@ var mcompose = function _mcompose(f, g) {
  * @return {Object} - c
  */
 var put = (0, _combinators.curry)(function _put(val, fa) {
-    return fa.put(val);
+  return fa.put(val);
 });
 
 /**
@@ -19493,7 +19702,7 @@ var put = (0, _combinators.curry)(function _put(val, fa) {
  * @return {Object} - c
  */
 var lift2 = (0, _combinators.curry)(function _lift2(f, m1, m2) {
-    return m1.map(f).apply(m2);
+  return m1.map(f).apply(m2);
 });
 
 /**
@@ -19508,7 +19717,7 @@ var lift2 = (0, _combinators.curry)(function _lift2(f, m1, m2) {
  * @return {Object} - e
  */
 var lift3 = (0, _combinators.curry)(function _lift3(f, m1, m2, m3) {
-    return lift2(f, m1, m2).apply(m3);
+  return lift2(f, m1, m2).apply(m3);
 });
 
 /**
@@ -19524,7 +19733,7 @@ var lift3 = (0, _combinators.curry)(function _lift3(f, m1, m2, m3) {
  * @return {Object} - f
  */
 var lift4 = (0, _combinators.curry)(function _lift4(f, m1, m2, m3, m4) {
-    return lift3(f, m1, m2, m3).apply(m4);
+  return lift3(f, m1, m2, m3).apply(m4);
 });
 
 /**
@@ -19537,13 +19746,13 @@ var lift4 = (0, _combinators.curry)(function _lift4(f, m1, m2, m3, m4) {
  * @return {Object} - c
  */
 var liftN = (0, _combinators.curry)(function _liftN(f) {
-    for (var _len = arguments.length, ms = Array(_len > 1 ? _len - 1 : 0), _key = 1; _key < _len; _key++) {
-        ms[_key - 1] = arguments[_key];
-    }
+  for (var _len = arguments.length, ms = Array(_len > 1 ? _len - 1 : 0), _key = 1; _key < _len; _key++) {
+    ms[_key - 1] = arguments[_key];
+  }
 
-    return ms.slice(1).reduce(function _apply(curM, nextM) {
-        return curM.apply(nextM);
-    }, ms.shift().map(f));
+  return ms.slice(1).reduce(function _apply(curM, nextM) {
+    return curM.apply(nextM);
+  }, ms.shift().map(f));
 });
 
 /**
@@ -19553,7 +19762,7 @@ var liftN = (0, _combinators.curry)(function _liftN(f) {
  * @return {Object} - b
  */
 function mjoin(ma) {
-    return ma.join();
+  return ma.mjoin();
 }
 
 /**
@@ -19563,7 +19772,7 @@ function mjoin(ma) {
  * @return {Object} - b
  */
 function toList(ma) {
-    return List(mjoin(ma));
+  return _dataStructures.List.of(ma.value);
 }
 
 /**
@@ -19572,9 +19781,9 @@ function toList(ma) {
  * @param {Object} ma - a
  * @return {Object} - b
  */
-function toMaybe(ma) {}
-//return Maybe(mjoin(ma));
-
+function toMaybe(ma) {
+  return (0, _dataStructures.Maybe)(ma.value);
+}
 
 /**
  * @signature
@@ -19582,9 +19791,9 @@ function toMaybe(ma) {}
  * @param {Object} ma - a
  * @return {Object} - b
  */
-function toFuture(ma) {}
-//return Future(mjoin(ma));
-
+function toFuture(ma) {
+  return _dataStructures.Future.of(ma.value);
+}
 
 /**
  * @signature
@@ -19592,9 +19801,9 @@ function toFuture(ma) {}
  * @param {Object} ma - a
  * @return {Object} - b
  */
-function toIdentity(ma) {}
-//return Identity(mjoin(ma));
-
+function toIdentity(ma) {
+  return (0, _dataStructures.Identity)(ma.value);
+}
 
 /**
  * @signature
@@ -19602,37 +19811,39 @@ function toIdentity(ma) {}
  * @param {Object} ma - a
  * @return {Object} - b
  */
-function toJust(ma) {}
-//return Just(mjoin(ma));
-
-
-//===========================================================================================//
-//===========================================================================================//
-//=======================           CONTAINER TRANSFORMERS            =======================//
-//===========================================================================================//
-//===========================================================================================//
-
-function _toIdentity() {
-    //return Identity.from(this.value);
+function toJust(ma) {
+  return (0, _dataStructures.Just)(ma.value);
 }
 
-function _toJust() {
-    //return Just.from(this.value);
+function toConstant(ma) {
+  return (0, _dataStructures.Constant)(ma.value);
 }
 
-function _toList() {
-    //return List.from(this.value);
+function toNothing(ma) {
+  return (0, _dataStructures.Nothing)();
 }
 
-function _toMaybe() {}
-//return Maybe.from(this.value);
+function toEither(ma) {
+  return (0, _dataStructures.Either)(ma);
+}
 
+function toRight(ma) {
+  return (0, _dataStructures.Right)(ma);
+}
+
+function toLeft(ma) {
+  return (0, _dataStructures.Left)(ma);
+}
 
 //===========================================================================================//
 //===========================================================================================//
 //============================           LIST HELPERS            ============================//
 //===========================================================================================//
 //===========================================================================================//
+
+function count(xs, predicate) {
+  return xs.count(predicate);
+}
 
 /**
  * @signature
@@ -19644,8 +19855,12 @@ function _toMaybe() {}
  * @return {Array} - c
  */
 var filter = (0, _combinators.curry)(function _filter(predicate, xs) {
-    xs.filter(predicate);
+  xs.filter(predicate);
 });
+
+function first(xs, predicate) {
+  return xs.first(predicate);
+}
 
 /**
  * @signature
@@ -19658,7 +19873,7 @@ var filter = (0, _combinators.curry)(function _filter(predicate, xs) {
  * @return {Array} - d
  */
 var intersect = (0, _combinators.curry)(function _intersect(xs, comparer, ys) {
-    return ys.intersect(xs, comparer);
+  return ys.intersect(xs, comparer);
 });
 
 /**
@@ -19672,7 +19887,27 @@ var intersect = (0, _combinators.curry)(function _intersect(xs, comparer, ys) {
  * @return {*} - d
  */
 var except = (0, _combinators.curry)(function _except(xs, comparer, ys) {
-    return ys.except(xs, comparer);
+  return ys.except(xs, comparer);
+});
+
+function last(xs, predicate) {
+  return xs.last(predicate);
+}
+
+var skip = (0, _combinators.curry)(function _skip(xs, amt) {
+  return xs.skip(amt);
+});
+
+var skipWhile = (0, _combinators.curry)(function _skipWhile(xs, predicate) {
+  return xs.skipWhile(predicate);
+});
+
+var take = (0, _combinators.curry)(function _take(xs, amt) {
+  return xs.take(amt);
+});
+
+var takeWhile = (0, _combinators.curry)(function _takeWhile(xs, predicate) {
+  return xs.takeWhile(predicate);
 });
 
 exports.ap = ap;
@@ -19681,7 +19916,6 @@ exports.fmap = fmap;
 exports.map = map;
 exports.mapWith = mapWith;
 exports.flatMap = flatMap;
-exports.flatMapWith = flatMapWith;
 exports.lift2 = lift2;
 exports.lift3 = lift3;
 exports.lift4 = lift4;
@@ -19703,12 +19937,30 @@ exports.isJust = isJust;
 exports.isLeft = isLeft;
 exports.isList = isList;
 exports.isMaybe = isMaybe;
-exports.isMonad = isMonad;
+exports.isImmutableDataStructure = isImmutableDataStructure;
 exports.isNothing = isNothing;
 exports.isRight = isRight;
 exports.isValidation = isValidation;
+exports.fold = fold;
+exports.sequence = sequence;
+exports.traverse = traverse;
+exports.contramap = contramap;
+exports.isEmpty = isEmpty;
+exports.equals = equals;
+exports.bimap = bimap;
+exports.dimap = dimap;
+exports.toList = toList;
+exports.toLeft = toLeft;
+exports.toRight = toRight;
+exports.toEither = toEither;
+exports.toIdentity = toIdentity;
+exports.toMaybe = toMaybe;
+exports.toNothing = toNothing;
+exports.toJust = toJust;
+exports.toFuture = toFuture;
+exports.toConstant = toConstant;
 
-},{"./combinators":330,"./dataStructures/monads/monads":341,"./functionalHelpers":345}],349:[function(require,module,exports){
+},{"./combinators":330,"./dataStructures/dataStructures":332,"./functionalHelpers":345}],349:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -19794,7 +20046,7 @@ var observable = {
     groupBy: function _groupBy(keySelector, comparer) {
         var bufferAmt = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : 0;
 
-        return op.call(this, _operators.groupByOperator, keySelector, comparer, bufferAmt);
+        return this.lift(Object.create(_operators.groupByOperator).init(keySelector, comparer, bufferAmt));
     },
     /**
      * @sig
@@ -19807,6 +20059,7 @@ var observable = {
             observables[_key] = arguments[_key];
         }
 
+        //TODO: fix merge operator - it doesn't appear to be working as intended
         return this.mergeMap.apply(this, [null].concat(observables));
     },
     /**
@@ -19817,12 +20070,21 @@ var observable = {
      * @return {observable} - c
      */
     mergeMap: function _mergeMap(fn) {
+        //TODO: fix merge operator - it doesn't appear to be working as intended
+        fn = fn || _combinators.identity;
+
         for (var _len2 = arguments.length, observables = Array(_len2 > 1 ? _len2 - 1 : 0), _key2 = 1; _key2 < _len2; _key2++) {
             observables[_key2 - 1] = arguments[_key2];
         }
 
-        if ((0, _functionalHelpers.delegatesTo)(this.operator, _operators.mergeOperator)) return this.lift.call(this.source, Object.create(_operators.mergeOperator).init(fn, [this].concat(observables, this.operator.observables)));
-        return op.call(this, _operators.mergeOperator, fn, [this].concat(observables));
+        if (_operators.mergeOperator.isPrototypeOf(this.operator)) return this.lift.call(this.source, Object.create(_operators.mergeOperator).init([this].concat(observables, this.operator.observables)));
+        return this.lift(Object.create(_operators.mergeOperator).init([this].concat(observables), fn));
+
+        /*
+        if (delegatesTo(this.operator, mergeOperator))
+            return this.lift.call(this.source, Object.create(mergeOperator).init(fn, [this].concat(observables, this.operator.observables)));
+        return op.call(this, mergeOperator, fn, [this].concat(observables));
+        */
     },
     /**
      * @sig
@@ -19887,6 +20149,25 @@ var observable = {
             subscriber.unsubscribe = unSub;
             return subscriber;
         };
+        return o;
+    },
+    //Not actual property, just naming it this temporarily until I figure out how to make this work
+    //and determine a better name for it.
+    fromInterval: function _fromInterval(fn) {
+        var o = Object.create(observable);
+        o.subscribe = function _subscribe(subscriber) {
+            var res = fn(function _cb(val) {
+                return subscriber.next(val);
+            });
+
+            subscriber.unsubscribe = function _unSub() {
+                subscriber.status = _helpers.observableStatus.complete;
+                clearInterval(res);
+            };
+
+            return subscriber;
+        };
+
         return o;
     },
     /**
@@ -20100,9 +20381,12 @@ var _debounceSubscriber = require('../subscribers/debounceSubscriber');
 var _operator_helpers = require('./operator_helpers');
 
 var debounceOperator = {
-    init: (0, _operator_helpers.initOperator)(['interval', 0]),
+    init: function _init(amt) {
+        this.interval = amt;
+        return this;
+    },
     subscribe: function _subscribe(subscriber, source) {
-        return _operator_helpers.subscribe.call(this, subscriber, source, _debounceSubscriber.debounceSubscriber);
+        return source.subscribe(Object.create(_debounceSubscriber.debounceSubscriber).init(subscriber, this.interval));
     }
 };
 
@@ -20210,9 +20494,22 @@ var _operator_helpers = require('./operator_helpers');
 
 var mergeOperator = {
     //TODO: update this to take an optional 'merge' function that defaults to an identity for each observable if not provided
-    init: (0, _operator_helpers.initOperator)('transform', 'observables'),
+    get observables() {
+        return this._observables || [];
+    },
+    set observables(arr) {
+        this._observables = arr;
+    },
+    init: function _init(observables, transform) {
+        //TODO: fix merge operator - it doesn't appear to be working as intended
+        this.observables = observables;
+        this.transform = transform;
+        return this;
+    },
+    //TODO: update this to take an optional 'merge' function that defaults to an identity for each observable if not provided
     subscribe: function _subscribe(subscriber, source) {
-        return _operator_helpers.subscribe.call(this, subscriber, source, _mergeSubscriber.mergeSubscriber);
+        return source.subscribe(Object.create(_mergeSubscriber.mergeSubscriber).init(subscriber, this.observables, this.transform));
+        //return subscribe.call(this, subscriber, source, mergeSubscriber);
     }
 };
 
@@ -20258,6 +20555,10 @@ function subscribe(subscriber, source, operatorSubscriber) {
     var _Object$create,
         _this = this;
 
+    if (this.observables) {
+        //console.log(...getSetters(this).map(prop => this[prop]));
+        //console.log(Object.getPrototypeOf(operatorSubscriber));
+    }
     return source.subscribe((_Object$create = Object.create(operatorSubscriber)).init.apply(_Object$create, [subscriber].concat(_toConsumableArray(getSetters(this).map(function (prop) {
         return _this[prop];
     })))));
@@ -20377,7 +20678,7 @@ var chainSubscriber = Object.create(_subscriber.subscriber, {
             try {
                 mappedResult = this.transform(item, this.count++);
                 //TODO: figure out what needs to be done to pull the item out of the inner observable
-                this.subscriber.next((0, _functionalHelpers.delegatesTo)(mappedResult, _observable.observable) ? mappedResult.value : mappedResult);
+                this.subscriber.next((0, _functionalHelpers.delegatesTo)(mappedResult, _observable.observable) ? mappedResult.source : mappedResult);
             } catch (err) {
                 this.subscriber.error(err);
             }
@@ -20518,9 +20819,9 @@ var _sort_util = require('../../dataStructures/sort_util');
 var groupBySubscriber = Object.create(_subscriber.subscriber, {
     next: {
         value: function _next(item) {
-            if (this.buffer.length + 1 >= this.bufferSize) {
+            if (this.buffer.length + 1 >= this.bufferAmount) {
                 try {
-                    var res = groupData(this.buffer, [{ keySelector: this.keySelector, comparer: this.comparer, direction: 'desc' }]);
+                    var res = groupData(this.buffer.concat(item), [{ keySelector: this.keySelector, comparer: this.comparer, direction: 2 }]);
                     this.subscriber.next(res);
                     this.buffer.length = 0;
                 } catch (ex) {
@@ -20577,7 +20878,7 @@ function findGroup(arr, field) {
 
 exports.groupBySubscriber = groupBySubscriber;
 
-},{"../../dataStructures/sort_util":343,"./subscriber":367}],364:[function(require,module,exports){
+},{"../../dataStructures/sort_util":342,"./subscriber":367}],364:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -20695,6 +20996,43 @@ var mergeSubscriber = Object.create(_subscriber.subscriber, {
     }
 });
 
+/*
+var mergeSubscriber = Object.create(subscriber, {
+    next: {
+        value: function _next(item) {
+            if (this.transform) {
+                var res;
+                try {
+                    res = this.transform(item, this.count++);
+                }
+                catch (err) {
+                    this.subscriber.error(err);
+                    return;
+                }
+                //Promise.resolve(res).then(this.then);
+                this.subscriber.next(res);
+            }
+            else this.subscriber.next(item);
+        },
+        writable: false,
+        configurable: false
+    },
+    init: {
+        value: function _init(subscriber, observables, transform) {
+            console.log(Array.prototype.slice.call(arguments)[2]);
+            this.transform = transform;
+            observables.forEach(function _subscribeToEach(observable) {
+                observable.subscribe(this);
+            }, this);
+            this.initialize(subscriber);
+            return this;
+        },
+        writable: false,
+        configurable: false
+    }
+});
+*/
+
 exports.mergeSubscriber = mergeSubscriber;
 
 },{"./subscriber":367}],367:[function(require,module,exports){
@@ -20706,6 +21044,10 @@ Object.defineProperty(exports, "__esModule", {
 exports.subscriber = undefined;
 
 var _helpers = require('../../helpers');
+
+/**
+ * @namespace stream
+ */
 
 /**
  * @typedef {Object}
@@ -20721,6 +21063,7 @@ var _helpers = require('../../helpers');
  * @property {function} onNext
  * @property {function} onError
  * @property {function} onComplete
+ * @memberOf stream
  * @description:
  */
 var subscriber = {
@@ -20972,13 +21315,14 @@ function filterReducer(predicate) {
  * @return {*} - c
  */
 var mapped = (0, _combinators.curry)(function _mapped(f, x) {
-    return identity(map((0, _combinators.compose)(function _mCompose(x) {
+    return (0, _combinators.identity)(map((0, _combinators.compose)(function _mCompose(x) {
         return x.value;
     }, f), x));
 });
 
 /**
  * @signature
+ * @face
  * @description d
  * @param {function} xform - a
  * @param {function} reducing - b
