@@ -130,11 +130,6 @@ var view = curry(function _view(lens, target) {
  */
 var over = curry(function _over(lens, mapFn, target) {
     return lens(function _lens(y) {
-        if (y === 'Charles') {
-            console.log(mapFn(y));
-            console.log(target);
-            console.log(lens(x => Identity(mapFn(x)))(target).value);
-        }
         return Identity(mapFn(y));
     })(target).value;
 });
