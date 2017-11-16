@@ -36,22 +36,21 @@ var debounceSubscriber = Object.create(subscriber, {
                 }
             };
         }
-    },
-    cleanUp: {
-        value: function _cleanUp() {
-            this.tearDownTimeout();
-            this.lastTick = undefined;
-            this.lastItem = undefined;
-        }
-    },
-    tearDownTimeout: {
-        value: function _tearDownTimeout() {
-            if (this.id && javaScriptTypes.Number === typeof this.id) {
-                clearTimeout(this.id);
-                this.id = null;
-            }
-        }
     }
 });
+
+debounceSubscriber.cleanUp = function _cleanUp() {
+    this.tearDownTimeout();
+    this.lastTick = undefined;
+    this.lastItem = undefined;
+    subscriber.unsubscribe.call(this);
+};
+
+debounceSubscriber.tearDownTimeout = function _tearDownTimeout() {
+    if (this.id && javaScriptTypes.Number === typeof this.id) {
+        clearTimeout(this.id);
+        this.id = null;
+    }
+};
 
 export { debounceSubscriber };

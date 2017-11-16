@@ -116,6 +116,7 @@ var constant = {
      */
     map: returnMe,
     chain: returnMe,
+    join: returnMe,
     /**
      * @signature
      * @description d
@@ -205,8 +206,6 @@ var constant = {
  * the mapping function to the underlying data.
  */
 constant.bimap = constant.map;
-
-constant.mjoin = join;
 
 constant.ap = constant.apply;
 constant.fmap = constant.chain;

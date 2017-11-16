@@ -3,7 +3,7 @@ import { identity } from '../../../src/dataStructures/identity';
 
 var Identity = monads.Identity;
 
-describe('Identity monad test', function _testIdentityMonad() {
+describe('Identity test', function _testIdentity() {
     describe('Identity object factory tests', function _testIdentityObjectFactory() {
         it('should return a new identity monad regardless of data type', function _testIdentityFactoryObjectCreation() {
             var arr = [1, 2, 3],
@@ -110,7 +110,7 @@ describe('Identity monad test', function _testIdentityMonad() {
         });
     });
 
-    describe('Identity monad object tests', function _testIdentityMonadObject() {
+    describe('Identity data structure tests', function _testIdentityDataStructure() {
         it('should not allow the ._value property to be updated', function _testWritePrevention() {
             var i = Identity(1),
                 err1 = false,
@@ -351,7 +351,7 @@ describe('Identity monad test', function _testIdentityMonad() {
         });
     });
 
-    describe('Identity laws test', function _testIdentityFunctorLaws() {
+    describe('Identity laws test', function _testIdentityLaws() {
         /*it('should obey the identity law', function _testIdentityFunctorIdentityLaw() {
             var v = Identity(2);
 
