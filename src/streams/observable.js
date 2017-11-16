@@ -198,24 +198,24 @@ var observable = {
         var o = Object.create(observable);
         o.source = list;
         o.idx = startingIdx;
-        o.subscribe = function _subscribe(subscriber) {
+        o.subscribe = function _subscribe(sub) {
             function unSub() {
                 this.status = observableStatus.complete;
             }
 
             var runner = (function _runner() {
-                if (subscriber.status !== observableStatus.paused && subscriber.status !== observableStatus.complete &&
+                if (sub.status !== observableStatus.paused && sub.status !== observableStatus.complete &&
                     this.idx < this.source.length) {
                     Promise.resolve(this.source[this.idx++])
                         .then(function _resolve(val) {
-                            subscriber.next(val);
+                            sub.next(val);
                             runner();
                         });
                 }
                 else {
-                    var d = subscriber;
-                    while (d.subscriber.subscriber) d = d.subscriber;
-                    d.unsubscribe();
+                    var d = sub;
+                    while (d.subscriber && d.subscriber.subscriber) d = d.subscriber;
+                    if (d.unsubscribe) d.unsubscribe();
                 }
             }).bind(this);
 
@@ -224,8 +224,18 @@ var observable = {
                     runner();
                 });
 
-            subscriber.unsubscribe = unSub;
-            return subscriber;
+            if (subscriber.isPrototypeOf(sub)) {
+                sub.unsubscribe = unSub;
+            }
+            else {
+                sub = {
+                    next: sub,
+                    error: arguments[1],
+                    complete: arguments[2]
+                };
+            }
+
+            return sub;
 
             /*
             var runner = (function _runner() {
