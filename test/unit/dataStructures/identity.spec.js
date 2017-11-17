@@ -366,7 +366,7 @@ describe('Identity test', function _testIdentity() {
 
             //Composition
             Identity(1).apply(Identity(x => x * x).apply(Identity(x => x + 2).map(f => g => x => f(g(x))))).value
-                .should.eql(Identity(1).apply(Identity(x => x * x)).apply(Identity(x => x + 2)).value)
+                .should.eql(Identity(1).apply(Identity(x => x * x)).apply(Identity(x => x + 2)).value);
 
             //Identity
             Identity(i).apply(Identity(i)).value.should.eql(i);
