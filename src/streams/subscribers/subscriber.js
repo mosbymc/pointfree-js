@@ -27,15 +27,15 @@ var subscriber = {
     },
     set status(status) {
         this._status = Object.keys(observableStatus)
-            .map(function _statusValues(status) { return observableStatus[status]; })
+            .map(stat => observableStatus[stat])
             .includes(status) ?
-            status : observableStatus.inactive;
+            status : this.status;
     },
     get count() {
         return this._count || 0;
     },
     set count(cnt) {
-        this._count = cnt || 0;
+        this._count = Number.isInteger(cnt) && -1 < cnt ? cnt : this.count;
     },
     /**
      * @sig

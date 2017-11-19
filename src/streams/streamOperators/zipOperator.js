@@ -1,0 +1,3 @@
+var zipOperator = {};
+
+export { zipOperator };

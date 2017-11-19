@@ -1,6 +1,7 @@
 import { observableStatus } from '../helpers';
 import { subscriber } from './subscribers/subscriber';
-import { debounceOperator, chainOperator, filterOperator, groupByOperator, itemBufferOperator, mapOperator, mergeOperator, timeBufferOperator } from './streamOperators/operators';
+import { debounceOperator, distinctOperator, chainOperator, filterOperator, groupByOperator, itemBufferOperator, mapOperator,
+    mergeOperator, timeBufferOperator, zipOperator } from './streamOperators/operators';
 import { generatorProto } from '../helpers';
 import { wrap, noop, delegatesTo } from '../functionalHelpers';
 import { compose, all, identity } from '../combinators';
@@ -50,6 +51,16 @@ var observable = {
      */
     chain: function _deepMap(fn) {
         return op.call(this, chainOperator, fn);
+    },
+    /**
+     * @signature
+     * @description d
+     * @param {function} comparer - A function used to compare values passed to the observable
+     * for distinctness. Defaults to 'strict equality' if no comparer is provided.
+     * @return {observable} Returns an observable
+     */
+    distinct: function _distinct(comparer) {
+        return this.lift(Object.create(distinctOperator).init(comparer));
     },
     /**
      * @sig
@@ -129,6 +140,20 @@ var observable = {
      */
     debounce: function _debounce(amt) {
         return op.call(this, debounceOperator, amt);
+    },
+    /**
+     * @description d
+     * @param {observable} observables - One or more observables to zip with the current observable
+     * @param {function} [zipFunc] - An optional function that is used once all matching items from the
+     * separate observables have been received. This function will be invoked with one item from each of
+     * the observables - they will be passed as individual items, not an array.
+     * @return {observable} Returns an observable
+     */
+    zip: function _zip(...observables) {
+        let hasProjection = 'function' === typeof observables[observables.length - 1];
+        observables = hasProjection ? observables.slice(0, observables.length - 2) : observables;
+        let projection = hasProjection ? observables[observables.length - 1] : i;
+        return this.lift(Object.create(zipOperator).init(observables, projection));
     },
     /**
      * @sig
