@@ -2,23 +2,25 @@ import { subscriber } from './subscriber';
 import { IndexSubscriber } from './indexedSubscriber';
 
 var zipSubscriber = Object.create(subscriber);
-zipSubscriber.next = function _next(item, index) {
-    let foundMissing = false,
-        setItem = false;
-    this.buffer = this.buffer.map(function _mapBuffer(buf, idx) {
-        if (!buf[index] && !setItem) {
-            buf[index] = item;
-            setItem = true;
-        }
-        else if (!buf[index]) foundMissing = true;
+zipSubscriber.next = function _next(item, observableIndex) {
+    let bufferLen = this.buffer[observableIndex].push(item);
+    let foundEach = true;
+    this.buffer.forEach(function _checkBuffer(buf) {
+        if (buf.length !== bufferLen) foundEach = false;
     });
 
-    if (!foundMissing) {
+    if (foundEach) {
         try {
-            this.subscriber.next(this.buffer.filter(buf => buf[index]));
+            let args = [];
+            this.buffer = this.buffer.filter(function _removeItems(buf) {
+                args.push(buf[bufferLen - 1].shift());
+                return buf;
+            });
+            if (this.transform) args = this.transform(...args);
+            this.subscriber.next(args);
         }
-        catch (err) {
-            this.subscriber.error(err);
+        catch(err) {
+            return this.subscriber.error(err);
         }
     }
 };
@@ -30,7 +32,8 @@ zipSubscriber.init = function _init(subscriber, observables, transform) {
     }, this);
     this.buffer = new Array(observables.length);
     this.buffer.forEach((buf, idx) => buf[idx] = {});
-    return this.initialize(IndexSubscriber(subscriber, observables.length));
+    this.initialize(this.subscriber);
+    return IndexSubscriber(this, observables.length);
 };
 
 export { zipSubscriber };

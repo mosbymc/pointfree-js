@@ -26,6 +26,7 @@ var groupBySubscriber = Object.create(subscriber, {
             this.comparer = comparer;
             this.bufferAmount = bufferSize;
             this.buffer = [];
+            this.subscriber = subscriber;
             return this;
         },
         writable: false,

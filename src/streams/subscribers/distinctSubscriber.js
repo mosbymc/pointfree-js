@@ -1,14 +1,13 @@
 import { subscriber } from './subscriber';
+import { cacher } from '../../helpers';
 
 var distinctSubscriber = Object.create(subscriber);
 distinctSubscriber.next = function _next(item) {
-    var sub = this.subscriber;
     try {
-        if (!this.cached(item)) Promise.resolve(item).then(it => sub.next(it));// this.subscriber.next(item);
+        if (!this.cached(item)) this.subscriber.next(item);
     }
     catch (err) {
-        Promise.resolve(err).then(e => sub.error(e));
-        //this.subscriber.error(err);
+        this.subscriber.error(err);
     }
 };
 

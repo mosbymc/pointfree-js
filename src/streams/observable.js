@@ -39,9 +39,12 @@ var observable = {
      * @return {observable} - b
      */
     map: function _map(fn) {
+        return this.lift(Object.create(mapOperator).init(fn));
+        /*
         if (delegatesTo(this.operator, mapOperator))
             return this.lift.call(this.source, Object.create(mapOperator).init(compose(fn, this.operator.transform)));
         return op.call(this, mapOperator, fn);
+        */
     },
     /**
      * @sig
@@ -50,7 +53,8 @@ var observable = {
      * @return {observable} - b
      */
     chain: function _deepMap(fn) {
-        return op.call(this, chainOperator, fn);
+        return this.lift(Object.create(chainOperator).init(fn));
+        //return op.call(this, chainOperator, fn);
     },
     /**
      * @signature
@@ -69,9 +73,12 @@ var observable = {
      * @return {observable} - b
      */
     filter: function _filter(predicate) {
+        return this.lift(Object.create(filterOperator).init(predicate));
+        /*
         if (delegatesTo(this.operator, filterOperator))
             return this.lift.call(this.source, Object.create(filterOperator).init(all(predicate, this.operator.predicate)));
         return op.call(this, filterOperator, predicate);
+        */
     },
     /**
      * @sig
@@ -92,7 +99,13 @@ var observable = {
      */
     merge: function _merge(...observables) {
         //TODO: fix merge operator - it doesn't appear to be working as intended
-        return this.mergeMap(null, ...observables);
+        //return this.mergeMap(null, ...observables);
+        var transform;
+        if ('function' === typeof observables[observables.length - 1]) {
+            transform = observables[observables.length - 1];
+            observables = observables.slice(0, observables.length - 1);
+        }
+        return this.lift(Object.create(mergeOperator).init(observables, transform));
     },
     /**
      * @sig
@@ -121,7 +134,8 @@ var observable = {
      * @return {observable} - b
      */
     itemBuffer: function _itemBuffer(count) {
-        return op.call(this, itemBufferOperator, count);
+        //return op.call(this, itemBufferOperator, count);
+        return this.lift(Object.create(itemBufferOperator).init(count));
     },
     /**
      * @sig
@@ -130,7 +144,8 @@ var observable = {
      * @return {observable} - b
      */
     timeBuffer: function _timeBuffer(amt) {
-        return op.call(this, timeBufferOperator, amt);
+        //return op.call(this, timeBufferOperator, amt);
+        return this.lift(Object.create(timeBufferOperator).init(amt));
     },
     /**
      * @sig
@@ -139,7 +154,8 @@ var observable = {
      * @return {*|observable} - b
      */
     debounce: function _debounce(amt) {
-        return op.call(this, debounceOperator, amt);
+        //return op.call(this, debounceOperator, amt);
+        return this.lift(Object.create(debounceOperator).init(amt));
     },
     /**
      * @description d
@@ -238,9 +254,25 @@ var observable = {
                         });
                 }
                 else {
-                    var d = sub;
-                    while (d.subscriber && d.subscriber.subscriber) d = d.subscriber;
-                    if (d.unsubscribe) d.unsubscribe();
+                    //var d = sub;
+                    //while (d.subscriber && d.subscriber.subscriber) d = d.subscriber;
+                    //if (d.unsubscribe) d.unsubscribe();
+                    //else if (d.complete) d.complete();
+                    //Promise.resolve(sub).then(_unsubscribe);
+                    Promise.resolve(sub).then(s => _unsubscribe(sub));
+                    //_unsubscribe(sub);
+                    function _unsubscribe(sub) {
+                        sub = sub.subscriber ? sub.subscriber : sub;
+                        if (sub.subscribers && sub.subscribers.length) {
+                            sub.subscribers.forEach(function _forEachSubscriber(s) {
+                                _unsubscribe(s);
+                            });
+                        }
+                        else {
+                            if (sub.complete) sub.complete();
+                            if (sub.unsubscribe) sub.unsubscribe();
+                        }
+                    }
                 }
             }).bind(this);
 

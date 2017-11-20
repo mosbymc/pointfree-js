@@ -25,16 +25,15 @@ timeBufferSubscriber.init = function _init(subscriber, interval) {
     this.now = Date.now;
 
     function _interval() {
-        if (this.buffer.length) {
-            //the map is needed here because, due to the asynchronous nature of subscribers and the subsequent
-            //clearing of the buffer, the subscriber#next argument would be nullified before it had a chance
-            //to act on it.
-            this.subscriber.next(this.buffer.map(function _mapBuffer(item) { return item; }));
+        var buffer = this.buffer.map(b => b);
+        if (buffer.length) {
+            this.subscriber.next(buffer.map(i => i));
             this.buffer.length = 0;
         }
     }
 
     this.id = setInterval((_interval).bind(this), interval);
+    this.subscriber = subscriber;
     return this;
 };
 
