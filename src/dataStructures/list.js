@@ -25,64 +25,63 @@ var listProxyHandler = {
  * at the consumer-object level, as well as to provide default values for a consumer-level
  * object at creation if not specified.
  * @typedef {Object}
- * @property {function} value
- * @property {function} extract
- * @property {function} apply
- * @property {function} append
- * @property {function} appendAll
+ * @property {function} extract - Returns the underlying data of the list as an array; used as a getter, not a function
+ * @property {function} apply - Applies the functions in one iterable to the data in the current list and returns a new list
+ * @property {function} append - Accepts one iterable and returns a new list with the contents appended to the current lists's contents
+ * @property {function} appendAll - Behaves like list#append but accepts one or more iterables
  * @property {function} bimap
- * @property {function} chain
- * @property {function} concat
- * @property {function} concatAll
+ * @property {function} chain - Accepts a {@link dataStructures.list} returning function and applies it to each item in the list, removing the resulting nested lists
+ * @property {function} concat - Accepts one iterable and returns a new list with the contents appended to the current list's contents
+ * @property {function} concatAll - Behaves like list#concat but accepts one or more iterables
  * @property {function} copyWithin
- * @property {function} distinct
- * @property {function} except
- * @property {function} fill
- * @property {function} filter
+ * @property {function} distinct - Accepts an optional function and returns a new list with distinct elements; defaults to strict equality if no function is provided
+ * @property {function} except - Accepts an iterable and returns a new list containing the disjunction between the two
+ * @property {function} fill - Accepts a single argument and returns a new list with all values in the current list replaced by the value
+ * @property {function} filter - Accepts a boolean returning function and returns a new list with all 'false' elements removed
  * @property {function} groupBy
  * @property {function} groupByDescending
  * @property {function} groupJoin
- * @property {function} intersect
+ * @property {function} intersect - Accepts an iterable and returns a new list containing only the conjunction between the two
  * @property {function} intersperse
  * @property {function} listJoin
- * @property {function} map
+ * @property {function} map - Applies the supplied function argument to each element in the list and returns a new list with the new values
  * @property {function} join
  * @property {function} ofType
- * @property {function} prepend
- * @property {function} prependAll
- * @property {function} reverse
+ * @property {function} prepend - Accepts one iterable and returns a new list with the contents prepended to the current lists's contents
+ * @property {function} prependAll - Behaves like list#prepend but accepts one or more iterables
+ * @property {function} reverse - Returns a new list with the contents in reverse order
  * @property {function} sequence
- * @property {function} skip
- * @property {function} skipWhile
- * @property {function} take
- * @property {function} takeWhile
- * @property {function} union
+ * @property {function} skip - Returns a new list with the first 'n' items removed; 'n' defaults to zero
+ * @property {function} skipWhile - Accepts a boolean returning function and returns a new list with all elements removed up until the first element that returns 'true'
+ * @property {function} take - Returns a new list with the last 'n' items removed; 'n' defaults to zero
+ * @property {function} takeWhile - Accepts a boolean returning function and returns a new list with all elements up until the first element that returns 'false'
+ * @property {function} union - Accepts an iterable and a comparer function and returns a new list that contains all distinct elements between the two
  * @property {function} zip
- * @property {function} all
- * @property {function} any
- * @property {function} count
+ * @property {function} all - Accepts a boolean-returning function and returns a boolean after applying the function to all elements that indicates if all the elements returned 'true'
+ * @property {function} any - Accepts a boolean-returning function and returns a boolean after applying the function to all elements that indicates if any of the elements returned 'true'
+ * @property {function} count - Returns an integer is equal to the number of elements in the list
  * @property {function} equals
- * @property {function} data
- * @property {function} extract
+ * @property {function} data - Returns the underlying data in the list in array form
+ * @property {function} extract - Returns the underlying data in the list in array form
  * @property {function} findIndex
  * @property {function} findLastIndex
- * @property {function} first
+ * @property {function} first - Accepts a boolean-returning function and returns the first element in the list where 'true' is returned from the function
  * @property {function} foldl
  * @property {function} foldr
- * @property {function} isEmpty
- * @property {function} last
+ * @property {function} isEmpty - Returns a boolean that indicates if the list has at least one element
+ * @property {function} last - Accepts a boolean-returning function and returns the last element in the list where 'true' is returned from the function
  * @property {function} reduceRight
- * @property {function} toArray
- * @property {function} toEvaluatedList
- * @property {function} toMap
- * @property {function} toSet
- * @property {function} toString
+ * @property {function} toArray - Returns the elements of the list in array form
+ * @property {function} toEvaluatedList - Returns a new list after evaluating the underlying function pipeline; This should only be used in cases where the list may need to be enumerated more than once
+ * @property {function} toMap - Returns the elements of the list in map form - the indices of the list act as the map's keys
+ * @property {function} toSet - Returns the elements of the list in set form
+ * @property {function} toString - Returns a string representation of the list
  * @property {function} valueOf
- * @property {function} factory
- * @property {function} of
+ * @property {function} factory - Reference to the List factory function
+ * @property {function} of - Creates a new list of whatever element is provided
  * @property {function} sequence
  * @property {function} traverse
- * @property {Symbol.iterator}
+ * @property {Symbol.iterator} - The list's iterator; can be used in for-of, for-in loops
  * @kind {Object}
  * @memberOf dataStructures
  * @namespace list_core
@@ -1372,7 +1371,12 @@ var listFromGen = source => createList(invoke(source));
  * @factory List
  * @description Creator function for a new List object. Takes any value/type as a parameter
  * and, if it has an iterator defined, with set it as the underlying source of the List as is,
- * or, wrap the item in an array if there is no defined iterator.
+ * or, wrap the item in an array if there is no defined iterator. The returned list object may
+ * be treated like an array in terms of retrieving an element at a specified index. Note however,
+ * that attempting to set a value via index location will not work.
+ *
+ * @example List([1, 2, 3, 4, 5])[2]    // => 3
+ *
  * @namespace List
  * @memberOf dataStructures
  * @property {function} from {@link List#from}
@@ -1590,7 +1594,7 @@ function createGroupedListDelegate(source, key) {
  * instance is evaluated.
  * @param {string} [key] - A string that denotes what value the new list delegate object instance
  * was grouped on.
- * @return {Proxy<dataStructure.list_core>|list_core|list|ordered_list} Returns either a {@link list} delegator object
+ * @return {Proxy<dataStructures.list_core>|list_core|list|ordered_list} Returns either a {@link list} delegator object
  * or an {@link ordered_list} delegator object based on the values passed as arguments.
  */
 function createList(source, iterator, sortObject, key) {
