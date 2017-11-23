@@ -246,10 +246,20 @@ Nothing.is = n => nothing === n;
 
 /**
  * @typedef {Object} just
- * @property {function} value - returns the underlying value of the just
+ * @property {function} extract - returns the underlying value of the just
  * @property {function} map - maps a single function over the underlying value of the just
+ * @property {function} chain
+ * @property {function} join
+ * @property {function} apply
  * @property {function} bimap
- * @property {function} extract
+ * @property {function} contramap
+ * @property {function} dimap
+ * @property {function} fold
+ * @property {function} sequence
+ * @property {function} traverse
+ * @property {function} isEmpty
+ * @property {boolean} isJust
+ * @property {boolean} isNothing
  * @property {function} valueOf - returns the underlying value of the just; used during concatenation and coercion
  * @property {function} toString - returns a string representation of the just and its underlying value
  * @property {function} factory - a reference to the just factory function
@@ -524,10 +534,20 @@ var just = {
 
 /**
  * @typedef {Object} nothing
- * @property {function} value - returns the underlying value of the 'nothing' data structure (always null)
+ * @property {function} extract - returns the underlying value of the 'nothing' data structure (always null)
  * @property {function} map - maps a single function over the underlying value of the 'nothing'
+ * @property {function} chain
+ * @property {function} join
+ * @property {function} apply
  * @property {function} bimap
- * @property {function} extract
+ * @property {function} contramap
+ * @property {function} dimap
+ * @property {function} fold
+ * @property {function} sequence
+ * @property {function} traverse
+ * @property {function} isEmpty
+ * @property {boolean} isJust
+ * @property {boolean} isNothing
  * @property {function} valueOf - returns the underlying value of the 'nothing'; used during concatenation and coercion
  * @property {function} toString - returns a string representation of the 'nothing' and its underlying value
  * @property {function} factory - a reference to the 'nothing' factory function
