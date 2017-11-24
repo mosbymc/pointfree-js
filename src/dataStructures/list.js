@@ -1379,15 +1379,16 @@ var listFromGen = source => createList(invoke(source));
  *
  * @namespace List
  * @memberOf dataStructures
- * @property {function} from {@link List#from}
- * @property {function} of {@link List#of}
- * @property {function} ordered {@link List#ordered}
- * @property {Object} empty {@link List#empty}
- * @property {function} just {@link List#just}
- * @property {function} unfold {@link List#unfold}
- * @property {function} is {@link List#is}
- * @property {function} repeat {@link List#repeat}
- * @property {function} extend {@link List#extend}
+ * @property {function} from {@link List#from} - Creates and returns a new list from any argument or arguments provided
+ * @property {function} of {@link List#of} - Creates and returns a new list from any argument or arguments provided
+ * @property {function} ordered {@link List#ordered} - Behaves like the {@link List} factory function but returns an ordered list from the source provided
+ * @property {Object} empty {@link List#empty} - Creates and returns a list with no elements
+ * @property {Object} identity {@link List#identity} - Creates and returns a list with no elements
+ * @property {function} just {@link List#just} - Creates and returns an ordered list with one element
+ * @property {function} unfold {@link List#unfold} - Accepts a generator function and returns a new list that is created via 'unfolding' the generator
+ * @property {function} is {@link List#is} - Determines if the given argument is a list and returns a boolean indicating if it is
+ * @property {function} repeat {@link List#repeat} - Accepts any value and an integer and returns a new list with the value repeated 'x' times
+ * @property {function} extend {@link List#extend} - Accepts a property name and a generator function and extends the list's functionality by adding that functionality to the list's prototype
  * @param {*} [source] - Any type, any value; used as the underlying source of the List
  * @return {list} - A new List instance with the value provided as the underlying source.
  */
@@ -1403,7 +1404,7 @@ var createListFromArgs = args => 1 !== args.length ? List(args) : Array.isArray(
 /**
  * @signature
  * @description Convenience function for listCreate a new List instance; internally calls List.
- * @memberOf List
+ * @memberOf dataStructures.List
  * @static
  * @function from
  * @see List
@@ -1415,7 +1416,7 @@ List.from = (...source) => ifElse(isOneArgAndAList, constant(...source), createL
 /**
  * @signature
  * @description Alias for List.from
- * @memberOf List
+ * @memberOf dataStructures.List
  * @static
  * @function of
  * @see List.from
@@ -1429,7 +1430,7 @@ List.of = List.from;
  * @signature
  * @description Creates a new {@link ordered_list} for the source provided. An optional
  * source selector and comparer functions may be provided.
- * @memberOf List
+ * @memberOf dataStructures.List
  * @static
  * @function ordered
  * @param {*} [source] - Any JavaScript value
@@ -1444,7 +1445,7 @@ List.ordered = (source, selector, comparer = defaultPredicate) => createList(sou
 
 /**
  * @description Holds a reference to an empty, ordered list.
- * @memberOf List
+ * @memberOf dataStructures.List
  * @property {Object} empty
  * @see ordered_list
  * @kind {Object}
@@ -1452,13 +1453,20 @@ List.ordered = (source, selector, comparer = defaultPredicate) => createList(sou
 List.empty = createList([], null,
     [createSortObject(identity, defaultPredicate, sortDirection.ascending)]);
 
+/**
+ * @description Holds a reference to an empty, ordered list
+ * @memberOf dataStructures.List
+ * @property {Object} identity
+ * @see dataStructures.ordered_list
+ * @kind {Object}
+ */
 List.identity = List.empty;
 
 /**
  * @signature
  * @description Creates and returns a new {@link ordered_list} since a list with a single
  * item is trivially ordered.
- * @memberOf List
+ * @memberOf dataStructures.List
  * @static
  * @function just
  * @see List
@@ -1472,7 +1480,7 @@ List.just = val => createList([val], null,
  * @signature
  * @description Takes a function and a seed value. The function is used to 'unfold' the seed value
  * into an array which is used as the source of a new List monad.
- * @memberOf List
+ * @memberOf dataStructures.List
  * @static
  * @function unfold
  * @see List
@@ -1486,7 +1494,7 @@ List.unfold = (fn, seed) => createList(unfold(fn)(seed));
  * @signature
  * @description Takes any value as an argument and returns a boolean indicating if
  * the value is a list.
- * @memberOf List
+ * @memberOf dataStructures.List
  * @static
  * @function is
  * @see List
@@ -1500,7 +1508,7 @@ List.is = isList;
  * @description Generates a new list with the specified item repeated the specified number of times. Because
  * this generates a list with the same item repeated n times, the resulting List is trivially
  * sorted. Thus, a sorted List is returned rather than an unsorted list.
- * @memberOf List
+ * @memberOf dataStructures.List
  * @static
  * @function repeat
  * @see List
@@ -1516,7 +1524,7 @@ List.repeat = function _repeat(item, count) {
  * @signature
  * @summary Extension function that allows new functionality to be applied to
  * the queryable object
- * @memberOf List
+ * @memberOf dataStructures.List
  * @static
  * @function extend
  * @see List
@@ -1554,7 +1562,7 @@ List.repeat = function _repeat(item, count) {
 List.extend = function _extend(prop, fn) {
     if (![list, ordered_list].some(type => prop in type)) {
         list_core[prop] = function _extension(...args) {
-            return createList(this, fn(this, ...args));
+            return createList(this, _iteratorWrapper(fn(this, ...args)));
         };
     }
     return List;
