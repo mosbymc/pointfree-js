@@ -61,10 +61,10 @@ Constant.is = f => constant.isPrototypeOf(f);
 
 /**
  * @typedef {Object} constant
- * @property {function} value - returns the underlying value of the the functor
+ * @property {function} extract - returns the underlying value of the the functor
  * @property {function} map - maps a single function over the underlying value of the functor
  * @property {function} bimap
- * @property {function} extract
+ * @property {function} contramap
  * @property {function} valueOf - returns the underlying value of the functor; used during concatenation and coercion
  * @property {function} toString - returns a string representation of the identity functor and its underlying value
  * @property {function} factory - a reference to the constant factory function
