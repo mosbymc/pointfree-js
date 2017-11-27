@@ -1,6 +1,6 @@
 import { isArray, strictEquals, isObject, type, delegatesFrom, invoke, defaultPredicate } from '../functionalHelpers';
 import { not, unfoldWith } from '../decorators';
-import { when, ifElse } from '../combinators';
+import { compose, when, ifElse } from '../combinators';
 import { javaScriptTypes, sortDirection, cacher, typeNames, generatorProto } from '../helpers';
 import { sortData } from './sort_util';
 
@@ -171,6 +171,21 @@ function contains(xs, val, comparer) {
 /**
  * @signature
  * @description d
+ * @param {Array|generator|dataStructures.list_core} xs - a
+ * @param {function} fn - b
+ * @return {generator} - c
+ */
+function contramap(xs, fn) {
+    return function *contramapIterator() {
+        for (let x of xs) {
+            yield compose(fn, x);
+        }
+    };
+}
+
+/**
+ * @signature
+ * @description d
  * @param {number} idx - a
  * @param {number} start - b
  * @param {number} end - c
@@ -193,6 +208,20 @@ function copyWithin(idx, start, end, xs) {
 function count(xs, predicate) {
     return strictEquals(javaScriptTypes.Undefined, type(predicate)) ?
         asArray(xs).length : asArray(xs).filter(predicate).length;
+}
+
+/**
+ * @signature
+ * @description d
+ * @param {Array|generator|dataStructures.list_core} xs - a
+ * @param {function} f - b
+ * @param {function} g - c
+ * @return {generator} d
+ */
+function dimap(xs, f, g) {
+    return function *dimapIterator() {
+        for (let x of xs) yield compose(f, x, g);
+    };
 }
 
 /**
@@ -810,6 +839,7 @@ function zip(xs, ys, selector) {
     };
 }
 
-export { all, any, apply, binarySearch, chain, concat, concatAll, contains, copyWithin, count, distinct, equals, except, fill, filter,
-        findIndex, findLastIndex, first, foldLeft, foldRight, groupBy, groupJoin, intersect, intersperse, join, last, map, ofType,
-        pop, prepend, prependAll, reduceRight, repeat, reverse, set, skipWhile, slice, sortBy, takeWhile, unfold, union, zip };
+export { all, any, apply, binarySearch, chain, concat, concatAll, contains, contramap, copyWithin, count, dimap, distinct, equals,
+        except, fill, filter, findIndex, findLastIndex, first, foldLeft, foldRight, groupBy, groupJoin, intersect, intersperse,
+        join, last, map, ofType, pop, prepend, prependAll, reduceRight, repeat, reverse, set, skipWhile, slice, sortBy, takeWhile,
+        unfold, union, zip };

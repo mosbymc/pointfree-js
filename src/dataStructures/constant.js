@@ -98,6 +98,18 @@ var constant = {
     get value() {
         return this._value;
     },
+    /**
+     * @signature () -> *
+     * @description Returns the underlying value of a constant delegator. This is a getter function
+     * and thus works differently than the fantasy-land specification; rather than invoking constant#extract
+     * as a function, you merely need to reference as a non-function property.
+     * @example Constant(10).extract // => 10
+     * @memberOf dataStructures.constant
+     * @instance
+     * @private
+     * @function
+     * @return {*} Returns the underlying value of the delegator. May be any value.
+     */
     get extract() {
         return this.value;
     },
@@ -133,7 +145,25 @@ var constant = {
     traverse: function _traverse(a, f) {
         return this.factory.of(this.value);
     },
+    contramap: returnMe,
+    dimap: returnMe,
     apply: returnMe,
+    /**
+     * @signature () -> boolean
+     * @description Returns a boolean indicating if the constant is 'empty'. Because there is
+     * no innate 'empty' value for a constant data structure, isEmpty will always return false.
+     * @memberOf dataStructures.constant
+     * @instance
+     * @function isEmpty
+     * @return {boolean} Returns a boolean indicating if the identity instance is 'empty'.
+     *
+     * @example
+     * Constant(10).isEmpty()  // => false
+     * Constant().isEmpty()    // => false
+     */
+    isEmpty: function _isEmpty() {
+        return false;
+    },
     /**
      * @signature * -> boolean
      * @description Determines if 'this' identity functor is equal to another functor. Equality

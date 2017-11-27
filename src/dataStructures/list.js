@@ -1,6 +1,7 @@
-import { all, any, apply, binarySearch, chain, concat, concatAll, contains, copyWithin, count, distinct, equals, except, fill, filter,
-        findIndex, findLastIndex, first, foldLeft, foldRight, groupBy, groupJoin, intersect, intersperse, join, last, map, ofType,
-        pop, prepend, prependAll, reduceRight, repeat, reverse, set, skipWhile, slice, sortBy, takeWhile, unfold, union, zip } from './list_iterators';
+import { all, any, apply, binarySearch, chain, concat, concatAll, contains, contramap, copyWithin, count, dimap, distinct, equals,
+        except, fill, filter, findIndex, findLastIndex, first, foldLeft, foldRight, groupBy, groupJoin, intersect, intersperse,
+        join, last, map, ofType, pop, prepend, prependAll, reduceRight, repeat, reverse, set, skipWhile, slice, sortBy, takeWhile,
+        unfold, union, zip } from './list_iterators';
 import { sortDirection, generatorProto } from '../helpers';
 import { wrap, defaultPredicate, delegatesFrom, isArray, noop, invoke, delegatesTo, isString, both } from '../functionalHelpers';
 import { when, ifElse, identity, constant } from '../combinators';
@@ -179,6 +180,15 @@ var list_core = {
     },
 
     /**
+     * @description d
+     * @param {function} fn - a
+     * @return {Proxy.<dataStructures.list_core>|dataStructures.list_core|dataStructures.list|dataStructures.ordered_list} b
+     */
+    contramap: function _contramap(fn) {
+        return createList(this, _iteratorWrapper(contramap(this, fn)));
+    },
+
+    /**
      * @signature
      * @description d
      * @memberOf dataStructures.list_core
@@ -194,6 +204,16 @@ var list_core = {
      */
     copyWithin: function _copyWithin(index, start, end) {
         return createList(this, _iteratorWrapper(copyWithin(index, start, end, this)));
+    },
+
+    /**
+     * @description d
+     * @param {function} f - a
+     * @param {function} g - b
+     * @return {Proxy.<dataStructures.list_core>|dataStructures.list_core|dataStructures.list|dataStructures.ordered_list} c
+     */
+    dimap: function _dimap(f, g) {
+        return createList(this, _iteratorWrapper(dimap(this, f, g)));
     },
 
     /**
