@@ -1038,18 +1038,11 @@ var list_core = {
     get [Symbol.toStringTag]() {
         return 'List';
     },
-
-    /**
-     * @signature
-     * @description d
-     * @memberOf dataStructures.list_core
-     * @instance
-     * @function valueOf
-     * @return {*} - a
-     */
+    /*
     valueOf: function _valueOf() {
-        return this.data.value;
+        return this.data;
     },
+    */
 
     /**
      * @signature
