@@ -311,11 +311,9 @@ var unary = (fn, arg) => undefined === arg ? curryN.call(this, 1, fn) : fn(arg);
  * @param {*} seed - a
  * @return {function} - b
  */
-function unfold(seed) {
-    return function *_unfold(fn) {
-
-    };
-}
+var unfold = curry(function _unfold(seed, fn) {
+    return unfoldWith(fn, seed);
+});
 
 /**
  * @signature
@@ -324,16 +322,16 @@ function unfold(seed) {
  * @param {function} fn - a
  * @return {function} - b
  */
-function unfoldWith(fn) {
-    return function *_unfold (val) {
-        let { next, value, done } = fn(val);
+var unfoldWith = curry(function _unfoldWith(fn, seed) {
+    return function *_unfoldWithIterator() {
+        let { next, value, done } = fn(seed);
 
-        while (!done) {
+        while(!done) {
             yield value;
-            ({ next, value, done } = fn(next));
+            ({next, value, done} = fn(next));
         }
     };
-}
+});
 
 /**
  * @signature

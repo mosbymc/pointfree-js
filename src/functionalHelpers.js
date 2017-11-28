@@ -258,7 +258,7 @@ var isArray = data => Array.isArray(data);
 /**
  * @signature
  * @description d
- * @param {boolean} bool - a
+ * @param {*} [bool] - a
  * @return {boolean} - b
  */
 var isBoolean = bool => javaScriptTypes.Boolean === type(bool);
@@ -266,7 +266,7 @@ var isBoolean = bool => javaScriptTypes.Boolean === type(bool);
 /**
  * @signature isFunction :: a -> Boolean
  * @description d
- * @param {function} fn - a
+ * @param {function} [fn] - a
  * @return {boolean} - b
  */
 var isFunction = fn => javaScriptTypes.Function === type(fn);
@@ -274,7 +274,7 @@ var isFunction = fn => javaScriptTypes.Function === type(fn);
 /**
  * @signature isObject :: a -> Boolean
  * @description d
- * @param {*} item - a
+ * @param {*} [item] - a
  * @return {boolean} - b
  */
 var isObject = item => javaScriptTypes.Object === type(item) && null !== item;
@@ -282,7 +282,7 @@ var isObject = item => javaScriptTypes.Object === type(item) && null !== item;
 /**
  * @signature
  * @description d
- * @param {*} item - a
+ * @param {*} [item] - a
  * @return {boolean} - b
  */
 function isPrimitive(item) {
@@ -293,7 +293,7 @@ function isPrimitive(item) {
 /**
  * @signature
  * @description d
- * @param {*} x - a
+ * @param {*} [x] - a
  * @return {boolean} - b
  */
 var isNothing = x => null == x;
@@ -301,7 +301,7 @@ var isNothing = x => null == x;
 /**
  * @signature
  * @description d
- * @param {*} n - a
+ * @param {*} [n] - a
  * @return {string|boolean} - b
  */
 var isNull = n => null === n;
@@ -309,7 +309,7 @@ var isNull = n => null === n;
 /**
  * @signature
  * @description d
- * @param {number} num - a
+ * @param {*} [num] - a
  * @return {boolean} - b
  */
 var isNumber = num => javaScriptTypes.Number == type(num);
@@ -317,7 +317,7 @@ var isNumber = num => javaScriptTypes.Number == type(num);
 /**
  * @signature
  * @description d
- * @param {*} x - a
+ * @param {*} [x] - a
  * @return {boolean} - b
  */
 var isSomething = x => null != x;
@@ -333,7 +333,7 @@ var isString = str => javaScriptTypes.String === type(str);
 /**
  * @signature
  * @description d
- * @param {Symbol} sym - a
+ * @param {*} [sym] - a
  * @return {boolean} - b
  */
 var isSymbol = sym => javaScriptTypes.Symbol === type(sym);
@@ -341,7 +341,7 @@ var isSymbol = sym => javaScriptTypes.Symbol === type(sym);
 /**
  * @signature
  * @description d
- * @param {*} u - a
+ * @param {*} [u] - a
  * @return {boolean} - b
  */
 var isUndefined = u => javaScriptTypes.Undefined === type(u);
@@ -570,7 +570,7 @@ var subtract = curry((x, y) => x - y);
  * @param {*} x - a
  * @return {boolean} - b
  */
-var truthy = x => flip(falsey(x));
+var truthy = x => flip(flip(x));
 
 /**
  * @signature type :: * -> string

@@ -17,6 +17,13 @@ afterEach(function _resetData() {
     });
 });
 
+describe('Test add', function _testAdd() {
+    it('should add two numbers or strings', function _testAdd() {
+        add(1, 2).should.eql(3);
+        add('Ma', 'rk').should.eql('Mark');
+    });
+});
+
 describe('Test adjust', function _testAdjust() {
     function _makeAdjustment(val) {
         return val * 2;
@@ -121,6 +128,12 @@ describe('Test concat', function _testConcat() {
     });
 });
 
+describe('Test divide', function _testDivide() {
+    it('should divide two numbers', function _testDivide() {
+        divide(1, 2).should.eql(0.5);
+    });
+});
+
 describe('Test either', function _testEither() {
     it('should return the union of two function invocations', function _testEither() {
         function one() { return true; }
@@ -135,6 +148,63 @@ describe('Test either', function _testEither() {
         res2.should.be.true;
         res3.should.be.false;
         res4.should.be.true;
+    });
+});
+
+describe('Test equals', function _testEquals() {
+    it('should test loose equality', function _testEquals() {
+        equals(1, 1).should.be.true;
+        equals('1', 1).should.be.true;
+        equals(1, '1').should.be.true;
+        equals(2, 1).should.be.false;
+        equals(false, 0).should.be.true;
+    });
+});
+
+describe('Test getWith', function _testGetWith() {
+    it('should get a property from an object', function _testGetWith() {
+        let getName = getWith('name'),
+            obj1 = { name: 'Mike' },
+            obj2 = { name: 'Charles' },
+            obj3 = { noname: '' };
+
+        getName(obj1).should.eql('Mike');
+        getName(obj2).should.eql('Charles');
+        expect(getName(obj3)).to.be.undefined;
+    });
+});
+
+describe('Test greaterThan', function _testGreaterThan() {
+    it('should return a boolean indicating if the first argument is greater than the second', function _testGreaterThan() {
+        greaterThan('1', '2').should.be.false;
+        greaterThan(1, 2).should.be.false;
+        greaterThan(2, 1).should.be.true;
+        greaterThan([], {}).should.be.false;
+        greaterThan(5, '5').should.be.false;
+    });
+});
+
+describe('Test greaterThanOrEqual', function _testGreaterThanOrEqual() {
+    it('should return a boolean indicating if the first argument is greater than or equal to the second', function _testGreaterThanOrEqual() {
+        greaterThanOrEqual('1', '2').should.be.false;
+        greaterThanOrEqual('1', '1').should.be.true;
+        greaterThanOrEqual(1, 2).should.be.false;
+        greaterThanOrEqual(2, 1).should.be.true;
+        greaterThanOrEqual([], {}).should.be.false;
+        greaterThanOrEqual(5, '5').should.be.true;
+    });
+});
+
+describe('Test has', function _testHas() {
+    it('should return true if the object \'has\' the property', function _testHas() {
+        let hasName = has('name'),
+            obj1 = { name: 'Mike' },
+            obj2 = { noname: 'Charles' },
+            obj3 = Object.create(obj1);
+
+        hasName(obj1).should.be.true;
+        hasName(obj2).should.be.false;
+        hasName(obj3).should.be.false;
     });
 });
 
@@ -169,6 +239,32 @@ describe('identity', function testIdentity() {
         numberResult.should.eql(primNumber);
         stringResult.should.eql(primString);
         booleanResult.should.eql(primBoolean);
+    });
+});
+
+describe('Test in', function _testIn() {
+    it('should return true if the property is \'in\' the object', function _testIn() {
+        let nameIn = inObject('name'),
+            obj1 = { name: 'Mike' },
+            obj2 = { noname: 'Charles' },
+            obj3 = Object.create(obj1);
+
+        nameIn(obj1).should.be.true;
+        nameIn(obj2).should.be.false;
+        nameIn(obj3).should.be.true;
+    });
+});
+
+describe('Test isBoolean', function _testIsBoolean() {
+    it('should return true is the argument is a boolean', function _testIsBoolean() {
+        isBoolean(true).should.be.true;
+        isBoolean(false).should.be.true;
+        isBoolean(1).should.be.false;
+        isBoolean('1').should.be.false;
+        isBoolean([]).should.be.false;
+        isBoolean({}).should.be.false;
+        isBoolean(null).should.be.false;
+        isBoolean().should.be.false;
     });
 });
 
@@ -298,6 +394,66 @@ describe('isFunction', function testIsFunction() {
         expect(isFunctionResult7).to.not.be.ok;
         expect(isFunctionResult8).to.be.a('boolean');
         expect(isFunctionResult8).to.not.be.ok;
+    });
+});
+
+describe('Test isNull', function _testIsNull() {
+    it('should return true if the argument is null', function _testIsNull() {
+        isNull(null).should.be.true;
+        isNull().should.be.false;
+        isNull(1).should.be.false;
+        isNull('1').should.be.false;
+        isNull([]).should.be.false;
+        isNull({}).should.be.false;
+    });
+});
+
+describe('Test isNumber', function _testIsNumber() {
+    it('should return true is the argument is a number', function _testIsNumber() {
+        isNumber(1).should.be.true;
+        isNumber('1').should.be.false;
+        isNumber(false).should.be.false;
+        isNumber([]).should.be.false;
+        isNumber({}).should.be.false;
+        isNumber().should.be.false;
+        isNumber(null).should.be.false;
+    });
+});
+
+describe('Test isSomething', function _testIsSomething() {
+    it('should return true if the argument is not null or undefined', function _testIsSomething() {
+        isSomething(1).should.be.true;
+        isSomething('1').should.be.true;
+        isSomething(false).should.be.true;
+        isSomething({}).should.be.true;
+        isSomething([]).should.be.true;
+        isSomething(null).should.be.false;
+        isSomething().should.be.false;
+    });
+});
+
+describe('Test isSymbol', function _testIsSymbol() {
+    it('should return true if the argument is a symbol', function _testIsSymbol() {
+        isSymbol(1).should.be.false;
+        isSymbol('1').should.be.false;
+        isSymbol([]).should.be.false;
+        isSymbol({}).should.be.false;
+        isSymbol(null).should.be.false;
+        isSymbol().should.be.false;
+        isSymbol(true).should.be.false;
+        isSymbol(Symbol()).should.be.true;
+    });
+});
+
+describe('Test isUndefined', function _testIsUndefined() {
+    it('should return true if the argument is undefined', function _testIsUndefined() {
+        isUndefined().should.be.true;
+        isUndefined(null).should.be.false;
+        isUndefined(1).should.be.false;
+        isUndefined('1').should.be.false;
+        isUndefined([]).should.be.false;
+        isUndefined({}).should.be.false;
+        isUndefined(Symbol()).should.be.false;
     });
 });
 
@@ -578,5 +734,18 @@ describe('curry', function testCurry() {
         var curryResult4 = tmpCurryResult4(5, 6);
         curryResult4.should.be.a('number');
         curryResult4.should.eql(15);
+    });
+});
+
+describe('Test truthy', function _testTruthy() {
+    it('should return appropriate boolean response based on javascript values', function _testTruthy() {
+        truthy(1).should.be.true;
+        truthy(0).should.be.false;
+        truthy(true).should.be.true;
+        truthy(false).should.be.false;
+        truthy([]).should.be.true;
+        truthy({}).should.be.true;
+        truthy('').should.be.false;
+        truthy('123').should.be.true;
     });
 });

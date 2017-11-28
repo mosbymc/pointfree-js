@@ -92,6 +92,30 @@ describe('Test combinators', function _testCombinators() {
         });
     });
 
+    describe('Test fork', function  _testFork() {
+        it('should run each execute each inner function and apply the outer function to the results', function _testFork() {
+            function f1(arg) { return arg * arg; }
+            function f2(arg) { return 10 * arg; }
+            function f3(arg1, arg2) { return arg1 + arg2; }
+
+            let f1Spy = sinon.spy(f1),
+                f2Spy = sinon.spy(f2),
+                f3Spy = sinon.spy(f3);
+
+            let forkFn = fork(f3Spy, f1Spy, f2Spy),
+                res = forkFn(5);
+
+            res.should.eql(75);
+            f1Spy.should.have.been.called.once;
+            f2Spy.should.have.been.called.once;
+            f3Spy.should.have.been.called.once;
+            f1Spy.should.have.returned(25);
+            f2Spy.should.have.returned(50);
+            f3Spy.should.have.returned(75);
+            f3Spy.should.have.been.calledWith(25, 50);
+        });
+    });
+
     describe('Test ifThisThenThat', function _testIfThisThenThat() {
         function pred(arg) { return !!arg; }
         function ifFunc(arg) { return 2 * arg; }
@@ -102,6 +126,41 @@ describe('Test combinators', function _testCombinators() {
 
         it('should not invoke the \'if\' function when the predicate returns false', function _testIfThisThenThatWithFalseyValue() {
             ifThisThenThat(pred, ifFunc, 0, 6).should.eql(6);
+        });
+    });
+
+    describe('Test pipe', function _testPipe() {
+        it('should return a function that, when invoked, applies all arguments to the first function and the the results to each subsequent function', function _testPipe() {
+            function f1(arg1, arg2, arg3) { return (arg1 + arg2) * arg3; }
+            function f2(arg) { return arg * arg; }
+            function f3(arg) { return arg - 10; }
+            function f4(arg) { return arg + 5; }
+
+            let f1Spy = sinon.spy(f1),
+                f2Spy = sinon.spy(f2),
+                f3Spy = sinon.spy(f3),
+                f4Spy = sinon.spy(f4);
+
+            let piped = pipe(f1Spy, f2Spy, f3Spy, f4Spy),
+                res = piped(2, 4);
+
+            res.should.be.a('function');
+            res.length.should.eql(1);
+
+            res = res(6);
+
+            piped.toString().should.eql('f1(f2(f3(f4)))()');
+            res.should.eql(1291);
+
+            f1Spy.should.have.been.called.once;
+            f2Spy.should.have.been.called.once;
+            f3Spy.should.have.been.called.once;
+            f4Spy.should.have.been.called.once;
+
+            f1Spy.should.have.been.calledWith(2, 4, 6);
+            f2Spy.should.have.been.calledWith(36);
+            f3Spy.should.have.been.calledWith(1296);
+            f4Spy.should.have.been.calledWith(1286);
         });
     });
 
