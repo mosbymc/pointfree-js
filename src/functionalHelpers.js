@@ -383,6 +383,7 @@ var mapSet = curry(function _mapSet(key, val, xs) {
     for (let k of xs.keys()) {
         ret.set(k, xs.get(k));
     }
+    ret.set(key, val);
     return ret;
 });
 
@@ -497,25 +498,15 @@ var or = curry((a, b) => !!(a || b));
 /**
  * @signature
  * @description d
- * @param {Array|String} xs - a
+ * @param {Array|String|*} args - a
  * @return {Array|String} - b
  */
-var reverse = xs => isArray(xs) ? xs.slice(0).reverse() : xs.split('').reverse().join('');
-
-/**
- * @signature
- * @description d
- * @kind function
- * @function set
- * @param {string} prop - a
- * @param {*} val - b
- * @param {object} obj - c
- * @return {object} - d
- */
-var set = curry(function _set(prop, val, obj) {
-    obj[prop] = val;
-    return obj;
-});
+function reverse(...args) {
+    if (1 === args.length) {
+        return isArray(args[0]) ? args[0].slice(0).reverse() : args[0].split('').reverse().join('');
+    }
+    return args.reverse();
+}
 
 /**
  * @signature
@@ -527,8 +518,12 @@ var set = curry(function _set(prop, val, obj) {
  * @return {Set} - c
  */
 var setSet = curry(function _setSet(val, set) {
-    set.add(val);
-    return set;
+    var ret = new Set();
+    for (let item of set) {
+        ret.add(item);
+    }
+    ret.add(val);
+    return ret;
 });
 
 /**
@@ -589,16 +584,8 @@ var type = a => typeof a;
  */
 var wrap = data => [data];
 
-function reverse2(...args) {
-    if (1 === args.length) {
-        if ('string' === typeof args[0]) return args[0].split('').reverse().join();
-        return args;
-    }
-    return args.reverse();
-}
-
 export { add, adjust, and, arraySet, both, concat, defaultPredicate, delegatesFrom, delegatesTo, divide, either, equals,
         falsey, flip, getWith, greaterThan, greaterThanOrEqual, has, inObject, invoke, isArray, isBoolean, isFunction,
         isObject, isPrimitive, isNothing, isNull, isNumber, isSomething, isString, isSymbol, isUndefined, lessThan,
-        lessThanOrEqual, mapSet, modulus, multiply, negate, notEqual, noop, nth, objectSet, once, or, reverse, set,
-        setSet, strictEquals, strictNotEqual, subtract, truthy, type, wrap };
+        lessThanOrEqual, mapSet, modulus, multiply, negate, notEqual, noop, nth, objectSet, once, or, reverse, setSet,
+        strictEquals, strictNotEqual, subtract, truthy, type, wrap };
