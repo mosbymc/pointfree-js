@@ -1,8 +1,8 @@
-import { ap, apply, fmap, map, mapWith, flatMap, lift2, lift3, lift4, liftN, mjoin, pluckWith,
+import { ap, apply, count, fmap, map, mapWith, flatMap, lift2, lift3, lift4, liftN, mjoin, pluckWith,
     chain, bind, mcompose, filter, intersect, except, isConstant, isEither, isFuture, isIdentity, isIo,
     isJust, isLeft, isList, isMaybe, isImmutableDataStructure, isNothing, isRight, isValidation, fold, sequence, traverse,
     contramap, isEmpty, equals, bimap, toList, toLeft, toRight, toEither, toIdentity, toMaybe, toNothing,
-    toJust, toFuture, toConstant } from '../../src/pointless_data_structures';
+    toJust, toFuture, toConstant, first, last, skip, skipWhile, take, takeWhile } from '../../src/pointless_data_structures';
 import { Constant, Either, Future, Identity, Io, Just, Left, List, Maybe, Nothing, Right, Validation } from '../../src/dataStructures/dataStructures';
 
 describe('Test pointless_data_structures', function _testFunctionalContainerHelpers() {
@@ -362,6 +362,48 @@ describe('Test pointless_data_structures', function _testFunctionalContainerHelp
         it('should work with nested data structures', function _testEqualsWithNestedTypes() {
             equals(Identity(Identity(1)), Identity(1)).should.be.true;
             equals(Maybe(true), Maybe(Maybe(false))).should.be.false;
+        });
+    });
+
+    describe('Test list specific functionality', function _testListSpecificFunctionality() {
+        describe('Test count', function _testCount() {
+            it('should return the number of item in the list that \'pass\' the predicate', function _testCount() {
+                count(x => 3 < x, List([1, 2, 3, 4, 5])).should.eql(2);
+
+            });
+        });
+
+        describe('Test except', function _testExcept() {
+            it('should return all items in the list except where they intersect', function _testExcept() {
+                except(List([3, 4, 5, 6, 7, 8]), (x, y) => x === y, List([1, 2, 3, 4, 5, 6, 7, 8, 9, 10]))
+                    .data.should.eql([1, 2, 9, 10]);
+            });
+        });
+
+        describe('Test filter', function _testFilter() {
+            it('should filter a list', function _testFilter() {
+                filter(x => 3 < x, List([1, 2, 3, 4, 5]))
+                    .data.should.eql([4, 5]);
+            });
+        });
+
+        describe('Test first', function _testFirst() {
+            it('should return the first item in the list that passes the predicate', function _testFirst() {
+                first(x => 4 <= x, List([1, 2, 3, 4, 5])).should.eql(4);
+            });
+        });
+
+        describe('Test intersect', function _testIntersect() {
+            it('should return the items of intersection', function _testIntersect() {
+                intersect(List([3, 4, 5, 6, 7, 8]), (x, y) => x === y, List([1, 2, 3, 4, 5, 6, 7, 8, 9, 10]))
+                    .data.should.eql([3, 4, 5, 6, 7, 8]);
+            });
+        });
+
+        describe('Test last', function _testLast() {
+            it('should return the last item in the list the \'passes\' the predicate', function _testLast() {
+                last(x => 2 < x, List([1, 2, 3, 4, 5])).should.eql(5);
+            });
         });
     });
 });
