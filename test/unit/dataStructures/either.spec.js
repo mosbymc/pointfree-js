@@ -5,7 +5,7 @@ var Either = monads.Either,
     Left = monads.Left,
     Right = monads.Right;
 
-describe('Either functor tests', function _testEitherFunctor() {
+describe('Either data structure tests', function _testEitherDataStructure() {
     describe('Either object factory tests', function _testEitherObjectFactory() {
         it('should return a new either functor with the correct side', function _testEitherFactoryObjectCreation() {
             var arr = [1, 2, 3],
@@ -146,7 +146,7 @@ describe('Either functor tests', function _testEitherFunctor() {
         });
     });
 
-    describe('Left and Right either functor creation tests', function _testLeftAndRightObjectCreation() {
+    describe('Left and Right either data structure creation tests', function _testLeftAndRightObjectCreation() {
         it('should return a new left either functor', function _testEitherCreationViaLeftFunction() {
             var e1 = Left(),
                 e2 = Left(1),
@@ -178,7 +178,7 @@ describe('Either functor tests', function _testEitherFunctor() {
         });
     });
 
-    describe('Either functor object tests', function _testEitherFunctorObject() {
+    describe('Either functor object tests', function _testEitherDataStructure() {
         it('should not allow the ._value property to be updated', function _testWritePrevention() {
             var e = Either(1),
                 err1 = false,
@@ -241,6 +241,21 @@ describe('Either functor tests', function _testEitherFunctor() {
 
             expect(e1_1.value).to.eql(e1.value);
             e2_1.value.should.eql(e2.value);
+        });
+
+        it('should select the first function argument as the mapping function and return a new right data structure', function _testRightBimap() {
+            Right(5).bimap(x => x * x, x => x - 5).extract.should.eql(25);
+        });
+
+        it('should select the second function argument as the mapping function and return a new left data structure', function _testLeftBimap() {
+            Left(5).bimap(x => x - 5, x => x * x).extract.should.eql(25);
+        });
+
+        it('should ignore the applied left\'s function value and return itself', function _testLeftApply() {
+            var l1 = Left(5),
+                l2 = Left(x => x * x);
+
+            l1.apply(l2).extract.should.eql(l1.extract);
         });
 
         it('should return underlying value when constant_functor#fold is invoked', function _testConstantDotFold() {

@@ -153,6 +153,12 @@ describe('Constant tests', function _testConstant() {
             Constant('10').extract.should.eql('10');
         });
 
+        it('should return false regardless of the underlying value when isEmpty is invoked', function _testIsEmpty() {
+            Constant(5).isEmpty().should.be.false;
+            Constant().isEmpty().should.be.false;
+            Constant(null).isEmpty().should.be.false;
+        });
+
         it('should transform a constant data structure to the other data structures types', function _testConstantTransforms() {
             var i = Constant(1);
             var c = i.mapToIdentity(),

@@ -1,4 +1,4 @@
-import { apply, disjunctionEqualMaker, stringMaker, valueOf, monad_apply, chain, join, sharedEitherFns } from './data_structure_util';
+import { apply, disjunctionEqualMaker, stringMaker, valueOf, chain, join, sharedEitherFns } from './data_structure_util';
 
 /**
  * @signature

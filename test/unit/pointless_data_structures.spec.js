@@ -1,4 +1,4 @@
-import { ap, apply, count, fmap, map, mapWith, flatMap, lift2, lift3, lift4, liftN, mjoin, pluckWith,
+import { ap, apply, count, fmap, map, mapWith, flatMap, lift2, lift3, lift4, liftN, join, pluckWith,
     chain, bind, mcompose, filter, intersect, except, isConstant, isEither, isFuture, isIdentity, isIo,
     isJust, isLeft, isList, isMaybe, isImmutableDataStructure, isNothing, isRight, isValidation, fold, sequence, traverse,
     contramap, isEmpty, equals, bimap, toList, toLeft, toRight, toEither, toIdentity, toMaybe, toNothing,
@@ -365,6 +365,43 @@ describe('Test pointless_data_structures', function _testFunctionalContainerHelp
         });
     });
 
+    describe('Test data structure transformers', function _testDataStructureTransformers() {
+        it('should turn on data structure into another', function _testDataStructureTransformers() {
+            var id = Identity(5);
+
+            Object.getPrototypeOf(Constant()).isPrototypeOf(toConstant(id)).should.be.true;
+            toConstant(id).extract.should.eql(5);
+
+            Object.getPrototypeOf(List()).isPrototypeOf(toList(id)).should.be.true;
+            toList(id).data.should.eql([5]);
+
+            Object.getPrototypeOf(Just()).isPrototypeOf(toMaybe(id)).should.be.true;
+            toMaybe(id).extract.should.eql(5);
+
+            Nothing().should.eql(toNothing(id));
+
+            Object.getPrototypeOf(Just()).isPrototypeOf(toJust(id)).should.be.true;
+            toJust(id).extract.should.eql(5);
+
+            Object.getPrototypeOf(Future()).isPrototypeOf(toFuture(id)).should.be.true;
+            toFuture(id).fork(x => x.should.eql(5), x => x.should.eql(5));
+
+            Object.getPrototypeOf(Right()).isPrototypeOf(toEither(id)).should.be.true;
+            toEither(id).extract.should.eql(5);
+
+            Object.getPrototypeOf(Left()).isPrototypeOf(toEither(Identity())).should.be.true;
+
+            Object.getPrototypeOf(Left()).isPrototypeOf(toLeft(id)).should.be.true;
+            toLeft(id).extract.should.eql(5);
+
+            Object.getPrototypeOf(Right()).isPrototypeOf(toRight(id)).should.be.true;
+            toRight(id).extract.should.eql(5);
+
+            Object.getPrototypeOf(Identity()).isPrototypeOf(toIdentity(Just(5))).should.be.true;
+            toIdentity(Just(5)).extract.should.eql(5);
+        });
+    });
+
     describe('Test list specific functionality', function _testListSpecificFunctionality() {
         describe('Test count', function _testCount() {
             it('should return the number of item in the list that \'pass\' the predicate', function _testCount() {
@@ -401,8 +438,42 @@ describe('Test pointless_data_structures', function _testFunctionalContainerHelp
         });
 
         describe('Test last', function _testLast() {
-            it('should return the last item in the list the \'passes\' the predicate', function _testLast() {
+            it('should return the last item in the list that \'passes\' the predicate', function _testLast() {
                 last(x => 2 < x, List([1, 2, 3, 4, 5])).should.eql(5);
+            });
+        });
+
+        describe('Test skip', function _testSkip() {
+            it('should skip x items in the list and return the rest', function _testSkip() {
+                skip(4, List([1, 2, 3, 4, 5]))
+                    .data.should.eql([5]);
+                skip(5, List([1, 2, 3, 4, 5]))
+                    .data.should.eql([]);
+                skip(-2, List([1, 2, 3, 4, 5]))
+                    .data.should.eql([1, 2, 3]);
+            });
+        });
+
+        describe('Test skipWhile', function _testSkipWhile() {
+            it('should skip all items until the first item that passes the predicate and return the rest', function _testSkipWhile() {
+                skipWhile(x => 3 > x, List([1, 2, 3, 4, 5]))
+                    .data.should.eql([3, 4, 5]);
+            });
+        });
+
+        describe('Test take', function _testTake() {
+            it('should take the first x items and return a new list', function _testTake() {
+                take(2, List([1, 2, 3, 4, 5]))
+                    .data.should.eql([1, 2]);
+                take(-2, List([1, 2, 3, 4, 5]))
+                    .data.should.eql([4, 5]);
+            });
+        });
+
+        describe('Test takeWhile', function _testTakeWhile() {
+            it('should take all the items until the first item that does not pass the predicate and return a new list', function _testTakeWhile() {
+                takeWhile(x => 2 > x, List([1, 2, 3, 4, 5]))
+                    .data.should.eql([1]);
             });
         });
     });
