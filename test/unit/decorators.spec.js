@@ -1,4 +1,4 @@
-import { after, apply, before, binary, bindFunction, bindWith, /*guardAfter,*/ guard, hyloWith, lateApply, leftApply, maybe,
+import { after, apply, before, binary, bindFunction, bindWith, foldWith, /*guardAfter,*/ guard, hyloWith, lateApply, leftApply, maybe,
         not, once, repeat, rightApply, safe, tap, ternary, tryCatch, unary, unfold, voidFn } from '../../src/decorators';
 
 describe('Decorators Test', function _testDecorators() {
@@ -113,6 +113,12 @@ describe('Decorators Test', function _testDecorators() {
         });
     });
 
+    describe('Test foldWith', function _testFoldWith() {
+        it('should fold the iterable with the supplied function', function _testFoldWith() {
+            foldWith(({ acc, element: n }) => acc * n, [1, 2, 3, 4, 5]).should.eql(120);
+        });
+    });
+
     /*
     describe('Test guardAfter', function _testGuardAfter() {
         it('should run the first function last', function _testGuardAfterWithSuccessfulFns() {
@@ -166,6 +172,19 @@ describe('Decorators Test', function _testDecorators() {
             func2Spy.should.have.been.calledOnce;
             func3Spy.should.not.have.been.called;
         });
+    });
+
+    describe('Test hyloWith', function _testHyloWith() {
+        let downToOne = (n) => 0 < n
+                ? { element: n, next: n - 1 }
+                : { done: true };
+
+        let product = (acc, n) => acc * n;
+
+        let res1 = foldWith(product, unfold(5, downToOne)());
+        let res2 = hyloWith(product, downToOne, 5);
+
+        res1.should.eql(res2);
     });
 
     describe('Test lateApply', function _TestLateApply() {

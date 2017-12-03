@@ -336,22 +336,32 @@ var unfoldWith = curry(function _unfoldWith(fn, seed) {
 /**
  * @signature
  * @description d
+ * @param {function} fn - a
+ * @param {Array|generator|Map|Set} iterable - b
+ * @return {*} c
+ * @type {Function}
+ */
+var foldWith = curry(function _foldWith(fn, iterable) {
+    let iterator = 'function' === typeof iterable ? iterable() : iterable[Symbol.iterator]();
+    let { value: acc } = iterator.next();
+
+    for (const element of iterator) {
+        acc = fn({ acc, element });
+    }
+
+    return acc;
+});
+
+/**
+ * @signature
+ * @description d
  * @function hyloWith
  * @param cata - a
  * @param ana - b
  * @param seed - c
  * @return {*} - d
  */
-var hyloWith = curry(function _hylo(cata, ana, seed) {
-    let { next: n, element: acc, done } = ana(seed);
-    let { next, element } = ana(n); // not a monoid
-
-    while (!done) {
-        acc = cata(acc, element);
-        ({ next, element, done } = ana(next));
-    }
-    return acc;
-});
+var hyloWith = curry((cata, ana, seed) => foldWith(cata, unfold(seed, ana)));
 
 /**
  * @signature (* -> *) -> [*] -> undefined
@@ -370,5 +380,5 @@ var voidFn = invoker((fn, ...args) => void fn(...args));
  var getWith = c(getWith);
  */
 
-export { after, apply, before, binary, bindFunction, bindWith, guard, hyloWith, lateApply, leftApply, maybe, not, once, repeat, rightApply,
+export { after, apply, before, binary, bindFunction, bindWith, foldWith, guard, hyloWith, lateApply, leftApply, maybe, not, once, repeat, rightApply,
         safe, tap, ternary, tryCatch, unary, unfold, unfoldWith, voidFn };
