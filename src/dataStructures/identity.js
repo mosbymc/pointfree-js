@@ -1,4 +1,4 @@
-import { apply, chain, contramap, dimap, join, equals, stringMaker, valueOf, extendMaker } from './data_structure_util';
+import { apply, chain, chainRec, contramap, dimap, join, equals, stringMaker, valueOf, extendMaker } from './data_structure_util';
 
 /**
  * @signature - :: * -> {@link dataStructures.identity}
@@ -177,6 +177,7 @@ var identity = {
      * Identity(10).chain(x => Just(x * x))        // => Identity(Just(100))
      */
     chain: chain,
+    chainRec: chainRec,
     /**
      * @signature () -> {@link dataStructures.identity}
      * @description Returns a new identity data structure. If the current identity is nested, join

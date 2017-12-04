@@ -385,6 +385,9 @@ var right = {
      * @return {boolean} - Returns a boolean indicating equality
      */
     equals: disjunctionEqualMaker('isRight'),
+    isEmpty: function _isEmpty() {
+        return false;
+    },
     /**
      * @signature () -> *
      * @description Returns the underlying value of the current functor 'instance'. This
@@ -569,6 +572,9 @@ var left = {
      * @return {boolean} - Returns a boolean indicating equality
      */
     equals: disjunctionEqualMaker('isLeft'),
+    isEmpty: function _isEmpty() {
+        return true;
+    },
     /**
      * @signature () -> *
      * @description Returns the underlying value of the current functor 'instance'. This

@@ -1,7 +1,7 @@
-import { ap, apply, count, fmap, map, mapWith, flatMap, lift2, lift3, lift4, liftN, join, pluckWith,
+import { ap, apply, count, chainRec, fmap, map, mapWith, flatMap, lift2, lift3, lift4, liftN, join, pluckWith,
     chain, bind, mcompose, filter, intersect, except, isConstant, isEither, isFuture, isIdentity, isIo,
     isJust, isLeft, isList, isMaybe, isImmutableDataStructure, isNothing, isRight, isValidation, fold, sequence, traverse,
-    contramap, isEmpty, equals, bimap, toList, toLeft, toRight, toEither, toIdentity, toMaybe, toNothing,
+    contramap, isEmpty, equals, bimap, dimap, toList, toLeft, toRight, toEither, toIdentity, toMaybe, toNothing,
     toJust, toFuture, toConstant, first, last, skip, skipWhile, take, takeWhile } from '../../src/pointless_data_structures';
 import { Constant, Either, Future, Identity, Io, Just, Left, List, Maybe, Nothing, Right, Validation } from '../../src/dataStructures/dataStructures';
 
@@ -229,6 +229,21 @@ describe('Test pointless_data_structures', function _testFunctionalContainerHelp
         });
     });
 
+    describe('Test isEmpty', function _testIsEmpty() {
+        it('should return the correct response based on the data structure type', function _testIsEmpty() {
+            isEmpty(Identity()).should.be.false;
+            isEmpty(Just()).should.be.false;
+            isEmpty(Nothing()).should.be.true;
+            isEmpty(Maybe()).should.be.true;
+            isEmpty(Maybe(1)).should.be.false;
+            isEmpty(Future()).should.be.false;
+            isEmpty(Left()).should.be.true;
+            isEmpty(Right(1)).should.be.false;
+            isEmpty(Either()).should.be.true;
+            isEmpty(Either.of(1)).should.be.false;
+        });
+    });
+
     describe('Test map', function _testMap() {
         it('should map over any mappable data structure', function _testMap() {
             var res1 = mapWith(x => x * 2, Identity(4)),
@@ -250,6 +265,30 @@ describe('Test pointless_data_structures', function _testFunctionalContainerHelp
         });
     });
 
+    describe('Test bimap', function _testBimap() {
+        it('should return a data structure of the same type having applied the correct function', function _testBimap() {
+            bimap(x => x * x, x => x + 4, Maybe(1)).extract.should.eql(1);
+            Object.getPrototypeOf(Nothing()).isPrototypeOf(bimap(x => x * x, x => x + 4, Nothing(1))).should.be.true;
+        });
+    });
+
+    describe('Test dimap', function _testDimap() {
+        it('should correctly dimap a data structure', function _testDimap() {
+            //dimap(x => x + 10, x => x / 5, Identity(5).apply(Identity(x => x * x))).extract.should.eql(45);
+        });
+    });
+
+    describe('Test chainRec', function _testChainRec() {
+        it('should recursively invoke the chain functionality on a data structure', function _testChainRec() {
+            function _recursiveChain(next, done, value) {
+                if (100 > value) return next(value + value);
+                return done(value);
+            }
+
+            chainRec(_recursiveChain, Identity(1)).extract.should.eql(128);
+        });
+    });
+
     describe('Test mcompose', function _testMCompose() {
         //it('should return something');
     });
@@ -262,6 +301,13 @@ describe('Test pointless_data_structures', function _testFunctionalContainerHelp
             var res = apply(i1, i2);
             Object.getPrototypeOf(i1).isPrototypeOf(res).should.be.true;
             res.value.should.eql(225);
+        });
+    });
+
+    describe('Test join', function _testJoin() {
+        it('should flatten a data structure one time', function _testJoin() {
+            join(Identity(Identity(1))).should.eql(Identity(1));
+            join(Identity(Just(1))).should.eql(Identity(Just(1)));
         });
     });
 

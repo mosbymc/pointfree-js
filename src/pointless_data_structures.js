@@ -239,7 +239,7 @@ var contramap = curry(function _contramap(fn, ma) {
  * @return {boolean} - b
  */
 function isEmpty(ma) {
-    return ma.isEmpty;
+    return ma.isEmpty();
 }
 
 /**
@@ -539,7 +539,7 @@ var take = curry((amt, xs) => xs.take(amt));
 
 var takeWhile = curry((predicate, xs) => xs.takeWhile(predicate));
 
-export { ap, apply, count, fmap, map, mapWith, flatMap, lift2, lift3, lift4, liftN, join, pluckWith,
+export { ap, apply, count, chainRec, fmap, map, mapWith, flatMap, lift2, lift3, lift4, liftN, join, pluckWith,
         chain, bind, mcompose, filter, intersect, except, isConstant, isEither, isFuture, isIdentity, isIo,
         isJust, isLeft, isList, isMaybe, isImmutableDataStructure, isNothing, isRight, isValidation, fold, sequence, traverse,
         contramap, isEmpty, equals, bimap, dimap, toList, toLeft, toRight, toEither, toIdentity, toMaybe, toNothing,

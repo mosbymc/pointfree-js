@@ -54,6 +54,18 @@ describe('Test combinators', function _testCombinators() {
         });
     });
 
+    describe('Test curry', function _testCurry() {
+        it('should curry a function only once', function _testCurry() {
+            function f(arg1, arg2, arg3) { return 0; }
+            let cf = curry(f),
+                res = curry(cf);
+
+            cf.orig.should.eql(res.orig);
+            cf.orig.should.eql(f);
+            res.orig.should.eql(f);
+        });
+    });
+
     describe('curryN', function _testCurryN() {
         it('should re-curry successfully', function _testCurryN_Re_Currying() {
             function testFn(arg1, arg2, arg3, arg4) {
@@ -71,15 +83,13 @@ describe('Test combinators', function _testCombinators() {
         //TODO: problem with it, running the tests via mocha seems to cause things to explode (similar to mocha
         //TODO: freaking out because I passed a function to Object.setProperty rather than a plain object). So,
         //TODO: for the time being, I'll leave the test out.
-        /*
-        it('should give a user-friendly string representation of the curried function', function _testCurryNToString() {
+        /*it('should give a user-friendly string representation of the curried function', function _testCurryNToString() {
             function fourArgs(arg1, arg2, arg3, arg4) { return arg1 + arg2 + arg3 + arg4; }
 
             var curriedFunc = curryN(4, fourArgs, []),
                 res = curriedFunc(1)(2, 3);
-            res.toString().should.eql('function fourArgs(arg1, arg2, arg3, arg4) {\n                $_$wf(17);\n                return $_$w(17, 32), arg1 + arg2 + arg3 + arg4;\n            }(1, 2, 3)');
-        });
-        */
+            res.toString().should.eql('function fourArgs(arg1, arg2, arg3, arg4) {\n                $_$wf(28);\n                return $_$w(28, 32), arg1 + arg2 + arg3 + arg4;\n            }(1, 2, 3)');
+        });*/
     });
 
     describe('Test curryRight', function _testCurryRight() {
@@ -161,6 +171,12 @@ describe('Test combinators', function _testCombinators() {
             f2Spy.should.have.been.calledWith(36);
             f3Spy.should.have.been.calledWith(1296);
             f4Spy.should.have.been.calledWith(1286);
+        });
+    });
+
+    describe('Test reduce', function _testReduce() {
+        it('should reduce the list', function _testReduce() {
+            reduce((x, y) => x +  y, 0, [1, 2, 3, 4, 5]).should.eql(15);
         });
     });
 

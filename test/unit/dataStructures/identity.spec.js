@@ -36,7 +36,7 @@ describe('Identity test', function _testIdentity() {
             expect(false).to.eql(i8.value);
         });
 
-        it('should return the same type/value when using the #of function', function _testIdentityDotOf() {
+        it('should return the same type/value when using the #of function', function _testIdentityOf() {
             var arr = [1, 2, 3],
                 obj = { a: 1, b: 2 },
                 i1 = Identity.of(),
@@ -67,7 +67,7 @@ describe('Identity test', function _testIdentity() {
             expect(false).to.eql(i8.value);
         });
 
-        it('should return correct boolean value when #is is invoked', function _testIdentityDotIs() {
+        it('should return correct boolean value when #is is invoked', function _testIdentityIs() {
             var i = Identity(10),
                 m = monads.Maybe(10),
                 c = monads.Constant(10),
@@ -90,7 +90,7 @@ describe('Identity test', function _testIdentity() {
             i.isEmpty().should.be.false;
         });
 
-        it('should lift any function to return an Identity wrapped value', function _testIdentityDotLift() {
+        it('should lift any function to return an Identity wrapped value', function _testIdentityLift() {
             function t1() { return -1; }
             function t2() { return '-1'; }
             function t3(arg) { return arg; }
@@ -135,7 +135,7 @@ describe('Identity test', function _testIdentity() {
             err2.should.be.true;
         });
 
-        it('should return a new identity functor instance with the mapped value', function _testIdentityFunctorMap() {
+        it('should return a new identity functor instance with the mapped value', function _testIdentityMap() {
             var i = Identity(1),
                 d = i.map(function _t() { return 2; });
 

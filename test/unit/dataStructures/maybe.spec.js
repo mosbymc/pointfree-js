@@ -202,11 +202,11 @@ describe('Maybe functor tests', function _testMaybeFunctor() {
             m1.should.eql(nothing);
             just.isPrototypeOf(m2).should.be.true;
 
-            m1.isNothing.should.be.true;
-            m1.isJust.should.be.false;
+            m1.isNothing().should.be.true;
+            m1.isJust().should.be.false;
 
-            m2.isNothing.should.be.false;
-            m2.isJust.should.be.true;
+            m2.isNothing().should.be.false;
+            m2.isJust().should.be.true;
         });
 
         it('should return a maybe with the correct isJust/isNothing values set when using peripheral delegate creators', function _testMaybeperipheralCreators() {
@@ -260,20 +260,20 @@ describe('Maybe functor tests', function _testMaybeFunctor() {
                 m4 = Maybe.of(null),
                 m5 = Maybe(1);
 
-            m1.isJust.should.eql(false);
-            m1.isNothing.should.eql(true);
+            m1.isJust().should.eql(false);
+            m1.isNothing().should.eql(true);
 
-            m2.isJust.should.eql(false);
-            m2.isNothing.should.eql(true);
+            m2.isJust().should.eql(false);
+            m2.isNothing().should.eql(true);
 
-            m3.isJust.should.eql(true);
-            m3.isNothing.should.eql(false);
+            m3.isJust().should.eql(true);
+            m3.isNothing().should.eql(false);
 
-            m4.isJust.should.eql(true);
-            m4.isNothing.should.eql(false);
+            m4.isJust().should.eql(true);
+            m4.isNothing().should.eql(false);
 
-            m5.isJust.should.eql(true);
-            m5.isNothing.should.eql(false);
+            m5.isJust().should.eql(true);
+            m5.isNothing().should.eql(false);
         });
 
         it('should return a new maybe instance with the mapped value', function _testMaybeMap() {

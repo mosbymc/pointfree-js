@@ -296,8 +296,12 @@ var just = {
     get extract() {
         return this.value;
     },
-    isJust: true,
-    isNothing: false,
+    isJust: function _isJust() {
+        return true;
+    },
+    isNothing: function _isNothing() {
+        return false;
+    },
     /**
      * @signature () -> {@link dataStructures.just}
      * @description Takes a function that is applied to the underlying value of the
@@ -492,6 +496,9 @@ var just = {
      * @return {boolean} - Returns a boolean indicating equality
      */
     equals: disjunctionEqualMaker('isJust'),
+    isEmpty: function _isEmpty() {
+        return false;
+    },
     /**
      * @signature () -> *
      * @description Returns the underlying value of the current just 'instance'. This
@@ -578,14 +585,12 @@ var nothing = {
      * @return {*} Returns the underlying value of the delegator. May be any value.
      */
     value: null,
-    /**
-     *
-     */
-    isJust: false,
-    /**
-     *
-     */
-    isNothing: true,
+    isJust: function _isJust() {
+        return false;
+    },
+    isNothing: function _isNothing() {
+        return true;
+    },
     /**
      * @signature () -> {@link dataStructures.nothing}
      * @description Takes a single function as an argument and returns 'nothing'. A 'nothing' cannot
@@ -647,6 +652,9 @@ var nothing = {
      * @return {boolean} - Returns a boolean indicating equality
      */
     equals: Nothing.is,
+    isEmpty: function _isEmpty() {
+        return true;
+    },
     /**
      * @signature () -> *
      * @description Returns the underlying value of the current 'nothing' 'instance'. This
