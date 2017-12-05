@@ -174,6 +174,10 @@ describe('Test lazy identity', function _testLazyIdentity() {
             LazyIdentity('10').extract.should.eql('10');
         });
 
+        it('should return its equivalent when extract is invoked during an extend', function _testIdentityExtend() {
+            LazyIdentity(10).extend(i => i.extract).extract.should.eql(LazyIdentity(10).extract);
+        });
+
         it('should represent the identity\'s \'type\' when \'Object.prototype.toString.call\' is invoked', function _testIdentityTypeString() {
             var i = LazyIdentity();
 

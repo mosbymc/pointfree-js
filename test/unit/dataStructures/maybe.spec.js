@@ -228,7 +228,7 @@ describe('Maybe functor tests', function _testMaybeFunctor() {
         });
     });
 
-    describe('Maybe functor object tests', function _testMaybeFunctorObject() {
+    describe('Maybe data structure implementation tests', function _testMaybeFunctorObject() {
         it('should not allow the ._value property to be updated', function _testWritePrevention() {
             var m = Maybe(1),
                 err1 = false,
@@ -304,6 +304,12 @@ describe('Maybe functor tests', function _testMaybeFunctor() {
         it('should extract the underlying value of a just', function _testJustExtract() {
             Just(10).extract.should.eql(10);
             Just('10').extract.should.eql('10');
+        });
+
+        it('should return its equivalent when extract is invoked during an extend', function _testMaybeExtend() {
+            Just(10).extend(j => j.extract).should.eql(Just(10));
+            Maybe(10).extend(m => m.extract).should.eql(Maybe(10));
+            Nothing().extend(n => n.extract).should.eql(Nothing());
         });
 
         it('should properly indicate equality when justs and nothings are are indeed equal', function _testMaybeEquality() {

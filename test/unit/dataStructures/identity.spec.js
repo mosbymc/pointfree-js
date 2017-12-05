@@ -177,6 +177,10 @@ describe('Identity test', function _testIdentity() {
             m4.equals(m5).should.be.false;
         });
 
+        it('should return its equivalent when extract is invoked during an extend', function _testIdentityExtend() {
+            Identity(10).extend(i => i.extract).should.eql(Identity(10));
+        });
+
         it('should map an identity to the other functor types', function _testIdentityMapTransform() {
             var i = Identity(1);
             var c = i.mapToConstant(),

@@ -1,5 +1,5 @@
 import { identity } from '../combinators';
-import { monad_apply, apply, chain, contramap, dimap, join, disjunctionEqualMaker, stringMaker, valueOf, sharedMaybeFns } from './data_structure_util';
+import { apply, chain, contramap, dimap, join, disjunctionEqualMaker, stringMaker, valueOf, sharedMaybeFns } from './data_structure_util';
 
 /**
  * @signature
@@ -499,6 +499,9 @@ var just = {
     isEmpty: function _isEmpty() {
         return false;
     },
+    extend: function _extend(fn) {
+        return Maybe(fn(this));
+    },
     /**
      * @signature () -> *
      * @description Returns the underlying value of the current just 'instance'. This
@@ -636,6 +639,7 @@ var nothing = {
         return a.of(Maybe.Nothing());
     },
     nothing: returnNothing,
+    extend: returnNothing,
     /**
      * @signature * -> boolean
      * @description Determines if 'this' nothing is equal to another data structure. Equality

@@ -1,4 +1,4 @@
-import { apply, chain, chainRec, contramap, dimap, join, equals, stringMaker, valueOf, extendMaker } from './data_structure_util';
+import { apply, chain, chainRec, contramap, extend, dimap, join, equals, stringMaker, valueOf } from './data_structure_util';
 
 /**
  * @signature - :: * -> {@link dataStructures.identity}
@@ -327,7 +327,7 @@ var identity = {
      * @return {Identity<T>} Returns a new identity that wraps the return value of the
      * function that was provided as an argument.
      */
-    extend: extendMaker(Identity),
+    extend: extend,
     /**
      * @signature * -> boolean
      * @description Determines if 'this' identity is equal to another data structure. Equality
