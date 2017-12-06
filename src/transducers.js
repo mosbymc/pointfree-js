@@ -55,21 +55,6 @@ function filterReducer(predicate) {
 
 /**
  * @signature
- * @description d
- * @kind function
- * @function mapped
- * @param {function} f - a
- * @param {*} x - b
- * @return {*} - c
- */
-var mapped = curry(function _mapped(f, x) {
-    return identity(map(compose(function _mCompose(x) {
-        return x.value;
-    }, f), x));
-});
-
-/**
- * @signature
  * @face
  * @description d
  * @param {function} xform - a
@@ -149,4 +134,4 @@ var taking = allows => reducerFn => {
 //var transduce2 = curry((xForm, f, init, coll) => reduce(xForm(f), init, coll));
 //console.log(transduce2(map(add(1)), concat, [], [1, 2, 3, 4]));
 
-export { mapping, filtering, mapReducer, filterReducer, mapped, transduce, reduce, dropping, taking };
+export { mapping, filtering, mapReducer, filterReducer, transduce, reduce, dropping, taking };
