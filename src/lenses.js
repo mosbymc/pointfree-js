@@ -206,6 +206,21 @@ function lensPath(...path) {
     }));
 }
 
+function pp(...path) {
+    return compose(path.map(function _pathMap(p) {
+        return lens(function _getter(prop, xs) {
+            if (Map.prototype.isPrototypeOf(xs)) return Maybe(xs.get(prop));
+            if (Set.prototype.isPrototypeOf(xs)) return xs.has(prop) ? Maybe(prop) : Maybe.Nothing();
+            return Maybe(xs[prop]);
+        }, function _setter(prop, val, xs) {
+            if (Map.prototype.isPrototypeOf(xs)) return Maybe(mapSet(prop, val, xs));
+            if (Set.prototype.isPrototypeOf(xs)) return Maybe(setSet(val, xs));
+            if (Array.isArray(xs)) return Maybe(arraySet(prop, val, xs));
+            return Maybe(objectSet(prop, val, xs));
+        })(p);
+    }));
+}
+
 /**
  * @signature
  * @description d
@@ -217,7 +232,8 @@ function lensPath(...path) {
  */
 var prismPath = curry(function _prismPath(path, obj) {
     path = when(not(isArray), split('.'), path);
-    console.log(path, obj);
+    console.log(path);
+    console.log(obj);
     var val = obj,
         idx = 0;
     while (idx < path.length) {
@@ -253,4 +269,4 @@ var traverse = curry((f, point, fctr) => compose(sequenceA(point), map(f))(fctr)
 
 var sequenceA = curry((point, fctr) => fctr.traverse(id, point));
 
-export { arrayLens, objectLens, mapLens, view, over, put, set, lens, prism, prismPath, makeLenses, lensPath, ul, mapped };
+export { arrayLens, objectLens, mapLens, view, over, put, set, lens, prism, prismPath, makeLenses, lensPath, ul, mapped, pp };

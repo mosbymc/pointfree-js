@@ -1,4 +1,4 @@
-import { arrayLens, objectLens, mapLens, view, over, put, set, lens, prism, prismPath, makeLenses, lensPath } from '../../src/lenses';
+import { arrayLens, objectLens, mapLens, view, over, put, set, lens, prism, prismPath, makeLenses, lensPath, pp } from '../../src/lenses';
 import { reverse } from '../../src/functionalHelpers';
 import { compose, curry } from '../../src/combinators';
 import { map, mapWith } from '../../src/pointless_data_structures';
@@ -37,8 +37,44 @@ describe('Test lenses', function _testLenses() {
                 .should.eql({ id: 3, name: 'CHARLES BRONSON', addresses: [{ street: '99 Walnut Dr.', zip: '04821' }, { street: '2321 Crane Way', zip: '08082' }]});
         });
 
+        it('should compose lenses for object interaction', function _testLensComposition() {
+            var address = lensPath('addresses'),
+                street = lensPath('street'),
+                first = lensPath(0);
+
+            var firstAddressStreet = compose(address, first, street);
+            view(firstAddressStreet, user).should.eql('99 Walnut Dr.');
+
+            let res1 = set(firstAddressStreet, '3849 Face Street', user);
+            res1.addresses[0].street.should.eq('3849 Face Street');
+            res1.should.not.eql(user);
+
+            over(firstAddressStreet, toUpper, user)
+                .addresses[0].street.should.eql('99 WALNUT DR.');
+        });
+
+        it('should work correctly on a js Map', function _testLensPathOnMap() {
+            let user1 = { firstName: 'Mike', lastName: 'Mahoney', addresses: addrs },
+                user2 = { firstName: 'Charles', lastName: 'Nimbrel', addresses: addrs },
+                user3 = { firstName: 'Nancy', lastName: 'Freidl', addresses: addrs },
+                personMap = new Map();
+
+            personMap.set(user1.firstName, user1);
+            personMap.set(user2.firstName, user2);
+            personMap.set(user3.firstName, user3);
+
+            let l = compose(lensPath('Nancy'), lensPath('addresses'), lensPath(1), lensPath('zip'));
+            view(l, personMap).should.eql('08082');
+            set(l, 12342, personMap)
+                .get('Nancy').addresses[1].zip.should.eql(12342);
+            over(l, toUpper, personMap)
+                .get('Nancy').addresses[1].zip.should.eql('08082');
+        });
+
         it('should create a lens path and view/update object', function _createPathForViewingAndUpdating() {
             var name = prismPath('name');
+            var n = pp('name');
+            //view(n, user);
 
             //view(name, user).should.eql('Charles Bronson');
             /*
