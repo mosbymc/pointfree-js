@@ -676,9 +676,11 @@ describe('Test functional helpers', function _testFunctionalHelpers() {
             s.add('1');
             s.add(2);
 
-            let res = setSet(3, s);
+            let res = setSet(2, 3, s);
             s.has(3).should.be.false;
+            s.has(2).should.be.true;
             res.has(3).should.be.true;
+            res.has(2).should.be.false;
         });
     });
 

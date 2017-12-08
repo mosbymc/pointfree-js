@@ -103,7 +103,7 @@ var ul = lens(curry(function _getter(prop, xs) {
     return xs[prop];
 }), curry(function _setter(prop, val, xs) {
     if (Map.prototype.isPrototypeOf(xs)) return mapSet(prop, val, xs);
-    if (Set.prototype.isPrototypeOf(xs)) return setSet(val, xs);
+    if (Set.prototype.isPrototypeOf(xs)) return setSet(prop, val, xs);
     if (Array.isArray(xs)) return arraySet(prop, val, xs);
     return objectSet(prop, val, xs);
 }));

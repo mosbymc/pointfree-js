@@ -1,4 +1,4 @@
-import { arrayLens, objectLens, mapLens, view, over, put, set, lens, prism, prismPath, makeLenses, lensPath, pp } from '../../src/lenses';
+import { arrayLens, objectLens, mapLens, view, over, put, set, lens, mapped, prism, prismPath, makeLenses, lensPath, pp } from '../../src/lenses';
 import { reverse } from '../../src/functionalHelpers';
 import { compose, curry } from '../../src/combinators';
 import { map, mapWith } from '../../src/pointless_data_structures';
@@ -15,12 +15,6 @@ function toUpper(str) {
 function replace(regex, str) {
     return str.replace(regex);
 }
-
-function _getValue(x) { return x.value }
-
-var mapped = curry(function(f, x) {
-    return Identity(mapWith(compose(_getValue, f), x));
-});
 
 describe('Test lenses', function _testLenses() {
     describe('Test makeLenses', function _makeLensesTest() {
@@ -69,6 +63,24 @@ describe('Test lenses', function _testLenses() {
                 .get('Nancy').addresses[1].zip.should.eql(12342);
             over(l, toUpper, personMap)
                 .get('Nancy').addresses[1].zip.should.eql('08082');
+        });
+
+        it('should work on a js Set', function _testLensPathOnSet() {
+            let personSet = new Set();
+            personSet.add('Mike');
+            personSet.add('Nancy');
+            personSet.add('Charles');
+
+            let l = lensPath('Charles');
+
+            view(l, personSet).should.eql('Charles');
+            expect(view(lensPath('Mack'), personSet)).to.be.undefined;
+
+            let setRes = set(l, 'Chuck', personSet);
+            setRes.has('Charles').should.be.false;
+            setRes.has('Chuck').should.be.true;
+
+            over(l, toUpper, personSet).has('CHARLES').should.be.true;
         });
 
         it('should create a lens path and view/update object', function _createPathForViewingAndUpdating() {

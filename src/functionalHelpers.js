@@ -517,12 +517,12 @@ function reverse(...args) {
  * @param {Set} set - b
  * @return {Set} - c
  */
-var setSet = curry(function _setSet(val, set) {
+var setSet = curry(function _setSet(oldVal, newVal, set) {
     var ret = new Set();
     for (let item of set) {
-        ret.add(item);
+        if (item !== oldVal) ret.add(item);
     }
-    ret.add(val);
+    ret.add(newVal);
     return ret;
 });
 
