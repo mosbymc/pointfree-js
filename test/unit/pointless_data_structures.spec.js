@@ -274,7 +274,7 @@ describe('Test pointless_data_structures', function _testFunctionalContainerHelp
 
     describe('Test dimap', function _testDimap() {
         it('should correctly dimap a data structure', function _testDimap() {
-            //dimap(x => x + 10, x => x / 5, Identity(5).apply(Identity(x => x * x))).extract.should.eql(45);
+            Identity(5).apply(dimap(x => x + 10, x => x / 5, Identity(x => x * x))).extract.should.eql(45);
         });
     });
 
@@ -290,7 +290,12 @@ describe('Test pointless_data_structures', function _testFunctionalContainerHelp
     });
 
     describe('Test mcompose', function _testMCompose() {
-        //it('should return something');
+        it('should compose both identity-returning functions and return a function waiting for arguments', function _testMcompose() {
+            function f1(arg) { return Identity(arg); }
+            function f2(arg) { return Identity(arg * arg); }
+
+            mcompose(f2, f1)(10).extract.should.eql(100);
+        });
     });
 
     describe('Test apply', function _testApply() {
