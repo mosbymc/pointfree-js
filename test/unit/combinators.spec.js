@@ -102,6 +102,12 @@ describe('Test combinators', function _testCombinators() {
         });
     });
 
+    describe('Test fixedPoint', function _testFixedPoint() {
+        it('should act on a recursive function', function _testFixedPoint() {
+            fixedPoint(recur => x => 1 === x ? 1 : x * recur(x - 1))(5).should.eql(120)
+        });
+    });
+
     describe('Test fork', function  _testFork() {
         it('should run each execute each inner function and apply the outer function to the results', function _testFork() {
             function f1(arg) { return arg * arg; }
@@ -174,6 +180,14 @@ describe('Test combinators', function _testCombinators() {
         });
     });
 
+    describe('Test q', function _testQ() {
+        it('should execute', function _testQ() {
+            let a = x => x * x,
+                b = x => x + 10;
+            q(a, b, 10).should.eql(110);
+        });
+    });
+
     describe('Test reduce', function _testReduce() {
         it('should reduce the list', function _testReduce() {
             reduce((x, y) => x +  y, 0, [1, 2, 3, 4, 5]).should.eql(15);
@@ -200,6 +214,12 @@ describe('Test combinators', function _testCombinators() {
 
         obj1.a.should.eql(3);
         obj2.a.should.eql(-1);
+    });
+
+    describe('Test t', function _testT() {
+        it('should execute', function _testT() {
+            t(10, x => x * x).should.eql(100);
+        });
     });
 
     describe('Test uncurry', function _testUncurry() {
@@ -237,6 +257,12 @@ describe('Test combinators', function _testCombinators() {
 
             var res = uncurriedFunc(1, 2, 3);
             res(1).should.eql(6);
+        });
+    });
+
+    describe('Test w', function _testW() {
+        it('should execute', function _testW() {
+            w(x => y => x * y, 5).should.eql(25);
         });
     });
 

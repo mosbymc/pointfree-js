@@ -230,12 +230,8 @@ var first = constant;
  * @return {*} - b
  */
 function fixedPoint(fn) {
-    function _fixedPoint(x) {
-        return fn(function _y_(v) {
-            x(x)(v);
-        });
-    }
-    return _fixedPoint(_fixedPoint);
+    let f = x => fn(v => x(x)(v));
+    return f(f);
 }
 
 /**
