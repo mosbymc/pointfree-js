@@ -1,4 +1,4 @@
-import { arrayLens, objectLens, mapLens, view, over, put, set, lens, mapped, prism, prismPath, makeLenses, lensPath, pp } from '../../src/lenses';
+import { arrayLens, objectLens, mapLens, view, over, put, set, lens, mapped, prism, makeLenses, lensPath, pp } from '../../src/lenses';
 import { reverse } from '../../src/functionalHelpers';
 import { compose, curry } from '../../src/combinators';
 import { map, mapWith } from '../../src/pointless_data_structures';
@@ -84,7 +84,7 @@ describe('Test lenses', function _testLenses() {
         });
 
         it('should create a lens path and view/update object', function _createPathForViewingAndUpdating() {
-            var name = prismPath('name');
+            //var name = prismPath('name');
             var n = pp('name');
             //view(n, user);
 

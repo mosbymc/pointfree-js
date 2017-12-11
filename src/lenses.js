@@ -179,24 +179,6 @@ function makeLenses(...paths) {
 /**
  * @signature
  * @description d
- * @param {string} paths - a
- * @return {function} - b
- */
-function improvedLensPath(...paths) {
-    var innerLensDef = curry(function _innerLensDef(prop, fn, xs) {
-        return mapWith(function _map(rep) {
-            return objectSet(prop, rep, xs);
-        }, fn(xs[prop]));
-    });
-
-    return compose(...paths.map(function _pathsMap(p) {
-        return innerLensDef(p);
-    }));
-}
-
-/**
- * @signature
- * @description d
  * @param {string|Number} path - a
  * @return {*} - b
  */
@@ -206,8 +188,14 @@ function lensPath(...path) {
     }));
 }
 
+/**
+ * @signature
+ * @description d
+ * @param {string} path - a
+ * @return {*} b
+ */
 function pp(...path) {
-    return compose(path.map(function _pathMap(p) {
+    return compose(when(not(isArray), split('.'), path).map(function _pathMap(p) {
         return lens(function _getter(prop, xs) {
             if (Map.prototype.isPrototypeOf(xs)) return Maybe(xs.get(prop));
             if (Set.prototype.isPrototypeOf(xs)) return xs.has(prop) ? Maybe(prop) : Maybe.Nothing();
@@ -220,30 +208,6 @@ function pp(...path) {
         })(p);
     }));
 }
-
-/**
- * @signature
- * @description d
- * @kind function
- * @function prismPath
- * @param {Array|String} path - a
- * @param {Object} obj - b
- * @return {*} - c
- */
-var prismPath = curry(function _prismPath(path, obj) {
-    path = when(not(isArray), split('.'), path);
-    console.log(path);
-    console.log(obj);
-    var val = obj,
-        idx = 0;
-    while (idx < path.length) {
-        if (null == val) return Maybe.Nothing();
-        console.log(val[path[idx]]);
-        val = val[path[idx]];
-        ++idx;
-    }
-    return Maybe(val);
-});
 
 /**
  * @signature
@@ -269,4 +233,4 @@ var traverse = curry((f, point, fctr) => compose(sequenceA(point), map(f))(fctr)
 
 var sequenceA = curry((point, fctr) => fctr.traverse(id, point));
 
-export { arrayLens, objectLens, mapLens, view, over, put, set, lens, prism, prismPath, makeLenses, lensPath, ul, mapped, pp };
+export { arrayLens, objectLens, mapLens, view, over, put, set, lens, prism, makeLenses, lensPath, ul, mapped, pp };
