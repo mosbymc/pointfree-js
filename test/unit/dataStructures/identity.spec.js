@@ -135,7 +135,7 @@ describe('Identity test', function _testIdentity() {
             err2.should.be.true;
         });
 
-        it('should return a new identity functor instance with the mapped value', function _testIdentityMap() {
+        it('should return a new identity data structure with the mapped value', function _testIdentityMap() {
             var i = Identity(1),
                 d = i.map(function _t() { return 2; });
 
@@ -337,7 +337,7 @@ describe('Identity test', function _testIdentity() {
             Identity(1).traverse(monads.Maybe, test).toString().should.eql('Just(Identity(3))');
         });
 
-        it('should have a .factory property that points to the factory function', function _testIdentityIsStupidViaFantasyLandSpecCompliance() {
+        it('should have a .factory property that points to the factory function', function _testIdentityFactoryPointer() {
             Identity(null).factory.should.eql(Identity);
             Identity(null).constructor.should.eql(Identity);
         });
