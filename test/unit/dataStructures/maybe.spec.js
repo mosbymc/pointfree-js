@@ -276,7 +276,7 @@ describe('Maybe functor tests', function _testMaybeFunctor() {
             m5.isNothing().should.eql(false);
         });
 
-        it('should return a new maybe instance with the mapped value', function _testMaybeMap() {
+        it('should return a new maybe data structure with the mapped value', function _testMaybeMap() {
             var m1 = Maybe(1),
                 m2 = Maybe(),
                 d1 = m1.map(function _t() { return 2; }),
@@ -288,7 +288,7 @@ describe('Maybe functor tests', function _testMaybeFunctor() {
             expect(m2.value).to.eql(d2.value);
         });
 
-        it('should return a new maybe instance with the bi-mapped value', function _testMaybeBiMap() {
+        it('should return a new maybe data structure with the bi-mapped value', function _testMaybeBiMap() {
             var f1 = x => x * x,
                 f2 = x => x;
 
@@ -457,7 +457,7 @@ describe('Maybe functor tests', function _testMaybeFunctor() {
             res.value.should.eql(n);
         });
 
-        it('should have a .constructor property that points to the factory function', function _testMaybeFunctorIsStupidViaFantasyLandSpecCompliance() {
+        it('should have a .constructor property that points to the factory function', function _testMaybeFactoryPointer() {
             Just(1).constructor.should.eql(Maybe);
             Nothing().constructor.should.eql(Maybe);
         });
