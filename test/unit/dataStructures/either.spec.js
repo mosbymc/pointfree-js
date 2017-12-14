@@ -258,17 +258,17 @@ describe('Either data structure tests', function _testEitherDataStructure() {
             l1.apply(l2).extract.should.eql(l1.extract);
         });
 
-        it('should return underlying value when constant_functor#fold is invoked', function _testConstantDotFold() {
+        it('should return underlying value when left#fold/right#fold is invoked', function _testEitherFold() {
             Right(10).fold((x, y) => x + y * 15, 0).should.eql(150);
             Left(10).fold((x, y) => x + y * 15, 0).should.eql(150);
         });
 
-        it('should return a Just of an Identity of 10 when #sequence is invoked', function _testConstantDotSequence() {
+        it('should return a Just of an Either of 10 when #sequence is invoked', function _testEitherSequence() {
             Right(10).sequence(monads.Maybe).toString().should.eql('Just(Right(10))');
             Left(10).sequence(monads.Maybe).toString().should.eql('Just(Left(10))');
         });
 
-        it('should return a Just of an Identity of 3 when #traverse is invoked', function _testConstantDotTraverse() {
+        it('should return a Just of an Either of 3 when #traverse is invoked', function _testEitherTraverse() {
             function test(val) {
                 return monads.Maybe(val + 2);
             }
@@ -277,7 +277,7 @@ describe('Either data structure tests', function _testEitherDataStructure() {
             Left(1).traverse(monads.Maybe, test).toString().should.eql('Just(Left(3))');
         });
 
-        it('should properly indicate equality when constant monads are indeed equal', function _testEitherFunctorEquality() {
+        it('should properly indicate equality when \'either\' data structures are indeed equal', function _testEitherEquality() {
             var m1 = Either(null),
                 m2 = Either(null),
                 m3 = Either(1),
@@ -336,7 +336,7 @@ describe('Either data structure tests', function _testEitherDataStructure() {
             m8.equals(m9).should.be.false;
         });
 
-        it('should have a functioning iterator', function _testEitherFunctorIterator() {
+        it('should have a functioning iterator', function _testEitherIterator() {
             var e1 = Either(10),
                 e2 = Either({ a: 1, b: 2 });
 
@@ -347,7 +347,7 @@ describe('Either data structure tests', function _testEitherDataStructure() {
             e2Res.should.eql([e2.value]);
         });
 
-        it('should allow "expected" functionality of concatenation for strings and mathematical operators for numbers', function _testEitherFunctorValueOf() {
+        it('should allow "expected" functionality of concatenation for strings and mathematical operators for numbers', function _testEitherValueOf() {
             var e1 = Either('Mark'),
                 e2 = Either(10);
 
@@ -364,7 +364,7 @@ describe('Either data structure tests', function _testEitherDataStructure() {
             num4.should.eql(2);
         });
 
-        it('should print the correct container type + value when .toString() is invoked', function _testEitherFunctorToString() {
+        it('should print the correct container type + value when .toString() is invoked', function _testEitherToString() {
             var c1 = Either(1, 'right'),
                 c2 = Either(null),
                 c3 = Either([1, 2, 3], 'left'),
@@ -384,7 +384,7 @@ describe('Either data structure tests', function _testEitherDataStructure() {
             Object.prototype.toString.call(l).should.eql('[object Left]');
         });
 
-        it('should have a .constructor property that points to the factory function', function _testEitherFunctorIsStupidViaFantasyLandSpecCompliance() {
+        it('should have a .constructor property that points to the factory function', function _testEitherFactoryPointer() {
             Either(null).constructor.should.eql(Either);
         });
     });

@@ -269,7 +269,7 @@ describe('Constant tests', function _testConstant() {
             Constant(1).traverse(monads.Identity).toString().should.eql('Constant(1)');
         });
 
-        it('should have a .constructor property that points to the factory function', function _testConstantIsStupidViaFantasyLandSpecCompliance() {
+        it('should have a .constructor property that points to the factory function', function _testConstantFactoryPointer() {
             Constant(null).constructor.should.eql(Constant);
         });
     });
@@ -281,7 +281,7 @@ describe('Constant tests', function _testConstant() {
             Constant(Constant).ap(v).value.should.eql(v.mjoin());
         });*/
 
-        it('should have a proper algebraic properties apply', function _testConstantMonadAlgebraicProperties() {
+        it('should have a proper algebraic properties apply', function _testConstantAlgebraicProperties() {
             function _i(val) { return  val + 2; }
             var x = 2;
             var t = f => f(Constant);

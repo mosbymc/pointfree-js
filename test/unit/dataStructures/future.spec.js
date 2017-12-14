@@ -216,10 +216,8 @@ describe('Future test', function _testFuture() {
             f3.equals(f2).should.be.false;
         });
 
-        it('should represent a future in string form', function _testFutureDotToString() {
-            var f = Future.of(1);
-
-            f.toString().should.eql('Future()');
+        it('should represent a future in string form', function _testFutureToString() {
+            Future.of(1).toString().should.eql('Future()');
         });
 
         it('should represent the future\'s \'type\' when \'Object.prototype.toString.call\' is invoked', function _testFutureTypeString() {
