@@ -45,7 +45,7 @@ var c = curry(function _c(x, y, z) {
 /**
  * @description Takes any number of arguments, collects them, and then returns them
  * in an array in reverse order.
- * @param {*} args The arguments that are to be grouped and reversed.
+ * @param {*} args - The arguments that are to be grouped and reversed.
  * @return {Array} Returns an array of values.
  */
 var rev = (...args) => args.reverse();
@@ -182,7 +182,7 @@ function curryN(arity, fn, received = []) {
 }
 
 /**
- * @signature
+ * @signature curryRight :: (* -> a) -> (* -> a)
  * @description Behaves like curry, but executes the given function with the arguments
  * in reverse order from that in which they were received.
  * @note This function is partially applied, not curried.
@@ -212,20 +212,19 @@ function curryRight(fn) {
 }
 
 /**
- * @signature
+ * @signature first :: a -> () -> a
  * @description d
  * @see constant
  * @kind function
  * @function first
- * @param {*} - a
- * @return {function} - b
+ * @param {*} - Any value
+ * @return {function} - Returns a function that always returns the argument supplied to the 'first' function
  */
 var first = constant;
 
 /**
  * @signature
  * @description d
- * @note This function is partially applied, not curried.
  * @param {function} fn - a
  * @return {*} - b
  */

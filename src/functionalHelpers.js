@@ -32,7 +32,7 @@ var adjust = curry(function _adjust(fn, idx, list) {
 });
 
 /**
- * @signature Number -> Number -> Number
+ * @signature add :: Number -> Number -> Number
  * @signature String -> String -> String
  * @description d
  * @kind function
@@ -55,7 +55,7 @@ var add = curry((x, y) => x + y);
 var and = curry((a, b) => !!(a && b));
 
 /**
- * @signature
+ * @signature arraySet :: Number -> * -> [] -> []
  * @description Updates the value at a specified index of an array by first creating a shallow copy
  * of the array and then updating its value at the specified index.
  * @kind function
@@ -72,7 +72,7 @@ var arraySet = curry(function _arraySet(idx, x, list) {
 });
 
 /**
- * @signature
+ * @signature both :: () -> () -> [*] -> boolean
  * @description d
  * @kind function
  * @function both
@@ -96,87 +96,92 @@ var concat = first => (...rest) => null == rest || !rest.length ? first :
     }, first);
 
 /**
- * @signature
- * @description d
+ * @signature defaultPredicate :: * -> boolean
+ * @description A function that always returns 'true'
  * @kind function
  * @function defaultPredicate
- * @return {boolean} - a
+ * @return {boolean} - The return value of this function will always be 'true', regardless
+ * of any arguments passed to it.
  */
 var defaultPredicate = constant(true);
 
 /**
- * @signature
- * @description d
+ * @signature delegatesFrom :: {} -> {} -> boolean
+ * @description Accepts any two objects and returns a boolean indicating if the first
+ * object is in the prototype chain of the second object.
  * @kind function
  * @function delegatesFrom
- * @param {object} delegate - a
- * @param {object} delegator - b
- * @return {boolean} - c
+ * @param {object} delegate - The delegate object
+ * @param {object} delegator - The delegator object
+ * @return {boolean} - Returns 'true' if the delegator delegates to the delegate, 'false' otherwise.
  */
 var delegatesFrom = curry((delegate, delegator) => delegate.isPrototypeOf(delegator));
 
 /**
- * @signature
- * @description d
+ * @signature delegatesTo :: {} -> {} -> boolean
+ * @description Accepts any two objects and returns a boolean indicating if the second
+ * object is in the prototype chain of the first object.
  * @kind function
  * @function delegatesTo
- * @param {object} delegator - a
- * @param {object} delegate - b
- * @return {boolean} - c
+ * @param {object} delegator - The delegator object
+ * @param {object} delegate - The delegate object
+ * @return {boolean} - Returns 'true' if the delegator delegates to the delegate, 'false' otherwise.
  */
 var delegatesTo = curry((delegator, delegate) => delegate.isPrototypeOf(delegator));
 
 /**
- * @signature
- * @description d
+ * @signature divide :: Number -> Number -> Number
+ * @description Accepts any two numbers and returns the result of dividing the first number
+ * by the second number.
  * @kind function
  * @function divide
- * @param {number} x - a
- * @param {number} y - b
- * @return {number} - c
+ * @param {number} x - The dividend
+ * @param {number} y - The divisor
+ * @return {number} - Returns the quotient
  */
 var divide = curry((x, y) => x / y);
 
 /**
- * @signature
- * @description d
+ * @signature either :: () -> () -> boolean
+ * @description Accepts two function, invokes them both, and returns true if either of
+ * the function returns a truthy value, false otherwise.
  * @kind function
  * @function either
- * @param {function} f - a
- * @param {function} g - b
- * @return {boolean} - c
+ * @param {function} f - A function to be tested for truthiness
+ * @param {function} g - A function to be tested for truthiness
+ * @return {boolean} - A boolean value indicating the truthiness of either function
  */
 var either = curry(function _either(f, g) {
     return !!(f() || g());
 });
 
 /**
- * @signature
- * @description d
+ * @signature equals :: * -> * -> boolean
+ * @description Accepts any two values and returns a boolean indicating loose equality of the values
  * @kind function
  * @function equals
- * @param {*} x - a
- * @param {*} y - b
- * @return {boolean} - c
+ * @param {*} x - Any value
+ * @param {*} y - Any value
+ * @return {boolean} - A boolean indicating if the two values are loose equal
  */
 var equals = curry((x, y) => x == y);
 
 /**
- * @signature
- * @description d
+ * @signature falsey :: * -> boolean
+ * @description Accepts any value and returns a boolean indicating if the value is falsey or not
  * @kind function
  * @function falsey
  * @see flip
- * @param {*} x - a
- * @return {boolean} - b
+ * @param {*} x - Any value
+ * @return {boolean} - Returns 'true' if the value provided is falsey, 'false' otherwise
  */
 var falsey = flip;
 
 /**
- * @signature
- * @description d
- * @param {*} x - a
- * @return {boolean} - b
+ * @signature flip :: * -> boolean
+ * @description Accepts any value and applies the '!' operator to it.
+ * @param {*} x - Any value
+ * @return {boolean} - Returns 'false' is the value is truthy, 'true' otherwise.
  */
 var flip = x => !x;
 
