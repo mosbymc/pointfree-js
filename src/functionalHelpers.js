@@ -72,7 +72,7 @@ var arraySet = curry(function _arraySet(idx, x, list) {
 });
 
 /**
- * @signature both :: () -> () -> [*] -> boolean
+ * @signature both :: () -> () -> [*] -> Boolean
  * @description d
  * @kind function
  * @function both
@@ -96,7 +96,7 @@ var concat = first => (...rest) => null == rest || !rest.length ? first :
     }, first);
 
 /**
- * @signature defaultPredicate :: * -> boolean
+ * @signature defaultPredicate :: * -> Boolean
  * @description A function that always returns 'true'
  * @kind function
  * @function defaultPredicate
@@ -106,7 +106,7 @@ var concat = first => (...rest) => null == rest || !rest.length ? first :
 var defaultPredicate = constant(true);
 
 /**
- * @signature delegatesFrom :: {} -> {} -> boolean
+ * @signature delegatesFrom :: {} -> {} -> Boolean
  * @description Accepts any two objects and returns a boolean indicating if the first
  * object is in the prototype chain of the second object.
  * @kind function
@@ -118,7 +118,7 @@ var defaultPredicate = constant(true);
 var delegatesFrom = curry((delegate, delegator) => delegate.isPrototypeOf(delegator));
 
 /**
- * @signature delegatesTo :: {} -> {} -> boolean
+ * @signature delegatesTo :: {} -> {} -> Boolean
  * @description Accepts any two objects and returns a boolean indicating if the second
  * object is in the prototype chain of the first object.
  * @kind function
@@ -142,7 +142,7 @@ var delegatesTo = curry((delegator, delegate) => delegate.isPrototypeOf(delegato
 var divide = curry((x, y) => x / y);
 
 /**
- * @signature either :: () -> () -> boolean
+ * @signature either :: () -> () -> Boolean
  * @description Accepts two function, invokes them both, and returns true if either of
  * the function returns a truthy value, false otherwise.
  * @kind function
@@ -156,7 +156,7 @@ var either = curry(function _either(f, g) {
 });
 
 /**
- * @signature equals :: * -> * -> boolean
+ * @signature equals :: * -> * -> Boolean
  * @description Accepts any two values and returns a boolean indicating loose equality of the values
  * @kind function
  * @function equals
@@ -167,7 +167,7 @@ var either = curry(function _either(f, g) {
 var equals = curry((x, y) => x == y);
 
 /**
- * @signature falsey :: * -> boolean
+ * @signature falsey :: * -> Boolean
  * @description Accepts any value and returns a boolean indicating if the value is falsey or not
  * @kind function
  * @function falsey
@@ -178,7 +178,7 @@ var equals = curry((x, y) => x == y);
 var falsey = flip;
 
 /**
- * @signature flip :: * -> boolean
+ * @signature flip :: * -> Boolean
  * @description Accepts any value and applies the '!' operator to it.
  * @param {*} x - Any value
  * @return {boolean} - Returns 'false' is the value is truthy, 'true' otherwise.
@@ -186,7 +186,7 @@ var falsey = flip;
 var flip = x => !x;
 
 /**
- * @signature
+ * @signature getWith :: String -> Object -> *
  * @description d
  * @kind function
  * @function getWith
@@ -197,7 +197,7 @@ var flip = x => !x;
 var getWith = curry((prop, obj) => obj[prop]);
 
 /**
- * @signature
+ * @signature greaterThan :: Number -> Number -> Boolean
  * @description d
  * @kind function
  * @function greaterThan
@@ -208,7 +208,7 @@ var getWith = curry((prop, obj) => obj[prop]);
 var greaterThan = curry((x, y) => x > y);
 
 /**
- * @signature
+ * @signature greaterThanOrEqual :: Number -> Number -> Boolean
  * @description d
  * @kind function
  * @function greaterThanOrEqual
@@ -219,7 +219,7 @@ var greaterThan = curry((x, y) => x > y);
 var greaterThanOrEqual = curry((x, y) => x >= y);
 
 /**
- * @signature
+ * @signature has :: String -> Object -> Boolean
  * @description d
  * @kind function
  * @function has
@@ -232,7 +232,7 @@ var has = curry(function _has(prop, obj) {
 });
 
 /**
- * @signature
+ * @signature inObject :: String -> Object -> Boolean
  * @description d
  * @kind function
  * @function inObject
@@ -245,7 +245,7 @@ var inObject = curry(function _inObject(prop, obj) {
 });
 
 /**
- * @signature
+ * @signature invoke :: Function -> *
  * @description d
  * @param {function|generator} fn - a
  * @return {*} - b
@@ -261,7 +261,7 @@ var invoke = fn => fn();
 var isArray = data => Array.isArray(data);
 
 /**
- * @signature
+ * @signature isBoolean :: * -> Boolean
  * @description d
  * @param {*} [bool] - a
  * @return {boolean} - b
@@ -285,7 +285,7 @@ var isFunction = fn => javaScriptTypes.Function === type(fn);
 var isObject = item => javaScriptTypes.Object === type(item) && null !== item;
 
 /**
- * @signature
+ * @signature isPrimitive :: * -> Boolean
  * @description d
  * @param {*} [item] - a
  * @return {boolean} - b
@@ -296,7 +296,7 @@ function isPrimitive(item) {
 }
 
 /**
- * @signature
+ * @signature isNothing :: * -> Boolean
  * @description d
  * @param {*} [x] - a
  * @return {boolean} - b
@@ -304,7 +304,7 @@ function isPrimitive(item) {
 var isNothing = x => null == x;
 
 /**
- * @signature
+ * @signature isNull :: * -> Boolean
  * @description d
  * @param {*} [n] - a
  * @return {string|boolean} - b
@@ -312,7 +312,7 @@ var isNothing = x => null == x;
 var isNull = n => null === n;
 
 /**
- * @signature
+ * @signature isNumber :: * -> Boolean
  * @description d
  * @param {*} [num] - a
  * @return {boolean} - b
@@ -320,7 +320,7 @@ var isNull = n => null === n;
 var isNumber = num => javaScriptTypes.Number == type(num);
 
 /**
- * @signature
+ * @signature isSomething :: * -> Boolean
  * @description d
  * @param {*} [x] - a
  * @return {boolean} - b
@@ -328,7 +328,7 @@ var isNumber = num => javaScriptTypes.Number == type(num);
 var isSomething = x => null != x;
 
 /**
- * @signature
+ * @signature isString :: * -> Boolean
  * @description d
  * @param {string} str - a
  * @return {boolean} - b
@@ -336,7 +336,7 @@ var isSomething = x => null != x;
 var isString = str => javaScriptTypes.String === type(str);
 
 /**
- * @signature
+ * @signature isSymbol :: * -> Boolean
  * @description d
  * @param {*} [sym] - a
  * @return {boolean} - b
@@ -344,7 +344,7 @@ var isString = str => javaScriptTypes.String === type(str);
 var isSymbol = sym => javaScriptTypes.Symbol === type(sym);
 
 /**
- * @signature
+ * @signature isUndefined :: * -> Boolean
  * @description d
  * @param {*} [u] - a
  * @return {boolean} - b
@@ -352,7 +352,7 @@ var isSymbol = sym => javaScriptTypes.Symbol === type(sym);
 var isUndefined = u => javaScriptTypes.Undefined === type(u);
 
 /**
- * @signature
+ * @signature lessThan :: Number -> Number -> Boolean
  * @description d
  * @kind function
  * @function lessThan
@@ -363,7 +363,7 @@ var isUndefined = u => javaScriptTypes.Undefined === type(u);
 var lessThan = curry((x, y) => x < y);
 
 /**
- * @signature
+ * @signature lessThanOrEqual :: Number -> Number -> Boolean
  * @description d
  * @kind function
  * @function lessThanOrEqual
@@ -374,7 +374,7 @@ var lessThan = curry((x, y) => x < y);
 var lessThanOrEqual = curry((x, y) => x <= y);
 
 /**
- * @signature
+ * @signature * -> * -> Map -> Map
  * @description d
  * @kind function
  * @function mapSet
@@ -393,7 +393,7 @@ var mapSet = curry(function _mapSet(key, val, xs) {
 });
 
 /**
- * @signature
+ * @signature modulus :: Number -> Number -> Number
  * @description d
  * @kind function
  * @function modulus
@@ -404,7 +404,7 @@ var mapSet = curry(function _mapSet(key, val, xs) {
 var modulus = curry((x, y) => x % y);
 
 /**
- * @signature
+ * @signature multiply :: Number -> Number -> Number
  * @description d
  * @kind function
  * @function multiply
@@ -415,7 +415,7 @@ var modulus = curry((x, y) => x % y);
 var multiply = curry((x, y) => x * y);
 
 /**
- * @signature
+ * @signature negate :: Number -> Number
  * @description d
  * @param {number} x - a
  * @return {number} - b
@@ -423,7 +423,7 @@ var multiply = curry((x, y) => x * y);
 var negate = x => -x;
 
 /**
- * @signature
+ * @signature notEqual :: * -> * -> -> Boolean
  * @description d
  * @kind function
  * @function notEqual
@@ -434,7 +434,7 @@ var negate = x => -x;
 var notEqual = curry((x, y) => x != y);
 
 /**
- * @signature
+ * @signature noop :: () -> Undefined
  * @description No-op function; used as default function in some cases when argument is optional
  * and consumer does not provide.
  * @returns {undefined} - a
@@ -514,7 +514,7 @@ function reverse(...args) {
 }
 
 /**
- * @signature
+ * @signature setSet :: * -> * -> Set -> Set
  * @description d
  * @kind function
  * @function setSet
@@ -532,7 +532,7 @@ var setSet = curry(function _setSet(oldVal, newVal, set) {
 });
 
 /**
- * @signature
+ * @signature strictEquals :: * -> * -> Boolean
  * @description d
  * @kind function
  * @function strictEquals
