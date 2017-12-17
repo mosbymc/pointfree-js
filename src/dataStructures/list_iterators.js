@@ -626,6 +626,12 @@ function ofType(xs, dataType) {
     };
 }
 
+/**
+ * @signature
+ * @description d
+ * @param {Array|generator|dataStructures.list_core} xs - a
+ * @return {generator} b
+ */
 function pop(xs) {
     return function *_popIterator() {
         let it = xs[Symbol.iterator](),

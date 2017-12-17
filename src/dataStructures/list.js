@@ -1109,6 +1109,12 @@ var list_core = {
     }
 };
 
+/**
+ * @description d
+ * @param {Number} idx - a
+ * @param {*} val - b
+ * @return {*} c
+ */
 list_core.set = function _set(idx, val) {
     let len = this.count();
     let normalizedIdx = 0 > idx ? len + idx : idx;
@@ -1118,6 +1124,11 @@ list_core.set = function _set(idx, val) {
     return this;
 };
 
+/**
+ * @description d
+ * @param {Number} idx - a
+ * @return {*} - b
+ */
 list_core.get = function _get(idx) {
     let len = this.count(),
         normalizedIdx = 0 > idx ? len + idx : idx;
