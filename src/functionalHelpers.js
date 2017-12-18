@@ -34,23 +34,23 @@ var adjust = curry(function _adjust(fn, idx, list) {
 /**
  * @signature add :: Number -> Number -> Number
  * @signature String -> String -> String
- * @description d
+ * @description Adds two numbers together and returns the result
  * @kind function
  * @function add
- * @param {number} x - a
- * @param {number} y - b
- * @return {number} - c
+ * @param {number} x - A number
+ * @param {number} y - A number
+ * @return {number} - A number; the result of adding the two arguments
  */
 var add = curry((x, y) => x + y);
 
 /**
  * @signature and :: (*... -> a) -> ((*... -> b) -> ((*... -> Boolean)))
- * @description d
+ * @description Performs an '&&' operation on any two arguments and returns the result
  * @kind function
  * @function and
- * @param {*} a - a
- * @param {*} b - b
- * @return {boolean} - c
+ * @param {*} a - Any value
+ * @param {*} b - Any value
+ * @return {boolean} - Returns 'true' if both arguments are truthy, 'false' otherwise
  */
 var and = curry((a, b) => !!(a && b));
 
@@ -73,7 +73,10 @@ var arraySet = curry(function _arraySet(idx, x, list) {
 
 /**
  * @signature both :: () -> () -> [*] -> Boolean
- * @description d
+ * @description Accepts two functions as arguments and returns a function waiting to be invoked.
+ * Any arguments passed to the returned function will be passed to the initial two function arguments
+ * during invocation. If the result of both of the two function arguments is truthy, the result will
+ * be 'true', otherwise the result will be 'false'.
  * @kind function
  * @function both
  * @param {function} f - a
@@ -86,9 +89,13 @@ var both = curry(function _both(f, g) {
 
 /**
  * @signature
- * @description d
- * @param {Array} first - a
- * @return {function} - b
+ * @description Accepts a string or an array and returns a function that accepts any number of
+ * individual arguments. When the returned function is invoked, it will concatenate all the individual
+ * arguments to the initial string or array passed in and return either a string or an array based on the
+ * type of the initial parameter.
+ * @param {Array|String} first - A string or an array
+ * @return {function} - Returns a function waiting for zero or more arguments to concatenate to
+ * the string or array.
  */
 var concat = first => (...rest) => null == rest || !rest.length ? first :
     rest.reduce(function _concatStrings(cur, next) {
@@ -187,23 +194,25 @@ var flip = x => !x;
 
 /**
  * @signature getWith :: String -> Object -> *
- * @description d
+ * @description Returns a the value assigned to a property of an object.
  * @kind function
  * @function getWith
- * @param {string} prop - a
- * @param {object} obj - b
- * @return {*} - c
+ * @param {string} prop - The property of the object whose assigned value should be returned.
+ * @param {object} obj - The object that has the property who's assigned value should be returned.
+ * @return {*} - Returns whatever value is assigned to the object's property
  */
 var getWith = curry((prop, obj) => obj[prop]);
 
 /**
  * @signature greaterThan :: Number -> Number -> Boolean
- * @description d
+ * @description Accepts any two strings or numbers and returns the result of using the
+ * greater than operator on the two arguments. The is performed as: x > y where 'x' is the
+ * first argument and 'y' is the second.
  * @kind function
  * @function greaterThan
- * @param {number | string} x - a
- * @param {number | string} y - b
- * @return {boolean} - c
+ * @param {number | string} x - A number or string value
+ * @param {number | string} y - A number or string value
+ * @return {boolean} - Returns a boolean indicating if the first argument is greater than the second
  */
 var greaterThan = curry((x, y) => x > y);
 
