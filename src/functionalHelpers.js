@@ -206,7 +206,7 @@ var getWith = curry((prop, obj) => obj[prop]);
 /**
  * @signature greaterThan :: Number -> Number -> Boolean
  * @description Accepts any two strings or numbers and returns the result of using the
- * greater than operator on the two arguments. The is performed as: x > y where 'x' is the
+ * greater than operator on the two arguments. The operation is performed as: x > y where 'x' is the
  * first argument and 'y' is the second.
  * @kind function
  * @function greaterThan
@@ -218,23 +218,28 @@ var greaterThan = curry((x, y) => x > y);
 
 /**
  * @signature greaterThanOrEqual :: Number -> Number -> Boolean
- * @description d
+ * @description Accepts any two strings or numbers and returns the result of using the
+ * 'greater than or equal to' operator on the two arguments. The operation is performed
+ * as: x >= y where 'x' is the first argument and 'y' is the second.
  * @kind function
  * @function greaterThanOrEqual
- * @param {string | number} x - a
- * @param {string | number} y - b
- * @return {boolean} - c
+ * @param {string | number} x - A number or string value
+ * @param {string | number} y - A number or string value
+ * @return {boolean} - Returns a boolean indicating if the first argument is greater than or
+ * equal to the second.
  */
 var greaterThanOrEqual = curry((x, y) => x >= y);
 
 /**
  * @signature has :: String -> Object -> Boolean
- * @description d
+ * @description Determines if an object has a specified own property.
  * @kind function
  * @function has
- * @param {string} prop - a
- * @param {object} obj - b
- * @return {boolean} - c
+ * @param {string} prop - The property to check for 'own' ownership
+ * @param {object} obj - The object to check
+ * @return {boolean} - Returns a boolean indicating if the object has the property
+ * as it's own; i.e. assigned to the object itself, not found in the object's
+ * prototype chain.
  */
 var has = curry(function _has(prop, obj) {
     return obj.hasOwnProperty(prop);
@@ -242,12 +247,13 @@ var has = curry(function _has(prop, obj) {
 
 /**
  * @signature inObject :: String -> Object -> Boolean
- * @description d
+ * @description Determines if a specified property can be found 'in' a given object.
  * @kind function
  * @function inObject
- * @param {string} key - a
- * @param {object} obj - b
- * @return {boolean} - c
+ * @param {string} prop - The property to check existence
+ * @param {object} obj - The object to check
+ * @return {boolean} - Returns a boolean indicating if the object has the property
+ * assigned directly to it, or if it exists in the object's prototype chain.
  */
 var inObject = curry(function _inObject(prop, obj) {
     return prop in obj;
@@ -255,49 +261,51 @@ var inObject = curry(function _inObject(prop, obj) {
 
 /**
  * @signature invoke :: Function -> *
- * @description d
- * @param {function|generator} fn - a
- * @return {*} - b
+ * @description Accepts a single function and invokes it with no arguments. Good for getting an
+ * iterator from a generator function.
+ * @param {function|generator} fn - The function to be invoked
+ * @return {*} - Returns the return value of the invoked function
  */
 var invoke = fn => fn();
 
 /**
  * @signature isArray :: a -> Boolean
- * @description d
- * @param {*} data - a
- * @return {boolean} - b
+ * @description Accepts any value and returns a boolean indicating if it is an array
+ * @param {*} data - Any value
+ * @return {boolean} - Returns 'true' if the value is an array, 'false' otherwise
  */
 var isArray = data => Array.isArray(data);
 
 /**
  * @signature isBoolean :: * -> Boolean
- * @description d
- * @param {*} [bool] - a
- * @return {boolean} - b
+ * @description Accepts any value and returns a boolean indicating if it is a boolean
+ * @param {*} [bool] - Any value
+ * @return {boolean} - Returns 'true' if the value is an array, 'false' otherwise
  */
 var isBoolean = bool => javaScriptTypes.Boolean === type(bool);
 
 /**
  * @signature isFunction :: a -> Boolean
- * @description d
- * @param {function} [fn] - a
- * @return {boolean} - b
+ * @description Accepts any value and returns a boolean indicating if it is a function
+ * @param {function} [fn] - Any value
+ * @return {boolean} - Returns 'true' if the value is a function, 'false' otherwise
  */
 var isFunction = fn => javaScriptTypes.Function === type(fn);
 
 /**
  * @signature isObject :: a -> Boolean
- * @description d
- * @param {*} [item] - a
- * @return {boolean} - b
+ * @description Accepts any value and returns a boolean indicating if it is an object
+ * @param {*} [item] - Any value
+ * @return {boolean} - Returns 'true' if the value is an object, 'false' otherwise
  */
 var isObject = item => javaScriptTypes.Object === type(item) && null !== item;
 
 /**
  * @signature isPrimitive :: * -> Boolean
- * @description d
- * @param {*} [item] - a
- * @return {boolean} - b
+ * @description Accepts any value and returns a boolean indicating if it is a primitive value
+ * @param {*} [item] - Any value
+ * @return {boolean} - Returns 'true' if the value is primitive (i.e. number, string, boolean, null, undefined),
+ * 'false' otherwise
  */
 function isPrimitive(item) {
     var itemType = type(item);
@@ -306,57 +314,57 @@ function isPrimitive(item) {
 
 /**
  * @signature isNothing :: * -> Boolean
- * @description d
- * @param {*} [x] - a
- * @return {boolean} - b
+ * @description Accepts any value and returns a boolean indicating if it is 'null' or 'undefined'
+ * @param {*} [x] - Any value
+ * @return {boolean} - Returns 'true' if the value is 'null' or 'undefined', 'false' otherwise
  */
 var isNothing = x => null == x;
 
 /**
  * @signature isNull :: * -> Boolean
- * @description d
- * @param {*} [n] - a
- * @return {string|boolean} - b
+ * @description Accepts any value and returns a boolean indicating if it is null
+ * @param {*} [n] - Any value
+ * @return {boolean} - Returns 'true' if the value is 'null', 'false' otherwise
  */
 var isNull = n => null === n;
 
 /**
  * @signature isNumber :: * -> Boolean
- * @description d
- * @param {*} [num] - a
- * @return {boolean} - b
+ * @description Accepts any value and returns a boolean indicating if it is a number
+ * @param {*} [num] - Any value
+ * @return {boolean} - Returns 'true' if the value is a number, 'false' otherwise
  */
 var isNumber = num => javaScriptTypes.Number == type(num);
 
 /**
  * @signature isSomething :: * -> Boolean
- * @description d
- * @param {*} [x] - a
- * @return {boolean} - b
+ * @description Accepts any value and returns a boolean indicating if it is not 'null' or 'undefined'
+ * @param {*} [x] - Any value
+ * @return {boolean} - Returns 'true' if the value is not 'null' or 'undefined', 'false' otherwise
  */
 var isSomething = x => null != x;
 
 /**
  * @signature isString :: * -> Boolean
- * @description d
- * @param {string} str - a
- * @return {boolean} - b
+ * @description Accepts any value and returns a boolean indicating if it is a string
+ * @param {string} str - Any value
+ * @return {boolean} - Returns 'true' if the value is a string, 'false' otherwise
  */
 var isString = str => javaScriptTypes.String === type(str);
 
 /**
  * @signature isSymbol :: * -> Boolean
- * @description d
- * @param {*} [sym] - a
- * @return {boolean} - b
+ * @description Accepts any value and returns a boolean indicating if it is a symbol
+ * @param {*} [sym] - Any value
+ * @return {boolean} - Returns 'true' if the value is a symbol, 'false' otherwise
  */
 var isSymbol = sym => javaScriptTypes.Symbol === type(sym);
 
 /**
  * @signature isUndefined :: * -> Boolean
- * @description d
- * @param {*} [u] - a
- * @return {boolean} - b
+ * @description Accepts and value and returns a boolean indicating if it is 'undefined'
+ * @param {*} [u] - Any value
+ * @return {boolean} - Returns 'true' if the value is 'undefined', 'false' otherwise
  */
 var isUndefined = u => javaScriptTypes.Undefined === type(u);
 
