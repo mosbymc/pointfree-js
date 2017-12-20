@@ -370,35 +370,42 @@ var isUndefined = u => javaScriptTypes.Undefined === type(u);
 
 /**
  * @signature lessThan :: Number -> Number -> Boolean
- * @description d
+ * @description Accepts any two strings or numbers and returns the result of using the
+ * less than operator on the two arguments. The operation is performed as: x < y where 'x' is the
+ * first argument and 'y' is the second.
  * @kind function
  * @function lessThan
- * @param {string | number} x - a
- * @param {string | number} y - b
- * @return {boolean} - c
+ * @param {string | number} x - Any number or string
+ * @param {string | number} y - Any number or string
+ * @return {boolean} Returns a boolean value indicating if the first value is less than the second.
  */
 var lessThan = curry((x, y) => x < y);
 
 /**
  * @signature lessThanOrEqual :: Number -> Number -> Boolean
- * @description d
+ * @description Accepts any two strings or numbers and returns the result of using the
+ * less than or equal operator on the two arguments. The operation is performed as:
+ * x <= y where 'x' is the first argument and 'y' is the second.
  * @kind function
  * @function lessThanOrEqual
- * @param {string | number} x - a
- * @param {string | number} y - b
- * @return {boolean} - c
+ * @param {string | number} x - Any number or string
+ * @param {string | number} y - Any number or string
+ * @return {boolean} - Returns a boolean value indicating if the first value is less
+ * than or equal to the second.
  */
 var lessThanOrEqual = curry((x, y) => x <= y);
 
 /**
  * @signature * -> * -> Map -> Map
- * @description d
+ * @description Accepts a a key-value pair to either insert into a map, or updating
+ * an existing entry. A new map is created with the inserted/updated value, and the
+ * original map is left unmodified.
  * @kind function
  * @function mapSet
- * @param {*} key - a
- * @param {*} val - b
- * @param {Map} xs - c
- * @return {Map} - d
+ * @param {*} key - The key to which the new value should be associated
+ * @param {*} val - The value to insert into/update the map
+ * @param {Map} xs - The map object to be updated
+ * @return {Map} - Returns a new map object with the kvp set as specified
  */
 var mapSet = curry(function _mapSet(key, val, xs) {
     var ret = new Map();
@@ -410,43 +417,53 @@ var mapSet = curry(function _mapSet(key, val, xs) {
 });
 
 /**
- * @signature modulus :: Number -> Number -> Number
- * @description d
+ * @signature modulus :: Integer -> Integer -> Integer
+ * @description Accepts any two integers and returns the result of modulating the
+ * first integer with the second. This is different from the 'remainder' function
+ * in that the sign of the remainder is returned 'correctly' according to a modulus
+ * operation; i.e. the sign is taken from the divisor, not the dividend.
+ * @see remainder
  * @kind function
  * @function modulus
- * @param {number} x - a
- * @param {number} y - b
- * @return {number} - c
+ * @param {Integer} x - Any integer
+ * @param {Integer} y - Any integer
+ * @return {Integer} - Returns the remainder of modulating the first integer by the second
  */
-var modulus = curry((x, y) => x % y);
+var modulus = curry(function _modulus(x, y) {
+    let sign = !!((0 > x) ^ (0 > y)) ? -1 : 1;
+    return sign * remainder(x, y);
+});
 
 /**
  * @signature multiply :: Number -> Number -> Number
- * @description d
+ * @description Accepts and two numbers and returns the result of multiplying them together
  * @kind function
  * @function multiply
- * @param {number} x - a
- * @param {number} y - b
- * @return {number} - c
+ * @param {number} x - Any number
+ * @param {number} y - Any number
+ * @return {number} - Returns the result of multiplying 'x' by 'y'
  */
 var multiply = curry((x, y) => x * y);
 
 /**
  * @signature negate :: Number -> Number
- * @description d
- * @param {number} x - a
- * @return {number} - b
+ * @description Accepts a single number or boolean value and flips its sign; i.e. a positive
+ * number will become negative and a negative number will become positive in the case of numbers,
+ * and 'true' will become 'false', and 'false' will become 'true' in the case of booleans.
+ * @param {Number|Boolean} x - Any number or boolean value
+ * @return {Number|Boolean} - Returns a negated numeric value or an inverted boolean value
  */
 var negate = x => -x;
 
 /**
  * @signature notEqual :: * -> * -> -> Boolean
- * @description d
+ * @description Accepts any two value and returns the result of applying the loose not
+ * equal operator on them.
  * @kind function
  * @function notEqual
- * @param {*} - a
- * @param {*} - b
- * @return {boolean} - c
+ * @param {*} - Any value
+ * @param {*} - Any value
+ * @return {boolean} - Returns 'true' if the value are loose not equal, 'false' otherwise
  */
 var notEqual = curry((x, y) => x != y);
 
@@ -516,6 +533,16 @@ function once(fn) {
  * @return {boolean} - c
  */
 var or = curry((a, b) => !!(a || b));
+
+/**
+ * @signature
+ * @description
+ * @kind function
+ * @param {Integer} x - a
+ * @param {Integer} y - b
+ * @return {Integer} - c
+ */
+var remainder = curry((x, y) => x % y);
 
 /**
  * @signature
@@ -609,5 +636,5 @@ var wrap = data => [data];
 export { add, adjust, and, arraySet, both, concat, defaultPredicate, delegatesFrom, delegatesTo, divide, either, equals,
         falsey, flip, getWith, greaterThan, greaterThanOrEqual, has, inObject, invoke, isArray, isBoolean, isFunction,
         isObject, isPrimitive, isNothing, isNull, isNumber, isSomething, isString, isSymbol, isUndefined, lessThan,
-        lessThanOrEqual, mapSet, modulus, multiply, negate, notEqual, noop, nth, objectSet, once, or, reverse, setSet,
-        strictEquals, strictNotEqual, subtract, truthy, type, wrap };
+        lessThanOrEqual, mapSet, modulus, multiply, negate, notEqual, noop, nth, objectSet, once, or, remainder, reverse,
+        setSet, strictEquals, strictNotEqual, subtract, truthy, type, wrap };

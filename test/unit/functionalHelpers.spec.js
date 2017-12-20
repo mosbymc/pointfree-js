@@ -1,8 +1,8 @@
 import { add, adjust, and, arraySet, both, concat, defaultPredicate, delegatesFrom, delegatesTo, divide, either, equals,
         falsey, flip, getWith, greaterThan, greaterThanOrEqual, has, inObject, invoke, isArray, isBoolean, isFunction,
         isObject, isNothing, isNull, isNumber, isPrimitive, isSomething, isString, isSymbol, isUndefined, lessThan,
-        lessThanOrEqual, mapSet, modulus, multiply, negate, notEqual, noop, nth, objectSet, once, or, reverse, setSet,
-        strictEquals, strictNotEqual, subtract, truthy, type, wrap } from '../../src/functionalHelpers';
+        lessThanOrEqual, mapSet, modulus, multiply, negate, notEqual, noop, nth, objectSet, once, or, remainder, reverse,
+        setSet, strictEquals, strictNotEqual, subtract, truthy, type, wrap } from '../../src/functionalHelpers';
 import { identity, curry, ifElse } from '../../src/combinators';
 import { not } from '../../src/decorators';
 import { testData } from '../testData';
@@ -563,6 +563,10 @@ describe('Test functional helpers', function _testFunctionalHelpers() {
             modulus(10, 2).should.eql(0);
             modulus(10, 3).should.eql(1);
             modulus(100, 7).should.eql(2);
+            modulus(7, -2).should.eql(-1);
+            modulus(-7, 2).should.eql(1);
+            modulus(-7, -2).should.eql(-1);
+            modulus(7, 2).should.eql(1);
         });
     });
 
@@ -652,6 +656,19 @@ describe('Test functional helpers', function _testFunctionalHelpers() {
             var orResult = or(false, 0);
             orResult.should.be.a('boolean');
             orResult.should.eql(false);
+        });
+    });
+
+    describe('Test remainder', function _testRemainder() {
+        it('should return the remainder after division', function _testRemainder() {
+            remainder(2, 1).should.eql(0);
+            remainder(10, 2).should.eql(0);
+            remainder(10, 3).should.eql(1);
+            remainder(100, 7).should.eql(2);
+            remainder(7, -2).should.eql(1);
+            remainder(-7, 2).should.eql(-1);
+            remainder(-7, -2).should.eql(-1);
+            remainder(7, 2).should.eql(1);
         });
     });
 
