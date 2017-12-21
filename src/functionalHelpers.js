@@ -476,13 +476,16 @@ var notEqual = curry((x, y) => x != y);
 function noop() {}
 
 /**
- * @signature
- * @description d
+ * @signature Integer -> * -> *
+ * @description Accepts an integer offset from the zeroth index of an array or string
+ * and an array or string and returns the value at the specified offset. Negative integers
+ * can be used to count backwards from the end of the array or string.
  * @kind function
  * @function nth
- * @param {number} offset - a
- * @param {Array} List - b
- * @return {*} - c
+ * @param {number} offset - An integer zero-based offset
+ * @param {Array|String} List - An array list or string
+ * @return {*} - Returns either the item at the specified index of the array or the character
+ * at the specified index of the string.
  */
 var nth = curry(function nth(offset, list) {
     var idx = 0 > offset ? list.length + offset : offset;
