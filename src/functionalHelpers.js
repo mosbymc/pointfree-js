@@ -493,14 +493,17 @@ var nth = curry(function nth(offset, list) {
 });
 
 /**
- * @signature
- * @description d
+ * @signature String -> * -> {} -> {}
+ * @description Accepts a property name, value, and object and will return a new object
+ * with the value provided assigned to the specified property. The original object remains
+ * unchanged.
  * @kind function
  * @function objectSet
- * @param {string} prop - a
- * @param {*} val - b
- * @param {object} obj - c
- * @return {object} - d
+ * @param {String} prop - The name of the property that the value should be assigned to
+ * @param {*} val - The value that should be assigned to the property name
+ * @param {Object} obj - The object to clone and update
+ * @return {Object} - Returns a cloned version of the provided object with the exception
+ * of the addition/update of the specified property.
  */
 var objectSet = curry(function _objectSet(prop, val, obj) {
     var result = shallowClone(obj);
