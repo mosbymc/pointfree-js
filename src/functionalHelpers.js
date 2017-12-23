@@ -72,7 +72,7 @@ var arraySet = curry(function _arraySet(idx, x, list) {
 });
 
 /**
- * @signature both :: () -> () -> [*] -> Boolean
+ * @signature both :: (*... -> a) -> ((*... -> b) -> ((*... -> Boolean)))
  * @description Accepts two functions as arguments and returns a function waiting to be invoked.
  * Any arguments passed to the returned function will be passed to the initial two function arguments
  * during invocation. If the result of both of the two function arguments is truthy, the result will
@@ -512,10 +512,13 @@ var objectSet = curry(function _objectSet(prop, val, obj) {
 });
 
 /**
- * @signature
- * @description d
- * @param {function} fn - a
- * @return {function} - b
+ * @signature () -> ()
+ * @description Accepts a function and returns a function awaiting invocation with zero or more
+ * arguments. When the returned function is invoked, it will in turn invoke the provided function
+ * with whatever arguments were passed to it. Subsequent invocation will not cause the provided
+ * function to be executed again and 'undefined' will be returned.
+ * @param {function} fn - A function that should only ever be invoked once
+ * @return {function} - Returns a function awaiting invocation
  */
 function once(fn) {
     var invoked = false,
@@ -530,31 +533,38 @@ function once(fn) {
 }
 
 /**
- * @signature or :: (*... -> a) -> ((*... -> b) -> ((*... -> Boolean)))
- * @description d
+ * @signature or :: * -> * -> -> Boolean
+ * @description Accepts any two arguments and returns a boolean value based on
+ * either of the two arguments being truthy
  * @kind function
  * @function or
- * @param {*} a - a
- * @param {*} b - b
- * @return {boolean} - c
+ * @param {*} a - Any value
+ * @param {*} b - Any value
+ * @return {boolean} Returns 'true' if either argument is truthy, 'false' otherwise
  */
 var or = curry((a, b) => !!(a || b));
 
 /**
- * @signature
- * @description
+ * @signature Integer -> Integer -> Integer
+ * @description Accepts two integer arguments and returns the remainder after dividing
+ * the first integer by the second. This is different from the {@link remainder} function
+ * in that the sign of the remainder is not changed to a true modulus remainder sign and
+ * is instead based in the dividend, not the divisor.
+ * @see modulus
  * @kind function
- * @param {Integer} x - a
- * @param {Integer} y - b
- * @return {Integer} - c
+ * @param {Integer} x - Any integer
+ * @param {Integer} y - Any integer
+ * @return {Integer} Returns the remainder of a division operation
  */
 var remainder = curry((x, y) => x % y);
 
 /**
- * @signature
- * @description d
- * @param {Array|String|*} args - a
- * @return {Array|String} - b
+ * @signature reverse :: *... -> Array
+ * @description Accepts either an array of arguments, a string, or several individual
+ * arguments and returns an array of arguments in reverse order they were received.
+ * @param {Array|String|*} args - An array, string, or several individual arguments
+ * @return {Array|String} - Returns a string if a string was received, or an array; all
+ * values are returned in reverse order they were received
  */
 function reverse(...args) {
     if (1 === args.length) {
