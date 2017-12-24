@@ -396,7 +396,7 @@ var lessThan = curry((x, y) => x < y);
 var lessThanOrEqual = curry((x, y) => x <= y);
 
 /**
- * @signature * -> * -> Map -> Map
+ * @signature mapSet -> * -> * -> Map -> Map
  * @description Accepts a a key-value pair to either insert into a map, or updating
  * an existing entry. A new map is created with the inserted/updated value, and the
  * original map is left unmodified.
@@ -476,7 +476,7 @@ var notEqual = curry((x, y) => x != y);
 function noop() {}
 
 /**
- * @signature Integer -> * -> *
+ * @signature nth :: Integer -> * -> *
  * @description Accepts an integer offset from the zeroth index of an array or string
  * and an array or string and returns the value at the specified offset. Negative integers
  * can be used to count backwards from the end of the array or string.
@@ -493,7 +493,7 @@ var nth = curry(function nth(offset, list) {
 });
 
 /**
- * @signature String -> * -> {} -> {}
+ * @signature objectSet :: String -> * -> {} -> {}
  * @description Accepts a property name, value, and object and will return a new object
  * with the value provided assigned to the specified property. The original object remains
  * unchanged.
@@ -512,7 +512,7 @@ var objectSet = curry(function _objectSet(prop, val, obj) {
 });
 
 /**
- * @signature () -> ()
+ * @signature once :: (*... -> a) -> (*... -> a) -> a
  * @description Accepts a function and returns a function awaiting invocation with zero or more
  * arguments. When the returned function is invoked, it will in turn invoke the provided function
  * with whatever arguments were passed to it. Subsequent invocation will not cause the provided
@@ -545,7 +545,7 @@ function once(fn) {
 var or = curry((a, b) => !!(a || b));
 
 /**
- * @signature Integer -> Integer -> Integer
+ * @signature remainder :: Integer -> Integer -> Integer
  * @description Accepts two integer arguments and returns the remainder after dividing
  * the first integer by the second. This is different from the {@link remainder} function
  * in that the sign of the remainder is not changed to a true modulus remainder sign and
@@ -593,34 +593,40 @@ var setSet = curry(function _setSet(oldVal, newVal, set) {
 
 /**
  * @signature strictEquals :: * -> * -> Boolean
- * @description d
+ * @description Accepts any two values and returns a boolean indicating
+ * strict equality between them.
  * @kind function
  * @function strictEquals
- * @param {*} x - a
- * @param {*} y - b
- * @return {boolean} - c
+ * @param {*} x - Any value
+ * @param {*} y - Any value
+ * @return {boolean} - Returns 'true' if both arguments are strictly equals,
+ * 'false' otherwise
  */
 var strictEquals = curry((x, y) => x === y);
 
 /**
  * @signature strictNotEquals :: * -> * -> boolean
- * @description d
+ * @description Accepts any two arguments and returns a boolean indicating
+ * strict inequality between them
  * @kind function
  * @function strictNotEqual
- * @param {*} x - a
- * @param {*} y - b
- * @return {boolean} - c
+ * @param {*} x - Any value
+ * @param {*} y - Any value
+ * @return {boolean} - Returns 'true' if both arguments are strictly not equal,
+ * 'false' otherwise
  */
 var strictNotEqual = curry((x, y) => x !== y);
 
 /**
  * @signature subtract :: number -> number -> number
- * @description d
+ * @description Accepts two numbers and returns the result of subtracting the
+ * second number from the first.
  * @kind function
  * @function subtract
- * @param {number} x - a
- * @param {number} y - b
- * @return {number} - c
+ * @param {number} x - Any number
+ * @param {number} y - Any number
+ * @return {number} Returns a the result of subtracting the second number from
+ * the first number
  */
 var subtract = curry((x, y) => x - y);
 
