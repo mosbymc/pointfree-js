@@ -632,9 +632,9 @@ var subtract = curry((x, y) => x - y);
 
 /**
  * @signature truthy :: * -> boolean
- * @description d
- * @param {*} x - a
- * @return {boolean} - b
+ * @description Accepts any value and returns a boolean indicating the 'truthiness' of the value
+ * @param {*} x - Any value
+ * @return {boolean} - Returns 'true' if the value is 'truthy', 'false' otherwise
  */
 var truthy = x => flip(flip(x));
 
