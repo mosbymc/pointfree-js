@@ -640,9 +640,9 @@ var truthy = x => flip(flip(x));
 
 /**
  * @signature type :: * -> string
- * @description d
- * @param {*} a - a
- * @return {string} - b
+ * @description Accepts any value and returns the string-valued 'typeof' operator use on that argument
+ * @param {*} a - Any value
+ * @return {string} - Returns the result of using the 'typeof' operator on the provided argument
  */
 var type = a => typeof a;
 
@@ -650,7 +650,7 @@ var type = a => typeof a;
  * @signature wrap :: a -> [a]
  * @description Takes any value of any type and returns an array containing
  * the value passed as its only item
- * @param {*} data - Any value, any type
+ * @param {*} data - Any value
  * @return {Array} - Returns an array of any value, any type
  */
 var wrap = data => [data];
