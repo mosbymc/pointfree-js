@@ -575,12 +575,13 @@ function reverse(...args) {
 
 /**
  * @signature setSet :: * -> * -> Set -> Set
- * @description d
+ * @description Accepts a property key and object and will return a new Set object
+ * with the key provided. The original Set object remains unchanged.
  * @kind function
  * @function setSet
- * @param {*} val - a
- * @param {Set} set - b
- * @return {Set} - c
+ * @param {*} val - 
+ * @param {Set} set - The set object to clone, update, and return
+ * @return {Set} - Returns a cloned set with the new key added to it
  */
 var setSet = curry(function _setSet(oldVal, newVal, set) {
     var ret = new Set();
