@@ -579,7 +579,7 @@ function reverse(...args) {
  * with the key provided. The original Set object remains unchanged.
  * @kind function
  * @function setSet
- * @param {*} val - 
+ * @param {*} val -
  * @param {Set} set - The set object to clone, update, and return
  * @return {Set} - Returns a cloned set with the new key added to it
  */
