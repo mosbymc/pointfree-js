@@ -87,7 +87,7 @@ describe('List functor test', function _testListFunctor() {
         });
 
         it('should return an ordered list delegator', function _testOrderedListCreationFunctionProperties() {
-            var l1 = List.empty,
+            var l1 = List.empty(),
                 l2 = List.just(1),
                 l3 = List.ordered([1, 2, 3, 4, 5], x => x);
 
@@ -973,7 +973,7 @@ describe('List functor test', function _testListFunctor() {
                 List([1, 2, 3, 4])
                     .isEmpty().should.be.false;
 
-                List.empty.isEmpty().should.be.true;
+                List.empty().isEmpty().should.be.true;
             });
 
             it('should return the last item in the list that matches the predicate', function _testLast() {
@@ -1122,7 +1122,7 @@ describe('List functor test', function _testListFunctor() {
 
                 predSpy.callCount.should.eql(54);
 
-                var list2 = List.empty;
+                var list2 = List.empty();
                 for (let item of list) {
                     list2 = list2.concat(item);
                 }

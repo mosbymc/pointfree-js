@@ -136,7 +136,9 @@ var list_core = {
 
     /**
      * @signature () -> dataStructures.list_core
-     * @description d
+     * @description Chains a list-returning function over each individual item in
+     * the list and returns a new list without the nesting that would normally occur
+     * if map was invoked instead.
      * @memberOf dataStructures.list_core
      * @instance
      * @function chain
@@ -150,10 +152,9 @@ var list_core = {
 
     /**
      * @signature [...iterable] -> dataStructures.list_core
-     * @description Concatenates two or more lists by appending the "method's" List argument(s) to the
-     * List's value. This function is a deferred execution call that returns
-     * a new queryable object delegator instance that contains all the requisite
-     * information on how to perform the operation.
+     * @description Concatenates two lists by appending the the provided List to the
+     * current List. This function is a deferred execution call that returns
+     * a new List containing the values of both Lists.
      * @memberOf dataStructures.list_core
      * @instance
      * @function concat
@@ -167,7 +168,10 @@ var list_core = {
 
     /**
      * @signature
-     * @description d
+     * @description Functions similar to {@link List#concat}, except it one or more
+     * Lists may be provided as arguments and each one will be appended to the current
+     * List's data in the ordered they are provided. List {@link List#concat}, this
+     * function is a deferred execution call that returns a new List.
      * @memberOf dataStructures.list_core
      * @instance
      * @function concatAll
@@ -180,7 +184,13 @@ var list_core = {
     },
 
     /**
-     * @description d
+     * @description This function only works if using the List as a contravariant. It Accepts
+     * a single function that is used to contramap over the current List's source functions.
+     * The provided function is composed with each function in the current List to create a new
+     * function, which is returned to create a new List object. Essentially, contramap is mapping
+     * over the output of the current List's function once it is applied to a data-containing List.
+     * This function property is a deferred execution function.
+     * the provided function argument
      * @param {function} fn - a
      * @return {Proxy.<dataStructures.list_core>|dataStructures.list_core|dataStructures.list|dataStructures.ordered_list} b
      */
@@ -190,7 +200,7 @@ var list_core = {
 
     /**
      * @signature
-     * @description d
+     * @description a
      * @memberOf dataStructures.list_core
      * @instance
      * @function copyWithin
@@ -574,7 +584,7 @@ var list_core = {
      * @return {dataStructures.list_core} - b
      */
     take: function _take(amt) {
-        if (!amt) return List.empty;
+        if (!amt) return List.empty();
         var count = 0 < amt ? -1 : 1;
         return 0 < amt ? this.takeWhile(idx => ++count < amt) : this.reverse().takeWhile(idx => --count > amt).reverse();
     },
@@ -1086,7 +1096,7 @@ var list_core = {
      * @return {list} - c
      */
     traverse: function _traverse(f, g) {
-        return this.foldl((ys, x) => ys.apply(g(x).map(x => y => y.concat([x]))), f(List.empty));
+        return this.foldl((ys, x) => ys.apply(g(x).map(x => y => y.concat([x]))), f(List.empty()));
     },
 
     /**
@@ -1420,6 +1430,9 @@ function List(source) {
     return ifElse(isList, identity, ifElse(delegatesFrom(generatorProto), listFromGen, listFromNonGen), source);
 }
 
+let emptyList = createList([], null,
+    [createSortObject(identity, defaultPredicate, sortDirection.ascending)]);
+
 var isOneArg = args => 1 === args.length;
 var isList = val => delegatesFrom(list_core, val);
 var isOneArgAndAList = args => !!(isOneArg(args) && isList(args[0]));
@@ -1439,7 +1452,9 @@ List.from = (...source) => ifElse(isOneArgAndAList, constant(...source), createL
 
 /**
  * @signature
- * @description Alias for List.from
+ * @description Creates a new list from all the arguments provided. If a single argument, that is not
+ * a list, is provided to List.of, an ordered list will be returned. Otherwise, each individual argument
+ * will be used provided to the function will be used as the source of the new list.
  * @memberOf dataStructures.List
  * @static
  * @function of
@@ -1468,14 +1483,14 @@ List.ordered = (source, selector, comparer = defaultPredicate) => createList(sou
     [createSortObject(selector, comparer, sortDirection.ascending)]);
 
 /**
- * @description Holds a reference to an empty, ordered list.
+ * @description Returns an empty, 'ordered' list. No arguments are accepted.
  * @memberOf dataStructures.List
- * @property {Object} empty
  * @see ordered_list
- * @kind {Object}
+ * @static
+ * @function empty
+ * @return {Object} Returns an empty list
  */
-List.empty = createList([], null,
-    [createSortObject(identity, defaultPredicate, sortDirection.ascending)]);
+List.empty = () => emptyList;
 
 /**
  * @description Holds a reference to an empty, ordered list
@@ -1503,7 +1518,7 @@ List.just = val => createList([val], null,
 /**
  * @signature
  * @description Takes a function and a seed value. The function is used to 'unfold' the seed value
- * into an array which is used as the source of a new List monad.
+ * into an array which is used as the source of a new List data structure.
  * @memberOf dataStructures.List
  * @static
  * @function unfold
