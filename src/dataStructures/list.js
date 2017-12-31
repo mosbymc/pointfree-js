@@ -228,7 +228,9 @@ var list_core = {
 
     /**
      * @signature (a -> boolean) -> List<b>
-     * @description d
+     * @description Accepts a single comparer function as an argument that determines if
+     * any two items of the List are equal. Only one of each distinct item is retained. If
+     * no argument is provided, strict equality between items is defaulted to.
      * @memberOf dataStructures.list_core
      * @instance
      * @function distinct
