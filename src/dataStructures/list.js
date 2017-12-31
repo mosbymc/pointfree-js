@@ -266,7 +266,11 @@ var list_core = {
 
     /**
      * @signature
-     * @description d
+     * @description Fills the List with any single, static value. An optional starting and ending
+     * indices may be provided to indicating at what index of the List to start filling it with the
+     * provided value and what index to stop. If no starting index is provided, the value will begin
+     * insertion at the start of the list; if no ending index is provided, the value will continue to
+     * be inserted from the start index to the last element in the list.
      * @memberOf dataStructures.list_core
      * @instance
      * @function fill
