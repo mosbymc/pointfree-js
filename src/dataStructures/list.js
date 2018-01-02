@@ -200,7 +200,8 @@ var list_core = {
 
     /**
      * @signature
-     * @description a
+     * @description Shallow copies part of the List to another segment within the list and returns a new List
+     * with the updated values.
      * @memberOf dataStructures.list_core
      * @instance
      * @function copyWithin
