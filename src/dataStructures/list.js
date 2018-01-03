@@ -129,6 +129,11 @@ var list_core = {
      * @this dataStructures.list_core
      * @param {dataStructures.list_core} l - a
      * @return {*} - b
+     *
+     * @example
+     * List([1, 2, 3, 4, 5])
+     *  .apply(List([x => x * x, x => x / 2, x => x * 5]))
+     *  .data => List([1, 1/2, 5, 4, 1, 10, 9, 3/2, 15, 16, 2, 20, 25, 5/2, 25])
      */
     apply: function _apply(l) {
         return createList(this, _iteratorWrapper(apply(this, l)));
@@ -145,6 +150,11 @@ var list_core = {
      * @this dataStructures.list_core
      * @param {function} fn - a
      * @return {list} - b
+     *
+     * @example
+     * List([1, 2, 3, 4, 5])
+     *  .chain(x => List.of(x * x))
+     *  .data => List([1, 4, 9, 16, 25])
      */
     chain: function _chain(fn) {
         return createList(this, _iteratorWrapper(chain(this, fn)));
@@ -161,6 +171,11 @@ var list_core = {
      * @this dataStructures.list_core
      * @param {Array | *} ys - a
      * @return {list} - b
+     *
+     * @example
+     * List([1, 2, 3, 4, 5])
+     *  .concat(List([6, 7, 8, 9, 10])
+     *  .data => List([1, 2, 3, 4, 5, 6, 7, 8, 9, 10])
      */
     concat: function _concat(ys) {
         return createList(this, _iteratorWrapper(concat(this, List.of(ys))));
@@ -579,6 +594,10 @@ var list_core = {
         return createList(this, _iteratorWrapper(slice(this, start, end)));
     },
 
+    /**
+     * @description d
+     * @return {dataStructures.list_core} a
+     */
     tail: function _tail() {
         return this.skip(1);
     },
