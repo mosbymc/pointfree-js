@@ -289,7 +289,10 @@ var list_core = {
 
     /**
      * @signature
-     * @description d
+     * @description Accepts a predicate function that is used to filter out all elements of
+     * the List that don't 'pass' the predicate. The function is called individually on each item
+     * of the List and only the items that get a 'true' response back from the predicate function
+     * are retained in the List.
      * @memberOf dataStructures.list_core
      * @instance
      * @function filter
