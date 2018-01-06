@@ -132,8 +132,7 @@ var list_core = {
      *
      * @example
      * List([1, 2, 3, 4, 5])
-     *  .apply(List([x => x * x, x => x / 2, x => x * 5]))
-     *  .data => List([1, 1/2, 5, 4, 1, 10, 9, 3/2, 15, 16, 2, 20, 25, 5/2, 25])
+     *  .apply(List([x => x * x, x => x / 2, x => x * 5]))     => List([1, 1/2, 5, 4, 1, 10, 9, 3/2, 15, 16, 2, 20, 25, 5/2, 25])
      */
     apply: function _apply(l) {
         return createList(this, _iteratorWrapper(apply(this, l)));
@@ -152,9 +151,7 @@ var list_core = {
      * @return {list} - b
      *
      * @example
-     * List([1, 2, 3, 4, 5])
-     *  .chain(x => List.of(x * x))
-     *  .data => List([1, 4, 9, 16, 25])
+     * List([1, 2, 3, 4, 5]).chain(x => List.of(x * x))     => List([1, 4, 9, 16, 25])
      */
     chain: function _chain(fn) {
         return createList(this, _iteratorWrapper(chain(this, fn)));
@@ -173,9 +170,7 @@ var list_core = {
      * @return {list} - b
      *
      * @example
-     * List([1, 2, 3, 4, 5])
-     *  .concat(List([6, 7, 8, 9, 10])
-     *  .data => List([1, 2, 3, 4, 5, 6, 7, 8, 9, 10])
+     * List([1, 2, 3, 4, 5]).concat(List([6, 7, 8, 9, 10])      => List([1, 2, 3, 4, 5, 6, 7, 8, 9, 10])
      */
     concat: function _concat(ys) {
         return createList(this, _iteratorWrapper(concat(this, List.of(ys))));
@@ -193,6 +188,10 @@ var list_core = {
      * @this list
      * @param {list|ordered_list} ys - One or more lists to concatenate with this list
      * @return {list} Returns a new list
+     *
+     * @example
+     * List([1, 2, 3, 4, 5])
+     *  .concatAll([6, ..., 10], List([11, ..., 15]), [16, ..., 20])    => List([1, 2, 3, 4, ... 18, 19, 20])
      */
     concatAll: function _concatAll(...ys) {
         return createList(this, _iteratorWrapper(concatAll(this, ys.map(y => List.of(y)))));
@@ -208,6 +207,11 @@ var list_core = {
      * the provided function argument
      * @param {function} fn - a
      * @return {Proxy.<dataStructures.list_core>|dataStructures.list_core|dataStructures.list|dataStructures.ordered_list} b
+     *
+     * @example
+     * List([1, 2, 3, 4, 5])
+     *  .apply(List([x => x * x, x => x + 10])
+     *  .contramap(x => x + 3))     => List([4, 7, 12, 19, 28, 14, 15, 16, 17, 18])
      */
     contramap: function _contramap(fn) {
         return createList(this, _iteratorWrapper(contramap(this, fn)));
