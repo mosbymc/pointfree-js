@@ -257,6 +257,10 @@ var list_core = {
      * @this dataStructures.list_core
      * @param {function} comparer - a
      * @return {list} - b
+     *
+     * @example
+     *  List([1, 1, 2, 2, 3, 3])
+     *      .distinct((x, y) => x === y)    => List([1. 2. 3])
      */
     distinct: function _distinct(comparer) {
         return createList(this, _iteratorWrapper(distinct(this, comparer)));
@@ -279,6 +283,10 @@ var list_core = {
      * @param {Array|generator} xs - a
      * @param {function} [comparer] - b
      * @return {list} - c
+     *
+     * @example
+     *  List([1. 2, 3, 4, 5, 6, 7, 8, 9, 10])
+     *      .except([2, 4, 6, 8, 10])   => L:st([1, 3, 5, 7, 9])
      */
     except: function _except(xs, comparer) {
         return createList(this, _iteratorWrapper(except(this, xs, comparer)));
@@ -318,6 +326,9 @@ var list_core = {
      * @this dataStructures.list_core
      * @param {function} predicate - a
      * @return {dataStructures.list_core} - b
+     *
+     * @example
+     *  List([1, 2, 3, 4, 5]).filter(x => 3 < x)    => List([4, 5])
      */
     filter: function _filter(predicate) {
         return createList(this, _iteratorWrapper(filter(this, predicate)));
