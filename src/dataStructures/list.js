@@ -344,6 +344,10 @@ var list_core = {
      * @param {function} keySelector - a
      * @param {function} [comparer] - b
      * @return {dataStructures.list_core} - c
+     *
+     * @example
+     * List([1, 2, 3, 3, 2, 2, 3, 1, 4])
+     *  .groupByDescending(x => x, (x, y) => x === y)  => List(List(1, 1), List(2, 2, 2), List(3, 3, 3), List(4))
      */
     groupBy: function _groupBy(keySelector, comparer) {
         return createList(this, _iteratorWrapper(groupBy(this, [createSortObject(keySelector, comparer, sortDirection.ascending)], createGroupedListDelegate)));
@@ -359,6 +363,10 @@ var list_core = {
      * @param {function} keySelector - a
      * @param {function} [comparer] - b
      * @return {dataStructures.list_core} - c
+     *
+     * @example
+     * List([1, 2, 3, 3, 2, 2, 3, 1, 4])
+     *  .groupByDescending(x => x, (x, y) => x === y)  => List(List(4), List(3, 3, 3), List(2, 2, 2), List(1, 1))
      */
     groupByDescending: function _groupByDescending(keySelector, comparer) {
         return createList(this, _iteratorWrapper(groupBy(this, [createSortObject(keySelector, comparer, sortDirection.descending)], createGroupedListDelegate)));
@@ -408,6 +416,10 @@ var list_core = {
      * @param {Array|generator} xs - a
      * @param {function} [comparer] - b
      * @return {dataStructures.list_core} - c
+     *
+     * @example
+     * List([1, 2, 3, 4, 5, 6])
+     *  .intersect(List([4, 5, 6, 7, 8, 9, 10], (x, y) => x === y)      => List(4, 5, 6)
      */
     intersect: function _intersect(xs, comparer) {
         return createList(this, _iteratorWrapper(intersect(this, xs, comparer)));
