@@ -347,7 +347,7 @@ var list_core = {
      *
      * @example
      * List([1, 2, 3, 3, 2, 2, 3, 1, 4])
-     *  .groupByDescending(x => x, (x, y) => x === y)  => List(List(1, 1), List(2, 2, 2), List(3, 3, 3), List(4))
+     *  .groupBy(x => x, (x, y) => x === y)  => List(List(1, 1), List(2, 2, 2), List(3, 3, 3), List(4))
      */
     groupBy: function _groupBy(keySelector, comparer) {
         return createList(this, _iteratorWrapper(groupBy(this, [createSortObject(keySelector, comparer, sortDirection.ascending)], createGroupedListDelegate)));
@@ -471,6 +471,9 @@ var list_core = {
      * @this dataStructures.list_core
      * @param {function} mapFunc - a
      * @return {dataStructures.list_core} - b
+     *
+     * @example
+     * List([1, 2, 3, 4, 5]).map(x => x * x)    => List(1, 4, 9, 16, 25)
      */
     map: function _map(mapFunc) {
         return createList(this, _iteratorWrapper(map(this, mapFunc)));
@@ -481,10 +484,13 @@ var list_core = {
      * @description d
      * @memberOf dataStructures.list_core
      * @instance
-     * @function mjoin
+     * @function join
      * @return {list} - a
+     *
+     * @example
+     * List([1, 2, 3, 4, 5]).map(x => List(x)).join()  => List(1, 2, 3, 4, 5)
      */
-    mjoin: function _mjoin() {
+    join: function _join() {
         return this.chain(x => x);
     },
 
@@ -520,6 +526,9 @@ var list_core = {
      * @this dataStructures.list_core
      * @param {Array|generator} xs - a
      * @return {dataStructures.list_core} - b
+     *
+     * @example
+     * List([1, 2, 3, 4, 5]).prepend([-2, -1, 0])   => List(-2, -1, 0, 1, 2, 3, 4, 5)
      */
     prepend: function _prepend(xs) {
         return createList(this, _iteratorWrapper(prepend(this, List.of(xs))));
@@ -534,11 +543,26 @@ var list_core = {
      * @this list
      * @param {Array|list|ordered_list} xs - A list
      * @return {list|ordered_list} Returns a new list
+     *
+     * @example
+     * List(6, 7, 8, 9).prependAll([0, 1, 2], [3, 4], [5])  => List(0, 1, 2, 3, 4, 5, 6, 7, 8, 9)
      */
     prependAll: function _prependAll(...xs) {
         return createList(this, _iteratorWrapper(prependAll(this, xs.map(x => List.of(x)))));
     },
 
+    /**
+     * @description d
+     * @member dataStructures.list_core
+     * @instance
+     * @function push
+     * @this dataStructures.list_core
+     * @param {*} items - a
+     * @return {dataStructures.list} - b
+     *
+     * @example
+     * List([1, 2, 3, 4, 5]).push(6)    => List(1, 2, 3, 4, 5, 6)
+     */
     push: function _push(...items) {
         return this.concat(items);
     },
@@ -553,11 +577,25 @@ var list_core = {
      * @external Array
      * @see {@link https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/reverse}
      * @return {dataStructures.list_core} - a
+     *
+     * @example
+     * List([1, 2, 3, 4, 5]).reverse()  => List(5, 3, 2, 2, 1)
      */
     reverse: function _reverse() {
         return createList(this, _iteratorWrapper(reverse(this)));
     },
 
+    /**
+     * @description d
+     * @memberOf dataStructures.list_core
+     * @instance
+     * @function shift
+     * @this dataStructures.list_core
+     * @return {dataStructures.list_core} a
+     *
+     * @example
+     * List([1, 2, 3, 4, 5]).shift()    => List(2, 3, 4, 5)
+     */
     shift: function _shift() {
         return this.skip(1);
     },
@@ -575,11 +613,14 @@ var list_core = {
      * @param {number} amt - The number of items in the source to skip before
      * returning the remainder.
      * @return {dataStructures.list_core} - a
+     *
+     * @example
+     * List([1, 2, 3, 4, 5]).skip(3)    => List(4, 5)
      */
     skip: function _skip(amt) {
         if (!amt) return this;
         var count = 0 < amt ? -1 : 1;
-        return 0 < amt ? this.skipWhile(idx => ++count < amt) : this.reverse().skipWhile(idx => --count > amt).reverse();
+        return 0 < amt ? this.skipWhile(() => ++count < amt) : this.reverse().skipWhile(() => --count > amt).reverse();
     },
 
     /**
@@ -591,6 +632,10 @@ var list_core = {
      * @this dataStructures.list_core
      * @param {function} [predicate] - a
      * @return {dataStructures.list_core} - b
+     *
+     * @example
+     * List([1, 2, 3, 4, 5, 6, 7, 8, 9, 10])
+     *  .skip(x => 5 > x)   => List(5, 6, 7, 8, 9, 10)
      */
     skipWhile: function _skipWhile(predicate = defaultPredicate) {
         return createList(this, _iteratorWrapper(skipWhile(this, predicate)));
@@ -617,13 +662,30 @@ var list_core = {
         return createList(this, _iteratorWrapper(slice(this, start, end)));
     },
 
+    /**
+     * @description d
+     * @memberOf dataStructures.list_core
+     * @instance
+     * @function splice
+     * @this dataStructures.list_core
+     * @param {Integer} start - a
+     * @param {Integer} end = b
+     * @return {dataStructures.list_core} c
+     */
     splice: function _splice(start, end) {
         return createList(this, _iteratorWrapper(slice(this, start, end)));
     },
 
     /**
      * @description d
+     * @memberOf dataStructures.list_core
+     * @instance
+     * @function tail
+     * @this dataStructures.list_core
      * @return {dataStructures.list_core} a
+     *
+     * @example
+     * List([1, 2, 3, 4, 5]).tail()     => List(2, 3, 4, 5)
      */
     tail: function _tail() {
         return this.skip(1);
@@ -638,11 +700,14 @@ var list_core = {
      * @this dataStructures.list_core
      * @param {number} amt - a
      * @return {dataStructures.list_core} - b
+     *
+     * @example
+     * List([1, 2, 3, 4, 5]).take(3)    => List(1, 2, 3)
      */
     take: function _take(amt) {
         if (!amt) return List.empty();
         var count = 0 < amt ? -1 : 1;
-        return 0 < amt ? this.takeWhile(idx => ++count < amt) : this.reverse().takeWhile(idx => --count > amt).reverse();
+        return 0 < amt ? this.takeWhile(() => ++count < amt) : this.reverse().takeWhile(() => --count > amt).reverse();
     },
 
     /**
@@ -654,6 +719,9 @@ var list_core = {
      * @this dataStructures.list_core
      * @param {function} [predicate] - a
      * @return {dataStructures.list_core} - b
+     *
+     * @example
+     * List([1, 2, 3, 4, 5]).takeWhile(x => 3 < x)      => List(1, 2)
      */
     takeWhile: function _takeWhile(predicate = defaultPredicate) {
         return createList(this, _iteratorWrapper(takeWhile(this, predicate)));
@@ -679,6 +747,15 @@ var list_core = {
         return createList(this, _iteratorWrapper(union(this, xs, comparer)));
     },
 
+    /**
+     * @description d
+     * @memberOf dataStructures.list_core
+     * @instance
+     * @function unshift
+     * @this dataStructures.list_core
+     * @param {*} items - a
+     * @return {dataStructures.list_core} b
+     */
     unshift: function _unshift(...items) {
         return this.prepend(items);
     },
@@ -780,6 +857,10 @@ var list_core = {
     /**
      * @signature
      * @description d
+     * @memberOf dataStructures.list_core
+     * @instance
+     * @function entries
+     * @this dataStructures.list_core
      * @external Array
      * @see {@link https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/entries}
      * @return {Iterator.<*>} Returns an iterator that contains the kvp's for
@@ -945,7 +1026,7 @@ var list_core = {
      * @return {string} Returns a string of each element in the list, optionally separated by
      * the provided delimiter.
      */
-    join: function _join(delimiter) {
+    arrayJoin: function _join(delimiter) {
         return this.data.join(delimiter);
     },
 
@@ -1001,6 +1082,7 @@ var list_core = {
      * @memberOf dataStructures.list_core
      * @instance
      * @function toArray
+     * @this dataStructures.list_core
      * @return {Array} - a
      */
     toArray: function _toArray() {
@@ -1020,6 +1102,7 @@ var list_core = {
      * @memberOf dataStructures.list_core
      * @instance
      * @function toEvaluatedList
+     * @this dataStructures.list_core
      * @return {list} - a
      */
     toEvaluatedList: function _toEvaluatedList() {
@@ -1032,6 +1115,7 @@ var list_core = {
      * @memberOf dataStructures.list_core
      * @instance
      * @function toMap
+     * @this dataStructures.list_core
      * @return {Map} - a
      */
     toMap: function _toMap() {
@@ -1046,6 +1130,7 @@ var list_core = {
      * @memberOf dataStructures.list_core
      * @instance
      * @function toSet
+     * @this dataStructures.list_core
      * @return {Set} - a
      */
     toSet: function _toSet() {
@@ -1073,6 +1158,7 @@ var list_core = {
      * @memberOf dataStructures.list_core
      * @instance
      * @function toString
+     * @this dataStructures.list_core
      * @return {string} Returns a string representation of the list. NOTE: This functionality
      * currently forces an evaluation of the pipelined operations.
      */
@@ -1126,6 +1212,7 @@ var list_core = {
      * @memberOf dataStructures.list_core
      * @instance
      * @function sequence
+     * @this dataStructures.list_core
      * @param {Object} p - Any pointed monad with a '#of' function property
      * @return {list} - b
      */
@@ -1146,6 +1233,7 @@ var list_core = {
      * @memberOf dataStructures.list_core
      * @instance
      * @function traverse
+     * @this dataStructures.list_core
      * @param {Object} f - A pointed monad with a '#of' function property. Used only in cases
      * where the mapping function cannot be run.
      * @param {function} g - b
@@ -1161,6 +1249,7 @@ var list_core = {
      * objectSet on the delegator at the time of creation.
      * @memberOf dataStructures.list_core
      * @instance
+     * @this dataStructures.list_core
      * @generator
      * @return {Array} - a
      */
@@ -1177,6 +1266,10 @@ var list_core = {
 
 /**
  * @description d
+ * @memberOf dataStructures.list_core
+ * @instance
+ * @function set
+ * @this dataStructures.list_core
  * @param {Number} idx - a
  * @param {*} val - b
  * @return {*} c
@@ -1192,6 +1285,10 @@ list_core.set = function _set(idx, val) {
 
 /**
  * @description d
+ * @memberOf dataStructures.list_core
+ * @instance
+ * @function get
+ * @this dataStructures.list_core
  * @param {Number} idx - a
  * @return {*} - b
  */
@@ -1207,6 +1304,7 @@ list_core.get = function _get(idx) {
  * @memberOf dataStructures.list_core
  * @instance
  * @function append
+ * @this dataStructures.list_core
  * @see dataStructures.list_core#concat
  * @param {Array | *} ys - a
  * @return {dataStructures.list_core} - b
@@ -1219,6 +1317,7 @@ list_core.append = list_core.concat;
  * @memberOf dataStructures.list_core
  * @instance
  * @function ap
+ * @this dataStructures.list_core
  * @see dataStructures.list_core#apply
  * @param {Object} ma - Any object with a map function - i.e. a monad.
  * @return {Object} Returns an instance of the monad object provide as an argument.
@@ -1231,6 +1330,7 @@ list_core.ap = list_core.apply;
  * @memberOf dataStructures.list_core
  * @instance
  * @function fmap
+ * @this dataStructures.list_core
  * @param {function} fn - a
  * @return {list} - b
  */
@@ -1242,6 +1342,7 @@ list_core.fmap = list_core.chain;
  * @memberOf dataStructures.list_core
  * @instance
  * @function fmap
+ * @this dataStructures.list_core
  * @param {function} fn - a
  * @return {list} - b
  */
@@ -1253,6 +1354,7 @@ list_core.flapMap = list_core.chain;
  * @memberOf dataStructures.list_core
  * @instance
  * @function bind
+ * @this dataStructures.list_core
  * @property {function} fn
  * @return {dataStructures.list_core} - Returns a new list monad
  */
