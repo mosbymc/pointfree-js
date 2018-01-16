@@ -1720,7 +1720,7 @@ List.repeat = function _repeat(item, count) {
 /**
  * @signature
  * @summary Extension function that allows new functionality to be applied to
- * the queryable object
+ * the list data structure
  * @memberOf dataStructures.List
  * @static
  * @function extend
@@ -1731,30 +1731,45 @@ List.repeat = function _repeat(item, count) {
  * @return {List} - a
  *
  * @description The fn parameter must be a non-generator function that takes one or more
- * arguments. If this new List function should be an immediately evaluated
- * function (like: foldl, any, reverse, etc.), it merely needs the accept one or more
- * arguments and know how to iterate the source. In the case of an immediately evaluated
- * function, the return type can be any javascript type. The first argument is always the
- * previous List instance that must be iterated. Additional arguments may be specified
- * if desired.
+ * arguments and returns a generator function. The first and only required argument that
+ * the wrapper function must accept is the list on which it will be operating. Any
+ * additional arguments supplied when invoking the new functionality on the list will
+ * be passed straight through in the order they were received by the list.
  *
- * If the function's evaluation should be deferred it needs to work a bit differently.
- * In this case, the function should accept one or more arguments, the first and only
- * required argument being the underlying source of the List object. This underlying
- * source can be anything with an iterator (generator, array, map, set, another list, etc.).
- * Any additional arguments that the function needs should be specified in the signature.
- * The return value of the function should be a generator that knows how to iterate the
- * underlying source. If the generator should operate like most List functions, i.e.
- * take a single item, process it, and then yield it out before asking for the next, a
- * for-of loop is the preferred method for employment. However, if the generator needs
- * all of the underlying data upfront (like orderBy and groupBy), Array.from is the
- * preferred method. Array.from will 'force' all the underlying List instances
- * to evaluate their data before it is handed over in full to the generator. The generator
- * can then act with full knowledge of the data and perform whatever operation is needed
- * before ultimately yielding out a single item at a time. If your extension function
- * needs to yield out all items at once, then that function is not a lazy evaluation
- * function and should be constructed like the immediately evaluated functions described
- * above.
+ * The returned generator will be set as the newly created list's iterator, just like the
+ * other built-in deferred functions. When iterating the returned generator, no arguments
+ * will be passed, so the wrapping function must provide a closure over all needed arguments
+ * by either explicitly naming them, or using the rest (...) operator and allowing the
+ * generator to determine what to do with the data present. The generator should not assume
+ * that the List argument provided will be any specific type of iterable as a List can use
+ * many different iterable sources like a generator, array, map, set, or another list.
+ *
+ * If each item can be operated on individually within the generator, a for-of loop is
+ * the preferred method of handling this operation. However, if the generator needs all
+ * the List's element's up front (like sortBy and groupBy), then the generator will need
+ * to force an evaluation in order to have all the data first. Array.from generally works
+ * well.
+ *
+ * However the data is retrieved, it should always be yielded out individually. If the data
+ * is grouped when yielding, any other generator's in the chain of operations that are waiting
+ * to execute will assume that each grouping is a single data point.
+ *
+ * @example
+ * //Outer function that accepts all arguments necessary for iteration and operation
+ * function takeEveryOtherOne(xs) {
+ *      //returns a generator function to be used as the new List's iterator when invoked
+ *      return function *_takeEveryOtherOne(xs) {
+ *          let idx = 0;
+ *          for (let x of xs) {
+ *              if (!(idx % 2)) yield x;
+ *              ++idx;
+ *          }
+ *      }
+ * }
+ *
+ * List.extend('everyOther', takeEveryOtherOne)
+ *
+ * List([1, 2, 3, 4, 5, 6, 7, 8, 9, 10]).everyOther()   => List(1, 3, 5, 7, 9)
  */
 List.extend = function _extend(prop, fn) {
     if (![list, ordered_list].some(type => prop in type)) {
