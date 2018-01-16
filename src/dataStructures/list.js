@@ -1661,14 +1661,16 @@ List.identity = List.empty;
 
 /**
  * @signature
- * @description Creates and returns a new {@link ordered_list} since a list with a single
- * item is trivially ordered.
+ * @description Accepts any single value and returns a new {@link ordered_list}
+ * since a list with a single item is trivially ordered. If an array, map, set, or
+ * list is passed as the argument, the entire data structure will be treated as a
+ * single element and the individual elements will be ignored.
  * @memberOf dataStructures.List
  * @static
  * @function just
  * @see List
- * @param {*} val - a
- * @return {ordered_list} - b
+ * @param {*} val - Any value
+ * @return {ordered_list} - Returns an ordered list with a single element
  */
 List.just = val => createList([val], null,
     [createSortObject(identity, defaultPredicate, sortDirection.ascending)]);
@@ -1697,6 +1699,13 @@ List.unfold = (fn, seed) => createList(unfold(fn)(seed));
  * @see List
  * @param {*} f - Any JavaScript value
  * @return {boolean} - Returns a boolean indicating of the value is a list.
+ *
+ * @example
+ * List.is(List.of(1, 2, 3, 4))     => true
+ *
+ * List.is([1, 2, 3, 4])            => false
+ *
+ * List.is()                        => false
  */
 List.is = isList;
 
@@ -1712,6 +1721,9 @@ List.is = isList;
  * @param {*} item - Any JavaScript value that should be used to build a new list monad.
  * @param {number} count - The number of times the value should be repeated to build the list.
  * @return {Proxy} - Returns a new ordered list monad.
+ *
+ * @example
+ * List.repeat(1, 5)    => List(1, 1, 1, 1, 1)
  */
 List.repeat = function _repeat(item, count) {
     return createList([], repeat(item, count), [createSortObject(identity, noop, sortDirection.descending)]);
@@ -1719,16 +1731,18 @@ List.repeat = function _repeat(item, count) {
 
 /**
  * @signature
- * @summary Extension function that allows new functionality to be applied to
+ * @description Extension function that allows new functionality to be applied to
  * the list data structure
  * @memberOf dataStructures.List
  * @static
  * @function extend
  * @see List
- * @param {string} prop - The name of the new property that should exist on the List; must be unique
+ * @param {string} prop - The name of the new property that should exist on the list data structure;
+ * must be unique, cannot override an existing property.
  * @param {function} fn - A function that defines the new List functionality and
  * will be called when this new List property is invoked.
- * @return {List} - a
+ * @return {List} Returns the List factory function after applying the new functionality to the
+ * list data structure.
  *
  * @description The fn parameter must be a non-generator function that takes one or more
  * arguments and returns a generator function. The first and only required argument that
@@ -1756,9 +1770,10 @@ List.repeat = function _repeat(item, count) {
  *
  * @example
  * //Outer function that accepts all arguments necessary for iteration and operation
- * function takeEveryOtherOne(xs) {
- *      //returns a generator function to be used as the new List's iterator when invoked
- *      return function *_takeEveryOtherOne(xs) {
+ * function takeOddIndices(xs) {
+ *      //returns a generator function to be used as the new List's iterator when the new
+ *     //'takeOdd' function of the List is invoked as seen below
+ *      return function *_takeOddIndices(xs) {
  *          let idx = 0;
  *          for (let x of xs) {
  *              if (!(idx % 2)) yield x;
@@ -1767,9 +1782,9 @@ List.repeat = function _repeat(item, count) {
  *      }
  * }
  *
- * List.extend('everyOther', takeEveryOtherOne)
+ * List.extend('takeOdd', takeOddIndices)
  *
- * List([1, 2, 3, 4, 5, 6, 7, 8, 9, 10]).everyOther()   => List(1, 3, 5, 7, 9)
+ * List([1, 2, 3, 4, 5, 6, 7, 8, 9, 10]).takeOdd()   => List(1, 3, 5, 7, 9)
  */
 List.extend = function _extend(prop, fn) {
     if (![list, ordered_list].some(type => prop in type)) {
