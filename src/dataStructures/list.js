@@ -789,6 +789,9 @@ var list_core = {
      * @this dataStructures.list_core
      * @param {function} [predicate] - a
      * @return {boolean} - b
+     *
+     * @example
+     * List([1, 2, 3, 4, 5]).all(x => 2 < x)    => false
      */
     all: function _all(predicate = defaultPredicate) {
         return all(this, predicate);
@@ -803,6 +806,11 @@ var list_core = {
      * @this dataStructures.list_core
      * @param {function} [predicate] - a
      * @return {boolean} - b
+     *
+     * @example
+     * List([1, 2, 3, 4, 5]).any(x => 2 < x)    => true
+     *
+     * List([1]).any()  => true
      */
     any: function _any(predicate = defaultPredicate) {
         return any(this, predicate);
@@ -817,6 +825,9 @@ var list_core = {
      * @this dataStructures.list_core
      * @param {function} [predicate] - a
      * @return {Number} -  b
+     *
+     * @example
+     * List([1, 2, 3, 4, 5]).count()    => 5
      */
     count: function _count(predicate) {
         return count(this, predicate);
