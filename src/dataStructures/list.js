@@ -992,6 +992,9 @@ var list_core = {
      * @see {@link https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/forEach}
      * @param {function} fn - A function that should be applied to each value held in the list
      * @return {dataStructures.list_core} Returns a list
+     *
+     * @example
+     * List([1, 2, 3, 4, 5]).forEach(console.log)
      */
     forEach: function _forEach(fn) {
         this.data.forEach(fn);
@@ -1023,6 +1026,11 @@ var list_core = {
      * @function isEmpty
      * @this dataStructures.list_core
      * @return {boolean} - a
+     *
+     * @example
+     * List([1, 2, 3, 4, 5]).isEmpty()  => false
+     * List([]).isEmpty()               => true
+     * List.empty().isEmpty()           => true
      */
     isEmpty: function _isEmpty() {
         return 0 === this.data.length;
