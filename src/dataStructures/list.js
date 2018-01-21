@@ -891,6 +891,11 @@ var list_core = {
      * @param {dataStructures.list_core} f - a
      * @param {function} [comparer] - b
      * @return {boolean} - c
+     *
+     * @example
+     * List([1, 2, 3, 4, 5]).equals(List([1, 2, 3, 4, 5]))  => true
+     * List([1, 2, 3, 4, 5]).equals(List.of(1, 2, 3, 4, 5)) => true
+     * List([1, 2, 3, 4, 5]).equals(List([1, 2, 3, 4]))     => false
      */
     equals: function _equals(f, comparer) {
         return Object.getPrototypeOf(this).isPrototypeOf(f) && equals(this, f, comparer);
