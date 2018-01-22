@@ -1078,6 +1078,10 @@ var list_core = {
      * @this dataStructures.list_core
      * @param {function} [predicate] - a
      * @return {*} - b
+     *
+     * @example
+     * List([1, 2, 3, 4, 5]).last()     => 5
+     * List([1, 2, 3, 4, 5]).last(x => 3 > x)   => 5
      */
     last: function _last(predicate = defaultPredicate) {
         return last(this, predicate);
