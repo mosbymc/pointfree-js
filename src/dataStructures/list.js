@@ -1,7 +1,5 @@
-import { all, any, apply, binarySearch, chain, concat, concatAll, contains, contramap, copyWithin, count, dimap, distinct, equals,
-        except, fill, filter, findIndex, findLastIndex, first, foldLeft, foldRight, groupBy, groupJoin, intersect, intersperse,
-        join, last, map, ofType, pop, prepend, prependAll, reduceRight, repeat, reverse, set, skipWhile, slice, sortBy, takeWhile,
-        unfold, union, zip } from './list_iterators';
+import * as iterators from './iterators';
+import * as list_util from './list_util';
 import { sortDirection, generatorProto } from '../helpers';
 import { wrap, defaultPredicate, delegatesFrom, isArray, noop, invoke, delegatesTo, isString, both } from '../functionalHelpers';
 import { when, ifElse, identity, constant } from '../combinators';
@@ -135,7 +133,7 @@ var list_core = {
      *  .apply(List([x => x * x, x => x / 2, x => x * 5]))     => List([1, 1/2, 5, 4, 1, 10, 9, 3/2, 15, 16, 2, 20, 25, 5/2, 25])
      */
     apply: function _apply(l) {
-        return createList(this, _iteratorWrapper(apply(this, l)));
+        return createList(this, _iteratorWrapper(iterators.apply(this, l)));
     },
 
     /**
@@ -154,7 +152,7 @@ var list_core = {
      * List([1, 2, 3, 4, 5]).chain(x => List.of(x * x))     => List([1, 4, 9, 16, 25])
      */
     chain: function _chain(fn) {
-        return createList(this, _iteratorWrapper(chain(this, fn)));
+        return createList(this, _iteratorWrapper(iterators.chain(this, fn)));
     },
 
     /**
@@ -173,7 +171,7 @@ var list_core = {
      * List([1, 2, 3, 4, 5]).concat(List([6, 7, 8, 9, 10])      => List([1, 2, 3, 4, 5, 6, 7, 8, 9, 10])
      */
     concat: function _concat(ys) {
-        return createList(this, _iteratorWrapper(concat(this, List.of(ys))));
+        return createList(this, _iteratorWrapper(iterators.concat(this, List.of(ys))));
     },
 
     /**
@@ -194,7 +192,7 @@ var list_core = {
      *  .concatAll([6, ..., 10], List([11, ..., 15]), [16, ..., 20])    => List([1, 2, 3, 4, ... 18, 19, 20])
      */
     concatAll: function _concatAll(...ys) {
-        return createList(this, _iteratorWrapper(concatAll(this, ys.map(y => List.of(y)))));
+        return createList(this, _iteratorWrapper(iterators.concatAll(this, ys.map(y => List.of(y)))));
     },
 
     /**
@@ -214,7 +212,7 @@ var list_core = {
      *  .contramap(x => x + 3))     => List([4, 7, 12, 19, 28, 14, 15, 16, 17, 18])
      */
     contramap: function _contramap(fn) {
-        return createList(this, _iteratorWrapper(contramap(this, fn)));
+        return createList(this, _iteratorWrapper(iterators.contramap(this, fn)));
     },
 
     /**
@@ -233,7 +231,7 @@ var list_core = {
      * @return {list} - d
      */
     copyWithin: function _copyWithin(index, start, end) {
-        return createList(this, _iteratorWrapper(copyWithin(index, start, end, this)));
+        return createList(this, _iteratorWrapper(iterators.copyWithin(index, start, end, this)));
     },
 
     /**
@@ -243,7 +241,7 @@ var list_core = {
      * @return {Proxy.<dataStructures.list_core>|dataStructures.list_core|dataStructures.list|dataStructures.ordered_list} c
      */
     dimap: function _dimap(f, g) {
-        return createList(this, _iteratorWrapper(dimap(this, f, g)));
+        return createList(this, _iteratorWrapper(iterators.dimap(this, f, g)));
     },
 
     /**
@@ -263,7 +261,7 @@ var list_core = {
      *      .distinct((x, y) => x === y)    => List([1. 2. 3])
      */
     distinct: function _distinct(comparer) {
-        return createList(this, _iteratorWrapper(distinct(this, comparer)));
+        return createList(this, _iteratorWrapper(iterators.distinct(this, comparer)));
     },
 
     /**
@@ -289,7 +287,7 @@ var list_core = {
      *      .except([2, 4, 6, 8, 10])   => L:st([1, 3, 5, 7, 9])
      */
     except: function _except(xs, comparer) {
-        return createList(this, _iteratorWrapper(except(this, xs, comparer)));
+        return createList(this, _iteratorWrapper(iterators.except(this, xs, comparer)));
     },
 
     /**
@@ -311,7 +309,7 @@ var list_core = {
      * @return {list} - d
      */
     fill: function _fill(value, start, end) {
-        return createList(this, _iteratorWrapper(fill(value, start, end, this)));
+        return createList(this, _iteratorWrapper(iterators.fill(value, start, end, this)));
     },
 
     /**
@@ -331,7 +329,7 @@ var list_core = {
      *  List([1, 2, 3, 4, 5]).filter(x => 3 < x)    => List([4, 5])
      */
     filter: function _filter(predicate) {
-        return createList(this, _iteratorWrapper(filter(this, predicate)));
+        return createList(this, _iteratorWrapper(iterators.filter(this, predicate)));
     },
 
     /**
@@ -350,7 +348,7 @@ var list_core = {
      *  .groupBy(x => x, (x, y) => x === y)  => List(List(1, 1), List(2, 2, 2), List(3, 3, 3), List(4))
      */
     groupBy: function _groupBy(keySelector, comparer) {
-        return createList(this, _iteratorWrapper(groupBy(this, [createSortObject(keySelector, comparer, sortDirection.ascending)], createGroupedListDelegate)));
+        return createList(this, _iteratorWrapper(iterators.groupBy(this, [createSortObject(keySelector, comparer, sortDirection.ascending)], createGroupedListDelegate)));
     },
 
     /**
@@ -369,7 +367,7 @@ var list_core = {
      *  .groupByDescending(x => x, (x, y) => x === y)  => List(List(4), List(3, 3, 3), List(2, 2, 2), List(1, 1))
      */
     groupByDescending: function _groupByDescending(keySelector, comparer) {
-        return createList(this, _iteratorWrapper(groupBy(this, [createSortObject(keySelector, comparer, sortDirection.descending)], createGroupedListDelegate)));
+        return createList(this, _iteratorWrapper(iterators.groupBy(this, [createSortObject(keySelector, comparer, sortDirection.descending)], createGroupedListDelegate)));
     },
 
     /**
@@ -393,7 +391,7 @@ var list_core = {
      * @return {dataStructures.list_core} - f
      */
     groupJoin: function _groupJoin(ys, xSelector, ySelector, projector, comparer) {
-        return createList(this, _iteratorWrapper(groupJoin(this, ys, xSelector, ySelector, projector, createGroupedListDelegate, comparer)));
+        return createList(this, _iteratorWrapper(iterators.groupJoin(this, ys, xSelector, ySelector, projector, createGroupedListDelegate, comparer)));
     },
 
     head: function _head() {
@@ -422,7 +420,7 @@ var list_core = {
      *  .intersect(List([4, 5, 6, 7, 8, 9, 10], (x, y) => x === y)      => List(4, 5, 6)
      */
     intersect: function _intersect(xs, comparer) {
-        return createList(this, _iteratorWrapper(intersect(this, xs, comparer)));
+        return createList(this, _iteratorWrapper(iterators.intersect(this, xs, comparer)));
     },
 
     /**
@@ -436,7 +434,7 @@ var list_core = {
      * @return {dataStructures.list_core} - b
      */
     intersperse: function _intersperse(val) {
-        return createList(this, _iteratorWrapper(intersperse(this, val)));
+        return createList(this, _iteratorWrapper(iterators.intersperse(this, val)));
     },
 
     /**
@@ -459,7 +457,7 @@ var list_core = {
      * @return {dataStructures.list_core} - f
      */
     listJoin: function _join(ys, xSelector, ySelector, projector, comparer) {
-        return createList(this, _iteratorWrapper(join(this, ys, xSelector, ySelector, projector, comparer)));
+        return createList(this, _iteratorWrapper(iterators.join(this, ys, xSelector, ySelector, projector, comparer)));
     },
 
     /**
@@ -476,7 +474,7 @@ var list_core = {
      * List([1, 2, 3, 4, 5]).map(x => x * x)    => List(1, 4, 9, 16, 25)
      */
     map: function _map(mapFunc) {
-        return createList(this, _iteratorWrapper(map(this, mapFunc)));
+        return createList(this, _iteratorWrapper(iterators.map(this, mapFunc)));
     },
 
     /**
@@ -505,7 +503,7 @@ var list_core = {
      * @returns {dataStructures.list_core} - b
      */
     ofType: function _ofType(type) {
-        return createList(this, _iteratorWrapper(ofType(this, type)));
+        return createList(this, _iteratorWrapper(iterators.ofType(this, type)));
     },
 
     /**
@@ -514,7 +512,7 @@ var list_core = {
      * @return {dataStructures.list_core} a
      */
     pop: function _pop() {
-        return createList(this, _iteratorWrapper(pop(this)));
+        return createList(this, _iteratorWrapper(iterators.pop(this)));
     },
 
     /**
@@ -531,7 +529,7 @@ var list_core = {
      * List([1, 2, 3, 4, 5]).prepend([-2, -1, 0])   => List(-2, -1, 0, 1, 2, 3, 4, 5)
      */
     prepend: function _prepend(xs) {
-        return createList(this, _iteratorWrapper(prepend(this, List.of(xs))));
+        return createList(this, _iteratorWrapper(iterators.prepend(this, List.of(xs))));
     },
 
     /**
@@ -548,7 +546,7 @@ var list_core = {
      * List(6, 7, 8, 9).prependAll([0, 1, 2], [3, 4], [5])  => List(0, 1, 2, 3, 4, 5, 6, 7, 8, 9)
      */
     prependAll: function _prependAll(...xs) {
-        return createList(this, _iteratorWrapper(prependAll(this, xs.map(x => List.of(x)))));
+        return createList(this, _iteratorWrapper(iterators.prependAll(this, xs.map(x => List.of(x)))));
     },
 
     /**
@@ -582,7 +580,7 @@ var list_core = {
      * List([1, 2, 3, 4, 5]).reverse()  => List(5, 3, 2, 2, 1)
      */
     reverse: function _reverse() {
-        return createList(this, _iteratorWrapper(reverse(this)));
+        return createList(this, _iteratorWrapper(iterators.reverse(this)));
     },
 
     /**
@@ -638,7 +636,7 @@ var list_core = {
      *  .skip(x => 5 > x)   => List(5, 6, 7, 8, 9, 10)
      */
     skipWhile: function _skipWhile(predicate = defaultPredicate) {
-        return createList(this, _iteratorWrapper(skipWhile(this, predicate)));
+        return createList(this, _iteratorWrapper(iterators.skipWhile(this, predicate)));
     },
 
     /**
@@ -659,7 +657,7 @@ var list_core = {
      * @return {dataStructures.list_core} Returns a new list
      */
     slice: function _slice(start, end) {
-        return createList(this, _iteratorWrapper(slice(this, start, end)));
+        return createList(this, _iteratorWrapper(iterators.slice(this, start, end)));
     },
 
     /**
@@ -673,7 +671,7 @@ var list_core = {
      * @return {dataStructures.list_core} c
      */
     splice: function _splice(start, end) {
-        return createList(this, _iteratorWrapper(slice(this, start, end)));
+        return createList(this, _iteratorWrapper(iterators.slice(this, start, end)));
     },
 
     /**
@@ -724,7 +722,7 @@ var list_core = {
      * List([1, 2, 3, 4, 5]).takeWhile(x => 3 < x)      => List(1, 2)
      */
     takeWhile: function _takeWhile(predicate = defaultPredicate) {
-        return createList(this, _iteratorWrapper(takeWhile(this, predicate)));
+        return createList(this, _iteratorWrapper(iterators.takeWhile(this, predicate)));
     },
 
     /**
@@ -744,7 +742,7 @@ var list_core = {
      * @return {dataStructures.list_core} - c
      */
     union: function _union(xs, comparer) {
-        return createList(this, _iteratorWrapper(union(this, xs, comparer)));
+        return createList(this, _iteratorWrapper(iterators.union(this, xs, comparer)));
     },
 
     /**
@@ -777,7 +775,7 @@ var list_core = {
      * @return {dataStructures.list_core} - c
      */
     zip: function _zip(selector, xs) {
-        return createList(this, _iteratorWrapper(zip(this, xs, selector)));
+        return createList(this, _iteratorWrapper(iterators.zip(this, xs, selector)));
     },
 
     /**
@@ -794,7 +792,7 @@ var list_core = {
      * List([1, 2, 3, 4, 5]).all(x => 2 < x)    => false
      */
     all: function _all(predicate = defaultPredicate) {
-        return all(this, predicate);
+        return list_util.all(this, predicate);
     },
 
     /**
@@ -813,7 +811,7 @@ var list_core = {
      * List([1]).any()  => true
      */
     any: function _any(predicate = defaultPredicate) {
-        return any(this, predicate);
+        return list_util.any(this, predicate);
     },
 
     /**
@@ -830,7 +828,7 @@ var list_core = {
      * List([1, 2, 3, 4, 5]).count()    => 5
      */
     count: function _count(predicate) {
-        return count(this, predicate);
+        return list_util.count(this, predicate);
     },
 
     /**
@@ -898,7 +896,7 @@ var list_core = {
      * List([1, 2, 3, 4, 5]).equals(List([1, 2, 3, 4]))     => false
      */
     equals: function _equals(f, comparer) {
-        return Object.getPrototypeOf(this).isPrototypeOf(f) && equals(this, f, comparer);
+        return Object.getPrototypeOf(this).isPrototypeOf(f) && list_util.equals(this, f, comparer);
     },
 
     /**
@@ -914,7 +912,7 @@ var list_core = {
      * @return {Number} - b
      */
     findIndex: function _findIndex(comparer) {
-        return findIndex(this, comparer);
+        return list_util.findIndex(this, comparer);
     },
 
     /**
@@ -928,7 +926,7 @@ var list_core = {
      * @return {Number} - b
      */
     findLastIndex: function _findLastIndex(comparer) {
-        return findLastIndex(this, comparer);
+        return list_util.findLastIndex(this, comparer);
     },
 
     /**
@@ -942,7 +940,7 @@ var list_core = {
      * @return {*} - b
      */
     first: function _first(predicate = defaultPredicate) {
-        return first(this, predicate);
+        return list_util.first(this, predicate);
     },
 
     /**
@@ -957,7 +955,7 @@ var list_core = {
      * @return {*} - c
      */
     foldl: function _foldl(fn, acc) {
-        return foldLeft(this, fn, acc);
+        return list_util.foldLeft(this, fn, acc);
     },
 
     /**
@@ -972,7 +970,7 @@ var list_core = {
      * @return {*} - c
      */
     foldr: function _foldr(fn, acc) {
-        return foldRight(this, fn, acc);
+        return list_util.foldRight(this, fn, acc);
     },
 
     /**
@@ -1084,7 +1082,7 @@ var list_core = {
      * List([1, 2, 3, 4, 5]).last(x => 3 > x)   => 5
      */
     last: function _last(predicate = defaultPredicate) {
-        return last(this, predicate);
+        return list_util.last(this, predicate);
     },
 
     /**
@@ -1101,7 +1099,7 @@ var list_core = {
      * @return {*} - c
      */
     reduceRight: function _reduceRight(fn, acc) {
-        return reduceRight(this, fn, acc);
+        return list_util.reduceRight(this, fn, acc);
     },
 
     /**
@@ -1306,7 +1304,7 @@ list_core.set = function _set(idx, val) {
     let len = this.count();
     let normalizedIdx = 0 > idx ? len + idx : idx;
     if (0 <= normalizedIdx) {
-        return createList(this, _iteratorWrapper(set(this, normalizedIdx, val)));
+        return createList(this, _iteratorWrapper(iterators.set(this, normalizedIdx, val)));
     }
     return this;
 };
@@ -1455,7 +1453,7 @@ var list = Object.create(list_core, /** @lends list_core */  {
     sortBy: {
         value: function _orderBy(keySelector = identity, comparer = defaultPredicate) {
             var sortObj = [createSortObject(keySelector, comparer, sortDirection.ascending)];
-            return createList(this, _iteratorWrapper(sortBy(this, sortObj)), sortObj);
+            return createList(this, _iteratorWrapper(iterators.sortBy(this, sortObj)), sortObj);
         }
     },
     /**
@@ -1471,7 +1469,7 @@ var list = Object.create(list_core, /** @lends list_core */  {
     sortByDescending: {
         value: function _orderByDescending(keySelector, comparer = defaultPredicate) {
             var sortObj = [createSortObject(keySelector, comparer, sortDirection.descending)];
-            return createList(this, _iteratorWrapper(sortBy(this, sortObj)), sortObj);
+            return createList(this, _iteratorWrapper(iterators.sortBy(this, sortObj)), sortObj);
         }
     },
     /**
@@ -1486,7 +1484,7 @@ var list = Object.create(list_core, /** @lends list_core */  {
      */
     contains: {
         value: function _contains(val, comparer) {
-            return contains(this, val, comparer);
+            return list_util.contains(this, val, comparer);
         }
     }
 });
@@ -1525,7 +1523,7 @@ var ordered_list = Object.create(list_core, /** @lends list_core */  {
     thenBy: {
         value: function _thenBy(keySelector, comparer = defaultPredicate) {
             var sortObj = this._appliedSorts.concat(createSortObject(keySelector, comparer, sortDirection.ascending));
-            return createList(this.value, _iteratorWrapper(sortBy(this, sortObj)), sortObj);
+            return createList(this.value, _iteratorWrapper(iterators.sortBy(this, sortObj)), sortObj);
         }
     },
     /**
@@ -1541,7 +1539,7 @@ var ordered_list = Object.create(list_core, /** @lends list_core */  {
     thenByDescending: {
         value: function thenByDescending(keySelector, comparer = defaultPredicate) {
             var sortObj = this._appliedSorts.concat(createSortObject(keySelector, comparer, sortDirection.descending));
-            return createList(this.value, _iteratorWrapper(sortBy(this, sortObj)), sortObj);
+            return createList(this.value, _iteratorWrapper(iterators.sortBy(this, sortObj)), sortObj);
         }
     },
     /**
@@ -1563,7 +1561,7 @@ var ordered_list = Object.create(list_core, /** @lends list_core */  {
      */
     contains: {
         value: function _contains(val, comparer) {
-            return binarySearch(when(not(isArray), Array.from, this.value), val, comparer);
+            return list_util.binarySearch(when(not(isArray), Array.from, this.value), val, comparer);
         }
     }
 });
@@ -1715,7 +1713,7 @@ List.just = val => createList([val], null,
  * @param {*} seed - b
  * @return {list} - c
  */
-List.unfold = (fn, seed) => createList(unfold(fn)(seed));
+List.unfold = (fn, seed) => createList(list_util.unfold(fn)(seed));
 
 /**
  * @signature
@@ -1754,7 +1752,7 @@ List.is = isList;
  * List.repeat(1, 5)    => List(1, 1, 1, 1, 1)
  */
 List.repeat = function _repeat(item, count) {
-    return createList([], repeat(item, count), [createSortObject(identity, noop, sortDirection.descending)]);
+    return createList([], iterators.repeat(item, count), [createSortObject(identity, noop, sortDirection.descending)]);
 };
 
 /**
