@@ -44,7 +44,7 @@ var typeNames = {
     /** object */
     'object': typeof{ a: 1 },
     /** string */
-    'string': typeof '',
+    'string': typeof'',
     /** symbol */
     'symbol': typeof Symbol.iterator,
     /** undefined */
