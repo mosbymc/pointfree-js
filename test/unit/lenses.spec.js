@@ -129,7 +129,7 @@ describe('Test lenses', function _testLenses() {
             view(mapLens('Mike'), obj.friends).should.eql({ id: 2, name: 'Mike' });
 
             var c = compose(mapLens('Charles'), objectLens('name'));
-            over(c, x => 'Chuck', friends).should.eql({});
+            over(c, x => 'Chuck', friends).get('Charles').name.should.eql('Chuck');
 
             var numKeys = 0;
             for (let k of friends.keys()) {
@@ -238,7 +238,8 @@ describe('Test lenses', function _testLenses() {
             view(mapLens('tumblers'), m).should.eql(['jill', 'jack']);
 
             var mapPrism = prism((k, xs) => xs.get(k), (k, r, xs) => xs.set(k, r));
-            view(mapPrism('no_tumblers'), m).should.eql({});
+            //console.log(view(mapPrism('no_tumblers'), m));
+            view(mapPrism('no_tumblers'), m).should.be.an('Map');
         });
     });
 });

@@ -108,9 +108,7 @@ function groupFactoryCreator(concatFn, identity, inverseFn, type) {
 function semigroupFactory(concatFn, type) {
     function semigroupFactory(val) {
         return Object.create(baseGroupObject, {
-            _value: {
-                value: val
-            },
+            _value: { value: val },
             concat: {
                 value: function _concat(g) {
                     return Object.getPrototypeOf(this) === Object.getPrototypeOf(g) ? this.factory(concatFn(this.value, g.value)) : this;
@@ -123,9 +121,7 @@ function semigroupFactory(concatFn, type) {
                     }, this);
                 }
             },
-            factory: {
-                value: semigroupFactory
-            },
+            factory: { value: semigroupFactory },
             /**
              * @signature toString :: () -> String
              * @description Returns a string representation of the current monoid and its
@@ -153,15 +149,9 @@ function monoidFactory(concatFn, identity, type) {
     function monoidFactory(val) {
         val = typeValidator(val);
         return Object.create(base, {
-            _value: {
-                value: val
-            },
-            isEmpty: {
-                value: val === identity
-            },
-            factory: {
-                value: monoidFactory
-            }
+            _value: { value: val },
+            isEmpty: { value: val === identity },
+            factory: { value: monoidFactory }
         });
 
         function typeValidator(val) {

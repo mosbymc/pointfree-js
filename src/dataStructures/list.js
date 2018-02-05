@@ -45,7 +45,6 @@ var listProxyHandler = {
  * @property {function} listJoin
  * @property {function} map - Applies the supplied function argument to each element in the list and returns a new list with the new values
  * @property {function} join
- * @property {function} ofType
  * @property {function} prepend - Accepts one iterable and returns a new list with the contents prepended to the current lists's contents
  * @property {function} prependAll - Behaves like list#prepend but accepts one or more iterables
  * @property {function} reverse - Returns a new list with the contents in reverse order
@@ -490,20 +489,6 @@ var list_core = {
      */
     join: function _join() {
         return this.chain(x => x);
-    },
-
-    /**
-     * @signature
-     * @description d
-     * @memberOf dataStructures.list_core
-     * @instance
-     * @function ofType
-     * @this dataStructures.list_core
-     * @param {string|Object} type - a
-     * @returns {dataStructures.list_core} - b
-     */
-    ofType: function _ofType(type) {
-        return createList(this, _iteratorWrapper(iterators.ofType(this, type)));
     },
 
     /**
@@ -1865,8 +1850,7 @@ function createList(source, iterator, sortObject, key) {
             _value: { value: source, writable: false, configurable: false }
         }) , listProxyHandler) :
         new Proxy(
-            Object.create(
-                ordered_list, {
+            Object.create(ordered_list, {
                     _value: { value: source, writable: false, configurable: false },
                     _appliedSorts: { value: sortObject, writable: false, configurable: false }
                 }), listProxyHandler);
@@ -1884,11 +1868,9 @@ function createList(source, iterator, sortObject, key) {
              * @description: case 2 = A key was passed as the only argument. Create a list
              * object and set the ._key field as the key string argument.
              */
-            return Object.defineProperties(
-                proxiedList, {
+            return Object.defineProperties(proxiedList, {
                     '_key': { value: key, writable: false, configurable: false },
-                    'key': { get: function _getKey() { return this._key; } }
-                });
+                    'key': { get: function _getKey() { return this._key; } }});
         /**
          * @description: case 5 = Both an iterator and a sort object were passed in. The consumer
          * invoked the sortBy/sortByDescending or thenBy/thenByDescending function properties. Create

@@ -34,9 +34,7 @@ function sortData(data, sortObject) {
             insertionSort(data, sort.keySelector, comparer, sort.direction) : mergeSort(data, sort.keySelector, comparer, sort.direction);
         //if (index === 0) sortedData = quickSort(data, sort.direction, sort.keySelector, comparer);
         else {
-            let sortedSubData = [],
-                itemsToSort = [],
-                prevKeySelector = sortObject[index - 1].keySelector;
+            let sortedSubData = [], itemsToSort = [], prevKeySelector = sortObject[index - 1].keySelector;
             sortedData.forEach(function _sortData(item, idx) {
                 //TODO: re-examine this logic; I think it is in reverse order
                 if (!itemsToSort.length || 0 === comparer(prevKeySelector(itemsToSort[0]), prevKeySelector(item), sort.direction))
@@ -132,9 +130,8 @@ function quickSort(source, dir, keySelector, keyComparer) {
  */
 function _quickSort(data, left, right, selector, comparer, dir) {
     do {
-        var i = left;
-        var j = right;
-        var currIdx = i + ((j - i) >> 1),
+        var i = left, j = right,
+            currIdx = i + ((j - i) >> 1),
             curr = selector(data[currIdx]);
 
         do {
