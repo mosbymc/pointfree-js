@@ -61,10 +61,10 @@ Constant.is = f => constant.isPrototypeOf(f);
 
 /**
  * @typedef {Object} constant
- * @property {function} value - returns the underlying value of the the functor
+ * @property {function} extract - returns the underlying value of the the functor
  * @property {function} map - maps a single function over the underlying value of the functor
  * @property {function} bimap
- * @property {function} extract
+ * @property {function} contramap
  * @property {function} valueOf - returns the underlying value of the functor; used during concatenation and coercion
  * @property {function} toString - returns a string representation of the identity functor and its underlying value
  * @property {function} factory - a reference to the constant factory function
@@ -98,6 +98,18 @@ var constant = {
     get value() {
         return this._value;
     },
+    /**
+     * @signature () -> *
+     * @description Returns the underlying value of a constant delegator. This is a getter function
+     * and thus works differently than the fantasy-land specification; rather than invoking constant#extract
+     * as a function, you merely need to reference as a non-function property.
+     * @example Constant(10).extract // => 10
+     * @memberOf dataStructures.constant
+     * @instance
+     * @private
+     * @function
+     * @return {*} Returns the underlying value of the delegator. May be any value.
+     */
     get extract() {
         return this.value;
     },
@@ -116,6 +128,7 @@ var constant = {
      */
     map: returnMe,
     chain: returnMe,
+    join: returnMe,
     /**
      * @signature
      * @description d
@@ -132,7 +145,25 @@ var constant = {
     traverse: function _traverse(a, f) {
         return this.factory.of(this.value);
     },
+    contramap: returnMe,
+    dimap: returnMe,
     apply: returnMe,
+    /**
+     * @signature () -> boolean
+     * @description Returns a boolean indicating if the constant is 'empty'. Because there is
+     * no innate 'empty' value for a constant data structure, isEmpty will always return false.
+     * @memberOf dataStructures.constant
+     * @instance
+     * @function isEmpty
+     * @return {boolean} Returns a boolean indicating if the identity instance is 'empty'.
+     *
+     * @example
+     * Constant(10).isEmpty()  // => false
+     * Constant().isEmpty()    // => false
+     */
+    isEmpty: function _isEmpty() {
+        return false;
+    },
     /**
      * @signature * -> boolean
      * @description Determines if 'this' identity functor is equal to another functor. Equality
@@ -205,8 +236,6 @@ var constant = {
  * the mapping function to the underlying data.
  */
 constant.bimap = constant.map;
-
-constant.mjoin = join;
 
 constant.ap = constant.apply;
 constant.fmap = constant.chain;

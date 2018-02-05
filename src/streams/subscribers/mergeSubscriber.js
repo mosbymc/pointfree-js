@@ -1,5 +1,33 @@
 import { subscriber } from './subscriber';
 
+var mergeSubscriber = Object.create(subscriber);
+
+mergeSubscriber.next = function _next(item) {
+    if (this.transform) {
+        var res;
+        try {
+            res = this.transform(item, this.count++);
+        }
+        catch (err) {
+            this.subscriber.error(err);
+            return;
+        }
+        this.subscriber.next(res);
+    }
+    else this.subscriber.next(item);
+};
+
+mergeSubscriber.init = function _init(subscriber, observables, transform) {
+    this.transform = transform;
+    observables.forEach(function _subscribeToEach(observable) {
+        observable.subscribe(this);
+    }, this);
+    this.initialize(subscriber);
+    this.subscriber = subscriber;
+    return this;
+};
+
+/*
 var mergeSubscriber = Object.create(subscriber, {
     next: {
         value: function _next(item) {
@@ -32,7 +60,7 @@ var mergeSubscriber = Object.create(subscriber, {
         writable: false,
         configurable: false
     }
-});
+});*/
 
 /*
 var mergeSubscriber = Object.create(subscriber, {

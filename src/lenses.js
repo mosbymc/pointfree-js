@@ -12,6 +12,16 @@ import { mapWith } from './pointless_data_structures';
 /**
  * @signature
  * @description d
+ * @param {function} f - a
+ * @param {*} x - b
+ * @return {*} c
+ * @type {Function}
+ */
+var mapped = curry((f, x) => Identity(map(compose(d => d.value, f), x)));
+
+/**
+ * @signature
+ * @description d
  * @kind function
  * @function lens
  * @param {function} getter - a
@@ -87,23 +97,16 @@ var mapLens = lens((key, xs) => xs.get(key), function _mapSet(key, val, xs) {
     return ret;
 });
 
-/**
- * @signature
- * @description d
- * @kind function
- * @function unifiedLens
- * @param {string} prop - a
- * @param {function} f - b
- * @param {Array|Object} xs - c
- * @return {*} - d
- */
-var unifiedLens = curry(function _unifiedLens(prop, f, xs) {
-    return mapWith(function _mapWith(value) {
-        if (Array.isArray(xs)) return arraySet(prop, value, xs);
-        else if (Map.prototype.isPrototypeOf(xs)) return mapSet(prop, value, xs);
-        return objectSet(prop, value, xs);
-    }, Map.prototype.isPrototypeOf(xs) ? f(xs.get(prop)) : f(xs[prop]));
-});
+var ul = lens(curry(function _getter(prop, xs) {
+    if (Map.prototype.isPrototypeOf(xs)) return xs.get(prop);
+    if (Set.prototype.isPrototypeOf(xs)) return xs.has(prop) ? prop : undefined;
+    return xs[prop];
+}), curry(function _setter(prop, val, xs) {
+    if (Map.prototype.isPrototypeOf(xs)) return mapSet(prop, val, xs);
+    if (Set.prototype.isPrototypeOf(xs)) return setSet(prop, val, xs);
+    if (Array.isArray(xs)) return arraySet(prop, val, xs);
+    return objectSet(prop, val, xs);
+}));
 
 /**
  * @signature
@@ -170,25 +173,7 @@ function makeLenses(...paths) {
     return paths.reduce(function _pathReduce(cur, next) {
         var ol = objectLens(next);
         return put(ol, ol, cur);
-    }, { num: arrayLens });
-}
-
-/**
- * @signature
- * @description d
- * @param {string} paths - a
- * @return {function} - b
- */
-function improvedLensPath(...paths) {
-    var innerLensDef = curry(function _innerLensDef(prop, fn, xs) {
-        return mapWith(function _map(rep) {
-            return objectSet(prop, rep, xs);
-        }, fn(xs[prop]));
-    });
-
-    return compose(...paths.map(function _pathsMap(p) {
-        return innerLensDef(p);
-    }));
+    }, { index: arrayLens });
 }
 
 /**
@@ -199,32 +184,30 @@ function improvedLensPath(...paths) {
  */
 function lensPath(...path) {
     return compose(...path.map(function _pathMap(p) {
-        return unifiedLens(p);
+        return ul(p);
     }));
 }
 
 /**
  * @signature
  * @description d
- * @kind function
- * @function prismPath
- * @param {Array|String} path - a
- * @param {Object} obj - b
- * @return {*} - c
+ * @param {string} path - a
+ * @return {*} b
  */
-var prismPath = curry(function _prismPath(path, obj) {
-    path = when(not(isArray), split('.'), path);
-    console.log(path, obj);
-    var val = obj,
-        idx = 0;
-    while (idx < path.length) {
-        if (null == val) return Maybe.Nothing();
-        console.log(val[path[idx]]);
-        val = val[path[idx]];
-        ++idx;
-    }
-    return Maybe(val);
-});
+function pp(...path) {
+    return compose(when(not(isArray), split('.'), path).map(function _pathMap(p) {
+        return lens(function _getter(prop, xs) {
+            if (Map.prototype.isPrototypeOf(xs)) return Maybe(xs.get(prop));
+            if (Set.prototype.isPrototypeOf(xs)) return xs.has(prop) ? Maybe(prop) : Maybe.Nothing();
+            return Maybe(xs[prop]);
+        }, function _setter(prop, val, xs) {
+            if (Map.prototype.isPrototypeOf(xs)) return Maybe(mapSet(prop, val, xs));
+            if (Set.prototype.isPrototypeOf(xs)) return Maybe(setSet(val, xs));
+            if (Array.isArray(xs)) return Maybe(arraySet(prop, val, xs));
+            return Maybe(objectSet(prop, val, xs));
+        })(p);
+    }));
+}
 
 /**
  * @signature
@@ -243,8 +226,6 @@ var extract = i => i.extract;
 
 var map = curry((fn, f) => f.map(fn));
 
-var  mapped = curry((f, x) => Identity(map(compose(extract, f), x)));
-
 //+ traversed :: Functor f => (a -> f a) -> Setter (f a) (f b) a b
 var traversed = curry((point, f, x) => Identity(traverse(compose(extract, f), point, x)));
 
@@ -252,4 +233,4 @@ var traverse = curry((f, point, fctr) => compose(sequenceA(point), map(f))(fctr)
 
 var sequenceA = curry((point, fctr) => fctr.traverse(id, point));
 
-export { arrayLens, objectLens, mapLens, view, over, put, set, lens, prism, prismPath, makeLenses, lensPath, unifiedLens };
+export { arrayLens, objectLens, mapLens, view, over, put, set, lens, prism, makeLenses, lensPath, ul, mapped, pp };

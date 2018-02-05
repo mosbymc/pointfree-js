@@ -34,7 +34,7 @@ describe('Test lazy identity', function _testLazyIdentity() {
             expect(false).to.eql(i8.value);
         });
 
-        it('should return the same type/value when using the #of function', function _testIdentityDotOf() {
+        it('should return the same type/value when using the #of function', function _testIdentityOf() {
             var arr = [1, 2, 3],
                 obj = { a: 1, b: 2 },
                 i1 = LazyIdentity.of(),
@@ -65,30 +65,21 @@ describe('Test lazy identity', function _testLazyIdentity() {
             expect(false).to.eql(i8.value);
         });
 
-        it('should return correct boolean value when #is is invoked', function _testIdentityDotIs() {
-            var i = LazyIdentity(10),
-                m = monads.Maybe(10),
-                c = monads.Constant(10),
-                f = LazyIdentity.is,
-                n = null,
-                s = 'string',
-                b = false;
-
-            LazyIdentity.is(c).should.be.false;
-            LazyIdentity.is(m).should.be.false;
-            LazyIdentity.is(i).should.be.true;
-            LazyIdentity.is(f).should.be.false;
-            LazyIdentity.is(n).should.be.false;
-            LazyIdentity.is(s).should.be.false;
-            LazyIdentity.is(b).should.be.false;
+        it('should return correct boolean value when #is is invoked', function _testIdentityIs() {
+            LazyIdentity.is(monads.Constant(10)).should.be.false;
+            LazyIdentity.is(monads.Maybe(10)).should.be.false;
+            LazyIdentity.is(LazyIdentity(10)).should.be.true;
+            LazyIdentity.is(LazyIdentity.is).should.be.false;
+            LazyIdentity.is(null).should.be.false;
+            LazyIdentity.is('string').should.be.false;
+            LazyIdentity.is(false).should.be.false;
         });
 
         it('should return an \'empty\' identity and no identity should be empty', function _testEmptyIdentity() {
-            var i = LazyIdentity.empty();
-            i.isEmpty.should.be.false;
+            LazyIdentity.empty().isEmpty.should.be.false;
         });
 
-        it('should lift any function to return an Identity wrapped value', function _testIdentityDotLift() {
+        it('should lift any function to return an Identity wrapped value', function _testIdentityLift() {
             function t1() { return -1; }
             function t2() { return '-1'; }
             function t3(arg) { return arg; }
@@ -132,7 +123,7 @@ describe('Test lazy identity', function _testLazyIdentity() {
             err2.should.be.true;
         });
 
-        it('should return a new identity functor instance with the mapped value', function _testIdentityFunctorMap() {
+        it('should return a new identity data structure instance with the mapped value', function _testIdentityMap() {
             var i = LazyIdentity(1),
                 d = i.map(function _t() { return 2; });
 
@@ -140,14 +131,14 @@ describe('Test lazy identity', function _testLazyIdentity() {
             i.should.not.equal(d);
         });
 
-        it('should map over the input', function _testIdentityContramap() {
+        it('should contramap over the input', function _testIdentityContramap() {
             LazyIdentity(x => x * x)
                 .contramap(x => x + 10)
                 .apply(LazyIdentity(5))
                 .extract.should.eql(225);
         });
 
-        it('should properly indicate equality when constant monads are indeed equal', function _testIdentityFunctorEquality() {
+        it('should properly indicate equality when constant monads are indeed equal', function _testIdentityEquality() {
             var m1 = LazyIdentity(null),
                 m2 = LazyIdentity(null),
                 m3 = LazyIdentity(1),
@@ -174,6 +165,10 @@ describe('Test lazy identity', function _testLazyIdentity() {
             LazyIdentity('10').extract.should.eql('10');
         });
 
+        it('should return its equivalent when extract is invoked during an extend', function _testIdentityExtend() {
+            LazyIdentity(10).extend(i => i.extract).extract.should.eql(LazyIdentity(10).extract);
+        });
+
         it('should represent the identity\'s \'type\' when \'Object.prototype.toString.call\' is invoked', function _testIdentityTypeString() {
             var i = LazyIdentity();
 
@@ -182,7 +177,7 @@ describe('Test lazy identity', function _testLazyIdentity() {
             //Object.prototype.toString.call(i).should.eql('[object Identity]');
         });
 
-        it('should have a functioning iterator', function _testIdentityFunctorIterator() {
+        it('should have a functioning iterator', function _testIdentityIterator() {
             var i1 = LazyIdentity(10),
                 i2 = LazyIdentity({ a: 1, b: 2 });
 
@@ -193,7 +188,7 @@ describe('Test lazy identity', function _testLazyIdentity() {
             i2Res.should.eql([i2.value]);
         });
 
-        it('should allow "expected" functionality of concatenation for strings and mathematical operators for numbers', function _testIdentityFunctorValueOf() {
+        it('should allow "expected" functionality of concatenation for strings and mathematical operators for numbers', function _testIdentityValueOf() {
             var i1 = LazyIdentity('Mark'),
                 i2 = LazyIdentity(10);
 
@@ -210,49 +205,36 @@ describe('Test lazy identity', function _testLazyIdentity() {
             num4.should.eql(2);
         });
 
-        it('should print the correct container type + value when .toString() is invoked', function _testIdentityFunctorToString() {
-            var c1 = LazyIdentity(1),
-                c2 = LazyIdentity(null),
-                c3 = LazyIdentity([1, 2, 3]),
-                c4 = LazyIdentity(LazyIdentity(LazyIdentity(5)));
-
-            c1.toString().should.eql('LazyIdentity(1)');
-            c2.toString().should.eql('LazyIdentity(null)');
-            c3.toString().should.eql('LazyIdentity(1,2,3)');
-            c4.toString().should.eql('LazyIdentity(LazyIdentity(LazyIdentity(5)))');
+        it('should print the correct container type + value when .toString() is invoked', function _testIdentityToString() {
+            LazyIdentity(1).toString().should.eql('LazyIdentity(1)');
+            LazyIdentity(null).toString().should.eql('LazyIdentity(null)');
+            LazyIdentity([1, 2, 3]).toString().should.eql('LazyIdentity(1,2,3)');
+            LazyIdentity(LazyIdentity(LazyIdentity(5))).toString().should.eql('LazyIdentity(LazyIdentity(LazyIdentity(5)))');
         });
 
-        it('should return the underlying value when the mjoin function property is called', function _testIdentityMonadMjoin() {
-            var i1 = LazyIdentity(10),
-                i2 = LazyIdentity(null),
-                i3 = LazyIdentity(LazyIdentity(1));
-
-            i1.mjoin().value.should.eql(LazyIdentity(10).value);
-            expect(i2.mjoin().value).to.eql(LazyIdentity(null).value);
-            i3.mjoin().value.should.eql(LazyIdentity(1).value);
+        it('should return the underlying value when the mjoin function property is called', function _testIdentityMjoin() {
+            LazyIdentity(10).mjoin().value.should.eql(LazyIdentity(10).value);
+            expect(LazyIdentity(null).mjoin().value).to.eql(LazyIdentity(null).value);
+            LazyIdentity(LazyIdentity(1)).mjoin().value.should.eql(LazyIdentity(1).value);
         });
 
-        it('should apply a mutating function to the underlying value and return the new value unwrapped in an Identity when chain is called', function _testIdentityMonadChain() {
-            var i1 = LazyIdentity(10),
-                i2 = LazyIdentity(LazyIdentity({ a: 1, b: 2 })),
-                i3 = LazyIdentity(25);
-
-            i1.chain(function _flatMap(val) {
+        it('should apply a mutating function to the underlying value and return the new value unwrapped in an Identity when chain is called', function _testIdentityChain() {
+            LazyIdentity(10).chain(function _flatMap(val) {
                 return LazyIdentity.of(5 * val);
             }).value.should.eql(50);
 
-            i2.chain(function _flatMap(ma) {
+            LazyIdentity(LazyIdentity({ a: 1, b: 2 })).chain(function _flatMap(ma) {
                 return ma.map(function _innerMap(val) {
                     return val.a + val.b;
                 });
             }).value.should.eql(3);
 
-            i3.chain(function _flatMap(val) {
+            LazyIdentity(25).chain(function _flatMap(val) {
                 return val + 2;
             }).value.should.eql(27);
         });
 
-        it('should return the applied monad type after mapping the identity monad\'s underlying value', function _testIdentityMonadApply() {
+        it('should return the applied monad type after mapping the identity data structure\'s underlying value', function _testIdentityApply() {
             var i = LazyIdentity(function _identityMap(val) {
                 return val ? val + 50 : 0;
             });
@@ -283,15 +265,15 @@ describe('Test lazy identity', function _testLazyIdentity() {
             //Object.getPrototypeOf(m3Res).should.eql(monads.Maybe(false));
         });
 
-        it('should return underlying value when constant_functor#fold is invoked', function _testConstantDotFold() {
+        it('should return underlying value when lazy_identity#fold is invoked', function _testConstantFold() {
             LazyIdentity(10).fold((x, y) => x + y * 15, 0).should.eql(150);
         });
 
-        it('should return a Just of an Identity of 10 when #sequence is invoked', function _testConstantDotSequence() {
+        it('should return a Just of an Identity of 10 when #sequence is invoked', function _testConstantSequence() {
             LazyIdentity(10).sequence(monads.Maybe).toString().should.eql('Just(LazyIdentity(10))');
         });
 
-        it('should return a Just of an Identity of 3 when #traverse is invoked', function _testConstantDotTraverse() {
+        it('should return a Just of an Identity of 3 when #traverse is invoked', function _testConstantTraverse() {
             function test(val) {
                 return monads.Maybe(val + 2);
             }
@@ -299,7 +281,7 @@ describe('Test lazy identity', function _testLazyIdentity() {
             LazyIdentity(1).traverse(monads.Maybe, test).toString().should.eql('Just(LazyIdentity(3))');
         });
 
-        it('should have a .factory property that points to the factory function', function _testIdentityFunctorIsStupidViaFantasyLandSpecCompliance() {
+        it('should have a .factory property that points to the factory function', function _testIdentityFactoryPointer() {
             LazyIdentity(null).factory.should.eql(LazyIdentity);
             LazyIdentity(null).constructor.should.eql(LazyIdentity);
         });

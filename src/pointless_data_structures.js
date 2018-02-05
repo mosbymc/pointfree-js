@@ -239,7 +239,7 @@ var contramap = curry(function _contramap(fn, ma) {
  * @return {boolean} - b
  */
 function isEmpty(ma) {
-    return ma.isEmpty;
+    return ma.isEmpty();
 }
 
 /**
@@ -408,8 +408,8 @@ var liftN = curry(function _liftN(f, ...ms) {
  * @param {Object} ma - a
  * @return {Object} - b
  */
-function mjoin(ma) {
-    return ma.mjoin();
+function join(ma) {
+    return ma.join();
 }
 
 /**
@@ -419,7 +419,7 @@ function mjoin(ma) {
  * @return {Object} - b
  */
 function toList(ma) {
-    return List.of(ma.value);
+    return List.of(ma.extract);
 }
 
 /**
@@ -429,7 +429,7 @@ function toList(ma) {
  * @return {Object} - b
  */
 function toMaybe(ma) {
-    return Maybe(ma.value);
+    return Maybe(ma.extract);
 }
 
 /**
@@ -439,7 +439,7 @@ function toMaybe(ma) {
  * @return {Object} - b
  */
 function toFuture(ma) {
-    return Future.of(ma.value);
+    return Future.of(ma.extract);
 }
 
 /**
@@ -449,7 +449,7 @@ function toFuture(ma) {
  * @return {Object} - b
  */
 function toIdentity(ma) {
-    return Identity(ma.value);
+    return Identity(ma.extract);
 }
 
 /**
@@ -459,27 +459,27 @@ function toIdentity(ma) {
  * @return {Object} - b
  */
 function toJust(ma) {
-    return Just(ma.value);
+    return Just(ma.extract);
 }
 
 function toConstant(ma) {
-    return Constant(ma.value);
+    return Constant(ma.extract);
 }
 
 function toNothing(ma) {
     return Nothing();
 }
 
-function toEither(ma) {
-    return Either(ma);
+function toEither(ma, fork) {
+    return Either(ma.extract, 'right' === fork || null != ma.extract ? 'right' : 'left');
 }
 
 function toRight(ma) {
-    return Right(ma);
+    return Right(ma.extract);
 }
 
 function toLeft(ma) {
-    return Left(ma);
+    return Left(ma.extract);
 }
 
 //===========================================================================================//
@@ -488,7 +488,7 @@ function toLeft(ma) {
 //===========================================================================================//
 //===========================================================================================//
 
-function count(xs, predicate) {
+function count(predicate, xs) {
     return xs.count(predicate);
 }
 
@@ -501,13 +501,9 @@ function count(xs, predicate) {
  * @param {Array} xs - b
  * @return {Array} - c
  */
-var filter = curry(function _filter(predicate, xs) {
-    xs.filter(predicate);
-});
+var filter = curry((predicate, xs) => xs.filter(predicate));
 
-function first(xs, predicate) {
-    return xs.first(predicate);
-}
+var first = curry((predicate, xs) => xs.first(predicate));
 
 /**
  * @signature
@@ -519,9 +515,7 @@ function first(xs, predicate) {
  * @param {Array} ys - c
  * @return {Array} - d
  */
-var intersect = curry(function _intersect(xs, comparer, ys) {
-    return ys.intersect(xs, comparer);
-});
+var intersect = curry((xs, comparer, ys) => ys.intersect(xs, comparer));
 
 /**
  * @signature
@@ -533,32 +527,20 @@ var intersect = curry(function _intersect(xs, comparer, ys) {
  * @param {Array} - c
  * @return {*} - d
  */
-var except = curry(function _except(xs, comparer, ys) {
-    return ys.except(xs, comparer);
-});
+var except = curry((xs, comparer, ys) => ys.except(xs, comparer));
 
-function last(xs, predicate) {
-    return xs.last(predicate);
-}
+var last = curry((predicate, xs) => xs.last(predicate));
 
-var skip = curry(function _skip(xs, amt) {
-    return xs.skip(amt);
-});
+var skip = curry((amt, xs) => xs.skip(amt));
 
-var skipWhile = curry(function _skipWhile(xs, predicate) {
-    return xs.skipWhile(predicate);
-});
+var skipWhile = curry((predicate, xs) => xs.skipWhile(predicate));
 
-var take = curry(function _take(xs, amt) {
-    return xs.take(amt);
-});
+var take = curry((amt, xs) => xs.take(amt));
 
-var takeWhile = curry(function _takeWhile(xs, predicate) {
-    return xs.takeWhile(predicate);
-});
+var takeWhile = curry((predicate, xs) => xs.takeWhile(predicate));
 
-export { ap, apply, fmap, map, mapWith, flatMap, lift2, lift3, lift4, liftN, mjoin, pluckWith,
+export { ap, apply, count, chainRec, fmap, map, mapWith, flatMap, lift2, lift3, lift4, liftN, join, pluckWith,
         chain, bind, mcompose, filter, intersect, except, isConstant, isEither, isFuture, isIdentity, isIo,
         isJust, isLeft, isList, isMaybe, isImmutableDataStructure, isNothing, isRight, isValidation, fold, sequence, traverse,
         contramap, isEmpty, equals, bimap, dimap, toList, toLeft, toRight, toEither, toIdentity, toMaybe, toNothing,
-        toJust, toFuture, toConstant };
+        toJust, toFuture, toConstant, first, last, skip, skipWhile, take, takeWhile };

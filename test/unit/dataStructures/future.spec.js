@@ -5,9 +5,9 @@ var Future = monads.Future;
 
 function identity(val) { return val; }
 
-describe('Future test', function _testFutureFunctor() {
-    describe('Future factory', function _testFutureFunctorObject() {
-        it('should return a new identity functor instance with the mapped value', function _testIdentityFunctorMap() {
+describe('Future test', function _testFuture() {
+    describe('Future data structure', function _testFutureDataStructure() {
+        it('should return a new future instance with the mapped value', function _testFutureMap() {
             var f = Future.of(1),
                 d = f.map(function _t() { return 2; });
 
@@ -15,7 +15,7 @@ describe('Future test', function _testFutureFunctor() {
             f.should.not.equal(d);
         });
 
-        it('should return the same type/value when using the #of function', function _testFutureDotOf() {
+        it('should return the same type/value when using the #of function', function _testFutureOf() {
             var arr = [1, 2, 3],
                 obj = { a: 1, b: 2 },
                 i1 = Future.of(),
@@ -46,7 +46,7 @@ describe('Future test', function _testFutureFunctor() {
             //expect(false).to.eql(i8.extract);
         });
 
-        it('should wrap any value given to the function', function _testFutureDotWrap() {
+        it('should wrap any value given to the function', function _testFutureWrap() {
             var f1 = Future.wrap(1),
                 f2 = Future.wrap(x => x);
 
@@ -55,19 +55,19 @@ describe('Future test', function _testFutureFunctor() {
             f2.extract(identity, identity)(1).should.eql(1);
         });
 
-        it('should build a future waiting to be rejected', function _testFutureDotReject() {
+        it('should build a future waiting to be rejected', function _testFutureReject() {
             var f = Future.reject(1);
 
             f.fork(identity, identity).should.eql(1);
         });
 
-        it('should construct and empty future', function _testFutureDotEmpty() {
+        it('should construct and empty future', function _testFutureEmpty() {
             var f = Future.empty();
 
             f.fork(identity, identity)(10).should.eql(10);
         });
 
-        it('should have a functioning iterator', function _testFutureFunctorIterator() {
+        it('should have a functioning iterator', function _testFutureIterator() {
             function fn() {}
             var f1 = Future.of(10),
                 f2 = Future(fn);
@@ -216,10 +216,8 @@ describe('Future test', function _testFutureFunctor() {
             f3.equals(f2).should.be.false;
         });
 
-        it('should represent a future in string form', function _testFutureDotToString() {
-            var f = Future.of(1);
-
-            f.toString().should.eql('Future()');
+        it('should represent a future in string form', function _testFutureToString() {
+            Future.of(1).toString().should.eql('Future()');
         });
 
         it('should represent the future\'s \'type\' when \'Object.prototype.toString.call\' is invoked', function _testFutureTypeString() {

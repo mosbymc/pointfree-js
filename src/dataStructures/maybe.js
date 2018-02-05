@@ -1,5 +1,5 @@
 import { identity } from '../combinators';
-import { monad_apply, apply, chain, contramap, dimap, join, disjunctionEqualMaker, stringMaker, valueOf, sharedMaybeFns } from './data_structure_util';
+import { apply, chain, contramap, dimap, join, disjunctionEqualMaker, stringMaker, valueOf, sharedMaybeFns } from './data_structure_util';
 
 /**
  * @signature
@@ -246,10 +246,20 @@ Nothing.is = n => nothing === n;
 
 /**
  * @typedef {Object} just
- * @property {function} value - returns the underlying value of the just
+ * @property {function} extract - returns the underlying value of the just
  * @property {function} map - maps a single function over the underlying value of the just
+ * @property {function} chain
+ * @property {function} join
+ * @property {function} apply
  * @property {function} bimap
- * @property {function} extract
+ * @property {function} contramap
+ * @property {function} dimap
+ * @property {function} fold
+ * @property {function} sequence
+ * @property {function} traverse
+ * @property {function} isEmpty
+ * @property {boolean} isJust
+ * @property {boolean} isNothing
  * @property {function} valueOf - returns the underlying value of the just; used during concatenation and coercion
  * @property {function} toString - returns a string representation of the just and its underlying value
  * @property {function} factory - a reference to the just factory function
@@ -286,8 +296,12 @@ var just = {
     get extract() {
         return this.value;
     },
-    isJust: true,
-    isNothing: false,
+    isJust: function _isJust() {
+        return true;
+    },
+    isNothing: function _isNothing() {
+        return false;
+    },
     /**
      * @signature () -> {@link dataStructures.just}
      * @description Takes a function that is applied to the underlying value of the
@@ -482,6 +496,12 @@ var just = {
      * @return {boolean} - Returns a boolean indicating equality
      */
     equals: disjunctionEqualMaker('isJust'),
+    isEmpty: function _isEmpty() {
+        return false;
+    },
+    extend: function _extend(fn) {
+        return Maybe(fn(this));
+    },
     /**
      * @signature () -> *
      * @description Returns the underlying value of the current just 'instance'. This
@@ -524,10 +544,20 @@ var just = {
 
 /**
  * @typedef {Object} nothing
- * @property {function} value - returns the underlying value of the 'nothing' data structure (always null)
+ * @property {function} extract - returns the underlying value of the 'nothing' data structure (always null)
  * @property {function} map - maps a single function over the underlying value of the 'nothing'
+ * @property {function} chain
+ * @property {function} join
+ * @property {function} apply
  * @property {function} bimap
- * @property {function} extract
+ * @property {function} contramap
+ * @property {function} dimap
+ * @property {function} fold
+ * @property {function} sequence
+ * @property {function} traverse
+ * @property {function} isEmpty
+ * @property {boolean} isJust
+ * @property {boolean} isNothing
  * @property {function} valueOf - returns the underlying value of the 'nothing'; used during concatenation and coercion
  * @property {function} toString - returns a string representation of the 'nothing' and its underlying value
  * @property {function} factory - a reference to the 'nothing' factory function
@@ -558,14 +588,12 @@ var nothing = {
      * @return {*} Returns the underlying value of the delegator. May be any value.
      */
     value: null,
-    /**
-     *
-     */
-    isJust: false,
-    /**
-     *
-     */
-    isNothing: true,
+    isJust: function _isJust() {
+        return false;
+    },
+    isNothing: function _isNothing() {
+        return true;
+    },
     /**
      * @signature () -> {@link dataStructures.nothing}
      * @description Takes a single function as an argument and returns 'nothing'. A 'nothing' cannot
@@ -611,6 +639,7 @@ var nothing = {
         return a.of(Maybe.Nothing());
     },
     nothing: returnNothing,
+    extend: returnNothing,
     /**
      * @signature * -> boolean
      * @description Determines if 'this' nothing is equal to another data structure. Equality
@@ -627,6 +656,9 @@ var nothing = {
      * @return {boolean} - Returns a boolean indicating equality
      */
     equals: Nothing.is,
+    isEmpty: function _isEmpty() {
+        return true;
+    },
     /**
      * @signature () -> *
      * @description Returns the underlying value of the current 'nothing' 'instance'. This

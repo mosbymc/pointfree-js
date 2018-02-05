@@ -1,4 +1,4 @@
-import { apply, chain, contramap, dimap, join, equals, stringMaker, valueOf, extendMaker } from './data_structure_util';
+import { apply, chain, chainRec, contramap, extend, dimap, join, equals, stringMaker, valueOf } from './data_structure_util';
 
 /**
  * @signature - :: * -> {@link dataStructures.identity}
@@ -124,9 +124,7 @@ var identity = {
      * @signature () -> *
      * @description Returns the underlying value of an identity delegator. This is a getter function
      * and thus works differently than the fantasy-land specification; rather than invoking identity#extract
-     * as a function, you merely need to reference as a non-function property. This makes infinitely more
-     * sense to me, especially if the underlying is a function... who wants to do this: identity.extract()(x, y, z)
-     * when they could do this: identity.extract(x, y, z)?
+     * as a function, you merely need to reference as a non-function property.
      * @example Identity(10).extract // => 10
      * @memberOf dataStructures.identity
      * @instance
@@ -179,6 +177,7 @@ var identity = {
      * Identity(10).chain(x => Just(x * x))        // => Identity(Just(100))
      */
     chain: chain,
+    chainRec: chainRec,
     /**
      * @signature () -> {@link dataStructures.identity}
      * @description Returns a new identity data structure. If the current identity is nested, join
@@ -281,7 +280,7 @@ var identity = {
      * underlying function.
      * @return {dataStructures.identity} Returns a new identity data structure.
      *
-     * @example Identity(x => x * x).contramap(x => x + 10).apply(Identity(5))  // => Identity(225)
+     * @example Identity(5).apply(Identity(x => x * x).contramap(x => x + 10))      // => Identity(225)
      */
     contramap: contramap,
 
@@ -300,7 +299,7 @@ var identity = {
      * @param {function} g - g
      * @return {dataStructures.identity} l
      *
-     * @example Identity(x => x * x).dimap(x => x + 10, x => x / 5).apply(Identity(5))  // => Identity(45)
+     * @example Identity(5).apply(Identity(x => x * x).dimap(x => x + 10, x => x / 5))  // => Identity(45)
      */
     dimap: dimap,
     /**
@@ -328,7 +327,7 @@ var identity = {
      * @return {Identity<T>} Returns a new identity that wraps the return value of the
      * function that was provided as an argument.
      */
-    extend: extendMaker(Identity),
+    extend: extend,
     /**
      * @signature * -> boolean
      * @description Determines if 'this' identity is equal to another data structure. Equality

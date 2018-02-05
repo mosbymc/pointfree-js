@@ -41,7 +41,7 @@ describe('Test observable', function _testObservable() {
                 return val * 2;
             })
             .subscribe(val => res.push(val),
-                err => console.log(err),
+                console.error,
                 function _complete() {
                     res.should.eql([2, 4, 6, 8, 10]);
                     done();
@@ -55,7 +55,7 @@ describe('Test observable', function _testObservable() {
         observable.fromList(list, 0)
             .map()      // => no map function
             .subscribe(val => res.push(val),
-                err => console.log(err),
+                console.error,
                 function _complete() {
                     res.should.eql(list);
                     done();

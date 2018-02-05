@@ -54,6 +54,18 @@ describe('Test combinators', function _testCombinators() {
         });
     });
 
+    describe('Test curry', function _testCurry() {
+        it('should curry a function only once', function _testCurry() {
+            function f(arg1, arg2, arg3) { return 0; }
+            let cf = curry(f),
+                res = curry(cf);
+
+            cf.orig.should.eql(res.orig);
+            cf.orig.should.eql(f);
+            res.orig.should.eql(f);
+        });
+    });
+
     describe('curryN', function _testCurryN() {
         it('should re-curry successfully', function _testCurryN_Re_Currying() {
             function testFn(arg1, arg2, arg3, arg4) {
@@ -71,15 +83,13 @@ describe('Test combinators', function _testCombinators() {
         //TODO: problem with it, running the tests via mocha seems to cause things to explode (similar to mocha
         //TODO: freaking out because I passed a function to Object.setProperty rather than a plain object). So,
         //TODO: for the time being, I'll leave the test out.
-        /*
-        it('should give a user-friendly string representation of the curried function', function _testCurryNToString() {
+        /*it('should give a user-friendly string representation of the curried function', function _testCurryNToString() {
             function fourArgs(arg1, arg2, arg3, arg4) { return arg1 + arg2 + arg3 + arg4; }
 
             var curriedFunc = curryN(4, fourArgs, []),
                 res = curriedFunc(1)(2, 3);
-            res.toString().should.eql('function fourArgs(arg1, arg2, arg3, arg4) {\n                $_$wf(17);\n                return $_$w(17, 32), arg1 + arg2 + arg3 + arg4;\n            }(1, 2, 3)');
-        });
-        */
+            res.toString().should.eql('function fourArgs(arg1, arg2, arg3, arg4) {\n                $_$wf(28);\n                return $_$w(28, 32), arg1 + arg2 + arg3 + arg4;\n            }(1, 2, 3)');
+        });*/
     });
 
     describe('Test curryRight', function _testCurryRight() {
@@ -89,6 +99,36 @@ describe('Test combinators', function _testCombinators() {
             }
 
             curryRight(mathEm)(3, 2, 1).should.eql(7);
+        });
+    });
+
+    describe('Test fixedPoint', function _testFixedPoint() {
+        it('should act on a recursive function', function _testFixedPoint() {
+            fixedPoint(recur => x => 1 === x ? 1 : x * recur(x - 1))(5).should.eql(120)
+        });
+    });
+
+    describe('Test fork', function  _testFork() {
+        it('should run each execute each inner function and apply the outer function to the results', function _testFork() {
+            function f1(arg) { return arg * arg; }
+            function f2(arg) { return 10 * arg; }
+            function f3(arg1, arg2) { return arg1 + arg2; }
+
+            let f1Spy = sinon.spy(f1),
+                f2Spy = sinon.spy(f2),
+                f3Spy = sinon.spy(f3);
+
+            let forkFn = fork(f3Spy, f1Spy, f2Spy),
+                res = forkFn(5);
+
+            res.should.eql(75);
+            f1Spy.should.have.been.called.once;
+            f2Spy.should.have.been.called.once;
+            f3Spy.should.have.been.called.once;
+            f1Spy.should.have.returned(25);
+            f2Spy.should.have.returned(50);
+            f3Spy.should.have.returned(75);
+            f3Spy.should.have.been.calledWith(25, 50);
         });
     });
 
@@ -102,6 +142,55 @@ describe('Test combinators', function _testCombinators() {
 
         it('should not invoke the \'if\' function when the predicate returns false', function _testIfThisThenThatWithFalseyValue() {
             ifThisThenThat(pred, ifFunc, 0, 6).should.eql(6);
+        });
+    });
+
+    describe('Test pipe', function _testPipe() {
+        it('should return a function that, when invoked, applies all arguments to the first function and the the results to each subsequent function', function _testPipe() {
+            function f1(arg1, arg2, arg3) { return (arg1 + arg2) * arg3; }
+            function f2(arg) { return arg * arg; }
+            function f3(arg) { return arg - 10; }
+            function f4(arg) { return arg + 5; }
+
+            let f1Spy = sinon.spy(f1),
+                f2Spy = sinon.spy(f2),
+                f3Spy = sinon.spy(f3),
+                f4Spy = sinon.spy(f4);
+
+            let piped = pipe(f1Spy, f2Spy, f3Spy, f4Spy),
+                res = piped(2, 4);
+
+            res.should.be.a('function');
+            res.length.should.eql(1);
+
+            res = res(6);
+
+            piped.toString().should.eql('f1(f2(f3(f4)))()');
+            res.should.eql(1291);
+
+            f1Spy.should.have.been.called.once;
+            f2Spy.should.have.been.called.once;
+            f3Spy.should.have.been.called.once;
+            f4Spy.should.have.been.called.once;
+
+            f1Spy.should.have.been.calledWith(2, 4, 6);
+            f2Spy.should.have.been.calledWith(36);
+            f3Spy.should.have.been.calledWith(1296);
+            f4Spy.should.have.been.calledWith(1286);
+        });
+    });
+
+    describe('Test q', function _testQ() {
+        it('should execute', function _testQ() {
+            let a = x => x * x,
+                b = x => x + 10;
+            q(a, b, 10).should.eql(110);
+        });
+    });
+
+    describe('Test reduce', function _testReduce() {
+        it('should reduce the list', function _testReduce() {
+            reduce((x, y) => x +  y, 0, [1, 2, 3, 4, 5]).should.eql(15);
         });
     });
 
@@ -125,6 +214,12 @@ describe('Test combinators', function _testCombinators() {
 
         obj1.a.should.eql(3);
         obj2.a.should.eql(-1);
+    });
+
+    describe('Test t', function _testT() {
+        it('should execute', function _testT() {
+            t(10, x => x * x).should.eql(100);
+        });
     });
 
     describe('Test uncurry', function _testUncurry() {
@@ -162,6 +257,12 @@ describe('Test combinators', function _testCombinators() {
 
             var res = uncurriedFunc(1, 2, 3);
             res(1).should.eql(6);
+        });
+    });
+
+    describe('Test w', function _testW() {
+        it('should execute', function _testW() {
+            w(x => y => x * y, 5).should.eql(25);
         });
     });
 

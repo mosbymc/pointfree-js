@@ -118,9 +118,9 @@ function semigroupFactory(concatFn, type) {
             },
             concatAll: {
                 value: function _concatAll(...g) {
-                    return this.factory(g.reduce(function _reduce(curr, next) {
+                    return g.reduce(function _reduce(curr, next) {
                         return curr.concat(next);
-                    }, this));
+                    }, this);
                 }
             },
             factory: {

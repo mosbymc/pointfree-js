@@ -202,11 +202,11 @@ describe('Maybe functor tests', function _testMaybeFunctor() {
             m1.should.eql(nothing);
             just.isPrototypeOf(m2).should.be.true;
 
-            m1.isNothing.should.be.true;
-            m1.isJust.should.be.false;
+            m1.isNothing().should.be.true;
+            m1.isJust().should.be.false;
 
-            m2.isNothing.should.be.false;
-            m2.isJust.should.be.true;
+            m2.isNothing().should.be.false;
+            m2.isJust().should.be.true;
         });
 
         it('should return a maybe with the correct isJust/isNothing values set when using peripheral delegate creators', function _testMaybeperipheralCreators() {
@@ -228,7 +228,7 @@ describe('Maybe functor tests', function _testMaybeFunctor() {
         });
     });
 
-    describe('Maybe functor object tests', function _testMaybeFunctorObject() {
+    describe('Maybe data structure implementation tests', function _testMaybeFunctorObject() {
         it('should not allow the ._value property to be updated', function _testWritePrevention() {
             var m = Maybe(1),
                 err1 = false,
@@ -260,23 +260,23 @@ describe('Maybe functor tests', function _testMaybeFunctor() {
                 m4 = Maybe.of(null),
                 m5 = Maybe(1);
 
-            m1.isJust.should.eql(false);
-            m1.isNothing.should.eql(true);
+            m1.isJust().should.eql(false);
+            m1.isNothing().should.eql(true);
 
-            m2.isJust.should.eql(false);
-            m2.isNothing.should.eql(true);
+            m2.isJust().should.eql(false);
+            m2.isNothing().should.eql(true);
 
-            m3.isJust.should.eql(true);
-            m3.isNothing.should.eql(false);
+            m3.isJust().should.eql(true);
+            m3.isNothing().should.eql(false);
 
-            m4.isJust.should.eql(true);
-            m4.isNothing.should.eql(false);
+            m4.isJust().should.eql(true);
+            m4.isNothing().should.eql(false);
 
-            m5.isJust.should.eql(true);
-            m5.isNothing.should.eql(false);
+            m5.isJust().should.eql(true);
+            m5.isNothing().should.eql(false);
         });
 
-        it('should return a new maybe instance with the mapped value', function _testMaybeMap() {
+        it('should return a new maybe data structure with the mapped value', function _testMaybeMap() {
             var m1 = Maybe(1),
                 m2 = Maybe(),
                 d1 = m1.map(function _t() { return 2; }),
@@ -288,7 +288,7 @@ describe('Maybe functor tests', function _testMaybeFunctor() {
             expect(m2.value).to.eql(d2.value);
         });
 
-        it('should return a new maybe instance with the bi-mapped value', function _testMaybeBiMap() {
+        it('should return a new maybe data structure with the bi-mapped value', function _testMaybeBiMap() {
             var f1 = x => x * x,
                 f2 = x => x;
 
@@ -304,6 +304,12 @@ describe('Maybe functor tests', function _testMaybeFunctor() {
         it('should extract the underlying value of a just', function _testJustExtract() {
             Just(10).extract.should.eql(10);
             Just('10').extract.should.eql('10');
+        });
+
+        it('should return its equivalent when extract is invoked during an extend', function _testMaybeExtend() {
+            Just(10).extend(j => j.extract).should.eql(Just(10));
+            Maybe(10).extend(m => m.extract).should.eql(Maybe(10));
+            Nothing().extend(n => n.extract).should.eql(Nothing());
         });
 
         it('should properly indicate equality when justs and nothings are are indeed equal', function _testMaybeEquality() {
@@ -451,7 +457,7 @@ describe('Maybe functor tests', function _testMaybeFunctor() {
             res.value.should.eql(n);
         });
 
-        it('should have a .constructor property that points to the factory function', function _testMaybeFunctorIsStupidViaFantasyLandSpecCompliance() {
+        it('should have a .constructor property that points to the factory function', function _testMaybeFactoryPointer() {
             Just(1).constructor.should.eql(Maybe);
             Nothing().constructor.should.eql(Maybe);
         });

@@ -3,7 +3,7 @@ import { identity } from '../../../src/dataStructures/identity';
 
 var Identity = monads.Identity;
 
-describe('Identity monad test', function _testIdentityMonad() {
+describe('Identity test', function _testIdentity() {
     describe('Identity object factory tests', function _testIdentityObjectFactory() {
         it('should return a new identity monad regardless of data type', function _testIdentityFactoryObjectCreation() {
             var arr = [1, 2, 3],
@@ -36,7 +36,7 @@ describe('Identity monad test', function _testIdentityMonad() {
             expect(false).to.eql(i8.value);
         });
 
-        it('should return the same type/value when using the #of function', function _testIdentityDotOf() {
+        it('should return the same type/value when using the #of function', function _testIdentityOf() {
             var arr = [1, 2, 3],
                 obj = { a: 1, b: 2 },
                 i1 = Identity.of(),
@@ -67,7 +67,7 @@ describe('Identity monad test', function _testIdentityMonad() {
             expect(false).to.eql(i8.value);
         });
 
-        it('should return correct boolean value when #is is invoked', function _testIdentityDotIs() {
+        it('should return correct boolean value when #is is invoked', function _testIdentityIs() {
             var i = Identity(10),
                 m = monads.Maybe(10),
                 c = monads.Constant(10),
@@ -90,7 +90,7 @@ describe('Identity monad test', function _testIdentityMonad() {
             i.isEmpty().should.be.false;
         });
 
-        it('should lift any function to return an Identity wrapped value', function _testIdentityDotLift() {
+        it('should lift any function to return an Identity wrapped value', function _testIdentityLift() {
             function t1() { return -1; }
             function t2() { return '-1'; }
             function t3(arg) { return arg; }
@@ -110,7 +110,7 @@ describe('Identity monad test', function _testIdentityMonad() {
         });
     });
 
-    describe('Identity monad object tests', function _testIdentityMonadObject() {
+    describe('Identity data structure tests', function _testIdentityDataStructure() {
         it('should not allow the ._value property to be updated', function _testWritePrevention() {
             var i = Identity(1),
                 err1 = false,
@@ -135,7 +135,7 @@ describe('Identity monad test', function _testIdentityMonad() {
             err2.should.be.true;
         });
 
-        it('should return a new identity functor instance with the mapped value', function _testIdentityFunctorMap() {
+        it('should return a new identity data structure with the mapped value', function _testIdentityMap() {
             var i = Identity(1),
                 d = i.map(function _t() { return 2; });
 
@@ -175,6 +175,10 @@ describe('Identity monad test', function _testIdentityMonad() {
             m3.equals(m5).should.be.false;
 
             m4.equals(m5).should.be.false;
+        });
+
+        it('should return its equivalent when extract is invoked during an extend', function _testIdentityExtend() {
+            Identity(10).extend(i => i.extract).should.eql(Identity(10));
         });
 
         it('should map an identity to the other functor types', function _testIdentityMapTransform() {
@@ -333,7 +337,7 @@ describe('Identity monad test', function _testIdentityMonad() {
             Identity(1).traverse(monads.Maybe, test).toString().should.eql('Just(Identity(3))');
         });
 
-        it('should have a .factory property that points to the factory function', function _testIdentityIsStupidViaFantasyLandSpecCompliance() {
+        it('should have a .factory property that points to the factory function', function _testIdentityFactoryPointer() {
             Identity(null).factory.should.eql(Identity);
             Identity(null).constructor.should.eql(Identity);
         });
@@ -351,7 +355,7 @@ describe('Identity monad test', function _testIdentityMonad() {
         });
     });
 
-    describe('Identity laws test', function _testIdentityFunctorLaws() {
+    describe('Identity laws test', function _testIdentityLaws() {
         /*it('should obey the identity law', function _testIdentityFunctorIdentityLaw() {
             var v = Identity(2);
 
@@ -366,7 +370,7 @@ describe('Identity monad test', function _testIdentityMonad() {
 
             //Composition
             Identity(1).apply(Identity(x => x * x).apply(Identity(x => x + 2).map(f => g => x => f(g(x))))).value
-                .should.eql(Identity(1).apply(Identity(x => x * x)).apply(Identity(x => x + 2)).value)
+                .should.eql(Identity(1).apply(Identity(x => x * x)).apply(Identity(x => x + 2)).value);
 
             //Identity
             Identity(i).apply(Identity(i)).value.should.eql(i);

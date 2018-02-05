@@ -1,6 +1,7 @@
 import { observableStatus } from '../helpers';
 import { subscriber } from './subscribers/subscriber';
-import { debounceOperator, chainOperator, filterOperator, groupByOperator, itemBufferOperator, mapOperator, mergeOperator, timeBufferOperator } from './streamOperators/operators';
+import { debounceOperator, distinctOperator, chainOperator, filterOperator, groupByOperator, itemBufferOperator, mapOperator,
+    mergeOperator, timeBufferOperator, zipOperator } from './streamOperators/operators';
 import { generatorProto } from '../helpers';
 import { wrap, noop, delegatesTo } from '../functionalHelpers';
 import { compose, all, identity } from '../combinators';
@@ -38,9 +39,12 @@ var observable = {
      * @return {observable} - b
      */
     map: function _map(fn) {
+        return this.lift(Object.create(mapOperator).init(fn));
+        /*
         if (delegatesTo(this.operator, mapOperator))
             return this.lift.call(this.source, Object.create(mapOperator).init(compose(fn, this.operator.transform)));
         return op.call(this, mapOperator, fn);
+        */
     },
     /**
      * @sig
@@ -49,7 +53,18 @@ var observable = {
      * @return {observable} - b
      */
     chain: function _deepMap(fn) {
-        return op.call(this, chainOperator, fn);
+        return this.lift(Object.create(chainOperator).init(fn));
+        //return op.call(this, chainOperator, fn);
+    },
+    /**
+     * @signature
+     * @description d
+     * @param {function} comparer - A function used to compare values passed to the observable
+     * for distinctness. Defaults to 'strict equality' if no comparer is provided.
+     * @return {observable} Returns an observable
+     */
+    distinct: function _distinct(comparer) {
+        return this.lift(Object.create(distinctOperator).init(comparer));
     },
     /**
      * @sig
@@ -58,9 +73,12 @@ var observable = {
      * @return {observable} - b
      */
     filter: function _filter(predicate) {
+        return this.lift(Object.create(filterOperator).init(predicate));
+        /*
         if (delegatesTo(this.operator, filterOperator))
             return this.lift.call(this.source, Object.create(filterOperator).init(all(predicate, this.operator.predicate)));
         return op.call(this, filterOperator, predicate);
+        */
     },
     /**
      * @sig
@@ -81,7 +99,13 @@ var observable = {
      */
     merge: function _merge(...observables) {
         //TODO: fix merge operator - it doesn't appear to be working as intended
-        return this.mergeMap(null, ...observables);
+        //return this.mergeMap(null, ...observables);
+        var transform;
+        if ('function' === typeof observables[observables.length - 1]) {
+            transform = observables[observables.length - 1];
+            observables = observables.slice(0, observables.length - 1);
+        }
+        return this.lift(Object.create(mergeOperator).init(observables, transform));
     },
     /**
      * @sig
@@ -110,7 +134,8 @@ var observable = {
      * @return {observable} - b
      */
     itemBuffer: function _itemBuffer(count) {
-        return op.call(this, itemBufferOperator, count);
+        //return op.call(this, itemBufferOperator, count);
+        return this.lift(Object.create(itemBufferOperator).init(count));
     },
     /**
      * @sig
@@ -119,7 +144,8 @@ var observable = {
      * @return {observable} - b
      */
     timeBuffer: function _timeBuffer(amt) {
-        return op.call(this, timeBufferOperator, amt);
+        //return op.call(this, timeBufferOperator, amt);
+        return this.lift(Object.create(timeBufferOperator).init(amt));
     },
     /**
      * @sig
@@ -128,7 +154,22 @@ var observable = {
      * @return {*|observable} - b
      */
     debounce: function _debounce(amt) {
-        return op.call(this, debounceOperator, amt);
+        //return op.call(this, debounceOperator, amt);
+        return this.lift(Object.create(debounceOperator).init(amt));
+    },
+    /**
+     * @description d
+     * @param {observable} observables - One or more observables to zip with the current observable
+     * @param {function} [zipFunc] - An optional function that is used once all matching items from the
+     * separate observables have been received. This function will be invoked with one item from each of
+     * the observables - they will be passed as individual items, not an array.
+     * @return {observable} Returns an observable
+     */
+    zip: function _zip(...observables) {
+        let hasProjection = 'function' === typeof observables[observables.length - 1];
+        observables = hasProjection ? observables.slice(0, observables.length - 2) : observables;
+        let projection = hasProjection ? observables[observables.length - 1] : i;
+        return this.lift(Object.create(zipOperator).init(observables, projection));
     },
     /**
      * @sig
@@ -198,24 +239,40 @@ var observable = {
         var o = Object.create(observable);
         o.source = list;
         o.idx = startingIdx;
-        o.subscribe = function _subscribe(subscriber) {
+        o.subscribe = function _subscribe(sub) {
             function unSub() {
                 this.status = observableStatus.complete;
             }
 
             var runner = (function _runner() {
-                if (subscriber.status !== observableStatus.paused && subscriber.status !== observableStatus.complete &&
+                if (sub.status !== observableStatus.paused && sub.status !== observableStatus.complete &&
                     this.idx < this.source.length) {
                     Promise.resolve(this.source[this.idx++])
                         .then(function _resolve(val) {
-                            subscriber.next(val);
+                            sub.next(val);
                             runner();
                         });
                 }
                 else {
-                    var d = subscriber;
-                    while (d.subscriber.subscriber) d = d.subscriber;
-                    d.unsubscribe();
+                    //var d = sub;
+                    //while (d.subscriber && d.subscriber.subscriber) d = d.subscriber;
+                    //if (d.unsubscribe) d.unsubscribe();
+                    //else if (d.complete) d.complete();
+                    //Promise.resolve(sub).then(_unsubscribe);
+                    Promise.resolve(sub).then(s => _unsubscribe(sub));
+                    //_unsubscribe(sub);
+                    function _unsubscribe(sub) {
+                        sub = sub.subscriber ? sub.subscriber : sub;
+                        if (sub.subscribers && sub.subscribers.length) {
+                            sub.subscribers.forEach(function _forEachSubscriber(s) {
+                                _unsubscribe(s);
+                            });
+                        }
+                        else {
+                            if (sub.complete) sub.complete();
+                            if (sub.unsubscribe) sub.unsubscribe();
+                        }
+                    }
                 }
             }).bind(this);
 
@@ -224,8 +281,18 @@ var observable = {
                     runner();
                 });
 
-            subscriber.unsubscribe = unSub;
-            return subscriber;
+            if (subscriber.isPrototypeOf(sub)) {
+                sub.unsubscribe = unSub;
+            }
+            else {
+                sub = {
+                    next: sub,
+                    error: arguments[1],
+                    complete: arguments[2]
+                };
+            }
+
+            return sub;
 
             /*
             var runner = (function _runner() {

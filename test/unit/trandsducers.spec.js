@@ -1,4 +1,4 @@
-import { mapping, filtering, mapReducer, filterReducer, mapped, transduce, reduce, dropping, taking } from '../../src/transducers';
+import { mapping, filtering, gating, mapReducer, filterReducer, mapped, transduce, reduce, dropping, taking } from '../../src/transducers';
 import { compose } from '../../src/combinators';
 
 function sum(x, y) {
@@ -53,6 +53,17 @@ describe('Test transducers', function _testTransducers() {
     describe('Test dropping and taking composition', function _testDroppingAndTakingComposition() {
         it('should compose the dropping and taking functions', function _droppingAndTakingCompose() {
             reduce( compose(dropping(2), taking(3) )(concat), [], [3,4,9,13,14,12,45,56]).should.eql([9, 13, 14]);
+        });
+    });
+
+    describe('Test gating', function _testGating() {
+        it('should gate the data', function _testGate() {
+            var stringsBetween2sAnd8s = compose(
+                gating(x => 3 > x, x => 7 < x),//items less than 3 open the gate, items over 7 close it
+                filtering(x => 'string' === typeof x)//of those that pass, only items that are strings
+            );
+            reduce(stringsBetween2sAnd8s(concat), [], ['zoop', 1, 5, 6, 'bloop', 7, 8, 9, 4, 'bop', 7, 8, 9, 2, 'barp'])
+                .should.eql(['bloop', 'barp']);
         });
     });
 

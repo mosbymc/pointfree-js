@@ -1,8 +1,8 @@
-import { ap, apply, fmap, map, mapWith, flatMap, lift2, lift3, lift4, liftN, mjoin, pluckWith,
+import { ap, apply, count, chainRec, fmap, map, mapWith, flatMap, lift2, lift3, lift4, liftN, join, pluckWith,
     chain, bind, mcompose, filter, intersect, except, isConstant, isEither, isFuture, isIdentity, isIo,
     isJust, isLeft, isList, isMaybe, isImmutableDataStructure, isNothing, isRight, isValidation, fold, sequence, traverse,
-    contramap, isEmpty, equals, bimap, toList, toLeft, toRight, toEither, toIdentity, toMaybe, toNothing,
-    toJust, toFuture, toConstant } from '../../src/pointless_data_structures';
+    contramap, isEmpty, equals, bimap, dimap, toList, toLeft, toRight, toEither, toIdentity, toMaybe, toNothing,
+    toJust, toFuture, toConstant, first, last, skip, skipWhile, take, takeWhile } from '../../src/pointless_data_structures';
 import { Constant, Either, Future, Identity, Io, Just, Left, List, Maybe, Nothing, Right, Validation } from '../../src/dataStructures/dataStructures';
 
 describe('Test pointless_data_structures', function _testFunctionalContainerHelpers() {
@@ -229,6 +229,21 @@ describe('Test pointless_data_structures', function _testFunctionalContainerHelp
         });
     });
 
+    describe('Test isEmpty', function _testIsEmpty() {
+        it('should return the correct response based on the data structure type', function _testIsEmpty() {
+            isEmpty(Identity()).should.be.false;
+            isEmpty(Just()).should.be.false;
+            isEmpty(Nothing()).should.be.true;
+            isEmpty(Maybe()).should.be.true;
+            isEmpty(Maybe(1)).should.be.false;
+            isEmpty(Future()).should.be.false;
+            isEmpty(Left()).should.be.true;
+            isEmpty(Right(1)).should.be.false;
+            isEmpty(Either()).should.be.true;
+            isEmpty(Either.of(1)).should.be.false;
+        });
+    });
+
     describe('Test map', function _testMap() {
         it('should map over any mappable data structure', function _testMap() {
             var res1 = mapWith(x => x * 2, Identity(4)),
@@ -250,8 +265,37 @@ describe('Test pointless_data_structures', function _testFunctionalContainerHelp
         });
     });
 
+    describe('Test bimap', function _testBimap() {
+        it('should return a data structure of the same type having applied the correct function', function _testBimap() {
+            bimap(x => x * x, x => x + 4, Maybe(1)).extract.should.eql(1);
+            Object.getPrototypeOf(Nothing()).isPrototypeOf(bimap(x => x * x, x => x + 4, Nothing(1))).should.be.true;
+        });
+    });
+
+    describe('Test dimap', function _testDimap() {
+        it('should correctly dimap a data structure', function _testDimap() {
+            Identity(5).apply(dimap(x => x + 10, x => x / 5, Identity(x => x * x))).extract.should.eql(45);
+        });
+    });
+
+    describe('Test chainRec', function _testChainRec() {
+        it('should recursively invoke the chain functionality on a data structure', function _testChainRec() {
+            function _recursiveChain(next, done, value) {
+                if (100 > value) return next(value + value);
+                return done(value);
+            }
+
+            chainRec(_recursiveChain, Identity(1)).extract.should.eql(128);
+        });
+    });
+
     describe('Test mcompose', function _testMCompose() {
-        //it('should return something');
+        it('should compose both identity-returning functions and return a function waiting for arguments', function _testMcompose() {
+            function f1(arg) { return Identity(arg); }
+            function f2(arg) { return Identity(arg * arg); }
+
+            mcompose(f2, f1)(10).extract.should.eql(100);
+        });
     });
 
     describe('Test apply', function _testApply() {
@@ -262,6 +306,13 @@ describe('Test pointless_data_structures', function _testFunctionalContainerHelp
             var res = apply(i1, i2);
             Object.getPrototypeOf(i1).isPrototypeOf(res).should.be.true;
             res.value.should.eql(225);
+        });
+    });
+
+    describe('Test join', function _testJoin() {
+        it('should flatten a data structure one time', function _testJoin() {
+            join(Identity(Identity(1))).should.eql(Identity(1));
+            join(Identity(Just(1))).should.eql(Identity(Just(1)));
         });
     });
 
@@ -362,6 +413,119 @@ describe('Test pointless_data_structures', function _testFunctionalContainerHelp
         it('should work with nested data structures', function _testEqualsWithNestedTypes() {
             equals(Identity(Identity(1)), Identity(1)).should.be.true;
             equals(Maybe(true), Maybe(Maybe(false))).should.be.false;
+        });
+    });
+
+    describe('Test data structure transformers', function _testDataStructureTransformers() {
+        it('should turn on data structure into another', function _testDataStructureTransformers() {
+            var id = Identity(5);
+
+            Object.getPrototypeOf(Constant()).isPrototypeOf(toConstant(id)).should.be.true;
+            toConstant(id).extract.should.eql(5);
+
+            Object.getPrototypeOf(List()).isPrototypeOf(toList(id)).should.be.true;
+            toList(id).data.should.eql([5]);
+
+            Object.getPrototypeOf(Just()).isPrototypeOf(toMaybe(id)).should.be.true;
+            toMaybe(id).extract.should.eql(5);
+
+            Nothing().should.eql(toNothing(id));
+
+            Object.getPrototypeOf(Just()).isPrototypeOf(toJust(id)).should.be.true;
+            toJust(id).extract.should.eql(5);
+
+            Object.getPrototypeOf(Future()).isPrototypeOf(toFuture(id)).should.be.true;
+            toFuture(id).fork(x => x.should.eql(5), x => x.should.eql(5));
+
+            Object.getPrototypeOf(Right()).isPrototypeOf(toEither(id)).should.be.true;
+            toEither(id).extract.should.eql(5);
+
+            Object.getPrototypeOf(Left()).isPrototypeOf(toEither(Identity())).should.be.true;
+
+            Object.getPrototypeOf(Left()).isPrototypeOf(toLeft(id)).should.be.true;
+            toLeft(id).extract.should.eql(5);
+
+            Object.getPrototypeOf(Right()).isPrototypeOf(toRight(id)).should.be.true;
+            toRight(id).extract.should.eql(5);
+
+            Object.getPrototypeOf(Identity()).isPrototypeOf(toIdentity(Just(5))).should.be.true;
+            toIdentity(Just(5)).extract.should.eql(5);
+        });
+    });
+
+    describe('Test list specific functionality', function _testListSpecificFunctionality() {
+        describe('Test count', function _testCount() {
+            it('should return the number of item in the list that \'pass\' the predicate', function _testCount() {
+                count(x => 3 < x, List([1, 2, 3, 4, 5])).should.eql(2);
+
+            });
+        });
+
+        describe('Test except', function _testExcept() {
+            it('should return all items in the list except where they intersect', function _testExcept() {
+                except(List([3, 4, 5, 6, 7, 8]), (x, y) => x === y, List([1, 2, 3, 4, 5, 6, 7, 8, 9, 10]))
+                    .data.should.eql([1, 2, 9, 10]);
+            });
+        });
+
+        describe('Test filter', function _testFilter() {
+            it('should filter a list', function _testFilter() {
+                filter(x => 3 < x, List([1, 2, 3, 4, 5]))
+                    .data.should.eql([4, 5]);
+            });
+        });
+
+        describe('Test first', function _testFirst() {
+            it('should return the first item in the list that passes the predicate', function _testFirst() {
+                first(x => 4 <= x, List([1, 2, 3, 4, 5])).should.eql(4);
+            });
+        });
+
+        describe('Test intersect', function _testIntersect() {
+            it('should return the items of intersection', function _testIntersect() {
+                intersect(List([3, 4, 5, 6, 7, 8]), (x, y) => x === y, List([1, 2, 3, 4, 5, 6, 7, 8, 9, 10]))
+                    .data.should.eql([3, 4, 5, 6, 7, 8]);
+            });
+        });
+
+        describe('Test last', function _testLast() {
+            it('should return the last item in the list that \'passes\' the predicate', function _testLast() {
+                last(x => 2 < x, List([1, 2, 3, 4, 5])).should.eql(5);
+            });
+        });
+
+        describe('Test skip', function _testSkip() {
+            it('should skip x items in the list and return the rest', function _testSkip() {
+                skip(4, List([1, 2, 3, 4, 5]))
+                    .data.should.eql([5]);
+                skip(5, List([1, 2, 3, 4, 5]))
+                    .data.should.eql([]);
+                skip(-2, List([1, 2, 3, 4, 5]))
+                    .data.should.eql([1, 2, 3]);
+            });
+        });
+
+        describe('Test skipWhile', function _testSkipWhile() {
+            it('should skip all items until the first item that passes the predicate and return the rest', function _testSkipWhile() {
+                skipWhile(x => 3 > x, List([1, 2, 3, 4, 5]))
+                    .data.should.eql([3, 4, 5]);
+            });
+        });
+
+        describe('Test take', function _testTake() {
+            it('should take the first x items and return a new list', function _testTake() {
+                take(2, List([1, 2, 3, 4, 5]))
+                    .data.should.eql([1, 2]);
+                take(-2, List([1, 2, 3, 4, 5]))
+                    .data.should.eql([4, 5]);
+            });
+        });
+
+        describe('Test takeWhile', function _testTakeWhile() {
+            it('should take all the items until the first item that does not pass the predicate and return a new list', function _testTakeWhile() {
+                takeWhile(x => 2 > x, List([1, 2, 3, 4, 5]))
+                    .data.should.eql([1]);
+            });
         });
     });
 });

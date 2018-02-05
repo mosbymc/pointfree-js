@@ -32,11 +32,10 @@ describe('Test subscriber', function _testSubscriber() {
 
         var s = Object.create(subscriber).initialize(result, error, complete);
         s.subscriptions.should.eql([]);
-        s.subscriber.next.should.eql(result);
-        s.subscriber.error.should.eql(error);
-        s.subscriber.complete.should.eql(complete);
+        s.subscribers[0].next.should.eql(result);
+        s.subscribers[0].error.should.eql(error);
+        s.subscribers[0].complete.should.eql(complete);
 
-        s.then('1').should.eql('1');
         s.status.should.eql(observableStatus.active);
         s.count.should.eql(0);
 
@@ -45,8 +44,7 @@ describe('Test subscriber', function _testSubscriber() {
         q.count.should.eql(0);
         q.status.should.eql(observableStatus.active);
 
-        q.subscriber.should.eql(s);
-        q.then('2').should.eql(s);
+        q.subscribers[0].should.eql(s);
     });
 
     it('should increment the count as the event handlers are invoked', function _testSubscriberEventHandlers() {
@@ -66,7 +64,7 @@ describe('Test subscriber', function _testSubscriber() {
 
         var s = Object.create(subscriber).initialize(noop, noop, noop);
         s.subscriptions.should.eql([]);
-        s.subscriber.should.be.a('object');
+        s.subscribers.should.be.an('array');
 
         var testObj = {};
         s.subscriptions = s.subscriptions.concat([1, 2, 3, 4, testObj, 5, 6, 7, 8, 9, 10]);
@@ -78,8 +76,12 @@ describe('Test subscriber', function _testSubscriber() {
         s.removeSubscriptions();
         s.subscriptions.should.eql([]);
 
-        s.removeSubscriber();
-        expect(s.subscriber).to.be.null;
+        s.subscribers = [1, 2, 3, 4, testObj, 5, 6, 7, 8, 9, 10];
+        s.removeSubscriber(testObj);
+
+        s.subscribers.should.eql([1, 2, 3, 4, 5, 6, 7, 8, 9, 10]);
+        s.removeSubscribers();
+        s.subscribers.should.eql([]);
     });
 
     it('should allow the error and complete handlers to be changed', function _testSubscriberHandlerSet() {
@@ -88,9 +90,9 @@ describe('Test subscriber', function _testSubscriber() {
         function complete() { return 3; }
 
         var s = Object.create(subscriber).initialize(result, error, complete);
-        s.subscriber.next.should.eql(result);
-        s.subscriber.error.should.eql(error);
-        s.subscriber.complete.should.eql(complete);
+        s.subscribers[0].next.should.eql(result);
+        s.subscribers[0].error.should.eql(error);
+        s.subscribers[0].complete.should.eql(complete);
 
         function updatedErrorHandler() {}
         function updatedCompleteHandler() {}
@@ -98,7 +100,7 @@ describe('Test subscriber', function _testSubscriber() {
         s.onError(updatedErrorHandler);
         s.onComplete(updatedCompleteHandler);
 
-        s.subscriber.error.should.eql(updatedErrorHandler);
-        s.subscriber.complete.should.eql(updatedCompleteHandler);
+        s.subscribers[0].error.should.eql(updatedErrorHandler);
+        s.subscribers[0].complete.should.eql(updatedCompleteHandler);
     });
 });

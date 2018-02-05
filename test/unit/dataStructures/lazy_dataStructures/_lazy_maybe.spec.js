@@ -34,7 +34,7 @@ describe('Test lazy maybe', function _testLazyMaybe() {
             expect(false).to.eql(i8.value);
         });
 
-        it('should return the same type/value when using the #of function', function _testMaybeDotOf() {
+        it('should return the same type/value when using the #of function', function _testMaybeOf() {
             var arr = [1, 2, 3],
                 obj = { a: 1, b: 2 },
                 i1 = LazyMaybe.of(),
@@ -65,7 +65,7 @@ describe('Test lazy maybe', function _testLazyMaybe() {
             expect(false).to.eql(i8.value);
         });
 
-        it('should return correct boolean value when #is is invoked', function _testMaybeDotIs() {
+        it('should return correct boolean value when #is is invoked', function _testMaybeIs() {
             var i = LazyMaybe(10),
                 m = monads.Maybe(10),
                 c = monads.Constant(10),
@@ -84,11 +84,10 @@ describe('Test lazy maybe', function _testLazyMaybe() {
         });
 
         it('should return an \'empty\' maybe and no identity should be empty', function _testEmptyMaybe() {
-            var i = LazyMaybe.empty();
-            i.isEmpty.should.be.true;
+            LazyMaybe.empty().isEmpty.should.be.true;
         });
 
-        it('should lift any function to return an Maybe wrapped value', function _testMaybeDotLift() {
+        it('should lift any function to return an Maybe wrapped value', function _testMaybeLift() {
             function t1() { return -1; }
             function t2() { return '-1'; }
             function t3(arg) { return arg; }
@@ -130,19 +129,13 @@ describe('Test lazy maybe', function _testLazyMaybe() {
         });
 
         it('should return a boolean indicating the correct data structure', function _testMaybeIsJust() {
-            var m1 = LazyMaybe(),
-                m2 = LazyMaybe(1);
-
-            LazyMaybe.isJust(m1).should.be.false;
-            LazyMaybe.isJust(m2).should.be.true;
+            LazyMaybe.isJust(LazyMaybe()).should.be.false;
+            LazyMaybe.isJust(LazyMaybe(1)).should.be.true;
         });
 
         it('should return a boolean indicating the correct data structure', function _testMaybeIsNothing() {
-            var m1 = LazyMaybe(),
-                m2 = LazyMaybe(1);
-
-            LazyMaybe.isNothing(m1).should.be.true;
-            LazyMaybe.isNothing(m2).should.be.false;
+            LazyMaybe.isNothing(LazyMaybe()).should.be.true;
+            LazyMaybe.isNothing(LazyMaybe(1)).should.be.false;
         });
     });
 
@@ -156,11 +149,8 @@ describe('Test lazy maybe', function _testLazyMaybe() {
         });
 
         it('should return a boolean indicating the data structure type', function _testJustIs() {
-            var m1 = LazyMaybe(),
-                m2 = LazyMaybe(1);
-
-            LazyJust.is(m1).should.be.false;
-            LazyJust.is(m2).should.be.true;
+            LazyJust.is(LazyMaybe()).should.be.false;
+            LazyJust.is(LazyMaybe(1)).should.be.true;
         });
     });
 
@@ -287,43 +277,30 @@ describe('Test lazy maybe', function _testLazyMaybe() {
         });
 
         it('should print the correct container type + value when .toString() is invoked', function _testMaybeToString() {
-            var c1 = LazyMaybe(1),
-                c2 = LazyMaybe(null),
-                c3 = LazyMaybe([1, 2, 3]),
-                c4 = LazyMaybe(LazyMaybe(LazyMaybe(5)));
-
-            c1.toString().should.eql('Just(1)');
-            c2.toString().should.eql('Nothing()');
-            c3.toString().should.eql('Just(1,2,3)');
-            c4.toString().should.eql('Just(Just(Just(5)))');
+            LazyMaybe(1).toString().should.eql('Just(1)');
+            LazyMaybe(null).toString().should.eql('Nothing()');
+            LazyMaybe([1, 2, 3]).toString().should.eql('Just(1,2,3)');
+            LazyMaybe(LazyMaybe(LazyMaybe(5))).toString().should.eql('Just(Just(Just(5)))');
         });
 
         it('should return the underlying value when the mjoin function property is called', function _testMaybeMjoin() {
-            var i1 = LazyMaybe(10),
-                i2 = LazyMaybe(null),
-                i3 = LazyMaybe(LazyMaybe(1));
-
-            i1.mjoin().value.should.eql(LazyMaybe(10).value);
-            expect(i2.mjoin().value).to.eql(LazyMaybe(null).value);
-            i3.mjoin().value.should.eql(LazyMaybe(1).value);
+            LazyMaybe(10).mjoin().value.should.eql(LazyMaybe(10).value);
+            expect(LazyMaybe(null).mjoin().value).to.eql(LazyMaybe(null).value);
+            LazyMaybe(LazyMaybe(1)).mjoin().value.should.eql(LazyMaybe(1).value);
         });
 
         it('should apply a mutating function to the underlying value and return the new value unwrapped in a maybe when chain is called', function _testMaybeChain() {
-            var i1 = LazyMaybe(10),
-                i2 = LazyMaybe(LazyMaybe({ a: 1, b: 2 })),
-                i3 = LazyMaybe(25);
-
-            i1.chain(function _flatMap(val) {
+            LazyMaybe(10).chain(function _flatMap(val) {
                 return LazyMaybe.of(5 * val);
             }).value.should.eql(50);
 
-            i2.chain(function _flatMap(ma) {
+            LazyMaybe(LazyMaybe({ a: 1, b: 2 })).chain(function _flatMap(ma) {
                 return ma.map(function _innerMap(val) {
                     return val.a + val.b;
                 });
             }).value.should.eql(3);
 
-            i3.chain(function _flatMap(val) {
+            LazyMaybe(25).chain(function _flatMap(val) {
                 return val + 2;
             }).value.should.eql(27);
         });
@@ -363,12 +340,12 @@ describe('Test lazy maybe', function _testLazyMaybe() {
             LazyMaybe(10).fold((x, y) => x + y * 15, 0).should.eql(150);
         });
 
-        it('should return a Just of an Identity of 10 when #sequence is invoked', function _testMaybeSequence() {
+        it('should return an Identity of a Just of 10 when #sequence is invoked', function _testMaybeSequence() {
             LazyMaybe(10).sequence(monads.Identity).toString().should.eql('Identity(Just(10))');
             LazyMaybe().sequence(monads.Identity).toString().should.eql('Identity(Nothing())');
         });
 
-        it('should return a Just of an Identity of 3 when #traverse is invoked', function _testMaybeTraverse() {
+        it('should return an Identity of a Just 3 when #traverse is invoked', function _testMaybeTraverse() {
             function test(val) {
                 return monads.Identity(val + 2);
             }
@@ -378,14 +355,11 @@ describe('Test lazy maybe', function _testLazyMaybe() {
         });
 
         it('should have an overridden Symbol.toStringTag operation', function _testMaybeToStringTag() {
-            var m1 = LazyMaybe(),
-                m2 = LazyMaybe(1);
-
-            Object.prototype.toString.call(m1).should.eql('[object Nothing]');
-            Object.prototype.toString.call(m2).should.eql('[object Just]');
+            Object.prototype.toString.call(LazyMaybe()).should.eql('[object Nothing]');
+            Object.prototype.toString.call(LazyMaybe(1)).should.eql('[object Just]');
         });
 
-        it('should have a .factory property that points to the factory function', function _testMaybeIsStupidViaFantasyLandSpecCompliance() {
+        it('should have a .factory property that points to the factory function', function _testMaybeFactoryPointer() {
             LazyMaybe(null).factory.should.eql(LazyMaybe);
             LazyMaybe(null).constructor.should.eql(LazyMaybe);
         });

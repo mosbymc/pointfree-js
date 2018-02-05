@@ -1,6 +1,5 @@
-import { all, any, apply, binarySearch, chain, concat, concatAll, contains, copyWithin, count, distinct, equals, except, fill, filter,
-        findIndex, findLastIndex, first, foldLeft, foldRight, groupBy, groupJoin, intersect, intersperse, join, last, map, ofType,
-        pop, prepend, prependAll, reduceRight, repeat, reverse, set, skipWhile, slice, sortBy, takeWhile, unfold, union, zip } from './list_iterators';
+import * as iterators from './iterators';
+import * as list_util from './list_util';
 import { sortDirection, generatorProto } from '../helpers';
 import { wrap, defaultPredicate, delegatesFrom, isArray, noop, invoke, delegatesTo, isString, both } from '../functionalHelpers';
 import { when, ifElse, identity, constant } from '../combinators';
@@ -25,64 +24,63 @@ var listProxyHandler = {
  * at the consumer-object level, as well as to provide default values for a consumer-level
  * object at creation if not specified.
  * @typedef {Object}
- * @property {function} value
- * @property {function} extract
- * @property {function} apply
- * @property {function} append
- * @property {function} appendAll
+ * @property {function} extract - Returns the underlying data of the list as an array; used as a getter, not a function
+ * @property {function} apply - Applies the functions in one iterable to the data in the current list and returns a new list
+ * @property {function} append - Accepts one iterable and returns a new list with the contents appended to the current lists's contents
+ * @property {function} appendAll - Behaves like list#append but accepts one or more iterables
  * @property {function} bimap
- * @property {function} chain
- * @property {function} concat
- * @property {function} concatAll
+ * @property {function} chain - Accepts a {@link dataStructures.list} returning function and applies it to each item in the list, removing the resulting nested lists
+ * @property {function} concat - Accepts one iterable and returns a new list with the contents appended to the current list's contents
+ * @property {function} concatAll - Behaves like list#concat but accepts one or more iterables
  * @property {function} copyWithin
- * @property {function} distinct
- * @property {function} except
- * @property {function} fill
- * @property {function} filter
+ * @property {function} distinct - Accepts an optional function and returns a new list with distinct elements; defaults to strict equality if no function is provided
+ * @property {function} except - Accepts an iterable and returns a new list containing the disjunction between the two
+ * @property {function} fill - Accepts a single argument and returns a new list with all values in the current list replaced by the value
+ * @property {function} filter - Accepts a boolean returning function and returns a new list with all 'false' elements removed
  * @property {function} groupBy
  * @property {function} groupByDescending
  * @property {function} groupJoin
- * @property {function} intersect
+ * @property {function} intersect - Accepts an iterable and returns a new list containing only the conjunction between the two
  * @property {function} intersperse
  * @property {function} listJoin
- * @property {function} map
+ * @property {function} map - Applies the supplied function argument to each element in the list and returns a new list with the new values
  * @property {function} join
  * @property {function} ofType
- * @property {function} prepend
- * @property {function} prependAll
- * @property {function} reverse
+ * @property {function} prepend - Accepts one iterable and returns a new list with the contents prepended to the current lists's contents
+ * @property {function} prependAll - Behaves like list#prepend but accepts one or more iterables
+ * @property {function} reverse - Returns a new list with the contents in reverse order
  * @property {function} sequence
- * @property {function} skip
- * @property {function} skipWhile
- * @property {function} take
- * @property {function} takeWhile
- * @property {function} union
+ * @property {function} skip - Returns a new list with the first 'n' items removed; 'n' defaults to zero
+ * @property {function} skipWhile - Accepts a boolean returning function and returns a new list with all elements removed up until the first element that returns 'true'
+ * @property {function} take - Returns a new list with the last 'n' items removed; 'n' defaults to zero
+ * @property {function} takeWhile - Accepts a boolean returning function and returns a new list with all elements up until the first element that returns 'false'
+ * @property {function} union - Accepts an iterable and a comparer function and returns a new list that contains all distinct elements between the two
  * @property {function} zip
- * @property {function} all
- * @property {function} any
- * @property {function} count
+ * @property {function} all - Accepts a boolean-returning function and returns a boolean after applying the function to all elements that indicates if all the elements returned 'true'
+ * @property {function} any - Accepts a boolean-returning function and returns a boolean after applying the function to all elements that indicates if any of the elements returned 'true'
+ * @property {function} count - Returns an integer is equal to the number of elements in the list
  * @property {function} equals
- * @property {function} data
- * @property {function} extract
+ * @property {function} data - Returns the underlying data in the list in array form
+ * @property {function} extract - Returns the underlying data in the list in array form
  * @property {function} findIndex
  * @property {function} findLastIndex
- * @property {function} first
+ * @property {function} first - Accepts a boolean-returning function and returns the first element in the list where 'true' is returned from the function
  * @property {function} foldl
  * @property {function} foldr
- * @property {function} isEmpty
- * @property {function} last
+ * @property {function} isEmpty - Returns a boolean that indicates if the list has at least one element
+ * @property {function} last - Accepts a boolean-returning function and returns the last element in the list where 'true' is returned from the function
  * @property {function} reduceRight
- * @property {function} toArray
- * @property {function} toEvaluatedList
- * @property {function} toMap
- * @property {function} toSet
- * @property {function} toString
+ * @property {function} toArray - Returns the elements of the list in array form
+ * @property {function} toEvaluatedList - Returns a new list after evaluating the underlying function pipeline; This should only be used in cases where the list may need to be enumerated more than once
+ * @property {function} toMap - Returns the elements of the list in map form - the indices of the list act as the map's keys
+ * @property {function} toSet - Returns the elements of the list in set form
+ * @property {function} toString - Returns a string representation of the list
  * @property {function} valueOf
- * @property {function} factory
- * @property {function} of
+ * @property {function} factory - Reference to the List factory function
+ * @property {function} of - Creates a new list of whatever element is provided
  * @property {function} sequence
  * @property {function} traverse
- * @property {Symbol.iterator}
+ * @property {Symbol.iterator} - The list's iterator; can be used in for-of, for-in loops
  * @kind {Object}
  * @memberOf dataStructures
  * @namespace list_core
@@ -129,59 +127,98 @@ var list_core = {
      * @this dataStructures.list_core
      * @param {dataStructures.list_core} l - a
      * @return {*} - b
+     *
+     * @example
+     * List([1, 2, 3, 4, 5])
+     *  .apply(List([x => x * x, x => x / 2, x => x * 5]))     => List([1, 1/2, 5, 4, 1, 10, 9, 3/2, 15, 16, 2, 20, 25, 5/2, 25])
      */
     apply: function _apply(l) {
-        return createList(this, _iteratorWrapper(apply(this, l)));
+        return createList(this, _iteratorWrapper(iterators.apply(this, l)));
     },
 
     /**
      * @signature () -> dataStructures.list_core
-     * @description d
+     * @description Chains a list-returning function over each individual item in
+     * the list and returns a new list without the nesting that would normally occur
+     * if map was invoked instead.
      * @memberOf dataStructures.list_core
      * @instance
      * @function chain
      * @this dataStructures.list_core
      * @param {function} fn - a
      * @return {list} - b
+     *
+     * @example
+     * List([1, 2, 3, 4, 5]).chain(x => List.of(x * x))     => List([1, 4, 9, 16, 25])
      */
     chain: function _chain(fn) {
-        return createList(this, _iteratorWrapper(chain(this, fn)));
+        return createList(this, _iteratorWrapper(iterators.chain(this, fn)));
     },
 
     /**
      * @signature [...iterable] -> dataStructures.list_core
-     * @description Concatenates two or more lists by appending the "method's" List argument(s) to the
-     * List's value. This function is a deferred execution call that returns
-     * a new queryable object delegator instance that contains all the requisite
-     * information on how to perform the operation.
+     * @description Concatenates two lists by appending the the provided List to the
+     * current List. This function is a deferred execution call that returns
+     * a new List containing the values of both Lists.
      * @memberOf dataStructures.list_core
      * @instance
      * @function concat
      * @this dataStructures.list_core
      * @param {Array | *} ys - a
      * @return {list} - b
+     *
+     * @example
+     * List([1, 2, 3, 4, 5]).concat(List([6, 7, 8, 9, 10])      => List([1, 2, 3, 4, 5, 6, 7, 8, 9, 10])
      */
     concat: function _concat(ys) {
-        return createList(this, _iteratorWrapper(concat(this, List.of(ys))));
+        return createList(this, _iteratorWrapper(iterators.concat(this, List.of(ys))));
     },
 
     /**
      * @signature
-     * @description d
+     * @description Functions similar to {@link List#concat}, except it one or more
+     * Lists may be provided as arguments and each one will be appended to the current
+     * List's data in the ordered they are provided. List {@link List#concat}, this
+     * function is a deferred execution call that returns a new List.
      * @memberOf dataStructures.list_core
      * @instance
      * @function concatAll
      * @this list
      * @param {list|ordered_list} ys - One or more lists to concatenate with this list
      * @return {list} Returns a new list
+     *
+     * @example
+     * List([1, 2, 3, 4, 5])
+     *  .concatAll([6, ..., 10], List([11, ..., 15]), [16, ..., 20])    => List([1, 2, 3, 4, ... 18, 19, 20])
      */
     concatAll: function _concatAll(...ys) {
-        return createList(this, _iteratorWrapper(concatAll(this, ys.map(y => List.of(y)))));
+        return createList(this, _iteratorWrapper(iterators.concatAll(this, ys.map(y => List.of(y)))));
+    },
+
+    /**
+     * @description This function only works if using the List as a contravariant. It Accepts
+     * a single function that is used to contramap over the current List's source functions.
+     * The provided function is composed with each function in the current List to create a new
+     * function, which is returned to create a new List object. Essentially, contramap is mapping
+     * over the output of the current List's function once it is applied to a data-containing List.
+     * This function property is a deferred execution function.
+     * the provided function argument
+     * @param {function} fn - a
+     * @return {Proxy.<dataStructures.list_core>|dataStructures.list_core|dataStructures.list|dataStructures.ordered_list} b
+     *
+     * @example
+     * List([1, 2, 3, 4, 5])
+     *  .apply(List([x => x * x, x => x + 10])
+     *  .contramap(x => x + 3))     => List([4, 7, 12, 19, 28, 14, 15, 16, 17, 18])
+     */
+    contramap: function _contramap(fn) {
+        return createList(this, _iteratorWrapper(iterators.contramap(this, fn)));
     },
 
     /**
      * @signature
-     * @description d
+     * @description Shallow copies part of the List to another segment within the list and returns a new List
+     * with the updated values.
      * @memberOf dataStructures.list_core
      * @instance
      * @function copyWithin
@@ -194,21 +231,37 @@ var list_core = {
      * @return {list} - d
      */
     copyWithin: function _copyWithin(index, start, end) {
-        return createList(this, _iteratorWrapper(copyWithin(index, start, end, this)));
+        return createList(this, _iteratorWrapper(iterators.copyWithin(index, start, end, this)));
+    },
+
+    /**
+     * @description d
+     * @param {function} f - a
+     * @param {function} g - b
+     * @return {Proxy.<dataStructures.list_core>|dataStructures.list_core|dataStructures.list|dataStructures.ordered_list} c
+     */
+    dimap: function _dimap(f, g) {
+        return createList(this, _iteratorWrapper(iterators.dimap(this, f, g)));
     },
 
     /**
      * @signature (a -> boolean) -> List<b>
-     * @description d
+     * @description Accepts a single comparer function as an argument that determines if
+     * any two items of the List are equal. Only one of each distinct item is retained. If
+     * no argument is provided, strict equality between items is defaulted to.
      * @memberOf dataStructures.list_core
      * @instance
      * @function distinct
      * @this dataStructures.list_core
      * @param {function} comparer - a
      * @return {list} - b
+     *
+     * @example
+     *  List([1, 1, 2, 2, 3, 3])
+     *      .distinct((x, y) => x === y)    => List([1. 2. 3])
      */
     distinct: function _distinct(comparer) {
-        return createList(this, _iteratorWrapper(distinct(this, comparer)));
+        return createList(this, _iteratorWrapper(iterators.distinct(this, comparer)));
     },
 
     /**
@@ -228,14 +281,22 @@ var list_core = {
      * @param {Array|generator} xs - a
      * @param {function} [comparer] - b
      * @return {list} - c
+     *
+     * @example
+     *  List([1. 2, 3, 4, 5, 6, 7, 8, 9, 10])
+     *      .except([2, 4, 6, 8, 10])   => L:st([1, 3, 5, 7, 9])
      */
     except: function _except(xs, comparer) {
-        return createList(this, _iteratorWrapper(except(this, xs, comparer)));
+        return createList(this, _iteratorWrapper(iterators.except(this, xs, comparer)));
     },
 
     /**
      * @signature
-     * @description d
+     * @description Fills the List with any single, static value. An optional starting and ending
+     * indices may be provided to indicating at what index of the List to start filling it with the
+     * provided value and what index to stop. If no starting index is provided, the value will begin
+     * insertion at the start of the list; if no ending index is provided, the value will continue to
+     * be inserted from the start index to the last element in the list.
      * @memberOf dataStructures.list_core
      * @instance
      * @function fill
@@ -248,21 +309,27 @@ var list_core = {
      * @return {list} - d
      */
     fill: function _fill(value, start, end) {
-        return createList(this, _iteratorWrapper(fill(value, start, end, this)));
+        return createList(this, _iteratorWrapper(iterators.fill(value, start, end, this)));
     },
 
     /**
      * @signature
-     * @description d
+     * @description Accepts a predicate function that is used to filter out all elements of
+     * the List that don't 'pass' the predicate. The function is called individually on each item
+     * of the List and only the items that get a 'true' response back from the predicate function
+     * are retained in the List.
      * @memberOf dataStructures.list_core
      * @instance
      * @function filter
      * @this dataStructures.list_core
      * @param {function} predicate - a
      * @return {dataStructures.list_core} - b
+     *
+     * @example
+     *  List([1, 2, 3, 4, 5]).filter(x => 3 < x)    => List([4, 5])
      */
     filter: function _filter(predicate) {
-        return createList(this, _iteratorWrapper(filter(this, predicate)));
+        return createList(this, _iteratorWrapper(iterators.filter(this, predicate)));
     },
 
     /**
@@ -275,9 +342,13 @@ var list_core = {
      * @param {function} keySelector - a
      * @param {function} [comparer] - b
      * @return {dataStructures.list_core} - c
+     *
+     * @example
+     * List([1, 2, 3, 3, 2, 2, 3, 1, 4])
+     *  .groupBy(x => x, (x, y) => x === y)  => List(List(1, 1), List(2, 2, 2), List(3, 3, 3), List(4))
      */
     groupBy: function _groupBy(keySelector, comparer) {
-        return createList(this, _iteratorWrapper(groupBy(this, [createSortObject(keySelector, comparer, sortDirection.ascending)], createGroupedListDelegate)));
+        return createList(this, _iteratorWrapper(iterators.groupBy(this, [createSortObject(keySelector, comparer, sortDirection.ascending)], createGroupedListDelegate)));
     },
 
     /**
@@ -290,9 +361,13 @@ var list_core = {
      * @param {function} keySelector - a
      * @param {function} [comparer] - b
      * @return {dataStructures.list_core} - c
+     *
+     * @example
+     * List([1, 2, 3, 3, 2, 2, 3, 1, 4])
+     *  .groupByDescending(x => x, (x, y) => x === y)  => List(List(4), List(3, 3, 3), List(2, 2, 2), List(1, 1))
      */
     groupByDescending: function _groupByDescending(keySelector, comparer) {
-        return createList(this, _iteratorWrapper(groupBy(this, [createSortObject(keySelector, comparer, sortDirection.descending)], createGroupedListDelegate)));
+        return createList(this, _iteratorWrapper(iterators.groupBy(this, [createSortObject(keySelector, comparer, sortDirection.descending)], createGroupedListDelegate)));
     },
 
     /**
@@ -316,7 +391,7 @@ var list_core = {
      * @return {dataStructures.list_core} - f
      */
     groupJoin: function _groupJoin(ys, xSelector, ySelector, projector, comparer) {
-        return createList(this, _iteratorWrapper(groupJoin(this, ys, xSelector, ySelector, projector, createGroupedListDelegate, comparer)));
+        return createList(this, _iteratorWrapper(iterators.groupJoin(this, ys, xSelector, ySelector, projector, createGroupedListDelegate, comparer)));
     },
 
     head: function _head() {
@@ -339,9 +414,13 @@ var list_core = {
      * @param {Array|generator} xs - a
      * @param {function} [comparer] - b
      * @return {dataStructures.list_core} - c
+     *
+     * @example
+     * List([1, 2, 3, 4, 5, 6])
+     *  .intersect(List([4, 5, 6, 7, 8, 9, 10], (x, y) => x === y)      => List(4, 5, 6)
      */
     intersect: function _intersect(xs, comparer) {
-        return createList(this, _iteratorWrapper(intersect(this, xs, comparer)));
+        return createList(this, _iteratorWrapper(iterators.intersect(this, xs, comparer)));
     },
 
     /**
@@ -355,7 +434,7 @@ var list_core = {
      * @return {dataStructures.list_core} - b
      */
     intersperse: function _intersperse(val) {
-        return createList(this, _iteratorWrapper(intersperse(this, val)));
+        return createList(this, _iteratorWrapper(iterators.intersperse(this, val)));
     },
 
     /**
@@ -378,7 +457,7 @@ var list_core = {
      * @return {dataStructures.list_core} - f
      */
     listJoin: function _join(ys, xSelector, ySelector, projector, comparer) {
-        return createList(this, _iteratorWrapper(join(this, ys, xSelector, ySelector, projector, comparer)));
+        return createList(this, _iteratorWrapper(iterators.join(this, ys, xSelector, ySelector, projector, comparer)));
     },
 
     /**
@@ -390,9 +469,12 @@ var list_core = {
      * @this dataStructures.list_core
      * @param {function} mapFunc - a
      * @return {dataStructures.list_core} - b
+     *
+     * @example
+     * List([1, 2, 3, 4, 5]).map(x => x * x)    => List(1, 4, 9, 16, 25)
      */
     map: function _map(mapFunc) {
-        return createList(this, _iteratorWrapper(map(this, mapFunc)));
+        return createList(this, _iteratorWrapper(iterators.map(this, mapFunc)));
     },
 
     /**
@@ -400,10 +482,13 @@ var list_core = {
      * @description d
      * @memberOf dataStructures.list_core
      * @instance
-     * @function mjoin
+     * @function join
      * @return {list} - a
+     *
+     * @example
+     * List([1, 2, 3, 4, 5]).map(x => List(x)).join()  => List(1, 2, 3, 4, 5)
      */
-    mjoin: function _mjoin() {
+    join: function _join() {
         return this.chain(x => x);
     },
 
@@ -418,7 +503,7 @@ var list_core = {
      * @returns {dataStructures.list_core} - b
      */
     ofType: function _ofType(type) {
-        return createList(this, _iteratorWrapper(ofType(this, type)));
+        return createList(this, _iteratorWrapper(iterators.ofType(this, type)));
     },
 
     /**
@@ -427,7 +512,7 @@ var list_core = {
      * @return {dataStructures.list_core} a
      */
     pop: function _pop() {
-        return createList(this, _iteratorWrapper(pop(this)));
+        return createList(this, _iteratorWrapper(iterators.pop(this)));
     },
 
     /**
@@ -439,9 +524,12 @@ var list_core = {
      * @this dataStructures.list_core
      * @param {Array|generator} xs - a
      * @return {dataStructures.list_core} - b
+     *
+     * @example
+     * List([1, 2, 3, 4, 5]).prepend([-2, -1, 0])   => List(-2, -1, 0, 1, 2, 3, 4, 5)
      */
     prepend: function _prepend(xs) {
-        return createList(this, _iteratorWrapper(prepend(this, List.of(xs))));
+        return createList(this, _iteratorWrapper(iterators.prepend(this, List.of(xs))));
     },
 
     /**
@@ -453,11 +541,26 @@ var list_core = {
      * @this list
      * @param {Array|list|ordered_list} xs - A list
      * @return {list|ordered_list} Returns a new list
+     *
+     * @example
+     * List(6, 7, 8, 9).prependAll([0, 1, 2], [3, 4], [5])  => List(0, 1, 2, 3, 4, 5, 6, 7, 8, 9)
      */
     prependAll: function _prependAll(...xs) {
-        return createList(this, _iteratorWrapper(prependAll(this, xs.map(x => List.of(x)))));
+        return createList(this, _iteratorWrapper(iterators.prependAll(this, xs.map(x => List.of(x)))));
     },
 
+    /**
+     * @description d
+     * @member dataStructures.list_core
+     * @instance
+     * @function push
+     * @this dataStructures.list_core
+     * @param {*} items - a
+     * @return {dataStructures.list} - b
+     *
+     * @example
+     * List([1, 2, 3, 4, 5]).push(6)    => List(1, 2, 3, 4, 5, 6)
+     */
     push: function _push(...items) {
         return this.concat(items);
     },
@@ -472,11 +575,25 @@ var list_core = {
      * @external Array
      * @see {@link https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/reverse}
      * @return {dataStructures.list_core} - a
+     *
+     * @example
+     * List([1, 2, 3, 4, 5]).reverse()  => List(5, 3, 2, 2, 1)
      */
     reverse: function _reverse() {
-        return createList(this, _iteratorWrapper(reverse(this)));
+        return createList(this, _iteratorWrapper(iterators.reverse(this)));
     },
 
+    /**
+     * @description d
+     * @memberOf dataStructures.list_core
+     * @instance
+     * @function shift
+     * @this dataStructures.list_core
+     * @return {dataStructures.list_core} a
+     *
+     * @example
+     * List([1, 2, 3, 4, 5]).shift()    => List(2, 3, 4, 5)
+     */
     shift: function _shift() {
         return this.skip(1);
     },
@@ -494,11 +611,14 @@ var list_core = {
      * @param {number} amt - The number of items in the source to skip before
      * returning the remainder.
      * @return {dataStructures.list_core} - a
+     *
+     * @example
+     * List([1, 2, 3, 4, 5]).skip(3)    => List(4, 5)
      */
     skip: function _skip(amt) {
         if (!amt) return this;
         var count = 0 < amt ? -1 : 1;
-        return 0 < amt ? this.skipWhile(idx => ++count < amt) : this.reverse().skipWhile(idx => --count > amt).reverse();
+        return 0 < amt ? this.skipWhile(() => ++count < amt) : this.reverse().skipWhile(() => --count > amt).reverse();
     },
 
     /**
@@ -510,9 +630,13 @@ var list_core = {
      * @this dataStructures.list_core
      * @param {function} [predicate] - a
      * @return {dataStructures.list_core} - b
+     *
+     * @example
+     * List([1, 2, 3, 4, 5, 6, 7, 8, 9, 10])
+     *  .skip(x => 5 > x)   => List(5, 6, 7, 8, 9, 10)
      */
     skipWhile: function _skipWhile(predicate = defaultPredicate) {
-        return createList(this, _iteratorWrapper(skipWhile(this, predicate)));
+        return createList(this, _iteratorWrapper(iterators.skipWhile(this, predicate)));
     },
 
     /**
@@ -533,13 +657,34 @@ var list_core = {
      * @return {dataStructures.list_core} Returns a new list
      */
     slice: function _slice(start, end) {
-        return createList(this, _iteratorWrapper(slice(this, start, end)));
+        return createList(this, _iteratorWrapper(iterators.slice(this, start, end)));
     },
 
+    /**
+     * @description d
+     * @memberOf dataStructures.list_core
+     * @instance
+     * @function splice
+     * @this dataStructures.list_core
+     * @param {Integer} start - a
+     * @param {Integer} end = b
+     * @return {dataStructures.list_core} c
+     */
     splice: function _splice(start, end) {
-        return createList(this, _iteratorWrapper(slice(this, start, end)));
+        return createList(this, _iteratorWrapper(iterators.slice(this, start, end)));
     },
 
+    /**
+     * @description d
+     * @memberOf dataStructures.list_core
+     * @instance
+     * @function tail
+     * @this dataStructures.list_core
+     * @return {dataStructures.list_core} a
+     *
+     * @example
+     * List([1, 2, 3, 4, 5]).tail()     => List(2, 3, 4, 5)
+     */
     tail: function _tail() {
         return this.skip(1);
     },
@@ -553,11 +698,14 @@ var list_core = {
      * @this dataStructures.list_core
      * @param {number} amt - a
      * @return {dataStructures.list_core} - b
+     *
+     * @example
+     * List([1, 2, 3, 4, 5]).take(3)    => List(1, 2, 3)
      */
     take: function _take(amt) {
-        if (!amt) return List.empty;
+        if (!amt) return List.empty();
         var count = 0 < amt ? -1 : 1;
-        return 0 < amt ? this.takeWhile(idx => ++count < amt) : this.reverse().takeWhile(idx => --count > amt).reverse();
+        return 0 < amt ? this.takeWhile(() => ++count < amt) : this.reverse().takeWhile(() => --count > amt).reverse();
     },
 
     /**
@@ -569,9 +717,12 @@ var list_core = {
      * @this dataStructures.list_core
      * @param {function} [predicate] - a
      * @return {dataStructures.list_core} - b
+     *
+     * @example
+     * List([1, 2, 3, 4, 5]).takeWhile(x => 3 < x)      => List(1, 2)
      */
     takeWhile: function _takeWhile(predicate = defaultPredicate) {
-        return createList(this, _iteratorWrapper(takeWhile(this, predicate)));
+        return createList(this, _iteratorWrapper(iterators.takeWhile(this, predicate)));
     },
 
     /**
@@ -591,9 +742,18 @@ var list_core = {
      * @return {dataStructures.list_core} - c
      */
     union: function _union(xs, comparer) {
-        return createList(this, _iteratorWrapper(union(this, xs, comparer)));
+        return createList(this, _iteratorWrapper(iterators.union(this, xs, comparer)));
     },
 
+    /**
+     * @description d
+     * @memberOf dataStructures.list_core
+     * @instance
+     * @function unshift
+     * @this dataStructures.list_core
+     * @param {*} items - a
+     * @return {dataStructures.list_core} b
+     */
     unshift: function _unshift(...items) {
         return this.prepend(items);
     },
@@ -615,7 +775,7 @@ var list_core = {
      * @return {dataStructures.list_core} - c
      */
     zip: function _zip(selector, xs) {
-        return createList(this, _iteratorWrapper(zip(this, xs, selector)));
+        return createList(this, _iteratorWrapper(iterators.zip(this, xs, selector)));
     },
 
     /**
@@ -627,9 +787,12 @@ var list_core = {
      * @this dataStructures.list_core
      * @param {function} [predicate] - a
      * @return {boolean} - b
+     *
+     * @example
+     * List([1, 2, 3, 4, 5]).all(x => 2 < x)    => false
      */
     all: function _all(predicate = defaultPredicate) {
-        return all(this, predicate);
+        return list_util.all(this, predicate);
     },
 
     /**
@@ -641,9 +804,14 @@ var list_core = {
      * @this dataStructures.list_core
      * @param {function} [predicate] - a
      * @return {boolean} - b
+     *
+     * @example
+     * List([1, 2, 3, 4, 5]).any(x => 2 < x)    => true
+     *
+     * List([1]).any()  => true
      */
     any: function _any(predicate = defaultPredicate) {
-        return any(this, predicate);
+        return list_util.any(this, predicate);
     },
 
     /**
@@ -655,9 +823,12 @@ var list_core = {
      * @this dataStructures.list_core
      * @param {function} [predicate] - a
      * @return {Number} -  b
+     *
+     * @example
+     * List([1, 2, 3, 4, 5]).count()    => 5
      */
     count: function _count(predicate) {
-        return count(this, predicate);
+        return list_util.count(this, predicate);
     },
 
     /**
@@ -695,6 +866,10 @@ var list_core = {
     /**
      * @signature
      * @description d
+     * @memberOf dataStructures.list_core
+     * @instance
+     * @function entries
+     * @this dataStructures.list_core
      * @external Array
      * @see {@link https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/entries}
      * @return {Iterator.<*>} Returns an iterator that contains the kvp's for
@@ -714,9 +889,14 @@ var list_core = {
      * @param {dataStructures.list_core} f - a
      * @param {function} [comparer] - b
      * @return {boolean} - c
+     *
+     * @example
+     * List([1, 2, 3, 4, 5]).equals(List([1, 2, 3, 4, 5]))  => true
+     * List([1, 2, 3, 4, 5]).equals(List.of(1, 2, 3, 4, 5)) => true
+     * List([1, 2, 3, 4, 5]).equals(List([1, 2, 3, 4]))     => false
      */
     equals: function _equals(f, comparer) {
-        return Object.getPrototypeOf(this).isPrototypeOf(f) && equals(this, f, comparer);
+        return Object.getPrototypeOf(this).isPrototypeOf(f) && list_util.equals(this, f, comparer);
     },
 
     /**
@@ -732,7 +912,7 @@ var list_core = {
      * @return {Number} - b
      */
     findIndex: function _findIndex(comparer) {
-        return findIndex(this, comparer);
+        return list_util.findIndex(this, comparer);
     },
 
     /**
@@ -746,7 +926,7 @@ var list_core = {
      * @return {Number} - b
      */
     findLastIndex: function _findLastIndex(comparer) {
-        return findLastIndex(this, comparer);
+        return list_util.findLastIndex(this, comparer);
     },
 
     /**
@@ -760,7 +940,7 @@ var list_core = {
      * @return {*} - b
      */
     first: function _first(predicate = defaultPredicate) {
-        return first(this, predicate);
+        return list_util.first(this, predicate);
     },
 
     /**
@@ -775,7 +955,7 @@ var list_core = {
      * @return {*} - c
      */
     foldl: function _foldl(fn, acc) {
-        return foldLeft(this, fn, acc);
+        return list_util.foldLeft(this, fn, acc);
     },
 
     /**
@@ -790,7 +970,7 @@ var list_core = {
      * @return {*} - c
      */
     foldr: function _foldr(fn, acc) {
-        return foldRight(this, fn, acc);
+        return list_util.foldRight(this, fn, acc);
     },
 
     /**
@@ -810,6 +990,9 @@ var list_core = {
      * @see {@link https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/forEach}
      * @param {function} fn - A function that should be applied to each value held in the list
      * @return {dataStructures.list_core} Returns a list
+     *
+     * @example
+     * List([1, 2, 3, 4, 5]).forEach(console.log)
      */
     forEach: function _forEach(fn) {
         this.data.forEach(fn);
@@ -841,6 +1024,11 @@ var list_core = {
      * @function isEmpty
      * @this dataStructures.list_core
      * @return {boolean} - a
+     *
+     * @example
+     * List([1, 2, 3, 4, 5]).isEmpty()  => false
+     * List([]).isEmpty()               => true
+     * List.empty().isEmpty()           => true
      */
     isEmpty: function _isEmpty() {
         return 0 === this.data.length;
@@ -860,7 +1048,7 @@ var list_core = {
      * @return {string} Returns a string of each element in the list, optionally separated by
      * the provided delimiter.
      */
-    join: function _join(delimiter) {
+    arrayJoin: function _join(delimiter) {
         return this.data.join(delimiter);
     },
 
@@ -888,9 +1076,13 @@ var list_core = {
      * @this dataStructures.list_core
      * @param {function} [predicate] - a
      * @return {*} - b
+     *
+     * @example
+     * List([1, 2, 3, 4, 5]).last()     => 5
+     * List([1, 2, 3, 4, 5]).last(x => 3 > x)   => 5
      */
     last: function _last(predicate = defaultPredicate) {
-        return last(this, predicate);
+        return list_util.last(this, predicate);
     },
 
     /**
@@ -907,7 +1099,7 @@ var list_core = {
      * @return {*} - c
      */
     reduceRight: function _reduceRight(fn, acc) {
-        return reduceRight(this, fn, acc);
+        return list_util.reduceRight(this, fn, acc);
     },
 
     /**
@@ -916,6 +1108,7 @@ var list_core = {
      * @memberOf dataStructures.list_core
      * @instance
      * @function toArray
+     * @this dataStructures.list_core
      * @return {Array} - a
      */
     toArray: function _toArray() {
@@ -935,6 +1128,7 @@ var list_core = {
      * @memberOf dataStructures.list_core
      * @instance
      * @function toEvaluatedList
+     * @this dataStructures.list_core
      * @return {list} - a
      */
     toEvaluatedList: function _toEvaluatedList() {
@@ -947,6 +1141,7 @@ var list_core = {
      * @memberOf dataStructures.list_core
      * @instance
      * @function toMap
+     * @this dataStructures.list_core
      * @return {Map} - a
      */
     toMap: function _toMap() {
@@ -961,6 +1156,7 @@ var list_core = {
      * @memberOf dataStructures.list_core
      * @instance
      * @function toSet
+     * @this dataStructures.list_core
      * @return {Set} - a
      */
     toSet: function _toSet() {
@@ -988,6 +1184,7 @@ var list_core = {
      * @memberOf dataStructures.list_core
      * @instance
      * @function toString
+     * @this dataStructures.list_core
      * @return {string} Returns a string representation of the list. NOTE: This functionality
      * currently forces an evaluation of the pipelined operations.
      */
@@ -1019,18 +1216,11 @@ var list_core = {
     get [Symbol.toStringTag]() {
         return 'List';
     },
-
-    /**
-     * @signature
-     * @description d
-     * @memberOf dataStructures.list_core
-     * @instance
-     * @function valueOf
-     * @return {*} - a
-     */
+    /*
     valueOf: function _valueOf() {
-        return this.data.value;
+        return this.data;
     },
+    */
 
     /**
      * @signature
@@ -1048,6 +1238,7 @@ var list_core = {
      * @memberOf dataStructures.list_core
      * @instance
      * @function sequence
+     * @this dataStructures.list_core
      * @param {Object} p - Any pointed monad with a '#of' function property
      * @return {list} - b
      */
@@ -1068,13 +1259,14 @@ var list_core = {
      * @memberOf dataStructures.list_core
      * @instance
      * @function traverse
+     * @this dataStructures.list_core
      * @param {Object} f - A pointed monad with a '#of' function property. Used only in cases
      * where the mapping function cannot be run.
      * @param {function} g - b
      * @return {list} - c
      */
     traverse: function _traverse(f, g) {
-        return this.foldl((ys, x) => ys.apply(g(x).map(x => y => y.concat([x]))), f(List.empty));
+        return this.foldl((ys, x) => ys.apply(g(x).map(x => y => y.concat([x]))), f(List.empty()));
     },
 
     /**
@@ -1083,6 +1275,7 @@ var list_core = {
      * objectSet on the delegator at the time of creation.
      * @memberOf dataStructures.list_core
      * @instance
+     * @this dataStructures.list_core
      * @generator
      * @return {Array} - a
      */
@@ -1097,15 +1290,34 @@ var list_core = {
     }
 };
 
+/**
+ * @description d
+ * @memberOf dataStructures.list_core
+ * @instance
+ * @function set
+ * @this dataStructures.list_core
+ * @param {Number} idx - a
+ * @param {*} val - b
+ * @return {*} c
+ */
 list_core.set = function _set(idx, val) {
     let len = this.count();
     let normalizedIdx = 0 > idx ? len + idx : idx;
     if (0 <= normalizedIdx) {
-        return createList(this, _iteratorWrapper(set(this, normalizedIdx, val)));
+        return createList(this, _iteratorWrapper(iterators.set(this, normalizedIdx, val)));
     }
     return this;
 };
 
+/**
+ * @description d
+ * @memberOf dataStructures.list_core
+ * @instance
+ * @function get
+ * @this dataStructures.list_core
+ * @param {Number} idx - a
+ * @return {*} - b
+ */
 list_core.get = function _get(idx) {
     let len = this.count(),
         normalizedIdx = 0 > idx ? len + idx : idx;
@@ -1118,6 +1330,7 @@ list_core.get = function _get(idx) {
  * @memberOf dataStructures.list_core
  * @instance
  * @function append
+ * @this dataStructures.list_core
  * @see dataStructures.list_core#concat
  * @param {Array | *} ys - a
  * @return {dataStructures.list_core} - b
@@ -1130,6 +1343,7 @@ list_core.append = list_core.concat;
  * @memberOf dataStructures.list_core
  * @instance
  * @function ap
+ * @this dataStructures.list_core
  * @see dataStructures.list_core#apply
  * @param {Object} ma - Any object with a map function - i.e. a monad.
  * @return {Object} Returns an instance of the monad object provide as an argument.
@@ -1142,6 +1356,7 @@ list_core.ap = list_core.apply;
  * @memberOf dataStructures.list_core
  * @instance
  * @function fmap
+ * @this dataStructures.list_core
  * @param {function} fn - a
  * @return {list} - b
  */
@@ -1153,6 +1368,7 @@ list_core.fmap = list_core.chain;
  * @memberOf dataStructures.list_core
  * @instance
  * @function fmap
+ * @this dataStructures.list_core
  * @param {function} fn - a
  * @return {list} - b
  */
@@ -1164,6 +1380,7 @@ list_core.flapMap = list_core.chain;
  * @memberOf dataStructures.list_core
  * @instance
  * @function bind
+ * @this dataStructures.list_core
  * @property {function} fn
  * @return {dataStructures.list_core} - Returns a new list monad
  */
@@ -1236,7 +1453,7 @@ var list = Object.create(list_core, /** @lends list_core */  {
     sortBy: {
         value: function _orderBy(keySelector = identity, comparer = defaultPredicate) {
             var sortObj = [createSortObject(keySelector, comparer, sortDirection.ascending)];
-            return createList(this, _iteratorWrapper(sortBy(this, sortObj)), sortObj);
+            return createList(this, _iteratorWrapper(iterators.sortBy(this, sortObj)), sortObj);
         }
     },
     /**
@@ -1252,7 +1469,7 @@ var list = Object.create(list_core, /** @lends list_core */  {
     sortByDescending: {
         value: function _orderByDescending(keySelector, comparer = defaultPredicate) {
             var sortObj = [createSortObject(keySelector, comparer, sortDirection.descending)];
-            return createList(this, _iteratorWrapper(sortBy(this, sortObj)), sortObj);
+            return createList(this, _iteratorWrapper(iterators.sortBy(this, sortObj)), sortObj);
         }
     },
     /**
@@ -1267,7 +1484,7 @@ var list = Object.create(list_core, /** @lends list_core */  {
      */
     contains: {
         value: function _contains(val, comparer) {
-            return contains(this, val, comparer);
+            return list_util.contains(this, val, comparer);
         }
     }
 });
@@ -1306,7 +1523,7 @@ var ordered_list = Object.create(list_core, /** @lends list_core */  {
     thenBy: {
         value: function _thenBy(keySelector, comparer = defaultPredicate) {
             var sortObj = this._appliedSorts.concat(createSortObject(keySelector, comparer, sortDirection.ascending));
-            return createList(this.value, _iteratorWrapper(sortBy(this, sortObj)), sortObj);
+            return createList(this.value, _iteratorWrapper(iterators.sortBy(this, sortObj)), sortObj);
         }
     },
     /**
@@ -1322,7 +1539,7 @@ var ordered_list = Object.create(list_core, /** @lends list_core */  {
     thenByDescending: {
         value: function thenByDescending(keySelector, comparer = defaultPredicate) {
             var sortObj = this._appliedSorts.concat(createSortObject(keySelector, comparer, sortDirection.descending));
-            return createList(this.value, _iteratorWrapper(sortBy(this, sortObj)), sortObj);
+            return createList(this.value, _iteratorWrapper(iterators.sortBy(this, sortObj)), sortObj);
         }
     },
     /**
@@ -1344,7 +1561,7 @@ var ordered_list = Object.create(list_core, /** @lends list_core */  {
      */
     contains: {
         value: function _contains(val, comparer) {
-            return binarySearch(when(not(isArray), Array.from, this.value), val, comparer);
+            return list_util.binarySearch(when(not(isArray), Array.from, this.value), val, comparer);
         }
     }
 });
@@ -1372,24 +1589,33 @@ var listFromGen = source => createList(invoke(source));
  * @factory List
  * @description Creator function for a new List object. Takes any value/type as a parameter
  * and, if it has an iterator defined, with set it as the underlying source of the List as is,
- * or, wrap the item in an array if there is no defined iterator.
+ * or, wrap the item in an array if there is no defined iterator. The returned list object may
+ * be treated like an array in terms of retrieving an element at a specified index. Note however,
+ * that attempting to set a value via index location will not work.
+ *
+ * @example List([1, 2, 3, 4, 5])[2]    // => 3
+ *
  * @namespace List
  * @memberOf dataStructures
- * @property {function} from {@link List#from}
- * @property {function} of {@link List#of}
- * @property {function} ordered {@link List#ordered}
- * @property {Object} empty {@link List#empty}
- * @property {function} just {@link List#just}
- * @property {function} unfold {@link List#unfold}
- * @property {function} is {@link List#is}
- * @property {function} repeat {@link List#repeat}
- * @property {function} extend {@link List#extend}
+ * @property {function} from {@link List#from} - Creates and returns a new list from any argument or arguments provided
+ * @property {function} of {@link List#of} - Creates and returns a new list from any argument or arguments provided
+ * @property {function} ordered {@link List#ordered} - Behaves like the {@link List} factory function but returns an ordered list from the source provided
+ * @property {Object} empty {@link List#empty} - Creates and returns a list with no elements
+ * @property {Object} identity {@link List#identity} - Creates and returns a list with no elements
+ * @property {function} just {@link List#just} - Creates and returns an ordered list with one element
+ * @property {function} unfold {@link List#unfold} - Accepts a generator function and returns a new list that is created via 'unfolding' the generator
+ * @property {function} is {@link List#is} - Determines if the given argument is a list and returns a boolean indicating if it is
+ * @property {function} repeat {@link List#repeat} - Accepts any value and an integer and returns a new list with the value repeated 'x' times
+ * @property {function} extend {@link List#extend} - Accepts a property name and a generator function and extends the list's functionality by adding that functionality to the list's prototype
  * @param {*} [source] - Any type, any value; used as the underlying source of the List
  * @return {list} - A new List instance with the value provided as the underlying source.
  */
 function List(source) {
     return ifElse(isList, identity, ifElse(delegatesFrom(generatorProto), listFromGen, listFromNonGen), source);
 }
+
+let emptyList = createList([], null,
+    [createSortObject(identity, defaultPredicate, sortDirection.ascending)]);
 
 var isOneArg = args => 1 === args.length;
 var isList = val => delegatesFrom(list_core, val);
@@ -1399,7 +1625,7 @@ var createListFromArgs = args => 1 !== args.length ? List(args) : Array.isArray(
 /**
  * @signature
  * @description Convenience function for listCreate a new List instance; internally calls List.
- * @memberOf List
+ * @memberOf dataStructures.List
  * @static
  * @function from
  * @see List
@@ -1410,8 +1636,10 @@ List.from = (...source) => ifElse(isOneArgAndAList, constant(...source), createL
 
 /**
  * @signature
- * @description Alias for List.from
- * @memberOf List
+ * @description Creates a new list from all the arguments provided. If a single argument, that is not
+ * a list, is provided to List.of, an ordered list will be returned. Otherwise, each individual argument
+ * will be used provided to the function will be used as the source of the new list.
+ * @memberOf dataStructures.List
  * @static
  * @function of
  * @see List.from
@@ -1425,7 +1653,7 @@ List.of = List.from;
  * @signature
  * @description Creates a new {@link ordered_list} for the source provided. An optional
  * source selector and comparer functions may be provided.
- * @memberOf List
+ * @memberOf dataStructures.List
  * @static
  * @function ordered
  * @param {*} [source] - Any JavaScript value
@@ -1439,27 +1667,36 @@ List.ordered = (source, selector, comparer = defaultPredicate) => createList(sou
     [createSortObject(selector, comparer, sortDirection.ascending)]);
 
 /**
- * @description Holds a reference to an empty, ordered list.
- * @memberOf List
- * @property {Object} empty
+ * @description Returns an empty, 'ordered' list. No arguments are accepted.
+ * @memberOf dataStructures.List
  * @see ordered_list
+ * @static
+ * @function empty
+ * @return {Object} Returns an empty list
+ */
+List.empty = () => emptyList;
+
+/**
+ * @description Holds a reference to an empty, ordered list
+ * @memberOf dataStructures.List
+ * @property {Object} identity
+ * @see dataStructures.ordered_list
  * @kind {Object}
  */
-List.empty = createList([], null,
-    [createSortObject(identity, defaultPredicate, sortDirection.ascending)]);
-
 List.identity = List.empty;
 
 /**
  * @signature
- * @description Creates and returns a new {@link ordered_list} since a list with a single
- * item is trivially ordered.
- * @memberOf List
+ * @description Accepts any single value and returns a new {@link ordered_list}
+ * since a list with a single item is trivially ordered. If an array, map, set, or
+ * list is passed as the argument, the entire data structure will be treated as a
+ * single element and the individual elements will be ignored.
+ * @memberOf dataStructures.List
  * @static
  * @function just
  * @see List
- * @param {*} val - a
- * @return {ordered_list} - b
+ * @param {*} val - Any value
+ * @return {ordered_list} - Returns an ordered list with a single element
  */
 List.just = val => createList([val], null,
     [createSortObject(identity, defaultPredicate, sortDirection.ascending)]);
@@ -1467,8 +1704,8 @@ List.just = val => createList([val], null,
 /**
  * @signature
  * @description Takes a function and a seed value. The function is used to 'unfold' the seed value
- * into an array which is used as the source of a new List monad.
- * @memberOf List
+ * into an array which is used as the source of a new List data structure.
+ * @memberOf dataStructures.List
  * @static
  * @function unfold
  * @see List
@@ -1476,18 +1713,25 @@ List.just = val => createList([val], null,
  * @param {*} seed - b
  * @return {list} - c
  */
-List.unfold = (fn, seed) => createList(unfold(fn)(seed));
+List.unfold = (fn, seed) => createList(list_util.unfold(fn)(seed));
 
 /**
  * @signature
  * @description Takes any value as an argument and returns a boolean indicating if
  * the value is a list.
- * @memberOf List
+ * @memberOf dataStructures.List
  * @static
  * @function is
  * @see List
  * @param {*} f - Any JavaScript value
  * @return {boolean} - Returns a boolean indicating of the value is a list.
+ *
+ * @example
+ * List.is(List.of(1, 2, 3, 4))     => true
+ *
+ * List.is([1, 2, 3, 4])            => false
+ *
+ * List.is()                        => false
  */
 List.is = isList;
 
@@ -1496,61 +1740,82 @@ List.is = isList;
  * @description Generates a new list with the specified item repeated the specified number of times. Because
  * this generates a list with the same item repeated n times, the resulting List is trivially
  * sorted. Thus, a sorted List is returned rather than an unsorted list.
- * @memberOf List
+ * @memberOf dataStructures.List
  * @static
  * @function repeat
  * @see List
  * @param {*} item - Any JavaScript value that should be used to build a new list monad.
  * @param {number} count - The number of times the value should be repeated to build the list.
  * @return {Proxy} - Returns a new ordered list monad.
+ *
+ * @example
+ * List.repeat(1, 5)    => List(1, 1, 1, 1, 1)
  */
 List.repeat = function _repeat(item, count) {
-    return createList([], repeat(item, count), [createSortObject(identity, noop, sortDirection.descending)]);
+    return createList([], iterators.repeat(item, count), [createSortObject(identity, noop, sortDirection.descending)]);
 };
 
 /**
  * @signature
- * @summary Extension function that allows new functionality to be applied to
- * the queryable object
- * @memberOf List
+ * @description Extension function that allows new functionality to be applied to
+ * the list data structure
+ * @memberOf dataStructures.List
  * @static
  * @function extend
  * @see List
- * @param {string} prop - The name of the new property that should exist on the List; must be unique
+ * @param {string} prop - The name of the new property that should exist on the list data structure;
+ * must be unique, cannot override an existing property.
  * @param {function} fn - A function that defines the new List functionality and
  * will be called when this new List property is invoked.
- * @return {List} - a
+ * @return {List} Returns the List factory function after applying the new functionality to the
+ * list data structure.
  *
  * @description The fn parameter must be a non-generator function that takes one or more
- * arguments. If this new List function should be an immediately evaluated
- * function (like: foldl, any, reverse, etc.), it merely needs the accept one or more
- * arguments and know how to iterate the source. In the case of an immediately evaluated
- * function, the return type can be any javascript type. The first argument is always the
- * previous List instance that must be iterated. Additional arguments may be specified
- * if desired.
+ * arguments and returns a generator function. The first and only required argument that
+ * the wrapper function must accept is the list on which it will be operating. Any
+ * additional arguments supplied when invoking the new functionality on the list will
+ * be passed straight through in the order they were received by the list.
  *
- * If the function's evaluation should be deferred it needs to work a bit differently.
- * In this case, the function should accept one or more arguments, the first and only
- * required argument being the underlying source of the List object. This underlying
- * source can be anything with an iterator (generator, array, map, set, another list, etc.).
- * Any additional arguments that the function needs should be specified in the signature.
- * The return value of the function should be a generator that knows how to iterate the
- * underlying source. If the generator should operate like most List functions, i.e.
- * take a single item, process it, and then yield it out before asking for the next, a
- * for-of loop is the preferred method for employment. However, if the generator needs
- * all of the underlying data upfront (like orderBy and groupBy), Array.from is the
- * preferred method. Array.from will 'force' all the underlying List instances
- * to evaluate their data before it is handed over in full to the generator. The generator
- * can then act with full knowledge of the data and perform whatever operation is needed
- * before ultimately yielding out a single item at a time. If your extension function
- * needs to yield out all items at once, then that function is not a lazy evaluation
- * function and should be constructed like the immediately evaluated functions described
- * above.
+ * The returned generator will be set as the newly created list's iterator, just like the
+ * other built-in deferred functions. When iterating the returned generator, no arguments
+ * will be passed, so the wrapping function must provide a closure over all needed arguments
+ * by either explicitly naming them, or using the rest (...) operator and allowing the
+ * generator to determine what to do with the data present. The generator should not assume
+ * that the List argument provided will be any specific type of iterable as a List can use
+ * many different iterable sources like a generator, array, map, set, or another list.
+ *
+ * If each item can be operated on individually within the generator, a for-of loop is
+ * the preferred method of handling this operation. However, if the generator needs all
+ * the List's element's up front (like sortBy and groupBy), then the generator will need
+ * to force an evaluation in order to have all the data first. Array.from generally works
+ * well.
+ *
+ * However the data is retrieved, it should always be yielded out individually. If the data
+ * is grouped when yielding, any other generator's in the chain of operations that are waiting
+ * to execute will assume that each grouping is a single data point.
+ *
+ * @example
+ * //Outer function that accepts all arguments necessary for iteration and operation
+ * function takeOddIndices(xs) {
+ *      //returns a generator function to be used as the new List's iterator when the new
+ *     //'takeOdd' function of the List is invoked as seen below
+ *      return function *_takeOddIndices(xs) {
+ *          let idx = 0;
+ *          for (let x of xs) {
+ *              if (!(idx % 2)) yield x;
+ *              ++idx;
+ *          }
+ *      }
+ * }
+ *
+ * List.extend('takeOdd', takeOddIndices)
+ *
+ * List([1, 2, 3, 4, 5, 6, 7, 8, 9, 10]).takeOdd()   => List(1, 3, 5, 7, 9)
  */
 List.extend = function _extend(prop, fn) {
     if (![list, ordered_list].some(type => prop in type)) {
         list_core[prop] = function _extension(...args) {
-            return createList(this, fn(this, ...args));
+            return createList(this, _iteratorWrapper(fn(this, ...args)));
         };
     }
     return List;
@@ -1590,7 +1855,7 @@ function createGroupedListDelegate(source, key) {
  * instance is evaluated.
  * @param {string} [key] - A string that denotes what value the new list delegate object instance
  * was grouped on.
- * @return {Proxy<dataStructure.list_core>|list_core|list|ordered_list} Returns either a {@link list} delegator object
+ * @return {Proxy<dataStructures.list_core>|list_core|list|ordered_list} Returns either a {@link list} delegator object
  * or an {@link ordered_list} delegator object based on the values passed as arguments.
  */
 function createList(source, iterator, sortObject, key) {

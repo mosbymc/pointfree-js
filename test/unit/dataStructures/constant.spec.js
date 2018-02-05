@@ -4,9 +4,9 @@ import { identity } from '../../../src/combinators';
 
 var Constant = monads.Constant;
 
-describe('Constant monad tests', function _testConstantMonad() {
-    describe('Constant object factory tests', function _testConstantObjectFactory() {
-        it('should return a new constant monad regardless of data type', function testConstantMonadObjectCreation() {
+describe('Constant tests', function _testConstant() {
+    describe('Constant factory tests', function _testConstantFactory() {
+        it('should return a new constant data structure regardless of data type', function testConstantObjectCreation() {
             var arr = [1, 2, 3],
                 obj = { a: 1, b: 2 },
                 c1 = Constant(),
@@ -37,7 +37,7 @@ describe('Constant monad tests', function _testConstantMonad() {
             expect(false).to.eql(c8.value);
         });
 
-        it('should return the same type/value when using the #of function', function testConstantDotOf() {
+        it('should return the same type/value when using the #of function', function testConstantOf() {
             var arr = [1, 2, 3],
                 obj = { a: 1, b: 2 },
                 c1 = Constant.of(),
@@ -68,7 +68,7 @@ describe('Constant monad tests', function _testConstantMonad() {
             expect(false).to.eql(c8.value);
         });
 
-        it('should return correct boolean value when #is is invoked', function _testConstantDotIs() {
+        it('should return correct boolean value when #is is invoked', function _testConstantIs() {
             var c = Constant(10),
                 m = monads.Maybe(10),
                 i = monads.Identity(10),
@@ -87,7 +87,7 @@ describe('Constant monad tests', function _testConstantMonad() {
         });
     });
 
-    describe('Constant monad object tests', function _testConstantMonadObject() {
+    describe('Constant data structure tests', function _testConstantDataStructure() {
         it('should not allow the ._value property to be updated', function _testWritePrevention() {
             var c = Constant(1),
                 err1 = false,
@@ -112,7 +112,7 @@ describe('Constant monad tests', function _testConstantMonad() {
             err2.should.be.true;
         });
 
-        it('should return a new constant functor instance with the same underlying value when mapping', function _testConstantFunctorMap() {
+        it('should return a new constant data structure instance with the same underlying value when mapping', function _testConstantMap() {
             var c = Constant(1),
                 d = c.map();
 
@@ -126,7 +126,7 @@ describe('Constant monad tests', function _testConstantMonad() {
                 .extract.should.eql(1);
         });
 
-        it('should properly indicate equality when constant monads are indeed equal', function _testConstantFunctorEquality() {
+        it('should properly indicate equality when constant data structures are indeed equal', function _testConstantEquality() {
             var m1 = Constant(null),
                 m2 = Constant(null),
                 m3 = Constant(1),
@@ -153,7 +153,13 @@ describe('Constant monad tests', function _testConstantMonad() {
             Constant('10').extract.should.eql('10');
         });
 
-        it('should transform a constant functor to the other functor types', function _testConstantFunctorTransforms() {
+        it('should return false regardless of the underlying value when isEmpty is invoked', function _testIsEmpty() {
+            Constant(5).isEmpty().should.be.false;
+            Constant().isEmpty().should.be.false;
+            Constant(null).isEmpty().should.be.false;
+        });
+
+        it('should transform a constant data structure to the other data structures types', function _testConstantTransforms() {
             var i = Constant(1);
             var c = i.mapToIdentity(),
                 f = i.mapToFuture(),
@@ -172,7 +178,7 @@ describe('Constant monad tests', function _testConstantMonad() {
             Object.getPrototypeOf(r).should.eql(Object.getPrototypeOf(monads.Right()));
         });
 
-        it('should have a functioning iterator', function _testConstantFunctorIterator() {
+        it('should have a functioning iterator', function _testConstantIterator() {
             var c1 = Constant(10),
                 c2 = Constant({ a: 1, b: 2 });
 
@@ -183,7 +189,7 @@ describe('Constant monad tests', function _testConstantMonad() {
             c2Res.should.eql([c2.value]);
         });
 
-        it('should allow "expected" functionality of concatenation for strings and mathematical operators for numbers', function _testConstantFunctorValueOf() {
+        it('should allow "expected" functionality of concatenation for strings and mathematical operators for numbers', function _testConstantValueOf() {
             var c1 = Constant('Mark'),
                 c2 = Constant(10);
 
@@ -200,7 +206,7 @@ describe('Constant monad tests', function _testConstantMonad() {
             num4.should.eql(2);
         });
 
-        it('should print the correct container type + value when .toString() is invoked', function testConstantFunctorToString() {
+        it('should print the correct data structure type + value when .toString() is invoked', function testConstantToString() {
             var c1 = Constant(1),
                 c2 = Constant(null),
                 c3 = Constant([1, 2, 3]),
@@ -212,17 +218,17 @@ describe('Constant monad tests', function _testConstantMonad() {
             c4.toString().should.eql('Constant(Constant(Constant(5)))');
         });
 
-        it('should return the underlying value when the mjoin function property is called', function _testConstantMonadMjoin() {
+        it('should return itself when the join property is invoked', function _testConstantJoin() {
             var c1 = Constant(10),
                 c2 = Constant(null),
                 c3 = Constant(Constant(1));
 
-            c1.mjoin().should.eql(Constant(10));
-            expect(c2.mjoin()).to.eql(Constant(null));
-            c3.mjoin().should.eql(Constant(1));
+            c1.join().should.eql(Constant(10));
+            expect(c2.join()).to.eql(Constant(null));
+            c3.join().should.eql(c3);
         });
 
-        it('should apply a mutating function to the underlying value and return the new value unwrapped in an Constant when chain is called', function _testConstantMonadChain() {
+        it('should apply a mutating function to the underlying value and return the new value unwrapped in an Constant when chain is called', function _testConstantChain() {
             var c1 = Constant(10),
                 c2 = Constant(Constant({ a: 1, b: 2 })),
                 c3 = Constant(25);
@@ -251,31 +257,31 @@ describe('Constant monad tests', function _testConstantMonad() {
             c1.extract.should.eql(res.extract);
         });
 
-        it('should return underlying value when constant_functor#fold is invoked', function _testConstantFold() {
+        it('should return underlying value when constant#fold is invoked', function _testConstantFold() {
             Constant(10).fold(x => x * 15).should.eql(150);
         });
 
-        it('should return a constant<T> and ignore the point when #sequence is invoked', function _testConstantSequence() {
+        it('should return a constant of type T and ignore the point when #sequence is invoked', function _testConstantSequence() {
             Constant(10).sequence(monads.Identity).toString().should.eql('Constant(10)');
         });
 
-        it('should return a constant<T> and ignore the params when #traverse is invoked', function _testConstantTraverse() {
+        it('should return a constant of type T and ignore the params when #traverse is invoked', function _testConstantTraverse() {
             Constant(1).traverse(monads.Identity).toString().should.eql('Constant(1)');
         });
 
-        it('should have a .constructor property that points to the factory function', function _testConstantIsStupidViaFantasyLandSpecCompliance() {
+        it('should have a .constructor property that points to the factory function', function _testConstantFactoryPointer() {
             Constant(null).constructor.should.eql(Constant);
         });
     });
 
-    describe('Constant laws test', function _testConstantMonadLaws() {
+    describe('Constant laws test', function _testConstantLaws() {
         /*it('should obey the identity law', function _testConstantMonadIdentityLaw() {
             var v = Constant(2);
 
             Constant(Constant).ap(v).value.should.eql(v.mjoin());
         });*/
 
-        it('should have a proper algebraic properties apply', function _testConstantMonadAlgebraicProperties() {
+        it('should have a proper algebraic properties apply', function _testConstantAlgebraicProperties() {
             function _i(val) { return  val + 2; }
             var x = 2;
             var t = f => f(Constant);

@@ -103,15 +103,12 @@ function _toPrimitive(hint) {
 
 /**
  * @signature
- * @description A factory function that takes a monad factory of any type
- * and returns a function that acts as an extend for that monad.
- * @param {function} typeFactory - A reference to a specific monad's factory function.
- * @return {_extend} Returns a function that acts as an extend for a monad.
+ * @description d
+ * @param {function} fn - a
+ * @return {*} b
  */
-function extendMaker(typeFactory) {
-    return function _extend(fn) {
-        return typeFactory(fn(this));
-    };
+function extend(fn) {
+    return this.factory.of(fn(this));
 }
 
 /**
@@ -357,6 +354,6 @@ var fl = {
     promap: 'fantasy-land/promap'
 };
 
-export { apply, applyTransforms, chain, contramap, monadIterator, dimap, disjunctionEqualMaker, equals, lifter,
-        join, stringMaker, valueOf, sharedMaybeFns, sharedEitherFns, applyFantasyLandSynonyms, applyAliases, chainRec, extendMaker,
+export { apply, applyTransforms, chain, contramap, extend, monadIterator, dimap, disjunctionEqualMaker, equals, lifter,
+        join, stringMaker, valueOf, sharedMaybeFns, sharedEitherFns, applyFantasyLandSynonyms, applyAliases, chainRec,
         setIteratorAndLift };

@@ -55,21 +55,6 @@ function filterReducer(predicate) {
 
 /**
  * @signature
- * @description d
- * @kind function
- * @function mapped
- * @param {function} f - a
- * @param {*} x - b
- * @return {*} - c
- */
-var mapped = curry(function _mapped(f, x) {
-    return identity(map(compose(function _mCompose(x) {
-        return x.value;
-    }, f), x));
-});
-
-/**
- * @signature
  * @face
  * @description d
  * @param {function} xform - a
@@ -140,6 +125,16 @@ var taking = allows => reducerFn => {
     };
 };
 
+var twoFactorGate = curry(function _gating(openFunc, closeFunc, isOpen) {
+   return function _gating_(x) {
+       if (openFunc(x)) isOpen = true;
+       if (closeFunc(x)) isOpen = false;
+       return isOpen;
+   };
+});
+
+var gating = (open, close, isOpen = false) => filtering(twoFactorGate(open, close, isOpen));
+
 //var map = curry((mapFn, redFn) => (xs, x) => redFn(xs, mapFn(x)));
 //var inc = reduce(map(add(1), concat), []);
 
@@ -149,4 +144,4 @@ var taking = allows => reducerFn => {
 //var transduce2 = curry((xForm, f, init, coll) => reduce(xForm(f), init, coll));
 //console.log(transduce2(map(add(1)), concat, [], [1, 2, 3, 4]));
 
-export { mapping, filtering, mapReducer, filterReducer, mapped, transduce, reduce, dropping, taking };
+export { mapping, filtering, gating, mapReducer, filterReducer, transduce, reduce, dropping, taking };

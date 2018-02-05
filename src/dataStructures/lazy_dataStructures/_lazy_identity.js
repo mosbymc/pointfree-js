@@ -2,7 +2,7 @@ import { nil, javaScriptTypes } from '../../helpers';
 import { type, strictEquals } from '../../functionalHelpers';
 import { not } from '../../decorators';
 import { constant } from '../../combinators';
-import { equals, stringMaker, valueOf, extendMaker } from '../data_structure_util';
+import { equals, stringMaker, valueOf } from '../data_structure_util';
 
 /**
  * @signature - :: * -> {@link dataStructures.lazy_identity}
@@ -298,7 +298,9 @@ var lazy_identity = {
      * @return {dataStructures.LazyIdentity<T>} Returns a new identity monad that wraps the return value of the
      * function that was provided as an argument.
      */
-    extend: extendMaker(LazyIdentity),
+    extend: function _extend(fn) {
+        return next(() => fn(this));
+    },
      /**
       * @signature * -> boolean
       * @description Determines if 'this' identity object is equal to another data structure. Equality

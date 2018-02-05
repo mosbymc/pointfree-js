@@ -1,5 +1,5 @@
-import { after, apply, before, binary, bindFunction, /*guardAfter,*/ guard, hyloWith, leftApply, maybe, not, once, repeat, rightApply,
-        safe, tap, ternary, tryCatch, unary, voidFn } from '../../src/decorators';
+import { after, apply, before, binary, bindFunction, bindWith, foldWith, /*guardAfter,*/ guard, hyloWith, lateApply, leftApply, maybe,
+        not, once, repeat, rightApply, safe, tap, ternary, tryCatch, unary, unfold, voidFn } from '../../src/decorators';
 
 describe('Decorators Test', function _testDecorators() {
     describe('Test after', function _testAfter() {
@@ -94,6 +94,31 @@ describe('Decorators Test', function _testDecorators() {
         });
     });
 
+    describe('Test bindWith', function _testBindWith() {
+        it('should bind a function to a context', function _testBindWith() {
+            function addTwoToPropA() {
+                this.a += 2;
+                return this;
+            }
+
+            var obj = { a: 3 },
+                bindSpy = sinon.spy(addTwoToPropA);
+
+            var resFn = bindWith(bindSpy, obj),
+                res = resFn();
+
+            res.should.be.an('object');
+            res.a.should.eql(5);
+            expect(bindSpy.calledOn(obj)).to.be.true;
+        });
+    });
+
+    describe('Test foldWith', function _testFoldWith() {
+        it('should fold the iterable with the supplied function', function _testFoldWith() {
+            foldWith(({ acc, element: n }) => acc * n, [1, 2, 3, 4, 5]).should.eql(120);
+        });
+    });
+
     /*
     describe('Test guardAfter', function _testGuardAfter() {
         it('should run the first function last', function _testGuardAfterWithSuccessfulFns() {
@@ -146,6 +171,35 @@ describe('Decorators Test', function _testDecorators() {
             func1Spy.should.not.have.been.called;
             func2Spy.should.have.been.calledOnce;
             func3Spy.should.not.have.been.called;
+        });
+    });
+
+    describe('Test hyloWith', function _testHyloWith() {
+        let downToOne = (n) => 0 < n
+                ? { element: n, next: n - 1 }
+                : { done: true };
+
+        let product = (acc, n) => acc * n;
+
+        let res1 = foldWith(product, unfold(5, downToOne)());
+        let res2 = hyloWith(product, downToOne, 5);
+
+        res1.should.eql(res2);
+    });
+
+    describe('Test lateApply', function _TestLateApply() {
+        it('should work like apply but add an extra function invocation', function _testLateApply() {
+            function doSomething(arg1, arg2, arg3, arg4) {
+                return arg1 + arg2 + arg3 + arg4;
+            }
+
+            let someSpy = sinon.spy(doSomething),
+                later = lateApply(someSpy);
+
+            var laterRes = later(1, 2, 3, 4);
+            laterRes.should.be.a('function');
+            laterRes().should.eql(10);
+            someSpy.should.have.been.called.once;
         });
     });
 
@@ -221,6 +275,19 @@ describe('Decorators Test', function _testDecorators() {
         });
     });
 
+    describe('Test rightApply', function _testRightApply() {
+        it('should apply the argument from right to left', function _testRightApply() {
+            function doStuff(arg1, arg2, arg3, arg4, arg5) {
+                return arg1 + arg2 * arg3 - arg4 / arg5;
+            }
+
+            var rightApplyFn = rightApply(doStuff),
+                rightApplyRes = rightApplyFn(5, 4, 3, 2, 1);
+
+            rightApplyRes.should.eql(6.2);
+        });
+    });
+
     describe('Test safe', function _testSafe() {
         it('should prevent running a function when null/undefined arguments are passed', function _testSafeWillNullArg() {
             function _t(arg) { return arg; }
@@ -256,6 +323,21 @@ describe('Decorators Test', function _testDecorators() {
 
             res.should.eql(10);
             _tSpy.should.have.been.calledOnce;
+        });
+    });
+
+    describe('Test tap', function _testTap() {
+        it('should apply the function to the argument and return the argument', function _testTap() {
+            function tapper(arg) {
+                return arg + 10;
+            }
+
+            let tapperSpy = sinon.spy(tapper),
+                tapped = tap(tapperSpy, 5);
+
+            tapped.should.eql(5);
+            tapperSpy.should.have.been.called.once;
+            tapperSpy.should.have.returned(15);
         });
     });
 
@@ -345,6 +427,21 @@ describe('Decorators Test', function _testDecorators() {
 
             res.should.be.an('array');
             res.should.eql([2]);
+        });
+    });
+
+    describe('Test unfold', function _testUnfold() {
+        it('should unfold the generator and return an array of values', function _testUnfold() {
+            function sum(list) {
+                let res = 0;
+                for(let i of list) {
+                    res += i;
+                }
+                return res;
+            }
+
+            let unfolded = unfold(5, n => 0 < n ? { value: n, next: n - 1 } : { done: true });
+                sum(unfolded()).should.eql(15);
         });
     });
 
