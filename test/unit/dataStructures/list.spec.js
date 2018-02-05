@@ -1052,9 +1052,16 @@ describe('List functor test', function _testListFunctor() {
 
             //TODO: need to update this - chai is not comparing maps correctly
             it('should return the underlying data as a map', function _testToMap() {
+                let m = new Map();
+                m.set(0, 1);
+                m.set(1, 2);
+                m.set(2, 3);
+                m.set(3, 4);
+                m.set(4, 5);
+
                 List([1, 2, 3, 4, 5])
                     .toMap()
-                    .should.eql(new Map());
+                    .should.eql(m);
             });
 
             it('should return the underlying data as a set', function _testToSet() {

@@ -122,9 +122,9 @@ describe('Test combinators', function _testCombinators() {
                 res = forkFn(5);
 
             res.should.eql(75);
-            f1Spy.should.have.been.called.once;
-            f2Spy.should.have.been.called.once;
-            f3Spy.should.have.been.called.once;
+            f1Spy.should.have.been.calledOnce;
+            f2Spy.should.have.been.calledOnce;
+            f3Spy.should.have.been.calledOnce;
             f1Spy.should.have.returned(25);
             f2Spy.should.have.returned(50);
             f3Spy.should.have.returned(75);
@@ -168,10 +168,10 @@ describe('Test combinators', function _testCombinators() {
             piped.toString().should.eql('f1(f2(f3(f4)))()');
             res.should.eql(1291);
 
-            f1Spy.should.have.been.called.once;
-            f2Spy.should.have.been.called.once;
-            f3Spy.should.have.been.called.once;
-            f4Spy.should.have.been.called.once;
+            f1Spy.should.have.been.calledOnce;
+            f2Spy.should.have.been.calledOnce;
+            f3Spy.should.have.been.calledOnce;
+            f4Spy.should.have.been.calledOnce;
 
             f1Spy.should.have.been.calledWith(2, 4, 6);
             f2Spy.should.have.been.calledWith(36);
