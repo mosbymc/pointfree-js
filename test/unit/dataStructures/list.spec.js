@@ -669,12 +669,6 @@ describe('List functor test', function _testListFunctor() {
                     .data.should.have.lengthOf(duplicateFirstNames.length);
             });
 
-            it('should filter values from a list that are not of the specified type', function _testOfType() {
-                List([1, 2, '3', '4', false, true, Symbol.for('test'), null, undefined, { a: 1 }])
-                    .ofType('number')
-                    .data.should.eql([1, 2]);
-            });
-
             it('should remove the first item and return a new list containing the rest', function _testPop() {
                 List([1, 2, 3, 4, 5])
                     .pop()

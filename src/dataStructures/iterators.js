@@ -408,55 +408,6 @@ function map(xs, fn) {
  * @signature
  * @description d
  * @param {Array|generator|dataStructures.list_core} xs - a
- * @param {string|Object|function|null|Array} dataType - b
- * @return {generator} - c
- */
-function ofType(xs, dataType) {
-    return function *ofTypeIterator() {
-        function _checkTypeKeys(key) {
-            return key in objItem;
-        }
-        function _checkItemKeys(key) {
-            return key in dataType;
-        }
-
-        if (dataType in typeNames) {
-            for (let x of xs) {
-                if (typeNames[dataType] === typeof x) yield x;
-            }
-        }
-        else {
-            if (strictEquals(javaScriptTypes.Function, type(dataType))) {
-                for (let x of xs) {
-                    if (x === dataType) yield x;
-                }
-            }
-            else if (null === dataType) {
-                for (let x of xs) {
-                    if (dataType === x) yield x;
-                }
-            }
-            else if (strictEquals(javaScriptTypes.Object, type(dataType)) && !isArray(dataType)) {
-                for (var objItem of xs) {
-                    if (dataType.isPrototypeOf(objItem))
-                        yield objItem;
-                    else if (strictEquals(javaScriptTypes.Object, type(objItem)) && null !== objItem &&
-                        Object.keys(dataType).every(_checkTypeKeys) && Object.keys(objItem).every(_checkItemKeys)) {
-                        yield objItem;
-                    }
-                }
-            }
-            else if (isArray(dataType)) {
-                for (var arr of xs) if (isArray(arr)) yield arr;
-            }
-        }
-    };
-}
-
-/**
- * @signature
- * @description d
- * @param {Array|generator|dataStructures.list_core} xs - a
  * @return {generator} b
  */
 function pop(xs) {
@@ -661,5 +612,5 @@ function zip(xs, ys, selector) {
 }
 
 export { apply, chain, concat, concatAll, contramap, copyWithin, dimap, distinct, except, fill, filter, groupBy,
-    groupJoin, intersect, intersperse, join, map, ofType, pop, prepend, prependAll, repeat, reverse, set,
+    groupJoin, intersect, intersperse, join, map, pop, prepend, prependAll, repeat, reverse, set,
     skipWhile, slice, sortBy, takeWhile, unfold, union, zip };
