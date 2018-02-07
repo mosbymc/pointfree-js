@@ -1,4 +1,4 @@
-version: 2
+version: "2"
 
 plugins:
   eslint:
@@ -29,19 +29,27 @@ exclude_patterns:
 - "dist/**/*"
 - "documentation/**/*"
 - "groups/**/*"
+- "jsdoc_plugin/**/*"
+- "lens_as_data_structure"
 - "misc/**/*"
 - "node_modules/**/*"
 - "plato/**/*"
 - "routes/**/*"
 - "test/**/*"
-- "jsdoc_plugin/**/*"
-- "index.js"
+- "typings/**/*"
+- ".babelrc"
+- ".eslintignore"
+- ".eslintrc.js"
+- ".gitignore"
+- ".jshintignore"
+- ".jshintrc"
+- ".snyk"
 - "app.js"
-- "gulpfile.js"
 - "gulp.config.js"
+- "gulpfile.js"
+- "index.js"
+- "LICENSE"
+- "README.md"
 - "wallaby.js"
-- "jsdoc.conf.json"
-
-ratings:
-  paths:
-  - "src/**/*"
+- "**/*.yml"
+- "**/*.json"

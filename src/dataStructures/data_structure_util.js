@@ -192,6 +192,23 @@ function join() {
 }
 
 /**
+ * @description d
+ * @param {function} fa - a
+ * @param {function} fn - b
+ * @return {*} c
+ */
+function traverse(fa, fn) {
+    return this.fold(function _reductioAdAbsurdum(xs, x) {
+        fn(x).map(function _map(x) {
+            return function _map_(y) {
+                return y.concat([x]);
+            };
+        }).ap(xs);
+        return fa(this.empty);
+    });
+}
+
+/**
  * @signature
  * @description d
  * @param {string} factory - a
@@ -356,4 +373,4 @@ var fl = {
 
 export { apply, applyTransforms, chain, contramap, extend, monadIterator, dimap, disjunctionEqualMaker, equals, lifter,
         join, stringMaker, valueOf, sharedMaybeFns, sharedEitherFns, applyFantasyLandSynonyms, applyAliases, chainRec,
-        setIteratorAndLift };
+        setIteratorAndLift, traverse };

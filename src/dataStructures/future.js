@@ -1,6 +1,6 @@
 import { once, type, strictEquals } from '../functionalHelpers';
 import { ifElse, constant, identity } from '../combinators';
-import { join, valueOf } from './data_structure_util';
+import { join, valueOf, traverse } from './data_structure_util';
 import { javaScriptTypes } from '../helpers';
 
 /**
@@ -272,16 +272,7 @@ var future = {
         return this.factory.of((reject, resolve) =>
             this.fork(err => resolve(f(err)), res => resolve(g(res))));
     },
-    traverse: function _traverse(fa, fn) {
-        return this.fold(function _reductioAdAbsurdum(xs, x) {
-            fn(x).map(function _map(x) {
-                return function _map_(y) {
-                    return y.concat([x]);
-                };
-            }).ap(xs);
-            return fa(this.empty);
-        });
-    },
+    traverse: traverse,
     bimap: function _bimap(f, g) {
         return this.factory.of((reject, resolve) => this._fork(safeFork(reject, err => reject(g(err))), safeFork(reject, res => resolve(f(res)))));
     },
