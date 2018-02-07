@@ -3,6 +3,7 @@ import { not, unfoldWith } from '../decorators';
 import { compose, when, ifElse } from '../combinators';
 import { javaScriptTypes, sortDirection, cacher, typeNames, generatorProto } from '../helpers';
 import { sortData } from './sort_util';
+import { nestLists, groupData } from './group_util';
 
 /** @module dataStructures/list_iterators */
 
@@ -61,9 +62,7 @@ function chain(xs, fn) {
             if (Object.getPrototypeOf(Object.getPrototypeOf(xs)).isPrototypeOf(res)) {
                 //If the result is a list, then we need to unwrap the values contained within and yield
                 //each one of them individually...
-                for (let item of res) {
-                    yield item;
-                }
+                for (let item of res) yield item;
             }
             //...otherwise the value is not a list and we just yield it as is.
             else yield res;
@@ -110,9 +109,7 @@ function concatAll(xs, yss) {
  */
 function contramap(xs, fn) {
     return function *contramapIterator() {
-        for (let x of xs) {
-            yield compose(fn, x);
-        }
+        for (let x of xs) yield compose(fn, x);
     };
 }
 
@@ -153,9 +150,8 @@ function dimap(xs, f, g) {
  * @return {generator} - c
  */
 function distinct(xs, comparer = strictEquals) {
-    var cached = cacher(comparer);
-
     return function *distinctIterator() {
+        let cached = cacher(comparer);
         for (let x of xs) {
             if (!cached(x)) yield x;
         }
@@ -171,12 +167,10 @@ function distinct(xs, comparer = strictEquals) {
  * @return {generator} - a
  */
 function except(xs, ys, comparer = strictEquals) {
-    ys = toArray(ys);
     return function *exceptIterator() {
+        ys = toArray(ys);
         for (let x of xs) {
-            if (!(ys.some(function _comparer(y) {
-                    return comparer(x, y);
-                }))) yield x;
+            if (!ys.some(y => comparer(x, y))) yield x;
         }
     };
 }
@@ -222,77 +216,9 @@ function filter(xs, predicate) {
 function groupBy(xs, groupObject, queryableConstructor) {
     return function *groupByIterator() {
         //gather all data from the iterable before grouping
-        var groupedData = nestLists(groupData(asArray(xs), groupObject), 0, null, queryableConstructor);
+        let groupedData = nestLists(groupData(asArray(xs), groupObject), 0, null, queryableConstructor);
         for (let x of groupedData) yield x;
     };
-}
-
-/**
- * @signature
- * @description d
- * @param {*} data - a
- * @param {number} depth - b
- * @param {string|null} key - c
- * @param {function} queryableConstructor - d
- * @return {Array} - e
- */
-function nestLists(data, depth, key, queryableConstructor) {
-    if (isArray(data)) {
-        data = data.map(function _createLists(item) {
-            if (null != item.key) return nestLists(item, depth + 1, item.key, queryableConstructor);
-            return item;
-        });
-    }
-    if (0 !== depth) {
-        data = queryableConstructor(data, null, null, key);
-    }
-    return data;
-}
-
-/**
- * @signature
- * @description d
- * @param {*} xs - a
- * @param {Array} groupObject - b
- * @return {Array} - c
- */
-function groupData(xs, groupObject) {
-    var sortedData = sortData(xs, groupObject),
-        retData = [];
-    sortedData.forEach(function _groupSortedData(item) {
-        let grp = retData;
-        groupObject.forEach(function _createGroupsByFields(group) {
-            grp = findGroup(grp, group.keySelector(item));
-        });
-        grp.push(item);
-    });
-
-    return retData;
-}
-
-/**
- * @signature
- * @description d
- * @param {Array} arr - a
- * @param {string} field - b
- * @return {Array} - c
- */
-function findGroup(arr, field) {
-    var grp;
-    if (arr.some(function _findGroup(group) {
-            if (group.key === field) {
-                grp = group;
-                return true;
-            }
-        }))
-        return grp;
-    else {
-        grp = [];
-        grp.key = field;
-        //objectSet(field, 'key', grp);
-        arr.push(grp);
-        return grp;
-    }
 }
 
 /**
@@ -338,9 +264,7 @@ function intersect(xs, ys, comparer = strictEquals) {
     return function *intersectIterator() {
         ys = toArray(ys);
         for (let x of xs) {
-            if (!strictEquals(javaScriptTypes.Undefined, x) && ys.some(function _checkEquivalency(it) {
-                    return comparer(x, it);
-                })) yield x;
+            if (ys.some(it => comparer(x, it))) yield x;
         }
     };
 }
@@ -381,9 +305,7 @@ function join(xs, ys, xSelector, ySelector, projector, comparer = strictEquals) 
         ys = toArray(ys);
         for (let x of xs) {
             for (let y of ys) {
-                if (comparer(xSelector(x), ySelector(y))) {
-                    yield projector(x, y);
-                }
+                if (comparer(xSelector(x), ySelector(y))) yield projector(x, y);
             }
         }
     };
@@ -398,9 +320,7 @@ function join(xs, ys, xSelector, ySelector, projector, comparer = strictEquals) 
  */
 function map(xs, fn) {
     return function *mapIterator() {
-        for (let x of xs) {
-            yield fn(x);
-        }
+        for (let x of xs) yield fn(x);
     };
 }
 
@@ -454,9 +374,7 @@ function prependAll(xs, yss) {
  */
 function repeat(item, count) {
     return function *repeatIterator() {
-        for (let i = 0; i < count; ++i) {
-            yield item;
-        }
+        for (let i = 0; i < count; ++i) yield item;
     };
 }
 
@@ -489,12 +407,10 @@ function set(xs, idx, val) {
             ++count;
         }
 
-        if (count < idx) {
-            while (count <= idx) {
-                if (count !== idx) yield undefined;
-                else yield val;
-                ++count;
-            }
+        while (count <= idx) {
+            if (count !== idx) yield undefined;
+            else yield val;
+            ++count;
         }
     };
 }
@@ -510,13 +426,10 @@ function skipWhile(xs, predicate) {
     return function *skipWhileIterator() {
         var hasFailed = false;
         for (let x of xs) {
-            if (!hasFailed) {
-                if (!predicate(x)) {
-                    hasFailed = true;
-                    yield x;
-                }
+            if (hasFailed || (!hasFailed && !predicate(x))) {
+                hasFailed = true;
+                yield x;
             }
-            else yield x;
         }
     };
 }
@@ -546,8 +459,7 @@ function slice(xs, start, end) {
 function sortBy(xs, orderObject) {
     return function *orderByIterator() {
         //gather all data from the xs before sorting
-        var x_s = sortData(asArray(xs), orderObject);
-        for (let x of x_s) yield x;
+        for (let x of sortData(asArray(xs), orderObject)) yield x;
     };
 }
 
@@ -604,7 +516,7 @@ function zip(xs, ys, selector) {
         var yArr = toArray(ys);
 
         for (let x of xs) {
-            if (idx >= yArr.length || !yArr.length) return;
+            if (idx >= yArr.length || !yArr.length) break;
             yield selector(x, yArr[idx]);
             ++idx;
         }
