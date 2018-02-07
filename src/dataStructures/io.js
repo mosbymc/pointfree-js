@@ -1,6 +1,6 @@
 import { constant } from '../combinators';
 import { type, strictEquals } from '../functionalHelpers';
-import { apply, chain, join, equals, stringMaker, valueOf } from './data_structure_util';
+import { apply, chain, join, equals, stringMaker, valueOf, traverse } from './data_structure_util';
 import { javaScriptTypes } from '../helpers';
 
 /**
@@ -64,16 +64,7 @@ var io = {
     fold: function _fold(fn, x) {
         return fn(this.value, x);
     },
-    traverse: function _traverse(fa, fn) {
-        return this.fold(function _reductioAdAbsurdum(xs, x) {
-            fn(x).map(function _map(x) {
-                return function _map_(y) {
-                    return y.concat([x]);
-                };
-            }).ap(xs);
-            return fa(this.empty);
-        });
-    },
+    traverse: traverse,
     runIo: function _runIo(...args) {
         return this.run(...args);
     },

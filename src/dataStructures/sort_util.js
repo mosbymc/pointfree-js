@@ -1,5 +1,8 @@
 import { deepClone, sortComparer } from '../helpers';
 
+let lengthOfItemsToSort = (items) => !items.length;
+let keyComparison = (items, comparer, selector, direction, item) => 0 === comparer(selector(items[0]), selector(item), direction);
+
 /** @module sort_util */
 
 var sort_obj = {};
@@ -18,15 +21,8 @@ function createSortObject(selector, comparer, direction) {
     });
 }
 
-/**
- * @signature
- * @description d
- * @param {Array} data - a
- * @param {Array} sortObject - b
- * @return {Array} - Returns an array sorted on 'n' fields in either ascending or descending
- * order for each field as specified in the 'sortObject' parameter
- */
-function sortData(data, sortObject) {
+/*
+function sortData2(data, sortObject) {
     var sortedData = data;
     sortObject.forEach(function _sortItems(sort, index) {
         var comparer = 'function' === typeof sort.comparer ? sort.comparer : sortComparer;
@@ -42,22 +38,68 @@ function sortData(data, sortObject) {
                 else {
                     if (1 === itemsToSort.length) sortedSubData = sortedSubData.concat(itemsToSort);
                     else {
-                        sortedSubData = sortedSubData.concat(5001 > itemsToSort.length ?
-                            insertionSort(itemsToSort, sort.keySelector, comparer, sort.direction) : mergeSort(itemsToSort, sort.keySelector, comparer, sort.direction));
+                        sortedSubData = sortItemsAndConcatWithSubData(sortedSubData, itemsToSort, comparer, sort.keySelector, sort.direction);
+                        //sortedSubData = sortedSubData.concat(5001 > itemsToSort.length ?
+                          //  insertionSort(itemsToSort, sort.keySelector, comparer, sort.direction) : mergeSort(itemsToSort, sort.keySelector, comparer, sort.direction));
                         //sortedSubData = sortedSubData.concat(quickSort(itemsToSort, sort.direction, sort.keySelector, comparer));
                     }
                     itemsToSort.length = 0;
                     itemsToSort[0] = item;
                 }
                 if (idx === sortedData.length - 1) {
-                    sortedSubData = sortedSubData.concat(5001 > itemsToSort.length ?
-                        insertionSort(itemsToSort, sort.keySelector, comparer, sort.direction) : mergeSort(itemsToSort, sort.keySelector, comparer, sort.direction));
+                    sortedSubData = sortItemsAndConcatWithSubData(sortedSubData, itemsToSort, comparer, sort.keySelector, sort.direction);
+                    //sortedSubData = sortedSubData.concat(5001 > itemsToSort.length ?
+                      //  insertionSort(itemsToSort, sort.keySelector, comparer, sort.direction) : mergeSort(itemsToSort, sort.keySelector, comparer, sort.direction));
                 }
             });
             sortedData = sortedSubData;
         }
     });
     return sortedData;
+}
+*/
+
+/**
+ * @signature
+ * @description d
+ * @param {Array} data - a
+ * @param {Array} sortObject - b
+ * @return {Array} - Returns an array sorted on 'n' fields in either ascending or descending
+ * order for each field as specified in the 'sortObject' parameter
+ */
+function sortData(data, sortObject) {
+    let comparer = 'function' === typeof sortObject[0].comparer ? sortObject[0].comparer : sortComparer,
+        sortedData = sortSubData(data, data, comparer, sortObject[0].keySelector, sortObject[0].direction);
+
+    sortObject.slice(1).forEach(function _sortItems(sort, index) {
+        let sortedSubData = [], itemsToSort = [], prevKeySelector = sortObject[0 === index ? 0 : index - 1].keySelector;
+        sortedData.forEach(function _sortData(item, idx) {
+            if (checkItemEquality(itemsToSort, item, comparer, prevKeySelector, sort.direction))
+                itemsToSort.push(item);
+            else {
+                sortedSubData = sortItemsAndConcatWithSubData(sortedSubData, itemsToSort, comparer, sort.keySelector, sort.direction);
+                itemsToSort.length = 0;
+                itemsToSort[0] = item;
+            }
+            if (idx === sortedData.length - 1) {
+                sortedSubData = sortItemsAndConcatWithSubData(sortedSubData, itemsToSort, comparer, sort.keySelector, sort.direction);
+            }
+        });
+        sortedData = sortedSubData;
+    });
+    return sortedData;
+}
+
+function checkItemEquality(itemsToSort, item, comparer, selector, direction) {
+    return !itemsToSort.length || 0 === comparer(selector(itemsToSort[0]), selector(item), direction);
+}
+
+function sortItemsAndConcatWithSubData(subData, items, comparer, selector, direction) {
+    return subData.concat(sortSubData(subData, items, comparer, selector, direction));
+}
+
+function sortSubData(subData, items, comparer, selector, direction) {
+    return 5001 > items.length ? insertionSort(items, selector, comparer, direction) : mergeSort(items, selector, comparer, direction);
 }
 
 /**
@@ -167,7 +209,7 @@ function _quickSort(data, left, right, selector, comparer, dir) {
  * @return {Array} - e
  */
 function insertionSort(source, keySelector, keyComparer, direction) {
-    if (0 === source.length) return source;
+    if (2 > source.length) return source;
     var i = 0,
         copy = [];
 
