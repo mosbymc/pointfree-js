@@ -1,18 +1,29 @@
-engines:
+version: 2
+
+plugins:
   eslint:
     enabled: true
-  duplication:
-    enabled: true
-    config:
-      languages:
-        javascript:
-          mass_threshold: 130
-  fixme:
-    enabled: false
-  nodesecurity:
-    enabled: false
 
-exclude_paths:
+checks:
+  argument-count:
+    config:
+      threshold: 6
+  file-lines:
+    config:
+      threshold: 300
+  method-count:
+    config:
+      threshold: 40
+  method-complexity:
+      config:
+        threshold: 10
+  identical-code:
+      config:
+        threshold: 100
+  similar-code:
+      enabled: false
+
+exclude_patterns:
 - "coverage/**/*"
 - "dev_browser/**/*"
 - "dist/**/*"
