@@ -21,8 +21,8 @@ function createSortObject(selector, comparer, direction) {
     });
 }
 
-/*
-function sortData2(data, sortObject) {
+
+function sortData(data, sortObject) {
     var sortedData = data;
     sortObject.forEach(function _sortItems(sort, index) {
         var comparer = 'function' === typeof sort.comparer ? sort.comparer : sortComparer;
@@ -57,7 +57,7 @@ function sortData2(data, sortObject) {
     });
     return sortedData;
 }
-*/
+
 
 /**
  * @signature
@@ -67,7 +67,7 @@ function sortData2(data, sortObject) {
  * @return {Array} - Returns an array sorted on 'n' fields in either ascending or descending
  * order for each field as specified in the 'sortObject' parameter
  */
-function sortData(data, sortObject) {
+function sortData2(data, sortObject) {
     let comparer = 'function' === typeof sortObject[0].comparer ? sortObject[0].comparer : sortComparer,
         sortedData = sortSubData(data, data, comparer, sortObject[0].keySelector, sortObject[0].direction);
 

@@ -488,7 +488,6 @@ describe('List functor test', function _testListFunctor() {
 
                 var res = List([1, 2, 3, 4, 5])
                     .except(_genny).data;
-
             });
 
             it('should group the test data on last name', function _testGroupBy() {
