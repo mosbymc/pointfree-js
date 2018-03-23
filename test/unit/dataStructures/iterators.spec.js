@@ -1590,8 +1590,7 @@ describe('Test Iterators', function _testIterators() {
                     if (!previousFieldsValues.length)
                         previousFieldsValues[0] = item.FirstName;
                     else {
-                        //TODO: Need to fix this assertion as chai no longer supports comparing strings
-                        //item.FirstName.should.be.at.least(previousFieldsValues[0]);
+                        expect(item.FirstName >= previousFieldsValues[0]).to.be.true;
                         if (item.FirstName !== previousFieldsValues[0])
                             previousFieldsValues[0] = item.FirstName;
                     }
@@ -1608,8 +1607,7 @@ describe('Test Iterators', function _testIterators() {
                     if (!previousFieldsValues.length)
                         previousFieldsValues[0] = item.FirstName;
                     else {
-                        //TODO: Need to fix this assertion as chai no longer supports comparing strings
-                        //item.FirstName.should.be.at.most(previousFieldsValues[0]);
+                        expect(item.FirstName <= previousFieldsValues[0]).to.be.true;
                         if (item.FirstName !== previousFieldsValues[0])
                             previousFieldsValues[0] = item.FirstName;
                     }
@@ -1633,35 +1631,31 @@ describe('Test Iterators', function _testIterators() {
                         previousFieldsValues[2] = item.FirstName;
                     }
                     else {
-                        //TODO: Need to fix this assertion as chai no longer supports comparing strings
                         if (item.State !== previousFieldsValues[0]) {
-                            //item.State.should.be.at.most(previousFieldsValues[0]);
+                            expect(item.State <= previousFieldsValues[0]).to.be.true;
                             previousFieldsValues[0] = item.State;
                             previousFieldsValues[1] = null;
                             previousFieldsValues[2] = null;
                         }
                         else if (item.LastName !== previousFieldsValues[1]) {
                             if (null !== previousFieldsValues[1]) {
-                                //TODO: Need to fix this assertion as chai no longer supports comparing strings
-                                //item.LastName.should.be.at.least(previousFieldsValues[1]);
+                                expect(item.LastName >= previousFieldsValues[1]).to.be.true;
                             }
-                            //item.State.should.be.at.most(previousFieldsValues[0]);
+                            expect(item.State <= previousFieldsValues[0]).to.be.true;
                             previousFieldsValues[1] = item.LastName;
                         }
                         else if (item.FirstName !== previousFieldsValues[2]) {
                             if (null !== previousFieldsValues[2]) {
-                                //TODO: Need to fix this assertion as chai no longer supports comparing strings
-                                //item.FirstName.should.be.at.least(previousFieldsValues[2]);
+                                expect(item.FirstName >= previousFieldsValues[2]).to.be.true;
                             }
-                            //TODO: Need to fix this assertion as chai no longer supports comparing strings
-                            //item.State.should.be.at.most(previousFieldsValues[0]);
-                            //item.LastName.should.be.at.least(previousFieldsValues[1]);
+                            expect(item.State <= previousFieldsValues[0]).to.be.true;
+                            expect(item.LastName >= previousFieldsValues[1]).to.be.true;
                             previousFieldsValues[2] = item.FirstName;
                         }
                         else {
-                            //item.State.should.be.at.most(previousFieldsValues[0]);
-                            //item.LastName.should.be.at.least(previousFieldsValues[1]);
-                            //item.FirstName.should.be.at.least(previousFieldsValues[2]);
+                            expect(item.State <= previousFieldsValues[0]).to.be.true;
+                            expect(item.LastName >= previousFieldsValues[1]).to.be.true;
+                            expect(item.FirstName >= previousFieldsValues[2]).to.be.true;
                         }
                     }
                 });
