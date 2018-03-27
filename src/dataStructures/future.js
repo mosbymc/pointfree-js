@@ -269,7 +269,7 @@ var future = {
             let appFn, value,
                 rej = once(reject),
                 resolveWhenComplete = safeFork(rej, function _result() {
-                    if (115 === value) {
+                    /*if (115 === value) {
                         console.log(null != appFn && null != value);
                         console.log(result);
                         console.log(appFn);
@@ -280,27 +280,27 @@ var future = {
                         console.log(value.toString());
                         console.log(appFn);
                         //console.log(ma);
-                    }
+                    }*/
                     if (null != appFn && null != value) return result(appFn(value));
                 });
 
-            console.log(this.source);
+            //console.log(this.source);
             this.fork(rej, function _thisForkApplied(val) {
-                if (115 !== val) {
+                /*if (115 !== val) {
                     console.log(val);
                     console.log(val.data);
-                }
+                }*/
                 value = val;
                 resolveWhenComplete();
             });
 
             ma.fork(rej, function _otherForkApplied(fn) {
                 appFn = fn;
-                console.log(fn);
+                //console.log(fn);
                 resolveWhenComplete();
             });
         });
-
+/*
         return this.factory((reject, resolve) => {
             let rej = once(reject),
                 val, mapper,
@@ -328,6 +328,7 @@ var future = {
 
             return [cur, other];
         });
+        */
 
         /*
         return Future((reject, result) => {
