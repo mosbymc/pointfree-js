@@ -1275,16 +1275,16 @@ var list_core = {
         }, f(List.empty());
          */
 
-        var equalsOneTwoOrThree = 3 === this.data.length && 1 === this.data[0] && 2 === this.data[1] && 3 === this.data[2];
+        /*var equalsOneTwoOrThree = 3 === this.data.length && 1 === this.data[0] && 2 === this.data[1] && 3 === this.data[2];
         var emptyFuture = 'Future()' === f().toString();
 
         if (equalsOneTwoOrThree && emptyFuture) {
             console.log(this.foldl((ys, x) => ys.apply(g(x).map(x => y => y.concat([x]))), f(List.empty())));
-        }
+        }*/
 
         return this.foldl(function _listTraverseFold(ys, x) {
             //console.log(ys);
-            if (emptyFuture && equalsOneTwoOrThree) {
+            /*if (emptyFuture && equalsOneTwoOrThree) {
                 console.log(ys);
 
                 console.log(g(x).map(function _listTraverseMap(x) {
@@ -1308,16 +1308,16 @@ var list_core = {
                         return y.concat([x]);
                     };
                 })));
-            }
+            }*/
 
             return ys.apply(g(x).map(function _listTraverseMap(x) {
                 //console.log(x);
                 return function _innerListTraverseMap(y) {
-                    if (emptyFuture && equalsOneTwoOrThree) {
+                    /*if (emptyFuture && equalsOneTwoOrThree) {
                         console.log(ys);
                         console.log(y);
                         console.log(x);
-                    }
+                    }*/
                     return y.concat([x]);
                 };
             }));
