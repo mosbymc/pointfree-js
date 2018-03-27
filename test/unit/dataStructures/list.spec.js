@@ -1227,7 +1227,7 @@ describe('List functor test', function _testListFunctor() {
             var count = 0;
 
             function _TO1(cb) {
-                setTimeout(function _to() {
+                return setTimeout(function _to() {
                     ++count;
                     count.should.eql(1);
                     cb(null, count);
@@ -1235,7 +1235,7 @@ describe('List functor test', function _testListFunctor() {
             }
 
             function _TO2(cb) {
-                setTimeout(function _to() {
+                return setTimeout(function _to() {
                     ++count;
                     count.should.eql(2);
                     cb(null, count);
@@ -1243,13 +1243,21 @@ describe('List functor test', function _testListFunctor() {
                 }, 30);
             }
 
-            List([ _TO1, _TO2])
+            let t = List([ _TO1, _TO2])
                 .traverse(monads.Future.of,
-                        fn => monads.Future((reject, result) => fn((err, res) => err ? reject(err) : result(res))))
-                .fork(noop, noop);
+                    fn => {
+                    console.log(fn);
+                    return monads.Future((reject, result) => fn((err, res) => err ? reject(err) : result(res)))
+                    });
+
+            Object.getPrototypeOf(monads.Future()).isPrototypeOf(t).should.be.true;
+            var p = t.fork(console.error, console.log);
+            console.log(p);
         });
 
         it('should traverse a list of identity', function _testListTraverseWithIdentity() {
+            console.log(List(['12332', 'erwer']).chain(x => List(x.split(''))).data);
+
             var i = List([1, 2, 3])
                 .traverse(monads.Identity.of, val => monads.Identity(val * val));
 

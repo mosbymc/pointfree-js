@@ -259,8 +259,8 @@ describe('Either data structure tests', function _testEitherDataStructure() {
         });
 
         it('should return underlying value when left#fold/right#fold is invoked', function _testEitherFold() {
-            Right(10).fold((x, y) => x + y * 15, 0).should.eql(150);
-            Left(10).fold((x, y) => x + y * 15, 0).should.eql(150);
+            Right(10).fold(x => x * x, x => x / x).should.eql(1);
+            Left(10).fold(x => x * x, x => x / x).should.eql(100);
         });
 
         it('should return a Just of an Either of 10 when #sequence is invoked', function _testEitherSequence() {

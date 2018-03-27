@@ -113,6 +113,25 @@ describe('Future test', function _testFuture() {
                 }, console.log);
         });
 
+        it('should ignore mapping on a rejected future', function _testFutureRejectMapping(done) {
+            function _to(rej, res) {
+                return setTimeout(function _timeout() {
+                    return res(5);
+                }, 10);
+            }
+
+            let successFork = sinon.spy(function _success(r) { console.log(r); });
+
+            Future.reject(_to)
+                .map(x => x * x)
+                .fork(function _err(e) {
+                    e.should.eql(_to);
+                    successFork.should.not.have.been.called;
+                    done();
+                }, function success(r) {
+                });
+        });
+
         it('should catch a thrown exception and call the reject handler when a mapping function throws', function _testFutureMapException(done) {
             Future(function _to(rej, res) {
                 setTimeout(function _timeout() {
@@ -175,6 +194,30 @@ describe('Future test', function _testFuture() {
         });
         */
 
+        it('should apply one future\'s function to another future\'s data', function _testFutureApply(done) {
+            let f1 = Future(function _to1(rej, res) {
+                return setTimeout(function _to() {
+                    return res(115);
+                }, 10);
+            }),
+                f2 = Future(function _to2(rej, res) {
+                    return setTimeout(function _to() {
+                        return res(function _mult(x) {
+                            return x * x;
+                        });
+                    }, 15);
+                }),
+                res = f1.apply(f2);
+
+            Object.getPrototypeOf(f1).isPrototypeOf(res).should.be.true;
+
+            res.fork(console.error, function _res(r) {
+                r.should.eql(13225);
+                done();
+            });
+
+        });
+
         it('should map the first function over a future', function _testFutureBimapSuccess(done) {
             Future(function _to(rej, res) {
                 setTimeout(function _timeout() {
@@ -223,6 +266,203 @@ describe('Future test', function _testFuture() {
         it('should represent the future\'s \'type\' when \'Object.prototype.toString.call\' is invoked', function _testFutureTypeString() {
             var i = Future(x => x);
             Object.prototype.toString.call(i).should.eql('[object Future]');
+        });
+
+        /*
+        it('should traverse', function _testFutureTraverse() {
+            function _to(reject, success) {
+                return setTimeout(function _sto() {
+                    return success(function _meme(x) {
+                        console.log(x);
+                        return x * x;
+                    });
+                }, 10);
+            }
+            let f1 = Future(_to),
+                f2 = Future(_to),
+                f3 = Future(_to);
+
+            let list = monads.List([f1, f2, f3]);
+            let traved = list.traverse(Future.of, function _val(x) {
+                console.log(x);
+                return Future(x);
+            });
+
+            console.log(traved);
+        });
+        */
+
+        it('fsds', function _asdas(done) {
+            let httpGet = path => Future.of(`${path} result`);
+            let list = monads.List(['home', 'about', 'blog']);
+            let t = list.traverse(Future.of, route => httpGet(route));
+
+            t.fork(console.error, function log(r) {
+                console.log(r.data);
+                r.data.should.eql(['home result', 'about result', 'blog result']);
+                done();
+            });
+        });
+
+        it('sdsd', function _erezcz(done) {
+            function httpGet(path) {
+                return Future(function _future(reject, success) {
+                    return setTimeout(function _sto() {
+                        success(`${path} result`);
+                    });
+                });
+            }
+
+            let list = monads.List(['home', 'about', 'blog']);
+            let t = list.traverse(Future.of, route => httpGet(route));
+
+            t.fork(console.error, function log(r) {
+                r.data.should.eql(['home result', 'about result', 'blog result']);
+                done();
+            });
+        });
+
+        it('ssdfd', function _wasdas(done) {
+            function httpGet(path) {
+                return Future(function _future(reject, success) {
+                    return setTimeout(function _sto() {
+                        success(`${path}result`);
+                    });
+                });
+            }
+
+            let list = monads.List([['/', '/home'], ['/about'], ['/blog', '/index']]);
+            let t = list.traverse(Future.of, routes => monads.List(routes).traverse(Future.of, route => httpGet(route)));
+
+            t.fork(console.error, function log(results) {
+                results.forEach(function _forEachResult(result, idx) {
+                    result.forEach(function forEachValue(v, i) {
+                        v.should.eql(list[idx][i] + 'result');
+                    });
+                });
+                done();
+            });
+        });
+
+        it('asdas', function _asdasd(done) {
+            var fake = id => ({ id: id, name: 'user1', best_friend_id: id + 1 });
+            var DB = ({
+                find: id => Future((reject, success) => success(2 < id ? monads.Right(fake(id)) : monads.Left('not found!')))
+            });
+            var eitherToFuture = e => e.fold(Future.reject, Future.of);
+
+            DB.find(3)
+                .chain(eitherToFuture)
+                .chain(user => DB.find(user.best_friend_id))
+                .chain(eitherToFuture)
+                .fork(console.error, function _log(r) {
+                    r.id.should.eql(4);
+                    r.name.should.eql('user1');
+                    r.best_friend_id.should.eql(5);
+                    done();
+                });
+        });
+
+        it('should traverse a List(Future) and return a Future(List)', function _testFutureTraverse() {
+            /*
+            var futurize = require('futurize').futurize(Task);
+
+            const futurize = Future => fn => function (...args) {
+                  return new Future((rej, res) =>
+                    void fn(...args, (err, result) => err? rej(err): res(result))
+                  );
+                };
+
+            var readFile = futurize(fs.readFile);
+
+             var files = List(['box.js', 'config.json']);
+             var f = files.traverse(Task.of, fn => readFile(fn, 'utf-8'));
+             f.fork(console.error, console.log);
+             */
+
+
+            function _to(val, cb) {
+                console.log(val, cb);
+                return setTimeout(function _sto() {
+                    console.log(val);
+                    return cb(null, val);
+                }, 10);
+            }
+
+            let futureWrapper = function _futurizedWraper(fn) {
+                return function _innerFuturized(...args) {
+                    return Future(function _f1(rej, res) {
+                        console.log(res);
+                        console.log(fn);
+
+                        return fn(...args, function _f2(err, result) {
+                            console.log(err, result);
+                            console.log(!err);
+                            console.log(res);
+                            return err ? rej(err) : res(result);
+                        });
+                    });
+                };
+            };
+
+            let futurized = futureWrapper(_to);
+
+            /*
+            let f1 = Future(function _to1(rej, res) {
+                return setTimeout(function _to() {
+                    return res(115);
+                }, 10);
+            }),
+                f2 = Future(function _to2(rej, res) {
+                    return setTimeout(function _to() {
+                        return res(function _mult(x) {
+                            return x * x;
+                        });
+                    }, 15);
+                }),
+                res = f2.apply(f1);
+             */
+
+            function traverse(val) {
+                let r = futurized(val);
+                console.log(r);
+                console.log(val);
+                return r;
+            }
+
+            let list = monads.List([1, 2, 3]);
+            let res = list.traverse(monads.Future.of, traverse);
+
+            Object.getPrototypeOf(Future()).isPrototypeOf(res).should.be.true;
+            console.log(res);
+
+            res.fork(function _error(e) {
+                console.log(1);
+                console.error(e);
+            }, function _log(r) {
+                r.should.eql(1);
+                //done();
+                console.log(1);
+                console.log(r);
+            });
+
+
+            //let r = res.fork(console.error, console.log);
+            //console.log(r);
+
+            //res.fork(console.error, console.log);
+
+
+            /*
+            .traverse(monads.Identity.of, val => monads.Identity(val * val));
+
+            var initial = 1;
+            Object.getPrototypeOf(monads.Identity()).isPrototypeOf(i).should.be.true;
+            Object.getPrototypeOf(List()).isPrototypeOf(i.value).should.be.true;
+            i.value.data.forEach(function _verifyResult(val) {
+                val.should.eql(initial * initial);
+                ++initial;
+             */
         });
     });
 });

@@ -419,7 +419,7 @@ describe('Maybe functor tests', function _testMaybeFunctor() {
         });
 
         it('should return underlying value when just#fold is invoked', function _testJustFold() {
-            Just(10).fold((x, y) => x + y * 15, 0).should.eql(150);
+            Just(10).fold(x => x * x, x => x / x).should.eql(100);
         });
 
         it('should return itself when fold is invoked on a nothing', function _testNothingFold() {
