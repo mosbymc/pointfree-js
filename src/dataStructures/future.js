@@ -14,9 +14,9 @@ import { javaScriptTypes } from '../helpers';
 function safeFork(reject, resolve) {
     return function _safeFork(val) {
         try {
-            var res = resolve(val);
-            //this._value = res;
-            return res;
+            //this._value = resolve(val);
+            //return this._value;
+            return resolve(val);
         }
         catch(ex) {
             reject(ex);
@@ -81,7 +81,32 @@ Future.is = f => future.isPrototypeOf(f);
     if ('function' !== typeof val) return Future((_, resolve) => safeFork(noop, resolve(val)));
     return Future(val);
 };*/
-Future.of = val => ifElse(constant(strictEquals(javaScriptTypes.Function, type(val))), Future, futureFunctionize, val);
+//TODO: Figure out which is the correct method of handeling Future.of...
+//TODO: Either everything passed (including functions) is wrapped in a function and then a future
+//TODO: is created from the wrapped value, or only non-function values are wrapped
+//Future.of = val => ifElse(constant(strictEquals(javaScriptTypes.Function, type(val))), Future, futureFunctionize, val);
+Future.of = val => Future((_, resolve) => safeFork(identity, resolve(val)));
+
+Future.all = function _all(futures) {
+    return Future((reject, resolve) => {
+        let results = [],
+            count = 0,
+            complete = false;
+        futures.forEach((future, i) => {
+            future.fork(err => {
+                if (!complete) {
+                    complete = true;
+                    reject(err);
+                }
+            }, res => {
+                results[i] = res;
+                count += 1;
+                if (futures.length === count)
+                    safeFork.call(this, reject, resolve)(results);
+            });
+        });
+    });
+};
 
 var futureFunctionize = val => Future((_, resolve) => safeFork(identity, resolve(val)));
 
@@ -219,12 +244,12 @@ var future = {
      * just performed.
      */
     map: function _map(fn) {
-        return this.factory.of((reject, resolve) => this.fork(err => reject(err), res => resolve(fn(res))));
+        return this.factory((reject, resolve) => this.fork(err => reject(err), res => resolve(fn(res))));
     },
     //TODO: probably need to compose here, not actually map over the value; this is a temporary fill-in until
     //TODO: I have time to finish working on the Future
     chain: function _chain(fn) {
-        return this.factory.of((reject, resolve) => this.fork(err => reject(err), res => fn(res).fork(reject, resolve)));
+        return this.factory((reject, resolve) => this.fork(err => reject(err), res => fn(res).fork(reject, resolve)));
         /*
         return this.of((reject, resolve) =>
         {
@@ -240,7 +265,43 @@ var future = {
         return this.chain(x => x);
     },
     apply: function _apply(ma) {
-        return this.factory.of((reject, resolve) => {
+        return Future((reject, result) => {
+            let appFn, value,
+                rej = once(reject),
+                resolveWhenComplete = safeFork(rej, function _result() {
+                    /*if (115 === value) {
+                        console.log(null != appFn && null != value);
+                        console.log(result);
+                        console.log(appFn);
+                    }
+                    else {
+                        console.log(null != appFn && null != value);
+                        console.log(result);
+                        console.log(value.toString());
+                        console.log(appFn);
+                        //console.log(ma);
+                    }*/
+                    if (null != appFn && null != value) return result(appFn(value));
+                });
+
+            //console.log(this.source);
+            this.fork(rej, function _thisForkApplied(val) {
+                /*if (115 !== val) {
+                    console.log(val);
+                    console.log(val.data);
+                }*/
+                value = val;
+                resolveWhenComplete();
+            });
+
+            ma.fork(rej, function _otherForkApplied(fn) {
+                appFn = fn;
+                //console.log(fn);
+                resolveWhenComplete();
+            });
+        });
+/*
+        return this.factory((reject, resolve) => {
             let rej = once(reject),
                 val, mapper,
                 rejected = false;
@@ -267,19 +328,81 @@ var future = {
 
             return [cur, other];
         });
+        */
+
+        /*
+        return Future((reject, result) => {
+            let appFn, value,
+            rej = once(reject),
+            resolveWhenComplete = safeFork(rej, function _result() {
+                if (null != appFn && null != value) return res(applyFn(value));
+            });
+            this.fork(rej, function _thisForkApplied(fn) {
+                appFn = fn;
+                resolveWhenComplete();
+            });
+
+            ma.fork(rej, function _otherForkApplied(val) {
+                value = val;
+                resolveWhenComplete();
+            });
+        });
+         */
+
+        /*
+        Future.prototype.ap = function(m) {
+            var self = this;
+
+          return new Future(function(rej, res) {
+            var applyFn, val;
+            var doReject = once(rej);
+
+            var resolveIfDone = jail(doReject, function() {
+              if (applyFn != null && val != null) {
+                return res(applyFn(val));
+              }
+            });
+
+            self._fork(doReject, function(fn) {
+              applyFn = fn;
+              resolveIfDone();
+            });
+
+            m._fork(doReject, function(v) {
+              val = v;
+              resolveIfDone();
+            });
+
+          });
+
+          function jail(handler, f){
+              return function(a){
+                try{
+                  return f(a);
+                } catch(err) {
+                  handler(err);
+                }
+              };
+            }
+
+        };
+         */
     },
     fold: function _fold(f, g) {
-        return this.factory.of((reject, resolve) =>
+        return this.factory((reject, resolve) =>
             this.fork(err => resolve(f(err)), res => resolve(g(res))));
     },
     traverse: traverse,
     bimap: function _bimap(f, g) {
-        return this.factory.of((reject, resolve) => this._fork(safeFork(reject, err => reject(g(err))), safeFork(reject, res => resolve(f(res)))));
+        return this.factory((reject, resolve) => this._fork(safeFork(reject, err => reject(g(err))), safeFork(reject, res => resolve(f(res)))));
     },
     isEmpty: function _isEmpty() {
         return this._fork === identity;
     },
     fork: function _fork(reject, resolve) {
+        if (console.error === reject && console.log === resolve) {
+
+        }
         return this._fork(reject, safeFork.call(this, reject, resolve));
     },
     /**

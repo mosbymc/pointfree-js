@@ -403,15 +403,15 @@ var just = {
      * @memberOf dataStructures.just
      * @instance
      * @function fold
-     * @param {function} fn - Any mapping function that should be applied to the underlying value
+     * @param {function} f - Any mapping function that should be applied to the underlying value
      * of the just.
-     * @param {*} acc - An JavaScript value that should be used as an accumulator.
+     * @param {function} g - An JavaScript value that should be used as an accumulator.
      * @return {*} Returns the return value of the mapping function provided as an argument.
      *
      * @example Just(10).fold((acc, x) => x + acc, 5)   // => 15
      */
-    fold: function _fold(fn, acc) {
-        return fn(acc, this.value);
+    fold: function _fold(f, g) {
+        return f(this.value);
     },
     /**
      * @signature just -> M<just<T>>
@@ -629,7 +629,7 @@ var nothing = {
     chain: returnNothing,
     mjoin: returnNothing,
     apply: returnNothing,
-    fold: function _fold(fn) {
+    fold: function _fold(f, g) {
         return Nothing();
     },
     sequence: function _sequence(p) {

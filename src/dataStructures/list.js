@@ -1251,7 +1251,79 @@ var list_core = {
      * @return {list} - c
      */
     traverse: function _traverse(f, g) {
-        return this.foldl((ys, x) => ys.apply(g(x).map(x => y => y.concat([x]))), f(List.empty()));
+        /*
+        return this.foldl(function _listTraverseFold(ys, x) {
+            return g(x).map(function _listTraverseMap(x) {
+                return function _innerListTraverseMap(y) {
+                    return y.concat([x]);
+                };
+            }).apply(ys);
+        }, f(List.empty()));
+        */
+        /*
+        List.prototype.traverse = function(point, f) {
+          return this.reduce((ys, x) =>
+            f(x).map(x => y => y.concat([x])).ap(ys), point(this.empty))
+        }
+
+        return this.foldl(function _listTraverseFold(ys, x) {
+            return g(x).map(function _listTraverseMap(x) {
+                return function _innerListTraverseMap(y) {
+                    return y.concat([x])
+                }
+            }).apply(ys);
+        }, f(List.empty());
+         */
+
+        /*var equalsOneTwoOrThree = 3 === this.data.length && 1 === this.data[0] && 2 === this.data[1] && 3 === this.data[2];
+        var emptyFuture = 'Future()' === f().toString();
+
+        if (equalsOneTwoOrThree && emptyFuture) {
+            console.log(this.foldl((ys, x) => ys.apply(g(x).map(x => y => y.concat([x]))), f(List.empty())));
+        }*/
+
+        return this.foldl(function _listTraverseFold(ys, x) {
+            //console.log(ys);
+            /*if (emptyFuture && equalsOneTwoOrThree) {
+                console.log(ys);
+
+                console.log(g(x).map(function _listTraverseMap(x) {
+                    //console.log(x);
+                    return function _innerListTraverseMap(y) {
+                        if (emptyFuture) {
+                            console.log(ys);
+                            console.log(y, x);
+                        }
+                        return y.concat([x]);
+                    };
+                }));
+
+                console.log(ys.apply(g(x).map(function _listTraverseMap(x) {
+                    //console.log(x);
+                    return function _innerListTraverseMap(y) {
+                        if (emptyFuture) {
+                            console.log(ys);
+                            console.log(y, x);
+                        }
+                        return y.concat([x]);
+                    };
+                })));
+            }*/
+
+            return ys.apply(g(x).map(function _listTraverseMap(x) {
+                //console.log(x);
+                return function _innerListTraverseMap(y) {
+                    /*if (emptyFuture && equalsOneTwoOrThree) {
+                        console.log(ys);
+                        console.log(y);
+                        console.log(x);
+                    }*/
+                    return y.concat([x]);
+                };
+            }));
+        }, f(List.empty()));
+
+        //return this.foldl((ys, x) => ys.apply(g(x).map(x => y => y.concat([x]))), f(List.empty()));
     },
 
     /**

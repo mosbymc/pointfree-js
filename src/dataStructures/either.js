@@ -331,13 +331,13 @@ var right = {
      * @memberOf dataStructures.right
      * @instance
      * @function fold
-     * @param {function} fn - Any mapping function that should be applied to the underlying value
+     * @param {function} f - Any mapping function that should be applied to the underlying value
      * of the identity monad.
-     * @param {*} acc - An JavaScript value that should be used as an accumulator.
+     * @param {function} g - An JavaScript value that should be used as an accumulator.
      * @return {*} Returns the return value of the mapping function provided as an argument.
      */
-    fold: function _fold(fn, acc) {
-        return fn(acc, this.value);
+    fold: function _fold(f, g) {
+        return g(this.value);
     },
     /**
      * @signature monad -> monad<monad<T>>
@@ -516,13 +516,13 @@ var left = {
      * @memberOf dataStructures.left
      * @instance
      * @function fold
-     * @param {function} fn - Any mapping function that should be applied to the underlying value
+     * @param {function} f - Any mapping function that should be applied to the underlying value
      * of the identity monad.
-     * @param {*} acc - An JavaScript value that should be used as an accumulator.
+     * @param {function} g - An JavaScript value that should be used as an accumulator.
      * @return {*} Returns the return value of the mapping function provided as an argument.
      */
-    fold: function _fold(fn, acc) {
-        return fn(acc, this.value);
+    fold: function _fold(f, g) {
+        return f(this.value);
     },
     /**
      * @signature monad -> monad<monad<T>>
