@@ -1,5 +1,5 @@
 import { once, type, strictEquals } from '../functionalHelpers';
-import { ifElse, constant, identity } from '../combinators';
+import { ifElse, constant, identity, compose } from '../combinators';
 import { join, valueOf, traverse } from './data_structure_util';
 import { javaScriptTypes } from '../helpers';
 
@@ -49,6 +49,10 @@ function Future(fn) {
         },
         _fork: {
             value: fn,
+            writable: false
+        },
+        isEmpty: {
+            value: () => false,
             writable: false
         }
     });
@@ -168,7 +172,7 @@ Future.delay = function _delay(val, delay) {
  * @description Creates and returns an 'empty' identity monad.
  * @return {dataStructures.future} - Returns a new identity monad.
  */
-Future.empty = () => Future(identity);
+Future.empty = () => emptyFuture;
 
 /**
  * @typedef {Object} future
@@ -261,148 +265,51 @@ var future = {
         });
         */
     },
-    mjoin: function _mjoin() {
+    join: function _join() {
         return this.chain(x => x);
     },
     apply: function _apply(ma) {
         return Future((reject, result) => {
             let appFn, value,
                 rej = once(reject),
-                resolveWhenComplete = safeFork(rej, function _result() {
-                    /*if (115 === value) {
-                        console.log(null != appFn && null != value);
-                        console.log(result);
-                        console.log(appFn);
-                    }
-                    else {
-                        console.log(null != appFn && null != value);
-                        console.log(result);
-                        console.log(value.toString());
-                        console.log(appFn);
-                        //console.log(ma);
-                    }*/
+                tryResolve = safeFork(rej, function _result() {
                     if (null != appFn && null != value) return result(appFn(value));
                 });
 
-            //console.log(this.source);
-            this.fork(rej, function _thisForkApplied(fn) {
-                /*if (115 !== val) {
-                    console.log(val);
-                    console.log(val.data);
-                }*/
+            this._fork(rej, function _thisForkApplied(fn) {
                 appFn = fn;
-                resolveWhenComplete();
+                tryResolve();
             });
 
             ma.fork(rej, function _otherForkApplied(val) {
                 value = val;
-                //console.log(fn);
-                resolveWhenComplete();
+                tryResolve();
             });
         });
-/*
-        return this.factory((reject, resolve) => {
-            let rej = once(reject),
-                val, mapper,
-                rejected = false;
-
-            var cur = this.fork(rej, guardResolve(function _gr(x) {
-                mapper = x;
-            }));
-
-            var other = ma.fork(rej, guardResolve(function _gr(x) {
-                val = x;
-            }));
-
-            function guardResolve(setter) {
-                return function _guardResolve(x) {
-                    if (rejected) return;
-
-                    setter(x);
-                    if (mapper && val) {
-                        return resolve(mapper(val));
-                    }
-                    return x;
-                };
-            }
-
-            return [cur, other];
-        });
-        */
-
-        /*
-        return Future((reject, result) => {
-            let appFn, value,
-            rej = once(reject),
-            resolveWhenComplete = safeFork(rej, function _result() {
-                if (null != appFn && null != value) return res(applyFn(value));
-            });
-            this.fork(rej, function _thisForkApplied(fn) {
-                appFn = fn;
-                resolveWhenComplete();
-            });
-
-            ma.fork(rej, function _otherForkApplied(val) {
-                value = val;
-                resolveWhenComplete();
-            });
-        });
-         */
-
-        /*
-        Future.prototype.ap = function(m) {
-            var self = this;
-
-          return new Future(function(rej, res) {
-            var applyFn, val;
-            var doReject = once(rej);
-
-            var resolveIfDone = jail(doReject, function() {
-              if (applyFn != null && val != null) {
-                return res(applyFn(val));
-              }
-            });
-
-            self._fork(doReject, function(fn) {
-              applyFn = fn;
-              resolveIfDone();
-            });
-
-            m._fork(doReject, function(v) {
-              val = v;
-              resolveIfDone();
-            });
-
-          });
-
-          function jail(handler, f){
-              return function(a){
-                try{
-                  return f(a);
-                } catch(err) {
-                  handler(err);
-                }
-              };
-            }
-
-        };
-         */
     },
     fold: function _fold(f, g) {
-        return this.factory((reject, resolve) =>
-            this.fork(err => resolve(f(err)), res => resolve(g(res))));
+        return this.fork(err => f(err), res => g(res));
     },
-    traverse: traverse,
+    traverse: function _traverse(f, g) {
+        let r = this.fold(f, g);
+        return f().chain(() => r);
+
+        /*
+        let r = this.fold(f, g);
+        return f().chain(() => r);
+        return f().chain(x => this.fold(f, g));
+         */
+    },
     bimap: function _bimap(f, g) {
-        return this.factory((reject, resolve) => this._fork(safeFork(reject, err => reject(g(err))), safeFork(reject, res => resolve(f(res)))));
+        return this.factory((reject, resolve) => this._fork(safeFork(reject, err => reject(f(err))), safeFork(reject, res => resolve(g(res)))));
     },
-    isEmpty: function _isEmpty() {
-        return this._fork === identity;
+    contramap: function _contramap(fn) {
+        return Future((reject, resolve) => this._fork(err => reject(err), res => resolve((...args) => res(fn(...args)))));
+    },
+    dimap: function _dimap(f, g) {
+        return Future((reject, resolve) => this._fork(err => reject(err), res => resolve((...args) => g(res(f(...args))))));
     },
     fork: function _fork(reject, resolve) {
-        if (console.error === reject && console.log === resolve) {
-
-        }
         return this._fork(reject, safeFork.call(this, reject, resolve));
     },
     /**
@@ -471,5 +378,21 @@ future.flapMap = future.chain;
 future.bind = future.chain;
 future.reduce = future.fold;
 future.constructor = future.factory;
+
+var emptyFuture = Object.create(future, {
+    _source: {
+        value: identity,
+        writable: false,
+        configurable: false
+    },
+    _fork: {
+        value: once(identity),
+        writable: false
+    },
+    isEmpty: {
+        value: () => true,
+        writable: false
+    }
+});
 
 export { Future, future };

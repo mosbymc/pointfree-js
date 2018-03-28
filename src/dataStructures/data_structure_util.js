@@ -198,14 +198,20 @@ function join() {
  * @return {*} c
  */
 function traverse(fa, fn) {
-    return this.fold(function _reductioAdAbsurdum(xs, x) {
-        fn(x).map(function _map(x) {
+    try {
+        return fn(this.extract);
+    }
+    catch (e) {
+        return fa(this.factory.empty());
+    }
+
+    /*return this.fold(function _reductioAdAbsurdum(xs, x) {
+        return fn(x).map(function _map(x) {
             return function _map_(y) {
                 return y.concat([x]);
             };
-        }).ap(xs);
-        return fa(this.empty);
-    });
+        }).apply(xs);
+    }, fa(this.factory.empty()));*/
 }
 
 /**
