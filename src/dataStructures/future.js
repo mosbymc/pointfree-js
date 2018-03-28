@@ -285,17 +285,17 @@ var future = {
                 });
 
             //console.log(this.source);
-            this.fork(rej, function _thisForkApplied(val) {
+            this.fork(rej, function _thisForkApplied(fn) {
                 /*if (115 !== val) {
                     console.log(val);
                     console.log(val.data);
                 }*/
-                value = val;
+                appFn = fn;
                 resolveWhenComplete();
             });
 
-            ma.fork(rej, function _otherForkApplied(fn) {
-                appFn = fn;
+            ma.fork(rej, function _otherForkApplied(val) {
+                value = val;
                 //console.log(fn);
                 resolveWhenComplete();
             });

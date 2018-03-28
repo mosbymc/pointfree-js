@@ -195,17 +195,17 @@ describe('List functor test', function _testListFunctor() {
         });
 
         it('should return a new list instance with the contramapped values', function _testListContramap() {
-            List([1, 2, 3, 4, 5])
-                .apply(List([x => x * x, x => x + 10])
-                    .contramap(x => x + 3))
-                .data.should.eql([4, 7, 12, 19, 28, 14, 15, 16, 17, 18]);
+            List([x => x * x, x => x + 10])
+                    .contramap(x => x + 3)
+                .apply(List([1, 2, 3, 4, 5]))
+                .data.should.eql([4, 14, 7, 15, 12, 16, 19, 17, 28, 18]);
         });
 
         it('should return a new list instance with the dimapped values', function _testListDimap() {
-            List([1, 2, 3, 4, 5])
-                .apply(List([x => x * x, x => x + 10])
-                    .dimap(x => x + 3, x => x / 2))
-                .data.should.eql([3.25, 4, 5.25, 7, 9.25, 13.5, 14, 14.5, 15, 15.5]);
+            List([x => x * x, x => x + 10])
+                    .dimap(x => x + 3, x => x / 2)
+                .apply(List([1, 2, 3, 4, 5]))
+                .data.should.eql([3.25, 13.5, 4, 14, 5.25, 14.5, 7, 15, 9.25, 15.5]);
         });
 
         it('should extract the underlying values as an array', function _testListExtract() {
@@ -310,7 +310,7 @@ describe('List functor test', function _testListFunctor() {
                 fn5 = x => x * 5,
                 l1 = List.from(fn1, fn2, fn3, fn4, fn5),
                 l2 = List([1, 2, 3, 4, 5]),
-                res = l2.apply(l1);
+                res = l1.apply(l2);
 
             Object.getPrototypeOf(l1).isPrototypeOf(res).should.be.true;
             res.data.should.have.lengthOf(25);
@@ -1221,8 +1221,6 @@ describe('List functor test', function _testListFunctor() {
     });
 
     describe('tmp', function _tmp() {
-        function noop() {}
-
         it('should do stuff', function _doStuff(done) {
             var count = 0;
 
@@ -1244,20 +1242,13 @@ describe('List functor test', function _testListFunctor() {
             }
 
             let t = List([ _TO1, _TO2])
-                .traverse(monads.Future.of,
-                    fn => {
-                    console.log(fn);
-                    return monads.Future((reject, result) => fn((err, res) => err ? reject(err) : result(res)))
-                    });
+                .traverse(monads.Future.of, fn => monads.Future((reject, result) => fn((err, res) => err ? reject(err) : result(res))));
 
             Object.getPrototypeOf(monads.Future()).isPrototypeOf(t).should.be.true;
-            var p = t.fork(console.error, console.log);
-            console.log(p);
+            t.fork(console.error, console.log);
         });
 
         it('should traverse a list of identity', function _testListTraverseWithIdentity() {
-            console.log(List(['12332', 'erwer']).chain(x => List(x.split(''))).data);
-
             var i = List([1, 2, 3])
                 .traverse(monads.Identity.of, val => monads.Identity(val * val));
 
@@ -1272,7 +1263,7 @@ describe('List functor test', function _testListFunctor() {
 
         it('should run sequence', function _testSequence() {
             var list = List([1, 2, 3, 4, 5]),
-                res = list.sequence(monads.Identity);
+                res = list.sequence(monads.Identity.of);
 
             Object.getPrototypeOf(monads.Identity()).isPrototypeOf(res).should.be.true;
             Object.getPrototypeOf(List()).isPrototypeOf(res.value).should.be.true;

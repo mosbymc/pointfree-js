@@ -118,7 +118,7 @@ function extend(fn) {
  * @return {Object} b
  */
 function apply(ma) {
-    return Object.getPrototypeOf(this).isPrototypeOf(ma) ? this.map(ma.value) : this;
+    return Object.getPrototypeOf(this).isPrototypeOf(ma) ? ma.map(this.value) : this;
 }
 
 /**

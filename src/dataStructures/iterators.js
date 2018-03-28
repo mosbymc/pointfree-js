@@ -33,7 +33,7 @@ var toArray = ifElse(delegatesFrom(generatorProto), arrayFromGenerator, asArray)
 function apply(xs, ys) {
     return function *_applyIterator() {
         for (let y of ys) {
-            for (let x of xs) yield y(x);
+            for (let x of xs) yield x(y);
         }
     };
 }
