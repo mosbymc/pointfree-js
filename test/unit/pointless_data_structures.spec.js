@@ -274,7 +274,8 @@ describe('Test pointless_data_structures', function _testFunctionalContainerHelp
 
     describe('Test dimap', function _testDimap() {
         it('should correctly dimap a data structure', function _testDimap() {
-            Identity(5).apply(dimap(x => x + 10, x => x / 5, Identity(x => x * x))).extract.should.eql(45);
+            dimap(x => x + 10, x => x / 5, Identity(x => x * x)).apply(Identity(5)).extract.should.eql(45);
+            //Identity(5).apply(dimap(x => x + 10, x => x / 5, Identity(x => x * x))).extract.should.eql(45);
         });
     });
 
@@ -303,7 +304,7 @@ describe('Test pointless_data_structures', function _testFunctionalContainerHelp
             var i1 = Identity(x => x * x),
                 i2 = Identity(15);
 
-            var res = apply(i1, i2);
+            var res = apply(i2, i1);
             Object.getPrototypeOf(i1).isPrototypeOf(res).should.be.true;
             res.value.should.eql(225);
         });
@@ -349,7 +350,9 @@ describe('Test pointless_data_structures', function _testFunctionalContainerHelp
             var i1 = Identity(x => x * x),
                 i2 = Identity(2);
 
-            var res = chain(x => x, apply(contramap(x => x + 5, i1), i2));
+
+
+            var res = chain(x => x, apply(i2, contramap(x => x + 5, i1)));
             Object.getPrototypeOf(Identity()).isPrototypeOf(res).should.be.true;
             res.value.should.eql(49);
         });

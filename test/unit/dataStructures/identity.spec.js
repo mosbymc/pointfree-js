@@ -144,14 +144,16 @@ describe('Identity test', function _testIdentity() {
         });
 
         it('should map over the input', function _testIdentityContramap() {
-            Identity(5).apply(Identity(x => x * x)
-                .contramap(x => x + 10))
+            Identity(x => x * x)
+                .contramap(x => x + 10)
+                .apply(Identity(5))
                 .extract.should.eql(225);
         });
 
         it('should dimap over the identity', function _testIdentityDimap() {
-            Identity(5).apply(Identity(x => x * x)
-                .dimap(x => x + 10, x => x / 5))
+            Identity(x => x * x)
+                .dimap(x => x + 10, x => x / 5)
+                .apply(Identity(5))
                 .extract.should.eql(45);
         });
 
@@ -294,28 +296,27 @@ describe('Identity test', function _testIdentity() {
                 le = monads.Left(x => x * x),
                 r = monads.Right(x => x * x);
 
-            var res1 = id.apply(c),
-                res2 = id.apply(l),
-                res3 = id.apply(n),
-                res4 = id.apply(j),
-                res5 = id.apply(le),
-                res6 = id.apply(r),
-                res = id.apply(i);
+            var res1 = c.apply(id),
+                res2 = l.apply(id),
+                res3 = n.apply(id),
+                res4 = j.apply(id),
+                res5 = le.apply(id),
+                res6 = r.apply(id),
+                res = i.apply(id);
 
-            identity.isPrototypeOf(res1).should.be.true;
-            identity.isPrototypeOf(res2).should.be.true;
-            identity.isPrototypeOf(res3).should.be.true;
-            identity.isPrototypeOf(res4).should.be.true;
-            identity.isPrototypeOf(res5).should.be.true;
-            identity.isPrototypeOf(res6).should.be.true;
+            Object.getPrototypeOf(c).isPrototypeOf(res1).should.be.true;
+            Object.getPrototypeOf(l).isPrototypeOf(res2).should.be.true;
+            Object.getPrototypeOf(n).isPrototypeOf(res3).should.be.true;
+            Object.getPrototypeOf(j).isPrototypeOf(res4).should.be.true;
+            Object.getPrototypeOf(le).isPrototypeOf(res5).should.be.true;
+            Object.getPrototypeOf(r).isPrototypeOf(res6).should.be.true;
             identity.isPrototypeOf(res).should.be.true;
 
-            id.extract.should.eql(res1.extract);
-            id.extract.should.eql(res2.extract);
-            id.extract.should.eql(res3.extract);
-            id.extract.should.eql(res4.extract);
-            id.extract.should.eql(res5.extract);
-            id.extract.should.eql(res6.extract);
+            c.extract.should.eql(res1.extract);
+            l.extract.should.eql(res2.extract);
+            j.extract.should.eql(res4.extract);
+            le.extract.should.eql(res5.extract);
+            r.extract.should.eql(res6.extract);
             id.extract.should.not.eql(res.extract);
 
             res.extract.should.eql(100);
@@ -369,17 +370,17 @@ describe('Identity test', function _testIdentity() {
             var t = f => f(i);
 
             //Composition
-            Identity(1).apply(Identity(x => x * x).apply(Identity(x => x + 2).map(f => g => x => f(g(x))))).value
-                .should.eql(Identity(1).apply(Identity(x => x * x)).apply(Identity(x => x + 2)).value);
+            Identity(f => g => f(g)).apply(Identity(x => x + 2).map(f => g => f(g) + 10)).apply(Identity(1)).value
+                .should.eql(Identity(f => g => f(g) + 10).apply(Identity(x => x + 2)).apply(Identity(1)).value);
 
             //Identity
             Identity(i).apply(Identity(i)).value.should.eql(i);
 
             //Homomorphism
             var pow = x => x * x;
-            Identity.of(5).apply(Identity.of(pow)).value.should.eql(Identity.of(pow(5)).value);
+            Identity.of(pow).apply(Identity.of(5)).value.should.eql(Identity.of(pow(5)).value);
 
-            Identity.of(x).map(i).value.should.eql(Identity.of(x).apply(Identity.of(i)).value);
+            Identity.of(x).map(i).value.should.eql(Identity.of(i).apply(Identity.of(x)).value);
 
             //Interchange
             var u = Identity(t);

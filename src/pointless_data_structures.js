@@ -353,7 +353,8 @@ var put = curry(function _put(val, fa) {
  * @return {Object} - c
  */
 var lift2 = curry(function _lift2(f, m1, m2) {
-    return m1.map(f).apply(m2);
+    return m2.apply(m1.map(f));
+    //return m1.map(f).apply(m2);
 });
 
 /**
@@ -368,7 +369,8 @@ var lift2 = curry(function _lift2(f, m1, m2) {
  * @return {Object} - e
  */
 var lift3 = curry(function _lift3(f, m1, m2, m3) {
-    return lift2(f, m1, m2).apply(m3);
+    return m3.apply(lift2(f, m1, m2));
+    //return lift2(f, m1, m2).apply(m3);
 });
 
 /**
@@ -384,7 +386,8 @@ var lift3 = curry(function _lift3(f, m1, m2, m3) {
  * @return {Object} - f
  */
 var lift4 = curry(function _lift4(f, m1, m2, m3, m4) {
-    return lift3(f, m1, m2, m3).apply(m4);
+    return m4.apply(lift3(f, m1, m2, m3));
+    //return lift3(f, m1, m2, m3).apply(m4);
 });
 
 /**
@@ -398,7 +401,7 @@ var lift4 = curry(function _lift4(f, m1, m2, m3, m4) {
  */
 var liftN = curry(function _liftN(f, ...ms) {
     return ms.slice(1).reduce(function _apply(curM, nextM) {
-        return curM.apply(nextM);
+        return nextM.apply(curM);
     }, ms.shift().map(f));
 });
 

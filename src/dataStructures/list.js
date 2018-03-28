@@ -132,7 +132,7 @@ var list_core = {
      *  .apply(List([x => x * x, x => x / 2, x => x * 5]))     => List([1, 1/2, 5, 4, 1, 10, 9, 3/2, 15, 16, 2, 20, 25, 5/2, 25])
      */
     apply: function _apply(l) {
-        return createList(this, _iteratorWrapper(iterators.apply(this, l)));
+        return Object.getPrototypeOf(this).isPrototypeOf(l) ? createList(this, _iteratorWrapper(iterators.apply(this, l))) : this;
     },
 
     /**
@@ -1224,11 +1224,11 @@ var list_core = {
      * @instance
      * @function sequence
      * @this dataStructures.list_core
-     * @param {Object} p - Any pointed monad with a '#of' function property
+     * @param {function} p - Any 'of' function on a pointed data structure's factory function.
      * @return {list} - b
      */
     sequence: function _sequence(p) {
-        return this.traverse(p, p.of);
+        return this.traverse(p, p);
         /*
         return this.foldr((m, ma) => {
             return m.chain(x => {
@@ -1245,85 +1245,13 @@ var list_core = {
      * @instance
      * @function traverse
      * @this dataStructures.list_core
-     * @param {Object} f - A pointed monad with a '#of' function property. Used only in cases
+     * @param {function} f - The 'of' function on a pointed data structure's factory function. Used only in cases
      * where the mapping function cannot be run.
      * @param {function} g - b
      * @return {list} - c
      */
     traverse: function _traverse(f, g) {
-        /*
-        return this.foldl(function _listTraverseFold(ys, x) {
-            return g(x).map(function _listTraverseMap(x) {
-                return function _innerListTraverseMap(y) {
-                    return y.concat([x]);
-                };
-            }).apply(ys);
-        }, f(List.empty()));
-        */
-        /*
-        List.prototype.traverse = function(point, f) {
-          return this.reduce((ys, x) =>
-            f(x).map(x => y => y.concat([x])).ap(ys), point(this.empty))
-        }
-
-        return this.foldl(function _listTraverseFold(ys, x) {
-            return g(x).map(function _listTraverseMap(x) {
-                return function _innerListTraverseMap(y) {
-                    return y.concat([x])
-                }
-            }).apply(ys);
-        }, f(List.empty());
-         */
-
-        /*var equalsOneTwoOrThree = 3 === this.data.length && 1 === this.data[0] && 2 === this.data[1] && 3 === this.data[2];
-        var emptyFuture = 'Future()' === f().toString();
-
-        if (equalsOneTwoOrThree && emptyFuture) {
-            console.log(this.foldl((ys, x) => ys.apply(g(x).map(x => y => y.concat([x]))), f(List.empty())));
-        }*/
-
-        return this.foldl(function _listTraverseFold(ys, x) {
-            //console.log(ys);
-            /*if (emptyFuture && equalsOneTwoOrThree) {
-                console.log(ys);
-
-                console.log(g(x).map(function _listTraverseMap(x) {
-                    //console.log(x);
-                    return function _innerListTraverseMap(y) {
-                        if (emptyFuture) {
-                            console.log(ys);
-                            console.log(y, x);
-                        }
-                        return y.concat([x]);
-                    };
-                }));
-
-                console.log(ys.apply(g(x).map(function _listTraverseMap(x) {
-                    //console.log(x);
-                    return function _innerListTraverseMap(y) {
-                        if (emptyFuture) {
-                            console.log(ys);
-                            console.log(y, x);
-                        }
-                        return y.concat([x]);
-                    };
-                })));
-            }*/
-
-            return ys.apply(g(x).map(function _listTraverseMap(x) {
-                //console.log(x);
-                return function _innerListTraverseMap(y) {
-                    /*if (emptyFuture && equalsOneTwoOrThree) {
-                        console.log(ys);
-                        console.log(y);
-                        console.log(x);
-                    }*/
-                    return y.concat([x]);
-                };
-            }));
-        }, f(List.empty()));
-
-        //return this.foldl((ys, x) => ys.apply(g(x).map(x => y => y.concat([x]))), f(List.empty()));
+        return this.foldl((ys, x) => g(x).map(x => y => y.concat([x])).apply(ys), f(List.empty()));
     },
 
     /**
