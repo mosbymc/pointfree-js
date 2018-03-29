@@ -1,6 +1,6 @@
 import { once, type, strictEquals } from '../functionalHelpers';
-import { ifElse, constant, identity, compose } from '../combinators';
-import { join, valueOf, traverse } from './data_structure_util';
+import { ifElse, constant, identity } from '../combinators';
+import { join, valueOf } from './data_structure_util';
 import { javaScriptTypes } from '../helpers';
 
 /**
@@ -14,12 +14,10 @@ import { javaScriptTypes } from '../helpers';
 function safeFork(reject, resolve) {
     return function _safeFork(val) {
         try {
-            //this._value = resolve(val);
-            //return this._value;
             return resolve(val);
         }
         catch(ex) {
-            reject(ex);
+            return reject(ex);
         }
     };
 }
@@ -85,11 +83,11 @@ Future.is = f => future.isPrototypeOf(f);
     if ('function' !== typeof val) return Future((_, resolve) => safeFork(noop, resolve(val)));
     return Future(val);
 };*/
-//TODO: Figure out which is the correct method of handeling Future.of...
+//TODO: Figure out which is the correct method of handling Future.of...
 //TODO: Either everything passed (including functions) is wrapped in a function and then a future
 //TODO: is created from the wrapped value, or only non-function values are wrapped
-//Future.of = val => ifElse(constant(strictEquals(javaScriptTypes.Function, type(val))), Future, futureFunctionize, val);
-Future.of = val => Future((_, resolve) => safeFork(identity, resolve(val)));
+Future.of = val => ifElse(constant(strictEquals(javaScriptTypes.Function, type(val))), Future, futureFunctionize, val);
+//Future.of = val => Future((_, resolve) => safeFork(identity, resolve(val)));
 
 Future.all = function _all(futures) {
     return Future((reject, resolve) => {
@@ -106,7 +104,7 @@ Future.all = function _all(futures) {
                 results[i] = res;
                 count += 1;
                 if (futures.length === count)
-                    safeFork.call(this, reject, resolve)(results);
+                    safeFork(reject, resolve)(results);
             });
         });
     });
@@ -135,7 +133,7 @@ Future.wrap = val => futureFunctionize(val);
  * @param {*} val - a
  * @return {future} - b
  */
-Future.reject = val => Future((reject, resolve) => reject(val));
+Future.reject = val => Future(reject => reject(val));
 
 /**
  * @signature
@@ -146,26 +144,7 @@ Future.reject = val => Future((reject, resolve) => reject(val));
  * @param {function} val - a
  * @return {future} - b
  */
-Future.unit = val => Future(val).complete();
-
-/**
- * @signature
- * @description Takes any value (function or otherwise) and a delay time in
- * milliseconds, and returns a new {@link dataStructures.future} that will fork in the amount
- * of time given as the delay.
- * @param {*} val - Any JavaScript value; {@link dataStructures.Future#of} is called under the
- * covers, so it need not be a function.
- * @param {number} delay - The amount of time in milliseconds the forking operation
- * should be delayed
- * @return {dataStructures.future} Returns a new future
- */
-Future.delay = function _delay(val, delay) {
-    var f = Future.of(fn);
-    setTimeout(function _timeout() {
-        f.fork();
-    }, delay);
-    return f;
-};
+Future.unit = Future.of;
 
 /**
  * @signature () -> {@link dataStructures.future}
@@ -226,13 +205,6 @@ var future = {
      */
     get extract() {
         return this._source;
-        /*
-        if (!this.isComplete) {
-            this.fork(x => x, x => x);
-            return this.value;
-        }
-        return this.source();
-        */
     },
     /**
      * @signature () -> {@link dataStructures.future}
@@ -248,22 +220,10 @@ var future = {
      * just performed.
      */
     map: function _map(fn) {
-        return this.factory((reject, resolve) => this.fork(err => reject(err), res => resolve(fn(res))));
+        return this.factory((reject, resolve) => this.fork(reject, res => resolve(fn(res))));
     },
-    //TODO: probably need to compose here, not actually map over the value; this is a temporary fill-in until
-    //TODO: I have time to finish working on the Future
     chain: function _chain(fn) {
-        return this.factory((reject, resolve) => this.fork(err => reject(err), res => fn(res).fork(reject, resolve)));
-        /*
-        return this.of((reject, resolve) =>
-        {
-            let cancel,
-                outerFork = this._fork(a => reject(a), b => {
-                    cancel = fn(b).fork(reject, resolve);
-                });
-            return cancel ? cancel : (cancel = outerFork, x => cancel());
-        });
-        */
+        return this.factory((reject, resolve) => this._fork(reject, res => fn(res).fork(reject, resolve)));
     },
     join: function _join() {
         return this.chain(x => x);
@@ -288,29 +248,19 @@ var future = {
         });
     },
     fold: function _fold(f, g) {
-        return this.fork(err => f(err), res => g(res));
-    },
-    traverse: function _traverse(f, g) {
-        let r = this.fold(f, g);
-        return f().chain(() => r);
-
-        /*
-        let r = this.fold(f, g);
-        return f().chain(() => r);
-        return f().chain(x => this.fold(f, g));
-         */
+        return this.fork(f, g);
     },
     bimap: function _bimap(f, g) {
-        return this.factory((reject, resolve) => this._fork(safeFork(reject, err => reject(f(err))), safeFork(reject, res => resolve(g(res)))));
+        return this.factory((reject, resolve) => this._fork(err => reject(f(err)), res => resolve(g(res))));
     },
     contramap: function _contramap(fn) {
-        return Future((reject, resolve) => this._fork(err => reject(err), res => resolve((...args) => res(fn(...args)))));
+        return Future((reject, resolve) => this._fork(reject, res => resolve((...args) => res(fn(...args)))));
     },
     dimap: function _dimap(f, g) {
-        return Future((reject, resolve) => this._fork(err => reject(err), res => resolve((...args) => g(res(f(...args))))));
+        return Future((reject, resolve) => this._fork(reject, res => resolve((...args) => g(res(f(...args))))));
     },
     fork: function _fork(reject, resolve) {
-        return this._fork(reject, safeFork.call(this, reject, resolve));
+        return this._fork(reject, safeFork(reject, resolve));
     },
     /**
      * @signature * -> boolean

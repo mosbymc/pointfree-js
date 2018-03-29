@@ -86,27 +86,6 @@ describe('Future test', function _testFuture() {
         });
 
         it('should map a function over a future', function _testFutureMap(done) {
-            var f = Future(function _t(rej, res) {
-                return setTimeout(function _timeout() {
-                    return res(5);
-                }, 25);
-            });
-
-            var t = f.map(x => x * x);
-            var p = f.map(x => x + 5);
-
-            t.fork(console.log, function _l(e) {
-                console.log(e);
-            });
-            p.fork(console.log, function _l(e) {
-                console.log(e);
-            });
-
-            t.fork(console.log, function _l(e) {
-                console.log(e);
-            });
-
-
             Future(function _to(rej, res) {
                 return setTimeout(function _timeout() {
                     return res(5);
@@ -318,18 +297,6 @@ describe('Future test', function _testFuture() {
         it('should represent the future\'s \'type\' when \'Object.prototype.toString.call\' is invoked', function _testFutureTypeString() {
             var i = Future(x => x);
             Object.prototype.toString.call(i).should.eql('[object Future]');
-        });
-
-        it('should turn a Future of a List into a List of Futures', function _test() {
-            var l = Future(function _future(rej, res) {
-                return setTimeout(function _to() {
-                    return res(5);
-                }, 10);
-            })
-                .traverse(monads.List.of, x => monads.List.of(x * x));
-
-            console.log(l.data);
-            var b = l.map(x => x);
         });
 
         it('fsds', function _asdas(done) {
