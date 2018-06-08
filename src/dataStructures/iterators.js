@@ -103,7 +103,7 @@ function concatAll(xs, yss) {
 /**
  * @signature
  * @description d
- * @param {Array|generator|dataStructures.list_core} xs - a
+ * @param {dataStructures.list_core|dataStructures.list|dataStructures.ordered_list|Array} xs - a
  * @param {function} fn - b
  * @return {generator} - c
  */
@@ -131,7 +131,7 @@ function copyWithin(idx, start, end, xs) {
 /**
  * @signature
  * @description d
- * @param {Array|generator|dataStructures.list_core} xs - a
+ * @param {dataStructures.list_core|dataStructures.list|dataStructures.ordered_list|Array} xs - a
  * @param {function} f - b
  * @param {function} g - c
  * @return {generator} d

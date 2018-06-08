@@ -32,7 +32,9 @@ var listProxyHandler = {
  * @property {function} chain - Accepts a {@link dataStructures.list} returning function and applies it to each item in the list, removing the resulting nested lists
  * @property {function} concat - Accepts one iterable and returns a new list with the contents appended to the current list's contents
  * @property {function} concatAll - Behaves like list#concat but accepts one or more iterables
+ * @property {function} contramap - Maps the output of a contravariant list
  * @property {function} copyWithin
+ * @property {function} dimap - Maps both the input and output of a contravariant list
  * @property {function} distinct - Accepts an optional function and returns a new list with distinct elements; defaults to strict equality if no function is provided
  * @property {function} except - Accepts an iterable and returns a new list containing the disjunction between the two
  * @property {function} fill - Accepts a single argument and returns a new list with all values in the current list replaced by the value
@@ -202,13 +204,17 @@ var list_core = {
      * over the output of the current List's function once it is applied to a data-containing List.
      * This function property is a deferred execution function.
      * the provided function argument
+     * @memberOf dataStructures.list_core
+     * @instance
+     * @function contramap
+     * @this list
      * @param {function} fn - a
      * @return {Proxy.<dataStructures.list_core>|dataStructures.list_core|dataStructures.list|dataStructures.ordered_list} b
      *
      * @example
-     * List([1, 2, 3, 4, 5])
-     *  .apply(List([x => x * x, x => x + 10])
-     *  .contramap(x => x + 3))     => List([4, 7, 12, 19, 28, 14, 15, 16, 17, 18])
+     * List([x => x * x, x => x + 10])
+     *  .contramap(x => x + 3)
+     *  .apply(List([1, 2, 3, 4, 5]))           => List(4, 14, 7, 15, 12, 16, 19, 17, 28, 18)
      */
     contramap: function _contramap(fn) {
         return createList(this, _iteratorWrapper(iterators.contramap(this, fn)));
@@ -234,10 +240,27 @@ var list_core = {
     },
 
     /**
-     * @description d
+     * @description This function only works if using the List as a contravariant. It Accepts
+     * two functions that are used to map over the input and output of the current list's function(s).
+     * The first function provided is used to map over the input into the current list's function(s),
+     * while the second function maps over the output. For example, if the current list contains a single
+     * function: x => x * x, and the two functions provided to dimap are: x => x + 2, x => x - 5, then
+     * the result of executing the dimapped list on a data set would mean each value would first have '2'
+     * added before being squared as the function in the original function performs, and then '5' would
+     * be subtracted from the squared result.
+     * the provided function argument
+     * @memberOf dataStructures.list_core
+     * @instance
+     * @function dimap
+     * @this list
      * @param {function} f - a
      * @param {function} g - b
      * @return {Proxy.<dataStructures.list_core>|dataStructures.list_core|dataStructures.list|dataStructures.ordered_list} c
+     *
+     * @example
+     * List([x => x * x, x => x + 10])
+     *  .dimap(x => x + 3, x => x / 2)
+     *  .apply(List([1, 2, 3, 4, 5]))           => List(3.25, 13.5, 4, 14, 5.25, 14.5, 7, 15, 9.25, 15.5)
      */
     dimap: function _dimap(f, g) {
         return createList(this, _iteratorWrapper(iterators.dimap(this, f, g)));
