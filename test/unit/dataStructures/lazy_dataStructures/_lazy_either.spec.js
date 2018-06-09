@@ -1,4 +1,4 @@
-import { LazyEither, lazy_right, lazy_left, LazyRight } from '../../../../src/dataStructures/lazy_dataStructures/_lazy_either';
+import { LazyEither, lazy_right, lazy_left, LazyRight, LazyLeft } from '../../../../src/dataStructures/lazy_dataStructures/_lazy_either';
 import * as monads from '../../../../src/dataStructures/dataStructures';
 
 describe('Test lazy maybe', function _testLazyEither() {
@@ -125,6 +125,7 @@ describe('Test lazy maybe', function _testLazyEither() {
         });
 
         it('should return nothing', function _testMaybeNothing() {
+            LazyLeft().should.eql(lazy_left);
             LazyEither.Left().should.eql(lazy_left);
         });
 

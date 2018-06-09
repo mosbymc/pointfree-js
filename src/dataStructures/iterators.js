@@ -109,7 +109,7 @@ function concatAll(xs, yss) {
  */
 function contramap(xs, fn) {
     return function *contramapIterator() {
-        for (let x of xs) yield compose(fn, x);
+        for (let x of xs) yield compose(x, fn);
     };
 }
 

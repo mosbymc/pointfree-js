@@ -189,12 +189,11 @@ var list_core = {
 
     /**
      * @description This function only works if using the List as a contravariant. It Accepts
-     * a single function that is used to contramap over the current List's source functions.
+     * a single function that is used to contramap over the current List's source function(s).
      * The provided function is composed with each function in the current List to create a new
      * function, which is returned to create a new List object. Essentially, contramap is mapping
-     * over the output of the current List's function once it is applied to a data-containing List.
-     * This function property is a deferred execution function.
-     * the provided function argument
+     * over the input of the current List's function(s) before it/they are applied to a data-containing
+     * List. This function property is a deferred execution function.
      * @memberOf dataStructures.list_core
      * @instance
      * @function contramap
@@ -205,7 +204,7 @@ var list_core = {
      * @example
      * List([x => x * x, x => x + 10])
      *  .contramap(x => x + 3)
-     *  .apply(List([1, 2, 3, 4, 5]))           => List(4, 14, 7, 15, 12, 16, 19, 17, 28, 18)
+     *  .apply(List([1, 2, 3, 4, 5]))           => List(16, 14, 25, 15, 36, 16, 49, 17, 64, 18)
      */
     contramap: function _contramap(fn) {
         return createList(this, list_util._iteratorWrapper(iterators.contramap(this, fn)));
@@ -239,7 +238,6 @@ var list_core = {
      * the result of executing the dimapped list on a data set would mean each value would first have '2'
      * added before being squared as the function in the original function performs, and then '5' would
      * be subtracted from the squared result.
-     * the provided function argument
      * @memberOf dataStructures.list_core
      * @instance
      * @function dimap

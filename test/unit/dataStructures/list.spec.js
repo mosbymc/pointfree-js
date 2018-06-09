@@ -198,7 +198,7 @@ describe('List functor test', function _testListFunctor() {
             List([x => x * x, x => x + 10])
                     .contramap(x => x + 3)
                 .apply(List([1, 2, 3, 4, 5]))
-                .data.should.eql([4, 14, 7, 15, 12, 16, 19, 17, 28, 18]);
+                .data.should.eql([16, 14, 25, 15, 36, 16, 49, 17, 64, 18]);
         });
 
         it('should return a new list instance with the dimapped values', function _testListDimap() {
