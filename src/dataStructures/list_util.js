@@ -1,4 +1,4 @@
-import { isArray, strictEquals, type, delegatesFrom, invoke } from '../functionalHelpers';
+import {isArray, strictEquals, type, delegatesFrom, invoke, isString, delegatesTo} from '../functionalHelpers';
 import { not, unfoldWith } from '../decorators';
 import { when, ifElse } from '../combinators';
 import { javaScriptTypes, generatorProto } from '../helpers';
@@ -181,6 +181,22 @@ function foldRight(arr, op, acc) {
     return res;
 }
 
+function _iteratorWrapper(it) {
+    return function *iterator() {
+        if (this.evaluatedData) {
+            for (let item of this.evaluatedData) yield item;
+        }
+        else {
+            let res = [];
+            for (let item of it()) {
+                res[res.length] = item;
+                yield item;
+            }
+            this.evaluatedData = res;
+        }
+    };
+}
+
 /**
  * @signature
  * @description d
@@ -193,6 +209,16 @@ function last(xs, predicate) {
         return asArray(xs).filter(predicate).slice(-1)[0];
     return asArray(xs).slice(-1)[0];
 }
+
+var listProxyHandler = {
+    get(target, prop) {
+        if (Reflect.has(target, prop)) return target[prop];
+        if ('symbol' !== typeof prop) {
+            let num = Number(prop);
+            if (Number.isInteger(num)) return target.toArray()[num];
+        }
+    }
+};
 
 /**
  * @signature
@@ -209,4 +235,4 @@ function reduceRight(xs, fn, initial) {
 var unfold = unfoldWith;
 
 export { all, any, binarySearch, contains, count, equals, findIndex, findLastIndex, first, foldLeft, foldRight,
-    last, reduceRight, unfold };
+    _iteratorWrapper, last, listProxyHandler, reduceRight, unfold };
