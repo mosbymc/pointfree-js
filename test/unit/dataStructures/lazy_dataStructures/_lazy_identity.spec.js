@@ -138,6 +138,13 @@ describe('Test lazy identity', function _testLazyIdentity() {
                 .extract.should.eql(225);
         });
 
+        it('should dimap over the input', function _testIdentityDimap() {
+            LazyIdentity(x => x * x)
+                .dimap(x => x + 5, x => x / 2)
+                .apply(LazyIdentity(10))
+                .extract.should.eql(112.5);
+        });
+
         it('should properly indicate equality when constant monads are indeed equal', function _testIdentityEquality() {
             var m1 = LazyIdentity(null),
                 m2 = LazyIdentity(null),

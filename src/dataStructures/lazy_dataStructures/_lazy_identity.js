@@ -1,6 +1,4 @@
-import { nil, javaScriptTypes } from '../../helpers';
-import { type, strictEquals } from '../../functionalHelpers';
-import { not } from '../../decorators';
+import { nil } from '../../helpers';
 import { constant } from '../../combinators';
 import { equals, stringMaker, valueOf } from '../data_structure_util';
 
@@ -208,7 +206,7 @@ var lazy_identity = {
      * @memberOf dataStructures.lazy_identity
      * @instance
      * @function apply
-     * @param {Object} ma - Any object with a map function - i.e. a monad.
+     * @param {dataStructures.lazy_identity} ma - Any object with a map function - i.e. a monad.
      * @return {Object} Returns an instance of the monad object provide as an argument.
      */
     apply: function _apply(ma) {
@@ -277,9 +275,18 @@ var lazy_identity = {
      * underling function.
      * @return {dataStructures.lazy_identity} Returns a new identity monad.
      */
-    contramap: function contramap(fn) {
+    contramap: function _contramap(fn) {
         return next(() => (...args) => this.value(fn(...args)));
     },
+     /**
+      * @description a
+      * @param {function} f - b
+      * @param {function} g - c
+      * @return {dataStructures.lazy_identity} Returns a new lazy identity data structure}
+      */
+     dimap: function _dimap(f, g) {
+        return next(() => (...args) => g(this.value(f(...args))));
+     },
     /**
      * @signature () -> boolean
      * @description Returns a boolean indicating if the monad is 'empty'

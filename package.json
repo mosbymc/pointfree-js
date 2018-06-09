@@ -23,7 +23,7 @@
     "coverage": "cross-env NODE_ENV=test nyc mocha --recursive test/unit",
     "coverage:report": "nyc report --reporter=text-lcov",
     "predocumentation": "del-cli documentation/*",
-    "documentation": "./node_modules/.bin/jsdoc -r src -d documentation -R ./README.md -c jsdoc.conf.json -t ./node_modules/ink-docstrap/template -X",
+    "documentation": "./node_modules/.bin/jsdoc -r src -d documentation -R ./README.md -c jsdoc.conf.json -t ./node_modules/ink-docstrap/template",
     "eslint": "./node_modules/.bin/eslint src",
     "jshint": "./node_modules/.bin/jshint src",
     "lint": "npm run jshint && npm run eslint",

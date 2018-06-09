@@ -82,20 +82,52 @@ describe('Future test', function _testFuture() {
 
     describe('Future data structure', function _testFuture() {
         it('should create an empty future', function _testFutureEmpty() {
-            var f1 = Future.empty();
-
-            f1.isEmpty().should.be.true;
+            Future.empty().isEmpty().should.be.true;
         });
 
         it('should map a function over a future', function _testFutureMap(done) {
             Future(function _to(rej, res) {
-                setTimeout(function _timeout() {
-                    res(5);
+                return setTimeout(function _timeout() {
+                    return res(5);
                 }, 25);
             })
                 .map(x => x * x)
                 .fork(console.error, function _res(res) {
                     res.should.eql(25);
+                    done();
+                });
+        });
+
+        it('should contramap a function', function _testFutureContramap(done) {
+            Future(function _to(rej, res) {
+                return setTimeout(function _timeout() {
+                    return res(x => x * x);
+                }, 10);
+            })
+                .contramap(x => x + 5)
+                .apply(Future(function _to1(rej, res) {
+                    return setTimeout(function _to() {
+                        return res(5);
+                    }, 10);
+                }))
+                .fork(console.error, function _res(res) {
+                    res.should.eql(100);
+                    done();
+                });
+        });
+
+        it('should dimap a function', function _testFutureDimap(done) {
+            Future(function _to(rej, res) {
+                return setTimeout(() => res(x => x * x), 10);
+            })
+                .dimap(x => x + 5, x => x / 2)
+                .apply(Future(function _to1(rej, res) {
+                    return setTimeout(function _to() {
+                        return res(5);
+                    }, 10);
+                }))
+                .fork(console.error, function _res(res) {
+                    res.should.eql(50);
                     done();
                 });
         });
@@ -176,7 +208,7 @@ describe('Future test', function _testFuture() {
                     done();
                 }, console.log);
         });
-        /*
+
         it('should flatten nested futures', function _testFutureJoin(done) {
             Future(function _to(rej, res) {
                 setTimeout(function _timeout() {
@@ -186,13 +218,12 @@ describe('Future test', function _testFuture() {
                 .map(function _chain(val) {
                     return Future.of(val * val);
                 })
-                .mjoin()
+                .join()
                 .fork(console.error, function _res(res) {
                     res.should.eql(25);
                     done();
                 })
         });
-        */
 
         it('should apply one future\'s function to another future\'s data', function _testFutureApply(done) {
             let f1 = Future(function _to1(rej, res) {
@@ -226,7 +257,7 @@ describe('Future test', function _testFuture() {
             })
                 .bimap(x => x * x, x => x - 5)
                 .fork(console.error, function _res(res) {
-                    res.should.eql(25);
+                    res.should.eql(0);
                     done();
                 });
         });
@@ -239,7 +270,7 @@ describe('Future test', function _testFuture() {
             })
                 .bimap(x => x * x, x => x - 5)
                 .fork(function _err(err) {
-                    err.should.eql(0);
+                    err.should.eql(25);
                     done();
                 }, console.log);
         });
