@@ -7,19 +7,19 @@ import { constant } from '../combinators';
  * @memberOf dataStructures
  * @property {function} of
  * @property {function} is
- * @param {*} val - a
+ * @param {function} st - a
  * @return {dataStructures.state} - b
  */
-function State(val) {
-    var t = tuple(val);
+function State(st) {
+    //var t = tuple(val);
     return Object.create(state, {
         _value: {
-            value: t,
+            value: st,
             writable: false,
             configurable: false
         },
         run: {
-            value: t,
+            value: st,
             writable: false,
             configurable: false
         }
@@ -61,7 +61,16 @@ var state = {
         return this._value;
     },
     map: function _map(fn) {
-        return State();
+        return State(function _stateMap(x) {
+            let [val, st] = this._value(x);
+            return [fn(val), st];
+        });
+    },
+    chain: function _chain(fn) {
+        return State(function _stateChain(x) {
+            let res = this._value(x);
+            return Object.getPrototypeOf(this).isPrototypeOf(res) ? fn(res.runState(1)) : this.factory.of(res);
+        });
     },
     put: function _put(val) {
 
