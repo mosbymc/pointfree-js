@@ -68,8 +68,16 @@ var state = {
     },
     chain: function _chain(fn) {
         return State(function _stateChain(x) {
-            let res = this._value(x);
-            return Object.getPrototypeOf(this).isPrototypeOf(res) ? fn(res.runState(1)) : this.factory.of(res);
+            let [val, st] = this._value(x);
+            return fn(val).runState(st);
+        });
+    },
+    apply: function _apply(st) {
+        return State(function _applyState(s) {
+            let [a, b] = this._value(s),
+                [c, d] = st.runState(b);
+
+            return [a(c), d];
         });
     },
     put: function _put(val) {
@@ -97,6 +105,10 @@ var state = {
      * @return {string} - a
      */
     toString: stringMaker('State'),
+
+    runState: function _runState(x) {
+        return this.value(x);
+    },
     get [Symbol.toStringTag]() {
         return 'State';
     },

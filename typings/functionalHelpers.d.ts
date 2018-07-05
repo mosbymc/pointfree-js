@@ -14,6 +14,7 @@ interface functionalHelpers<> {
     either(f: () => boolean, g: () => boolean): boolean;
     equals(x: any, y: any): boolean;
     falsey(x: any): boolean;
+    flip(x: any): boolean;
     getWith(prop: string, obj: object): any;
     greaterThan(x: number, y: number): boolean;
     greaterThan(x: string, y: string): boolean;
@@ -24,6 +25,7 @@ interface functionalHelpers<> {
     invoke(fn: () => any): any;
     isArray(x: any): boolean;
     isBoolean(x: any): boolean;
+    isFunction(x: any): boolean;
     isObject(x: any): boolean;
     isPrimitive(x: any): boolean;
     isNothing(x: any): boolean;
@@ -37,7 +39,18 @@ interface functionalHelpers<> {
     lessThan(x: string, y: string): boolean;
     lessThanOrEqual(x: number, y: number): boolean;
     lessThanOrEqual(x: string, y: string): boolean;
+    modulus(x: number, y: number): number;
+    multiple(x: number, y: number): number;
+    negate(x: number): number;
     notEqual(x: any, y: any): boolean;
     noop(): void;
-
+    once(fn: (...args) => any): (...args) => any;
+    or(a: any, b: any): boolean;
+    remainder(x: number, y: number): number;
+    reverse(...args: Array<any>): Array<any>;
+    strictEquals(x: any, y: any): boolean;
+    strictNotEqual(x: any, y: any): boolean;
+    subtract(x: number, y: number): number;
+    truthy(x: any): boolean;
+    wrap(data: any): Array<any>;
 }
