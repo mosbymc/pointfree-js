@@ -1134,15 +1134,20 @@ var list_core = {
 
     /**
      * @signature
-     * @description d
+     * @description list_core#toMap turns the list into a native JavaScript Map object. It accepts an
+     * optional function parameter that, when passed, determines exactly how each value in the list
+     * should be as a key/value of the Map object. The function will receive each item in the list, one
+     * at a time, and must return an array of two items, the key and the value, in that order. If a function
+     * is not passed, each item's index in the list will be used as the key for the Map.
      * @memberOf dataStructures.list_core
      * @instance
      * @function toMap
      * @this dataStructures.list_core
+     * @param {function} [fn] - An optional function that will determine how to transform the list's elements into a map
      * @return {Map} - a
      */
-    toMap: function _toMap() {
-        return new Map(this.data.map((val, idx) => [idx, val]));
+    toMap: function _toMap(fn) {
+        return new Map(this.data.map('function' === typeof fn ? fn : (val, idx) => [idx, val]));
     },
 
     /**

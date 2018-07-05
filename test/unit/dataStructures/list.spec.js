@@ -1050,7 +1050,7 @@ describe('List functor test', function _testListFunctor() {
             });
 
             //TODO: need to update this - chai is not comparing maps correctly
-            it('should return the underlying data as a map', function _testToMap() {
+            it('should return the underlying data as a map', function _testToMapWithNoParameter() {
                 let m = new Map();
                 m.set(0, 1);
                 m.set(1, 2);
@@ -1060,6 +1060,19 @@ describe('List functor test', function _testListFunctor() {
 
                 List([1, 2, 3, 4, 5])
                     .toMap()
+                    .should.eql(m);
+            });
+
+            it('should return the underlying data as a map', function _testToMapWithFunctionParameter() {
+                let m = new Map();
+                m.set(-5, 1);
+                m.set(-4, 2);
+                m.set(-3, 3);
+                m.set(-2, 4);
+                m.set(-1, 5);
+
+                List([1, 2, 3, 4, 5])
+                    .toMap((item, idx) => [idx - 5, item])
                     .should.eql(m);
             });
 

@@ -1,11 +1,12 @@
-interface Future<> {
-    (source: () => any): future;
-    of(source: any): future;
+interface Future<T> {
+    (source: (rej: (err: any) => void, res: (success: T) => void) => void): future;
+    of(source: T): future<() => T>;
     is(x: any): boolean;
+    lift(fn: (args: T) => T): (args: T) => future<() => T>;
     empty(): future;
 }
 
-interface future<any> {
+interface future<T> extends IMonad<T> {
     extract: any;
     map(fn: (x: any) => any): future<any>;
     bimap(f: (x: any) => any, g: (y: any) => any): future;
