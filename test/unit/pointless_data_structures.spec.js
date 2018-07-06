@@ -3,7 +3,7 @@ import { ap, apply, count, chainRec, fmap, map, mapWith, flatMap, lift2, lift3, 
     isJust, isLeft, isList, isMaybe, isImmutableDataStructure, isNothing, isRight, isValidation, fold, sequence, traverse,
     contramap, isEmpty, equals, bimap, dimap, toList, toLeft, toRight, toEither, toIdentity, toMaybe, toNothing,
     toJust, toFuture, toConstant, first, last, skip, skipWhile, take, takeWhile } from '../../src/pointless_data_structures';
-import { Constant, Either, Future, Identity, Io, Just, Left, List, Maybe, Nothing, Right, Validation } from '../../src/dataStructures/dataStructures';
+import { Constant, Either, Future, Identity, Io, Just, Left, List, Maybe, Nothing, Right } from '../../src/dataStructures/dataStructures';
 
 describe('Test pointless_data_structures', function _testFunctionalContainerHelpers() {
     describe('Test isImmutableDataStructure', function _testIsMonad() {
@@ -15,7 +15,6 @@ describe('Test pointless_data_structures', function _testFunctionalContainerHelp
             isImmutableDataStructure(Just(1)).should.be.true;
             isImmutableDataStructure(Io(1)).should.be.true;
             isImmutableDataStructure(Future(1)).should.be.true;
-            isImmutableDataStructure(Validation(1)).should.be.true;
             isImmutableDataStructure(Nothing()).should.be.true;
             isImmutableDataStructure(Left(1)).should.be.true;
         });
@@ -35,7 +34,6 @@ describe('Test pointless_data_structures', function _testFunctionalContainerHelp
             isConstant(Just(1)).should.be.false;
             isConstant(Io(1)).should.be.false;
             isConstant(Future(1)).should.be.false;
-            isConstant(Validation(1)).should.be.false;
         });
     });
 
@@ -46,7 +44,6 @@ describe('Test pointless_data_structures', function _testFunctionalContainerHelp
         });
 
         it('should return false for any non-either container type', function _testIsEitherWithNonEitherContainer() {
-            isEither(Validation(1)).should.be.false;
             isEither(Future(1)).should.be.false;
             isEither(Io(1)).should.be.false;
             isEither(Just(1)).should.be.false;
@@ -70,7 +67,6 @@ describe('Test pointless_data_structures', function _testFunctionalContainerHelp
             isFuture(Just(1)).should.be.false;
             isFuture(Identity(1)).should.be.false;
             isFuture(Io(1)).should.be.false;
-            isFuture(Validation(1)).should.be.false;
         });
     });
 
@@ -87,7 +83,6 @@ describe('Test pointless_data_structures', function _testFunctionalContainerHelp
             isIdentity(Just(1)).should.be.false;
             isIdentity(Future(1)).should.be.false;
             isIdentity(Io(1)).should.be.false;
-            isIdentity(Validation(1)).should.be.false;
         });
     });
 
@@ -105,7 +100,6 @@ describe('Test pointless_data_structures', function _testFunctionalContainerHelp
             isIo(Just(1)).should.be.false;
             isIo(Future(1)).should.be.false;
             isIo(Identity(1)).should.be.false;
-            isIo(Validation(1)).should.be.false;
         });
     });
 
@@ -121,7 +115,6 @@ describe('Test pointless_data_structures', function _testFunctionalContainerHelp
             isJust(Nothing()).should.be.false;
             isJust(Future.of(1)).should.be.false;
             isJust(Io.of(1)).should.be.false;
-            isJust(Validation(1)).should.be.false;
         });
     });
 
@@ -137,7 +130,6 @@ describe('Test pointless_data_structures', function _testFunctionalContainerHelp
             isLeft(Just(1)).should.be.false;
             isLeft(Future(1)).should.be.false;
             isLeft(Io(1)).should.be.false;
-            isLeft(Validation(1)).should.be.false;
         });
     });
 
@@ -154,7 +146,6 @@ describe('Test pointless_data_structures', function _testFunctionalContainerHelp
             isList(Just(1)).should.be.false;
             isList(Future(1)).should.be.false;
             isList(Io(1)).should.be.false;
-            isList(Validation(1)).should.be.false;
             isList(Identity(1)).should.be.false;
         });
     });
@@ -173,7 +164,6 @@ describe('Test pointless_data_structures', function _testFunctionalContainerHelp
             isMaybe(Identity(1)).should.be.false;
             isMaybe(Future.of(1)).should.be.false;
             isMaybe(Io.of(1)).should.be.false;
-            isMaybe(Validation(1)).should.be.false;
         });
     });
 
@@ -190,7 +180,6 @@ describe('Test pointless_data_structures', function _testFunctionalContainerHelp
             isNothing(Just(1)).should.be.false;
             isNothing(Future(1)).should.be.false;
             isNothing(Io(1)).should.be.false;
-            isNothing(Validation(1)).should.be.false;
         });
     });
 
@@ -208,10 +197,10 @@ describe('Test pointless_data_structures', function _testFunctionalContainerHelp
             isRight(Just(1)).should.be.false;
             isRight(Future(1)).should.be.false;
             isRight(Io(1)).should.be.false;
-            isRight(Validation(1)).should.be.false;
         });
     });
 
+    /*
     describe('Test isValidation', function _testIsValidation() {
         it('should return true for all validation container types', function _testIsValidationWithValidationContainer() {
             isValidation(Validation(1)).should.be.true;
@@ -228,6 +217,7 @@ describe('Test pointless_data_structures', function _testFunctionalContainerHelp
             isValidation(Identity(1)).should.be.false;
         });
     });
+    */
 
     describe('Test isEmpty', function _testIsEmpty() {
         it('should return the correct response based on the data structure type', function _testIsEmpty() {
