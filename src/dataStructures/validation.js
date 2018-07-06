@@ -1,76 +1,75 @@
-import { monad_apply, chain, join, equals, stringMaker, valueOf } from './data_structure_util';
+import { apply, chain, join, equals, stringMaker, valueOf } from './data_structure_util';
 
-/**
- * @description d
- * @namespace Validation
- * @memberOf dataStructures
- * @property {function} of
- * @property {function} is
- * @param {*} val - a
- * @return {dataStructures.validation} - b
- */
-function Validation(val) {
-    return Object.create(validation, {
+var Validation = {
+    success: function _success(val) {
+        return Success(val);
+    },
+    failure: function _failure(val) {
+        return Failure(val);
+    },
+    of: function _of(val) {
+        return Success(val);
+    },
+    is: function _is(val) {
+        let proto = Object.getPrototypeOf(val);
+        return proto === success || proto === failure;
+    }
+};
+
+function Success(suc) {
+    return Object.create(success, {
         _value: {
-            value: val
+            value: suc,
+            writable: false,
+            configurable: false
         }
     });
 }
 
-/**
- * @description d
- * @memberOf dataStructures.Validation
- * @param {*} val - a
- * @return {dataStructures.validation} - b
- */
-Validation.of = function _of(val) {
-    return Validation(val);
+function Failure(fail) {
+    return Object.create(failure, {
+        _value: {
+            value: [fail],
+            writable: false,
+            configurable: false
+        }
+    });
+}
+
+var success = {
+    get value() {
+        return this._value;
+    },
+    get extract() {
+        return this._value;
+    },
+    isSuccess: function _isSuccess() {
+        return true;
+    },
+    isFailure: function _isFailure() {
+        return false;
+    },
+    concat: function _concat(other) {
+        return other;
+    }
 };
 
-/**
- * @signature
- * @description d
- * @memberOf dataStructures.Validation
- * @param {Object} f - a
- * @return {boolean} - b
- */
-Validation.is = f => validation.isPrototypeOf(f);
-
-/**
- * @description d
- * @namespace validation
- * @memberOf dataStructures
- */
-var validation = {
-    map: function _map(fn) {
-        return this.of(fn(this.value));
+var failure = {
+    get value() {
+        return this._value;
     },
-    valueOf: valueOf,
-    equals: equals,
-    toString: stringMaker('Validation'),
-    get [Symbol.toStringTag]() {
-        return 'Validation';
+    get extract() {
+        return this._value;
     },
-    factory: Validation
+    isSuccess: function _isSuccess() {
+        return false;
+    },
+    isFailure: function _isFailure() {
+        return true;
+    },
+    concat: function _concat(other) {
+        return other.isSuccess() ? this : Failure(this.value.concat(other.value));
+    }
 };
 
-/**
- * @signature
- * @description Since the constant functor does not represent a disjunction, the Validation's
- * bimap function property behaves just as its map function property. It is merely here as a
- * convenience so that swapping out functors/monads does not break an application that is
- * relying on its existence.
- * @memberOf dataStructures.validation
- * @type {function}
- * @param {function} f - a
- * @param {function} g - b
- * @return {validation} - c
- */
-validation.bimap = validation.map;
-
-validation.chain = chain;
-validation.mjoin = join;
-validation.apply = monad_apply;
-validation.constructor = validation.factory;
-
-export { Validation, validation };
+export { Validation, Success, Failure, success, failure };
