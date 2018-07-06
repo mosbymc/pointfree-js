@@ -18,6 +18,11 @@ function State(st) {
             writable: false,
             configurable: false
         },
+        _state: {
+            value: st,
+            writable: false,
+            configurable: false
+        },
         run: {
             value: st,
             writable: false,
