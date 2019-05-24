@@ -189,11 +189,12 @@ var list_core = {
 
     /**
      * @description This function only works if using the List as a contravariant. It Accepts
-     * a single function that is used to contramap over the current List's source function(s).
+     * a single function that is used to contramap over the current List's source functions.
      * The provided function is composed with each function in the current List to create a new
      * function, which is returned to create a new List object. Essentially, contramap is mapping
-     * over the input of the current List's function(s) before it/they are applied to a data-containing
-     * List. This function property is a deferred execution function.
+     * over the output of the current List's function once it is applied to a data-containing List.
+     * This function property is a deferred execution function.
+     * the provided function argument
      * @memberOf dataStructures.list_core
      * @instance
      * @function contramap
@@ -204,7 +205,7 @@ var list_core = {
      * @example
      * List([x => x * x, x => x + 10])
      *  .contramap(x => x + 3)
-     *  .apply(List([1, 2, 3, 4, 5]))           => List(16, 14, 25, 15, 36, 16, 49, 17, 64, 18)
+     *  .apply(List([1, 2, 3, 4, 5]))           => List(4, 14, 7, 15, 12, 16, 19, 17, 28, 18)
      */
     contramap: function _contramap(fn) {
         return createList(this, list_util._iteratorWrapper(iterators.contramap(this, fn)));
@@ -238,6 +239,7 @@ var list_core = {
      * the result of executing the dimapped list on a data set would mean each value would first have '2'
      * added before being squared as the function in the original function performs, and then '5' would
      * be subtracted from the squared result.
+     * the provided function argument
      * @memberOf dataStructures.list_core
      * @instance
      * @function dimap
@@ -405,6 +407,16 @@ var list_core = {
         return createList(this, list_util._iteratorWrapper(iterators.groupJoin(this, ys, xSelector, ySelector, projector, createGroupedListDelegate, comparer)));
     },
 
+    /**
+     * @signature
+     * @description Returns the first item in the list
+     * @memberOf dataStructures.list_core
+     * @instance
+     * @this dataStructures.list_core
+     * @return {*} - Returns the first item in the list
+     *
+     * @example List([1, 2, 3, 4]).head()   => 1
+     */
     head: function _head() {
         return this.take(1);
     },
@@ -777,7 +789,11 @@ var list_core = {
 
     /**
      * @signature (a -> Boolean) -> [a] -> Boolean
-     * @description d
+     * @description Accepts a predicate function and returns a boolean indicating
+     * if all elements in the list passed the predicate. In order for this function
+     * to have a value of 'true', all elements must pass through the predicate function
+     * with a value of 'true'. If any elements returns 'false', the result of List#all
+     * will be false.
      * @memberOf dataStructures.list_core
      * @instance
      * @function all
@@ -787,6 +803,7 @@ var list_core = {
      *
      * @example
      * List([1, 2, 3, 4, 5]).all(x => 2 < x)    => false
+     * List([1, 1, 1]).all(x => 1 === x)    => true
      */
     all: function _all(predicate = defaultPredicate) {
         return list_util.all(this, predicate);
@@ -794,7 +811,11 @@ var list_core = {
 
     /**
      * @signature: (a -> Boolean) -> [a] -> Boolean
-     * @description d
+     * @description Accepts a predicate function and returns a boolean indicating
+     * if any of the elements in the list passed the predicate. In order for this
+     * function to have a vlaue of 'true', at least one element must pass through
+     * the predicate function with a value of 'true'. Only if all the elements
+     * return 'false' will the result of List#any be false.
      * @memberOf dataStructures.list_core
      * @instance
      * @function any
@@ -806,14 +827,19 @@ var list_core = {
      * List([1, 2, 3, 4, 5]).any(x => 2 < x)    => true
      *
      * List([1]).any()  => true
+     *
+     * List([5, 6, 7, 8, 9]).any(x => 3 > x)    => false
      */
     any: function _any(predicate = defaultPredicate) {
         return list_util.any(this, predicate);
     },
 
     /**
-     * @signature
-     * @description d
+     * @signature () -> Number
+     * @description Returns the number of elements contained in the list. This function
+     * takes an optional predicate function that will count the number of elements in the
+     * list that passed the predicate function. If no predicate is supplied, List#count
+     * will return the total number of elements in the list.
      * @memberOf dataStructures.list_core
      * @instance
      * @function count
@@ -823,6 +849,8 @@ var list_core = {
      *
      * @example
      * List([1, 2, 3, 4, 5]).count()    => 5
+     *
+     * List([1, 2, 3, 4, 5]).count(x => 3 === x)    => 1
      */
     count: function _count(predicate) {
         return list_util.count(this, predicate);
