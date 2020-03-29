@@ -109,7 +109,7 @@ describe('List functor test', function _testListFunctor() {
                 .data.should.eql([0, 1, 2, 3, 4, 5]);
         });
 
-        it('should return correct response when checking if a type is an Identity', function _testListIs() {
+        it('should return correct response when checking if a type delegates to List', function _testListIs() {
             var l = List(2),
                 m = monads.Maybe(2),
                 c = monads.Constant(null),
@@ -158,6 +158,37 @@ describe('List functor test', function _testListFunctor() {
             res.should.have.lengthOf(1);
             res[0].should.be.true;
             extensionSpy.should.have.been.calledOnce;
+        });
+
+        it('should allow multiple arguments to be passed to an extension function', function _work() {
+            function extension(xs, arg1, arg2, arg3) {
+                return function *_extension() {
+                    for (let item of xs) yield item;
+                    yield arg1 + arg2 + arg3;
+                };
+            }
+
+            var extensionSpy = sinon.spy(extension);
+            List.extend('work', extensionSpy);
+            var res = List([1, 2, 3]).work(4, 5, 6).data;
+
+            res.should.be.an('array');
+            res.should.have.lengthOf(4);
+            res[res.length - 1].should.eql(15);
+            extensionSpy.should.have.been.calledOnce;
+        });
+
+        it('should work', function _work() {
+            function removeDuplicates(xs, ...args) {
+                var ys = args[0];
+                return function *_removeDuplicates() {
+                    for (let item of xs.filter(x => ys.all(y => y !== x))) yield item;
+                };
+            }
+
+            List.extend('removeDuplicates', removeDuplicates);
+            var res = List([1, 2, 3, 4, 5, 6, 7, 8, 9, 0]).removeDuplicates(List([1, 3, 5, 7, 9])).data;
+            res.should.eql([2,4,6,8,0]);
         });
     });
 
@@ -245,21 +276,8 @@ describe('List functor test', function _testListFunctor() {
             c4.toString().should.eql('List(5)');
         });
 
-        it('should print a locale specific version of the underlying data when .toLocaleString() is invoked', function _testListToLocaleString() {
-            var c1 = List(1),
-                c2 = List(null),
-                c3 = List([1, 2, 3]),
-                c4 = List(List(List(5)));
-
-            c1.toLocaleString().should.eql('1');
-            c2.toLocaleString().should.eql('');
-            c3.toLocaleString().should.eql('1,2,3');
-            c4.toLocaleString().should.eql('5');
-        });
-
         it('should print the List\'s \'class\' when Object.toString is invoked on the list', function _testObjectToString() {
-            Object.prototype.toString.call(List([1, 2, 3, 4, 5]))
-                .should.eql('[object List]');
+            Object.prototype.toString.call(List([1, 2, 3, 4, 5])).should.eql('[object List]');
         });
 
         it('should return a json stringified version of the underlying data', function _testToJSON() {
@@ -872,7 +890,7 @@ describe('List functor test', function _testListFunctor() {
 
             it('should return a boolean indicating if two lists are equivalent', function _testEqual() {
                 List([1, 2, 3, 4, 5])
-                    .equals(List([1, 2, 3, 4, 5], (x, y) => x === y))
+                    .equals(List([1, 2, 3, 4, 5]), (x, y) => x === y)
                     .should.be.true;
             });
 
@@ -1140,6 +1158,7 @@ describe('List functor test', function _testListFunctor() {
                     list2 = list2.concat(item);
                 }
 
+                list2.data; //force another evaluation here if 'evaluatedData' hadn't been set in the above evaluation
                 predSpy.callCount.should.eql(54);
             });
 

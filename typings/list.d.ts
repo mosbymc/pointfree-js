@@ -65,7 +65,7 @@ interface list<T> extends IMonad<T> {
     contains(val: any, comparer: (x: T, y: any) => boolean): boolean;
     count(): number;
     count(predicate: (x: T) => boolean): number;
-    equals(f: list, comparer: (x: T, y: any) => boolean): boolean;
+    equals(f: list<T>, comparer: (x: T, y: any) => boolean): boolean;
     findIndex(comparer: (x: T) => boolean): number;
     findLastIndex(comparer: (x: T) => boolean): number;
     first(): T;
@@ -98,7 +98,7 @@ interface list<T> extends IMonad<T> {
 
 interface ordered_list<T> extends IMonad<T> {
     apply(l: list<(arg: T) => any>): list<any>;
-    chain(fn: (x: T) => list): list<T>;
+    chain(fn: (x: T) => list<any>): list<T>;
     concat(ys: Iterable): list<any>;
     concatAll(...ys: Array<Iterable>): list<any>;
     contramap(fn: (x: T) => any): list<T>;
@@ -142,7 +142,7 @@ interface ordered_list<T> extends IMonad<T> {
     slice(start: number, end: number): list<T>;
     thenBy(): ordered_list<T>;
     thenBy(keySelector: (x: T) => any): ordered_list<T>;
-    thenBy(keySelector: (x: T) => any, comparer: (x: any, y: any) => boolean): ordered_list<T>;
+    thenBy(keySelector: (x: T) => any, comparer: (x: any, y: any, z: number) => boolean): ordered_list<T>;
     thenByDescending(): ordered_list<T>;
     thenByDescending(keySelector: (x: T) => any): ordered_list<T>;
     thenByDescending(keySelector: (x: T) => any, comparer: (x: any, y: any) => boolean): ordered_list<T>;
@@ -163,7 +163,7 @@ interface ordered_list<T> extends IMonad<T> {
     contains(val: any, comparer: (x: T, y: any) => boolean): boolean;
     count(): number;
     count(predicate: (x: T) => boolean): number;
-    equals(f: list, comparer: (x: T, y: any) => boolean): boolean;
+    equals(f: list<any>, comparer: (x: T, y: any) => boolean): boolean;
     findIndex(comparer: (x: T) => boolean): number;
     findLastIndex(comparer: (x: T) => boolean): number;
     first(): T;
@@ -182,14 +182,14 @@ interface ordered_list<T> extends IMonad<T> {
     toArray(): Array<T>;
     toEvaluatedList(): list<T>;
     toMap(): Map;
-    toMap(fn: (item: T, idx: number) => Array<any, any>): Map<T>;
+    toMap(fn: (item: T, idx: number) => Array<T>): Map<T>;
     toSet(): Set;
     toString(): string;
     toLocaleString(): string;
     toJSON(): string;
     set(idx: number, val: any): list<T>;
     get(idx: number): any;
-    factory: List;
+    factory: List<T>;
     data: Array<T>;
     extract: Array<T>;
 }
@@ -199,9 +199,9 @@ interface List<T> {
     from(...source: Array<T>): list<T>;
     ordered(source: Iterable, selector: (x: T) => T): list<T>;
     ordered(source: Iterable, selector: (x: T) => T, comparer: (x: T, y: T) => boolean): ordered_list<T>;
-    empty(): ordered_list;
+    empty(): ordered_list<T>;
     just(val: T): ordered_list<T>;
-    unfold(fn: (val: any) => { next: any, value: any, done: boolean }, seed: any): list;
+    unfold(fn: (val: any) => { next: any, value: any, done: boolean }, seed: any): list<T>;
     is(x: any): boolean;
     repeat(item: T, count: number): list<T>;
     extend(prop: string, fn: (...x: Array<any>) => () => any): void;

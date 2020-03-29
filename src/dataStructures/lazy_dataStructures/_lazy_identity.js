@@ -96,7 +96,7 @@ var next = fn => Object.create(lazy_identity, {
  * @property {function} map - maps a single function over the underlying value of the monad
  * @property {function} chain - returns a new identity monad
  * @property {function} mjoin - returns a new identity monad
- * @property {function} monad_apply - returns a new instance of whatever monad type's underlying value this
+ * @property {function} apply - returns a new instance of whatever monad type's underlying value this
  * identity's underlying function value should be mapped over.
  * @property {function} bimap - returns a new identity monad
  * @property {function} fold - Applies a function to the identity's underlying value and returns the result

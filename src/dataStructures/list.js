@@ -41,13 +41,12 @@ var bitMaskMaxListValue = createBitMask(true, true, false);
  * @property {function} prepend - Accepts one iterable and returns a new list with the contents prepended to the current lists's contents
  * @property {function} prependAll - Behaves like list#prepend but accepts one or more iterables
  * @property {function} reverse - Returns a new list with the contents in reverse order
- * @property {function} sequence
  * @property {function} skip - Returns a new list with the first 'n' items removed; 'n' defaults to zero
  * @property {function} skipWhile - Accepts a boolean returning function and returns a new list with all elements removed up until the first element that returns 'true'
  * @property {function} take - Returns a new list with the last 'n' items removed; 'n' defaults to zero
  * @property {function} takeWhile - Accepts a boolean returning function and returns a new list with all elements up until the first element that returns 'false'
  * @property {function} union - Accepts an iterable and a comparer function and returns a new list that contains all distinct elements between the two
- * @property {function} zip
+ * @property {function} zip - Applies a specified function to the corresponding elements of two sequences, producing a sequence of the results
  * @property {function} all - Accepts a boolean-returning function and returns a boolean after applying the function to all elements that indicates if all the elements returned 'true'
  * @property {function} any - Accepts a boolean-returning function and returns a boolean after applying the function to all elements that indicates if any of the elements returned 'true'
  * @property {function} count - Returns an integer is equal to the number of elements in the list
@@ -117,7 +116,7 @@ var list_core = {
      * @instance
      * @function apply
      * @this dataStructures.list_core
-     * @param {dataStructures.list_core} l - a
+     * @param {Proxy.<dataStructures.list_core>|dataStructures.list_core|dataStructures.list|dataStructures.ordered_list} l - a
      * @return {Proxy.<dataStructures.list_core>|dataStructures.list_core|dataStructures.list|dataStructures.ordered_list} - b
      *
      * @example
@@ -769,12 +768,11 @@ var list_core = {
 
     /**
      * @signature
-     * @description Produces a List of the items in the queryable object and the List passed as
-     * a function argument. A comparer function may be provided to the function that determines
-     * the equality/inequality of the items in each List; if left undefined, the
-     * function will use a default equality comparer. This function is a deferred
-     * execution call that returns a new queryable object delegator instance that
-     * contains all the requisite information on how to perform the operation.
+     * @description The method merges each element of the first sequence with an element that has
+     * the same index in the second sequence. If the sequences do not have the same number of elements,
+     * the method merges sequences until it reaches the end of one of them. For example, if one
+     * sequence has three elements and the other one has four, the result sequence will have only
+     * three elements.
      * @memberOf dataStructures.list_core
      * @instance
      * @function zip
@@ -813,7 +811,7 @@ var list_core = {
      * @signature: (a -> Boolean) -> [a] -> Boolean
      * @description Accepts a predicate function and returns a boolean indicating
      * if any of the elements in the list passed the predicate. In order for this
-     * function to have a vlaue of 'true', at least one element must pass through
+     * function to have a value of 'true', at least one element must pass through
      * the predicate function with a value of 'true'. Only if all the elements
      * return 'false' will the result of List#any be false.
      * @memberOf dataStructures.list_core
@@ -1236,10 +1234,6 @@ var list_core = {
         return `List(${this.value})`;
     },
 
-    toLocaleString: function _toLocaleString() {
-        return this.toArray().toLocaleString();
-    },
-
     toJSON: function _toJSON() {
         return this.data;
     },
@@ -1417,9 +1411,8 @@ list_core.bind = list_core.chain;
  * @memberOf dataStructures.list_core
  * @instance
  * @function every
- * @type {dataStructures.list_core.all}
  * @this dataStructures.list_core
- * @param {function} predicate - a
+ * @param {function} [predicate] - a
  * @return {boolean} - b
  */
 list_core.every = list_core.all;
@@ -1429,10 +1422,9 @@ list_core.every = list_core.all;
  * @description Alias for {@link dataStructures.list_core#any}
  * @memberOf dataStructures.list_core
  * @instance
- * @function every
- * @type {dataStructures.list_core.any}
+ * @function some
  * @this dataStructures.list_core
- * @param {function} predicate - a
+ * @param {function} [predicate] - a
  * @return {boolean} - b
  */
 list_core.some = list_core.any;
@@ -1615,9 +1607,7 @@ var listFromGen = source => createList(invoke(source));
  * and, if it has an iterator defined, with set it as the underlying source of the List as is,
  * or, wrap the item in an array if there is no defined iterator. The returned list object may
  * be treated like an array in terms of retrieving an element at a specified index. Note however,
- * that attempting to set a value via index location will not work.
- *
- * @example List([1, 2, 3, 4, 5])[2]    // => 3
+ * that attempting to set a value via index location will not work.-i
  *
  * @namespace List
  * @memberOf dataStructures
@@ -1791,15 +1781,17 @@ List.repeat = function _repeat(item, count) {
  * must be unique, cannot override an existing property.
  * @param {function} fn - A function that defines the new List functionality and
  * will be called when this new List property is invoked.
- * @return {List} Returns the List factory function after applying the new functionality to the
+ * @return {dataStructures.List} Returns the List factory function after applying the new functionality to the
  * list data structure.
  *
- * @description The fn parameter must be a non-generator function that takes one or more
- * arguments and returns a generator function. The first and only required argument that
- * the wrapper function must accept is the list on which it will be operating. Any
- * additional arguments supplied when invoking the new functionality on the list will
- * be passed straight through in the order they were received by the list.
- *
+ * @description An extension function that allows new functionality to be applied to
+ * the list data structure. The 'fn' parameter must be a non-generator function that
+ * takes one or more arguments and returns a generator function. The first and only
+ * required argument that the wrapper function must accept is the list on which it
+ * will be operating. Any additional arguments supplied when invoking the new
+ * functionality on the list will be passed straight through in the order they were
+ * received by the list.
+ * <br><br>
  * The returned generator will be set as the newly created list's iterator, just like the
  * other built-in deferred functions. When iterating the returned generator, no arguments
  * will be passed, so the wrapping function must provide a closure over all needed arguments
@@ -1807,23 +1799,26 @@ List.repeat = function _repeat(item, count) {
  * generator to determine what to do with the data present. The generator should not assume
  * that the List argument provided will be any specific type of iterable as a List can use
  * many different iterable sources like a generator, array, map, set, or another list.
- *
+ * <br><br>
  * If each item can be operated on individually within the generator, a for-of loop is
  * the preferred method of handling this operation. However, if the generator needs all
  * the List's element's up front (like sortBy and groupBy), then the generator will need
  * to force an evaluation in order to have all the data first. Array.from generally works
  * well.
- *
+ * <br><br>
  * However the data is retrieved, it should always be yielded out individually. If the data
  * is grouped when yielding, any other generator's in the chain of operations that are waiting
  * to execute will assume that each grouping is a single data point.
  *
  * @example
- * //Outer function that accepts all arguments necessary for iteration and operation
+ * //Extension function that accepts the list as its only argument
+ *
+ * //Outer function that accepts all arguments necessary for iteration and operation and
+ * //returns a generator
  * function takeOddIndices(xs) {
  *      //returns a generator function to be used as the new List's iterator when the new
  *     //'takeOdd' function of the List is invoked as seen below
- *      return function *_takeOddIndices(xs) {
+ *      return function *_takeOddIndices() {
  *          let idx = 0;
  *          for (let x of xs) {
  *              if (!(idx % 2)) yield x;
@@ -1833,8 +1828,21 @@ List.repeat = function _repeat(item, count) {
  * }
  *
  * List.extend('takeOdd', takeOddIndices)
- *
  * List([1, 2, 3, 4, 5, 6, 7, 8, 9, 10]).takeOdd()   => List(1, 3, 5, 7, 9)
+ *
+ *
+ * @example
+ * //Extension function that accepts arguments besides the list itself
+ * function removeDuplicates(xs, ...args) {
+ *      var ys = args[0];
+ *      //returns a generator that the list will use to iterator each item
+ *      return function _removeDuplicates() {
+ *          for (let item of xs.filter(x => ys.all(y => y !== x))) yield item;
+ *      }
+ * }
+ *  *
+ * List.extend('removeDuplicates', removeDuplicates);
+ * List([1, 2, 3, 4, 5, 6, 7, 8, 9, 0]).removeDuplicates(List([1, 3, 5, 7, 9]))     => List(2, 4, 6, 8, 0)
  */
 List.extend = function _extend(prop, fn) {
     if (![list, ordered_list].some(type => prop in type)) {
@@ -1842,7 +1850,7 @@ List.extend = function _extend(prop, fn) {
             return createList(this, list_util._iteratorWrapper(fn(this, ...args)));
         };
     }
-    return List;
+    return this;
 };
 
 function createGroupedListDelegate(source, key) {
@@ -1863,7 +1871,7 @@ function createGroupedListDelegate(source, key) {
  * is created, setting the iterator for the object instance as the provided iterator, the
  * ._appliedSorts field as the sortObj argument, and the ._key field as the 'key' parameter's
  * value.
- *
+ * <br><br>
  * The switch case inside the function only handles a subset of the possible bit flag values.
  * Technically there could be as many as eight different scenarios to check, not including the
  * default case. However, in practice, the only values received from the 'createBitMask' function

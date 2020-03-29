@@ -24,12 +24,11 @@ var toArray = ifElse(delegatesFrom(generatorProto), arrayFromGenerator, asArray)
 /**
  * @signature
  * @description d
- * @param {Array|generator|dataStructures.list_core} xs - a
+ * @param {array|generator|dataStructures.list_core} xs - a
  * @param {function} [predicate] - b
  * @return {boolean} - c
  */
 function all(xs, predicate) {
-    xs = asArray(xs);
     return strictEquals(javaScriptTypes.Function, type(predicate)) && toArray(xs).every(predicate);
 }
 
@@ -112,10 +111,7 @@ function equals(xs, ys, comparer = strictEquals) {
     var x_s = xs.data,
         y_s = ys.data;
 
-    return x_s.length === y_s.length &&
-        x_s.every(function _checkEquality(x, idx) {
-            return comparer(x, y_s[idx]);
-        });
+    return x_s.length === y_s.length && x_s.every((x, idx) => comparer(x, y_s[idx]));
 }
 
 /**
@@ -205,9 +201,7 @@ function _iteratorWrapper(it) {
  * @return {*} - c
  */
 function last(xs, predicate) {
-    if (strictEquals(javaScriptTypes.Function, type(predicate)))
-        return asArray(xs).filter(predicate).slice(-1)[0];
-    return asArray(xs).slice(-1)[0];
+    return strictEquals(javaScriptTypes.Function, type(predicate)) ? asArray(xs).filter(predicate).slice(-1)[0] : asArray(xs).slice(-1)[0];
 }
 
 var listProxyHandler = {
