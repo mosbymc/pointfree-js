@@ -13,7 +13,7 @@
 
 A JavaScript library that brings together algebraic data structures, combinators, decorators, lenses, transducers, and more into a single environment.
 
-This is a work in progress and is not yet ready for production use.
+This is a work in progress and is meant more as a learning tool for myself than anything else.
 
 Currently in progress:
 - lazify existing data structures
