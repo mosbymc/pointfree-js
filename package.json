@@ -116,7 +116,7 @@
     "del-cli": "^1.1.0",
     "docdash": "^0.4.0",
     "eslint": "^4.19.1",
-    "express": "^4.16.3",
+    "express": "^4.17.3",
     "google-closure-compiler-js": "^20180101.0.0",
     "gulp": "^3.9.1",
     "gulp-babel": "^7.0.1",
